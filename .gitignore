@@ -1,0 +1,53 @@
+# Eclipse IDE
+.project
+.classpath
+org.eclipse.core.resources.prefs
+
+# Maven
+target/
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+git.properties
+release.properties
+dependency-reduced-pom.xml
+
+# Javascript Temporary Files
+npm-debug.log
+.cake_task_cache
+public/
+node_modules/
+dist/
+components/
+.sass-cache/
+.tmp/
+unit.xml
+e2e.xml
+
+# Java Temporary files
+reports/
+build/
+.pmd
+dist_*/
+mem.h2.db
+mem.lock.db
+mem.trace.db
+logs/
+
+# *nix temporary files
+*~
+*.swp
+
+# Mac metadata
+.DS_Store
+
+# Kaleidoscope
+*.orig
+
+# Python
+*.pyc
+
+# Keys
+*.pem
+
+# Vagrant
+.vagrant/
