@@ -26,6 +26,7 @@ e2e.xml
 # Java Temporary files
 reports/
 build/
+.gradle
 .pmd
 dist_*/
 mem.h2.db
