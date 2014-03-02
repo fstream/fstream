@@ -14,14 +14,20 @@ Install [gradle](http://www.gradle.org/download). On Mac, you can use [brew](htt
 
 	brew install gradle
 	
-Install [Gradle IDE](https://github.com/spring-projects/eclipse-integration-gradle/)
+Install [Gradle IDE](https://github.com/spring-projects/eclipse-integration-gradle/):
 
-Import Gradle project in Eclipse  
+	https://github.com/spring-projects/eclipse-integration-gradle/
+
+Import Gradle project in Eclipse:
+
+	https://github.com/spring-projects/eclipse-integration-gradle/wiki/Gradle-Import-Wizard
 
 Patch Eclipse to use Lombok:
 
+```bash
 	wget http://projectlombok.googlecode.com/files/lombok.jar
 	java -jar lombok.jar
+```	
 
 Build
 ---
