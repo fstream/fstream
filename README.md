@@ -25,8 +25,8 @@ Import Gradle project in Eclipse:
 Patch Eclipse to use Lombok:
 
 ```bash
-	wget http://projectlombok.googlecode.com/files/lombok.jar
-	java -jar lombok.jar
+wget http://projectlombok.googlecode.com/files/lombok.jar
+java -jar lombok.jar
 ```	
 
 Build
@@ -35,5 +35,5 @@ Build
 To build from the command line:
 
 	cd fstream
-	gradle build
+	gradle
 
