@@ -6,12 +6,13 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
-package io.fstream.core;
+package io.fstream.web;
 
-public class Main {
-	
-	public static void main(String... args) {
+import lombok.Value;
 
-	}
-	
+// Look at the outline to the right and behold!
+@Value
+public class Data {
+
+	int field;
 }
