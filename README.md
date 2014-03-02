@@ -18,11 +18,11 @@ Install [Gradle IDE](https://github.com/spring-projects/eclipse-integration-grad
 
 	https://github.com/spring-projects/eclipse-integration-gradle/
 
-Import Gradle project in Eclipse:
+Import Gradle IDE project in Eclipse:
 
 	https://github.com/spring-projects/eclipse-integration-gradle/wiki/Gradle-Import-Wizard
 
-Patch Eclipse to use Lombok:
+Patch Eclipse to use [Lombok](http://projectlombok.org/):
 
 ```bash
 wget http://projectlombok.googlecode.com/files/lombok.jar
