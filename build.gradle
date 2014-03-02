@@ -17,7 +17,7 @@ subprojects {
 	apply plugin: 'eclipse'
 
 	sourceCompatibility = JavaVersion.VERSION_1_6
-	targetCompatibility = JavaVersion.VERSION_1_6
+	targetCompatibility = project.sourceCompatibility
 
 	repositories { mavenCentral() }
 
@@ -29,7 +29,7 @@ subprojects {
 
 	jar {
 		manifest {
-			attributes 'provider': 'gradle', 'Implementation-Title': 'md', 'Implementation-Version': version
+			attributes 'Provider': 'gradle', 'Implementation-Title': project.name, 'Implementation-Version': project.version
 		}
 	}
 }
