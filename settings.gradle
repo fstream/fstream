@@ -8,5 +8,3 @@
  */
 
 include 'fstream-core', 'fstream-web'
-
-rootProject.name = 'fstream'

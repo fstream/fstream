@@ -6,3 +6,8 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
+
+dependencies {
+	compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.quickfix:1.5.3_1'
+}
+
