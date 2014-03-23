@@ -24,6 +24,9 @@ subprojects {
 	dependencies {
 		compile 'com.google.guava:guava:16.0.1'
 		compile 'org.projectlombok:lombok:1.12.4'
+		compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.quickfix:1.5.3_1'
+		compile 'org.slf4j:slf4j-simple:1.6.1'
+		compile 'org.apache.mina:mina-core:1.1.0'
 		testCompile 'junit:junit:4.11'
 	}
 
