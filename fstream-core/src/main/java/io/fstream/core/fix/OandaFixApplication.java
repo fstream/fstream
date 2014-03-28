@@ -57,16 +57,16 @@ public class OandaFixApplication extends MessageCracker implements Application {
 
 	@Override
 	public void toAdmin(Message message, SessionID sessionId) {
+		// See http://www.quickfixj.org/confluence/display/qfj/User+FAQ
 		log.info("Inside toAdmin");
 		MsgType msgType = new MsgType();
 		try {
 			StringField type = message.getHeader().getField(msgType);
 			if (type.valueEquals(MsgType.LOGON)) {
-                message.setField(new Password("Password"));
+                message.setField(new Password(TestQuickFixJConnectivity.FIX_PASSWORD));
 				message.setField(new ResetSeqNumFlag(true));
 			}
 		} catch (FieldNotFound e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
