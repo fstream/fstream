@@ -23,8 +23,8 @@
     </encoder>
   </appender>
   
-  <logger name="quickfix" level="TRACE"/>
-  <logger name="quickfixj.event" level="DEBUG"/>
+  <logger name="quickfix" level="INFO"/>
+  <logger name="quickfixj.event" level="INFO"/>
 
   <root level="TRACE">
     <appender-ref ref="STDOUT" />

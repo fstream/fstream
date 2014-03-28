@@ -18,42 +18,42 @@ import quickfix.SessionSettings;
 import quickfix.SocketInitiator;
 
 @Slf4j
-public class TestQuickFixJConnectivity {
+public class Main {
 
-	/**
-	 * Config.
-	 * <p>
-	 * Set on the command line / launcher using
-	 * {@code -Dfix.username=xxx -Dfix.password=yyy}
-	 */
-	public static final String FIX_USERNAME = System.getProperty("fix.username");
-	public static final String FIX_PASSWORD = System.getProperty("fix.password");
-	public static final String FIX_CONFIG_FILE = "quickfix-mina.cfg";
+  /**
+   * Config.
+   * <p>
+   * Set on the command line / launcher using {@code -Dfix.username=xxx -Dfix.password=yyy}
+   */
+  public static final String FIX_USERNAME = System.getProperty("fix.username");
+  public static final String FIX_PASSWORD = System.getProperty("fix.password");
+  public static final String FIX_CONFIG_FILE = "quickfix-mina.cfg";
 
-	public static void main(String... args) {
-		SocketInitiator socketInitiator = null;
-		try {
-			socketInitiator = createSocketInitiator();
-			socketInitiator.start();
-			socketInitiator.block();
-		} catch (Throwable t) {
-			log.error("Exception:", t);
-		} finally {
-			if (socketInitiator != null) {
-				socketInitiator.stop(true);
-			}
-		}
-	}
+  public static void main(String... args) {
+    SocketInitiator socketInitiator = null;
+    try {
+      socketInitiator = createSocketInitiator();
+      socketInitiator.start();
 
-	private static SocketInitiator createSocketInitiator() throws ConfigError {
-		val application = new OandaFixApplication();
-		val sessionSettings = new SessionSettings(FIX_CONFIG_FILE);
-		val fileStoreFactory = new FileStoreFactory(sessionSettings);
-		val logFactory = new SLF4JLogFactory(sessionSettings);
-		val messageFactory = new DefaultMessageFactory();
+      // Press enter to stop application
+      System.in.read();
+    } catch (Throwable t) {
+      log.error("Exception:", t);
+    } finally {
+      if (socketInitiator != null) {
+        socketInitiator.stop(true);
+      }
+    }
+  }
 
-		return new SocketInitiator(application, fileStoreFactory,
-				sessionSettings, logFactory, messageFactory);
-	}
+  private static SocketInitiator createSocketInitiator() throws ConfigError {
+    val application = new OandaFixApplication();
+    val sessionSettings = new SessionSettings(FIX_CONFIG_FILE);
+    val fileStoreFactory = new FileStoreFactory(sessionSettings);
+    val logFactory = new SLF4JLogFactory(sessionSettings);
+    val messageFactory = new DefaultMessageFactory();
+
+    return new SocketInitiator(application, fileStoreFactory, sessionSettings, logFactory, messageFactory);
+  }
 
 }

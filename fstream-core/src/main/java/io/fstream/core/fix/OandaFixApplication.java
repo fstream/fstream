@@ -8,6 +8,11 @@
  */
 package io.fstream.core.fix;
 
+import static io.fstream.core.fix.Main.FIX_PASSWORD;
+import static quickfix.field.MsgType.FIELD;
+import static quickfix.field.MsgType.LOGON;
+import lombok.SneakyThrows;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import quickfix.Application;
 import quickfix.DoNotSend;
@@ -18,9 +23,9 @@ import quickfix.Message;
 import quickfix.MessageCracker;
 import quickfix.RejectLogon;
 import quickfix.SessionID;
-import quickfix.StringField;
 import quickfix.UnsupportedMessageType;
-import quickfix.field.*;
+import quickfix.field.Password;
+import quickfix.field.ResetSeqNumFlag;
 import quickfix.fix44.Logon;
 import quickfix.fix44.NewOrderSingle;
 import quickfix.fix44.SecurityDefinition;
@@ -28,70 +33,66 @@ import quickfix.fix44.SecurityDefinition;
 @Slf4j
 public class OandaFixApplication extends MessageCracker implements Application {
 
-	@Override
-	public void fromAdmin(Message arg0, SessionID arg1) throws FieldNotFound,
-			IncorrectDataFormat, IncorrectTagValue, RejectLogon {
-		log.info("Successfully called fromAdmin for sessionId: {}", arg0);
-	}
+  @Override
+  @SneakyThrows
+  public void toAdmin(Message message, SessionID sessionId) {
+    // See http://www.quickfixj.org/confluence/display/qfj/User+FAQ
+    log.info("toAdmin - message: {}", message);
+    val msgType = message.getHeader().getString(FIELD);
+    if (LOGON.compareTo(msgType) == 0) {
+      message.setField(new Password(FIX_PASSWORD));
+      message.setField(new ResetSeqNumFlag(true));
+    }
+  }
 
-	@Override
-	public void fromApp(Message arg0, SessionID arg1) throws FieldNotFound,
-			IncorrectDataFormat, IncorrectTagValue, UnsupportedMessageType {
-		log.info("Successfully called fromApp for sessionId: {}", arg0);
-	}
+  @Override
+  public void toApp(Message message, SessionID sessionID) throws DoNotSend {
+    log.info("toApp - message: {}", message);
+  }
 
-	@Override
-	public void onCreate(SessionID arg0) {
-		log.info("Successfully called onCreate for sessionId: {}", arg0);
-	}
+  @Override
+  public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
+      IncorrectTagValue, RejectLogon {
+    log.info("fromAdmin - message: {}", message);
+  }
 
-	@Override
-	public void onLogon(SessionID arg0) {
-		log.info("Successfully logged on for sessionId: {}", arg0);
-	}
+  @Override
+  public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
+      IncorrectTagValue, UnsupportedMessageType {
+    log.info("fromApp - message: {}", message);
+  }
 
-	@Override
-	public void onLogout(SessionID arg0) {
-		log.info("Successfully logged out for sessionId : " + arg0);
-	}
+  @Override
+  public void onCreate(SessionID sessionID) {
+    log.info("onCreate - sessionId: {}", sessionID);
+  }
 
-	@Override
-	public void toAdmin(Message message, SessionID sessionId) {
-		// See http://www.quickfixj.org/confluence/display/qfj/User+FAQ
-		log.info("Inside toAdmin");
-		MsgType msgType = new MsgType();
-		try {
-			StringField type = message.getHeader().getField(msgType);
-			if (type.valueEquals(MsgType.LOGON)) {
-                message.setField(new Password(TestQuickFixJConnectivity.FIX_PASSWORD));
-				message.setField(new ResetSeqNumFlag(true));
-			}
-		} catch (FieldNotFound e) {
-			e.printStackTrace();
-		}
-	}
+  @Override
+  public void onLogon(SessionID sessionID) {
+    log.info("onLogon - sessionId: {}", sessionID);
+  }
 
-	@Override
-	public void toApp(Message arg0, SessionID arg1) throws DoNotSend {
-		log.info("Message : {} for sessionid : {}", arg0, arg1);
-	}
+  @Override
+  public void onLogout(SessionID sessionID) {
+    log.info("onLogout - sessionId: {}", sessionID);
+  }
 
-	public void onMessage(NewOrderSingle message, SessionID sessionID)
-			throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
-		log.info("Inside onMessage for New Order Single");
-		super.onMessage(message, sessionID);
-	}
+  public void onMessage(NewOrderSingle newOrderSingle, SessionID sessionID) throws FieldNotFound,
+      UnsupportedMessageType, IncorrectTagValue {
+    log.info("onMessage - newOrderSingle: {}", newOrderSingle);
+    super.onMessage(newOrderSingle, sessionID);
+  }
 
-	public void onMessage(SecurityDefinition message, SessionID sessionID)
-			throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
-		log.info("Inside onMessage for SecurityDefinition");
-		super.onMessage(message, sessionID);
-	}
+  public void onMessage(SecurityDefinition securityDefinition, SessionID sessionID) throws FieldNotFound,
+      UnsupportedMessageType, IncorrectTagValue {
+    log.info("onMessage - securityDefinition: {}", securityDefinition);
+    super.onMessage(securityDefinition, sessionID);
+  }
 
-	public void onMessage(Logon message, SessionID sessionID)
-			throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
-		log.info("Inside Logon Message");
-		super.onMessage(message, sessionID);
-	}
+  public void onMessage(Logon logon, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType,
+      IncorrectTagValue {
+    log.info("onMessage - logon: {}", logon);
+    super.onMessage(logon, sessionID);
+  }
 
 }
