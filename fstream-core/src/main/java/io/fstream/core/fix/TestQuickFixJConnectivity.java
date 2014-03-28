@@ -35,6 +35,7 @@ public class TestQuickFixJConnectivity {
 	 * <p>
 	 * Set on the command line / launcher using {@code -Dfix.username=xxx -Dfix.password=yyy}
 	 */
+
 	private static final String FIX_USERNAME = System.getProperty("fix.username");
 	private static final String FIX_PASSWORD = System.getProperty("fix.password");
 	
@@ -44,10 +45,10 @@ public class TestQuickFixJConnectivity {
             socketInitiator = createSocketInitiator();
             socketInitiator.start();
             
-            Thread.sleep(1000);
+//            Thread.sleep(1000);
             val sessionId = socketInitiator.getSessions().get(0);
             log.info("session id " + sessionId);
-            sendLogonRequest(sessionId);
+//            sendLogonRequest(sessionId);
             
             int i = 0;
             val maxAttempts = 5;
@@ -70,7 +71,7 @@ public class TestQuickFixJConnectivity {
     }
 	private static SocketInitiator createSocketInitiator() throws ConfigError {
 		val application = new OandaFixApplication();
-		val sessionSettings = new SessionSettings("quickfix2.cfg");
+		val sessionSettings = new SessionSettings("quickfixStunnel.cfg");
 		val fileStoreFactory = new FileStoreFactory(sessionSettings);
 		val logFactory = new SLF4JLogFactory(sessionSettings);
 		val messageFactory = new DefaultMessageFactory();
@@ -84,7 +85,7 @@ public class TestQuickFixJConnectivity {
         header.setField(new BeginString("FIX.4.4"));
         logon.setField(new Username(FIX_USERNAME));
         logon.setField(new Password(FIX_PASSWORD));
-        logon.setField(new Account(""));
+//        logon.setField(new Account("5066523"));
         logon.set(new ResetSeqNumFlag(true));
         log.info("logon request: {}", logon.toString());
         

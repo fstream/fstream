@@ -18,7 +18,9 @@ import quickfix.Message;
 import quickfix.MessageCracker;
 import quickfix.RejectLogon;
 import quickfix.SessionID;
+import quickfix.StringField;
 import quickfix.UnsupportedMessageType;
+import quickfix.field.*;
 import quickfix.fix44.Logon;
 import quickfix.fix44.NewOrderSingle;
 import quickfix.fix44.SecurityDefinition;
@@ -56,6 +58,17 @@ public class OandaFixApplication extends MessageCracker implements Application {
 	@Override
 	public void toAdmin(Message message, SessionID sessionId) {
 		log.info("Inside toAdmin");
+		MsgType msgType = new MsgType();
+		try {
+			StringField type = message.getHeader().getField(msgType);
+			if (type.valueEquals(MsgType.LOGON)) {
+                message.setField(new Password("Password"));
+				message.setField(new ResetSeqNumFlag(true));
+			}
+		} catch (FieldNotFound e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
