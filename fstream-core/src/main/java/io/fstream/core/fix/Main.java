@@ -32,10 +32,10 @@ public class Main {
   public static void main(String... args) {
     SocketInitiator socketInitiator = null;
     try {
-      socketInitiator = createSocketInitiator();
+      socketInitiator = newSocketInitiator();
       socketInitiator.start();
 
-      // Press enter to stop application
+      log.info("Press enter to stop application");
       System.in.read();
     } catch (Throwable t) {
       log.error("Exception:", t);
@@ -46,7 +46,7 @@ public class Main {
     }
   }
 
-  private static SocketInitiator createSocketInitiator() throws ConfigError {
+  private static SocketInitiator newSocketInitiator() throws ConfigError {
     val application = new OandaFixApplication();
     val sessionSettings = new SessionSettings(FIX_CONFIG_FILE);
     val fileStoreFactory = new FileStoreFactory(sessionSettings);

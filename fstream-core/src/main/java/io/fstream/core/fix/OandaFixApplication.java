@@ -9,8 +9,11 @@
 package io.fstream.core.fix;
 
 import static io.fstream.core.fix.Main.FIX_PASSWORD;
+import static quickfix.field.MDEntryType.BID;
+import static quickfix.field.MDEntryType.OFFER;
 import static quickfix.field.MsgType.FIELD;
 import static quickfix.field.MsgType.LOGON;
+import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +25,18 @@ import quickfix.IncorrectTagValue;
 import quickfix.Message;
 import quickfix.MessageCracker;
 import quickfix.RejectLogon;
+import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.UnsupportedMessageType;
+import quickfix.field.MDEntryType;
+import quickfix.field.MDReqID;
 import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
-import quickfix.fix44.Logon;
-import quickfix.fix44.NewOrderSingle;
-import quickfix.fix44.SecurityDefinition;
+import quickfix.field.SubscriptionRequestType;
+import quickfix.field.Symbol;
+import quickfix.field.TargetSubID;
+import quickfix.fix44.MarketDataSnapshotFullRefresh;
+import quickfix.fix44.News;
 
 @Slf4j
 public class OandaFixApplication extends MessageCracker implements Application {
@@ -40,6 +48,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("toAdmin - message: {}", message);
     val msgType = message.getHeader().getString(FIELD);
     if (LOGON.compareTo(msgType) == 0) {
+      message.setField(new TargetSubID("RATES"));
       message.setField(new Password(FIX_PASSWORD));
       message.setField(new ResetSeqNumFlag(true));
     }
@@ -51,6 +60,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
   }
 
   @Override
+  @SneakyThrows
   public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, RejectLogon {
     log.info("fromAdmin - message: {}", message);
@@ -60,6 +70,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
   public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, UnsupportedMessageType {
     log.info("fromApp - message: {}", message);
+    crack(message, sessionID);
   }
 
   @Override
@@ -70,6 +81,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
   @Override
   public void onLogon(SessionID sessionID) {
     log.info("onLogon - sessionId: {}", sessionID);
+    register(sessionID);
   }
 
   @Override
@@ -77,22 +89,37 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("onLogout - sessionId: {}", sessionID);
   }
 
-  public void onMessage(NewOrderSingle newOrderSingle, SessionID sessionID) throws FieldNotFound,
+  public void onMessage(News news, SessionID sessionID) throws FieldNotFound,
       UnsupportedMessageType, IncorrectTagValue {
-    log.info("onMessage - newOrderSingle: {}", newOrderSingle);
-    super.onMessage(newOrderSingle, sessionID);
+    log.info("onMessage - news: {}", news);
   }
 
-  public void onMessage(SecurityDefinition securityDefinition, SessionID sessionID) throws FieldNotFound,
-      UnsupportedMessageType, IncorrectTagValue {
-    log.info("onMessage - securityDefinition: {}", securityDefinition);
-    super.onMessage(securityDefinition, sessionID);
+  @SneakyThrows
+  private static void register(SessionID sessionID) {
+    log.info("Registering rates");
+
+    val message = new MarketDataSnapshotFullRefresh();
+    message.set(new MDReqID("MDQeq"));
+    message.setField(new SubscriptionRequestType(SNAPSHOT_PLUS_UPDATES));
+    message.addGroup(newBidGroup());
+    message.addGroup(newOfferGroup());
+    message.setField(new Symbol("EUR/USD"));
+
+    Session.sendToTarget(message, sessionID);
   }
 
-  public void onMessage(Logon logon, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType,
-      IncorrectTagValue {
-    log.info("onMessage - logon: {}", logon);
-    super.onMessage(logon, sessionID);
+  private static MarketDataSnapshotFullRefresh.NoMDEntries newOfferGroup() {
+    val offer = new MarketDataSnapshotFullRefresh.NoMDEntries();
+    offer.set(new MDEntryType(OFFER));
+
+    return offer;
+  }
+
+  private static MarketDataSnapshotFullRefresh.NoMDEntries newBidGroup() {
+    val bid = new MarketDataSnapshotFullRefresh.NoMDEntries();
+    bid.set(new MDEntryType(BID));
+
+    return bid;
   }
 
 }
