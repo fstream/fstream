@@ -29,7 +29,6 @@ import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.UnsupportedMessageType;
 import quickfix.field.MDEntryType;
-import quickfix.field.MDReqID;
 import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
 import quickfix.field.SubscriptionRequestType;
@@ -89,9 +88,14 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("onLogout - sessionId: {}", sessionID);
   }
 
-  public void onMessage(News news, SessionID sessionID) throws FieldNotFound,
-      UnsupportedMessageType, IncorrectTagValue {
+  public void onMessage(News news, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
     log.info("onMessage - news: {}", news);
+  }
+
+  @Override
+  public void onMessage(Message message, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType,
+      IncorrectTagValue {
+    log.info("onMessage - message: {}", message);
   }
 
   @SneakyThrows
@@ -99,7 +103,6 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("Registering rates");
 
     val message = new MarketDataSnapshotFullRefresh();
-    message.set(new MDReqID("MDQeq"));
     message.setField(new SubscriptionRequestType(SNAPSHOT_PLUS_UPDATES));
     message.addGroup(newBidGroup());
     message.addGroup(newOfferGroup());
