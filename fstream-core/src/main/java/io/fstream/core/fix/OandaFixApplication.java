@@ -40,6 +40,13 @@ import quickfix.fix44.News;
 @Slf4j
 public class OandaFixApplication extends MessageCracker implements Application {
 
+  /**
+   * Required for rates.
+   * <p>
+   * @see https://github.com/oanda/fixapidocs/blob/master/oanda-fix-api-msgflow.rst#market-data-connections
+   */
+  private static final String RATES_SUB_ID = "RATES";
+
   @Override
   @SneakyThrows
   public void toAdmin(Message message, SessionID sessionId) {
@@ -47,7 +54,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("toAdmin - message: {}", message);
     val msgType = message.getHeader().getString(FIELD);
     if (LOGON.compareTo(msgType) == 0) {
-      message.setField(new TargetSubID("RATES"));
+      message.setField(new TargetSubID(RATES_SUB_ID));
       message.setField(new Password(FIX_PASSWORD));
       message.setField(new ResetSeqNumFlag(true));
     }
@@ -62,7 +69,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
   @SneakyThrows
   public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, RejectLogon {
-    log.info("fromAdmin - message: {}", message);
+    log.info("fromAdmin - message: {}", message.toXML());
   }
 
   @Override
@@ -103,6 +110,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("Registering rates");
 
     val message = new MarketDataSnapshotFullRefresh();
+    message.setField(new TargetSubID(RATES_SUB_ID));
     message.setField(new SubscriptionRequestType(SNAPSHOT_PLUS_UPDATES));
     message.addGroup(newBidGroup());
     message.addGroup(newOfferGroup());
