@@ -51,9 +51,9 @@ public class OandaFixApplication extends MessageCracker implements Application {
 
   @Override
   @SneakyThrows
-  public void toAdmin(Message message, SessionID sessionId) {
+  public void toAdmin(Message message, SessionID sessionID) {
     // See http://www.quickfixj.org/confluence/display/qfj/User+FAQ
-    log.info("toAdmin - message: {}", message);
+    log.info("toAdmin - message: {}", formatMessage(message, sessionID));
     val msgType = message.getHeader().getString(FIELD);
     if (LOGON.compareTo(msgType) == 0) {
       message.setField(new TargetSubID(RATES_SUB_ID));
@@ -64,20 +64,20 @@ public class OandaFixApplication extends MessageCracker implements Application {
 
   @Override
   public void toApp(Message message, SessionID sessionID) throws DoNotSend {
-    log.info("toApp - message: {}", message);
+    log.info("toApp - message: {}", formatMessage(message, sessionID));
   }
 
   @Override
   @SneakyThrows
   public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, RejectLogon {
-    log.info("fromAdmin - message: {}", message.toXML());
+    log.info("fromAdmin - message: {}", formatMessage(message, sessionID));
   }
 
   @Override
   public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, UnsupportedMessageType {
-    log.info("fromApp - message: {}", message);
+    log.info("fromApp - message: {}", formatMessage(message, sessionID));
     crack(message, sessionID);
   }
 
@@ -98,13 +98,13 @@ public class OandaFixApplication extends MessageCracker implements Application {
   }
 
   public void onMessage(News news, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
-    log.info("onMessage - news: {}", news);
+    log.info("onMessage - news: {}", formatMessage(news, sessionID));
   }
 
   @Override
   public void onMessage(Message message, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType,
       IncorrectTagValue {
-    log.info("onMessage - message: {}", message);
+    log.info("onMessage - message: {}", formatMessage(message, sessionID));
   }
 
   @SneakyThrows
@@ -119,7 +119,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
     header.setField(new NoRelatedSym(1));
     header.setField(new Symbol("EUR/USD"));
 
-    log.info("Registering rates: {}", message.toXML());
+    log.info("Registering rates: {}", formatMessage(message, sessionID));
     Session.sendToTarget(message, sessionID);
   }
 
@@ -137,6 +137,13 @@ public class OandaFixApplication extends MessageCracker implements Application {
     bid.set(new MDEntryType(BID));
 
     return bid;
+  }
+
+  private static String formatMessage(Message message, SessionID sessionID) {
+    val session = Session.lookupSession(sessionID);
+    val dataDictionary = session.getDataDictionary();
+
+    return message.toXML(dataDictionary);
   }
 
 }
