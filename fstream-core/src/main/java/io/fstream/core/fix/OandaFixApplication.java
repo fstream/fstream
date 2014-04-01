@@ -29,6 +29,8 @@ import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.UnsupportedMessageType;
 import quickfix.field.MDEntryType;
+import quickfix.field.NoMDEntryTypes;
+import quickfix.field.NoRelatedSym;
 import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
 import quickfix.field.SubscriptionRequestType;
@@ -107,18 +109,21 @@ public class OandaFixApplication extends MessageCracker implements Application {
 
   @SneakyThrows
   private static void register(SessionID sessionID) {
-    log.info("Registering rates");
-
     val message = new MarketDataSnapshotFullRefresh();
-    message.setField(new TargetSubID(RATES_SUB_ID));
-    message.setField(new SubscriptionRequestType(SNAPSHOT_PLUS_UPDATES));
-    message.addGroup(newBidGroup());
-    message.addGroup(newOfferGroup());
-    message.setField(new Symbol("EUR/USD"));
 
+    val header = message.getHeader();
+    header.setField(new SubscriptionRequestType(SNAPSHOT_PLUS_UPDATES));
+    header.setField(new TargetSubID(RATES_SUB_ID));
+    header.setField(new NoMDEntryTypes(1));
+    header.setField(new MDEntryType(BID));
+    header.setField(new NoRelatedSym(1));
+    header.setField(new Symbol("EUR/USD"));
+
+    log.info("Registering rates: {}", message.toXML());
     Session.sendToTarget(message, sessionID);
   }
 
+  @SuppressWarnings("unused")
   private static MarketDataSnapshotFullRefresh.NoMDEntries newOfferGroup() {
     val offer = new MarketDataSnapshotFullRefresh.NoMDEntries();
     offer.set(new MDEntryType(OFFER));
@@ -126,6 +131,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
     return offer;
   }
 
+  @SuppressWarnings("unused")
   private static MarketDataSnapshotFullRefresh.NoMDEntries newBidGroup() {
     val bid = new MarketDataSnapshotFullRefresh.NoMDEntries();
     bid.set(new MDEntryType(BID));
