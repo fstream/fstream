@@ -9,8 +9,12 @@
 package io.fstream.core.fix;
 
 import static io.fstream.core.fix.Main.FIX_PASSWORD;
+import static quickfix.field.MDEntryType.BID;
+import static quickfix.field.MDEntryType.OFFER;
+import static quickfix.field.MDUpdateType.FULL_REFRESH;
 import static quickfix.field.MsgType.FIELD;
 import static quickfix.field.MsgType.LOGON;
+import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +29,17 @@ import quickfix.RejectLogon;
 import quickfix.Session;
 import quickfix.SessionID;
 import quickfix.UnsupportedMessageType;
+import quickfix.field.MDEntryType;
+import quickfix.field.MDReqID;
+import quickfix.field.MDUpdateType;
+import quickfix.field.MarketDepth;
 import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
+import quickfix.field.SubscriptionRequestType;
+import quickfix.field.Symbol;
 import quickfix.field.TargetSubID;
+import quickfix.fix44.MarketDataRequest;
+import quickfix.fix44.MarketDataSnapshotFullRefresh;
 import quickfix.fix44.News;
 
 @Slf4j
@@ -88,22 +100,44 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("onLogout - sessionId: {}", sessionID);
   }
 
-  public void onMessage(News news, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
-    log.info("onMessage - news: {}", news);
+  @Override
+  public void onMessage(Message unknown, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType,
+      IncorrectTagValue {
+    log.info("onMessage - [unknown]: {}", formatMessage(unknown, sessionID));
   }
 
-  @Override
-  public void onMessage(Message message, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType,
-      IncorrectTagValue {
-    log.info("onMessage - message: {}", formatMessage(message, sessionID));
+  public void onMessage(News news, SessionID sessionID) {
+    log.info("onMessage - News: {}", news);
+  }
+
+  public void onMessage(MarketDataSnapshotFullRefresh refresh, SessionID sessionID) {
+    log.info("onMessage - MarketDataSnapshotFullRefresh: {}", formatMessage(refresh, sessionID));
   }
 
   @SneakyThrows
   private static void register(SessionID sessionID) {
-    // val message = Messages.message1();
-    // val message = Messages.message2();
-    // val message = Messages.message3();
-    val message = Messages.message4();
+    // All these fields are required
+    val message = new MarketDataRequest(
+        new MDReqID("fstream-rates"),
+        new SubscriptionRequestType(SNAPSHOT_PLUS_UPDATES),
+        new MarketDepth(1));
+
+    message.set(new MDUpdateType(FULL_REFRESH));
+
+    // Required for all OANDA rates requests
+    message.getHeader().setField(new TargetSubID(RATES_SUB_ID));
+
+    // Entry types
+    val group = new MarketDataRequest.NoMDEntryTypes();
+    group.set(new MDEntryType(BID));
+    message.addGroup(group);
+    group.set(new MDEntryType(OFFER));
+    message.addGroup(group);
+
+    // Symbols
+    val relatedSymbols = new MarketDataRequest.NoRelatedSym();
+    relatedSymbols.set(new Symbol("EUR/USD"));
+    message.addGroup(relatedSymbols);
 
     Session.sendToTarget(message, sessionID);
   }
