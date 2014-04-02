@@ -40,10 +40,9 @@ import quickfix.field.Symbol;
 import quickfix.field.TargetSubID;
 import quickfix.fix44.MarketDataRequest;
 import quickfix.fix44.MarketDataSnapshotFullRefresh;
-import quickfix.fix44.News;
 
 @Slf4j
-public class OandaFixApplication extends MessageCracker implements Application {
+public class OandaRatesApplication extends MessageCracker implements Application {
 
   /**
    * Required for rates.
@@ -56,7 +55,7 @@ public class OandaFixApplication extends MessageCracker implements Application {
   @SneakyThrows
   public void toAdmin(Message message, SessionID sessionID) {
     // See http://www.quickfixj.org/confluence/display/qfj/User+FAQ
-    log.info("toAdmin - message: {}", formatMessage(message, sessionID));
+    log.info("toAdmin - Message: {}", formatMessage(message, sessionID));
     val msgType = message.getHeader().getString(FIELD);
     if (LOGON.compareTo(msgType) == 0) {
       message.setField(new TargetSubID(RATES_SUB_ID));
@@ -67,20 +66,20 @@ public class OandaFixApplication extends MessageCracker implements Application {
 
   @Override
   public void toApp(Message message, SessionID sessionID) throws DoNotSend {
-    log.info("toApp - message: {}", formatMessage(message, sessionID));
+    log.info("toApp - Message: {}", formatMessage(message, sessionID));
   }
 
   @Override
   @SneakyThrows
   public void fromAdmin(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, RejectLogon {
-    log.info("fromAdmin - message: {}", formatMessage(message, sessionID));
+    log.info("fromAdmin - Message: {}", formatMessage(message, sessionID));
   }
 
   @Override
   public void fromApp(Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat,
       IncorrectTagValue, UnsupportedMessageType {
-    log.info("fromApp - message: {}", message);
+    log.info("fromApp - Message: {}", message);
     crack(message, sessionID);
   }
 
@@ -106,10 +105,6 @@ public class OandaFixApplication extends MessageCracker implements Application {
     log.info("onMessage - [unknown]: {}", formatMessage(unknown, sessionID));
   }
 
-  public void onMessage(News news, SessionID sessionID) {
-    log.info("onMessage - News: {}", news);
-  }
-
   public void onMessage(MarketDataSnapshotFullRefresh refresh, SessionID sessionID) {
     log.info("onMessage - MarketDataSnapshotFullRefresh: {}", formatMessage(refresh, sessionID));
   }
@@ -128,17 +123,18 @@ public class OandaFixApplication extends MessageCracker implements Application {
     message.getHeader().setField(new TargetSubID(RATES_SUB_ID));
 
     // Entry types
-    val group = new MarketDataRequest.NoMDEntryTypes();
-    group.set(new MDEntryType(BID));
-    message.addGroup(group);
-    group.set(new MDEntryType(OFFER));
-    message.addGroup(group);
+    val entryTypes = new MarketDataRequest.NoMDEntryTypes();
+    entryTypes.set(new MDEntryType(BID));
+    message.addGroup(entryTypes);
+    entryTypes.set(new MDEntryType(OFFER));
+    message.addGroup(entryTypes);
 
     // Symbols
     val relatedSymbols = new MarketDataRequest.NoRelatedSym();
     relatedSymbols.set(new Symbol("EUR/USD"));
     message.addGroup(relatedSymbols);
 
+    log.info("Registering...");
     Session.sendToTarget(message, sessionID);
   }
 

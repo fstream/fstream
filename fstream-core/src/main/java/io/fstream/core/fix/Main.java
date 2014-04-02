@@ -47,7 +47,7 @@ public class Main {
   }
 
   private static SocketInitiator newSocketInitiator() throws ConfigError {
-    val application = new OandaFixApplication();
+    val application = new OandaRatesApplication();
     val sessionSettings = new SessionSettings(FIX_CONFIG_FILE);
     val fileStoreFactory = new FileStoreFactory(sessionSettings);
     val logFactory = new SLF4JLogFactory(sessionSettings);

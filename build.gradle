@@ -20,7 +20,7 @@ subprojects {
 	targetCompatibility = project.sourceCompatibility
 
 	repositories { 
-    mavenCentral() 
+    	mavenCentral() 
 	    maven {
 	        url 'http://repo.marketcetera.org/maven/'
 	    }
