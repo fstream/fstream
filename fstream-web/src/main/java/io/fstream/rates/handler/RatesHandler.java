@@ -21,6 +21,7 @@ public class RatesHandler {
 
   public void handle(Exchange exchange) {
     // TODO: send to message queue declaratively and remove this processor
+    // TODO: stub out https://gist.github.com/mardambey/2650743
     val message = exchange.getIn().getBody(Message.class);
     log.info("Rates: {}", message.toXML());
 

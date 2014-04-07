@@ -8,17 +8,7 @@
  */
 package io.fstream.rates;
 
-import static org.apache.camel.builder.PredicateBuilder.and;
-import static org.apache.camel.component.quickfixj.QuickfixjEndpoint.EVENT_CATEGORY_KEY;
-import static org.apache.camel.component.quickfixj.QuickfixjEndpoint.MESSAGE_TYPE_KEY;
-import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.AdminMessageSent;
-import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.AppMessageReceived;
-import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.SessionLogon;
-import static quickfix.field.MsgType.LOGON;
-import static quickfix.field.MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH;
-import io.fstream.rates.handler.PasswordSetter;
-import io.fstream.rates.handler.RatesHandler;
-import io.fstream.rates.handler.RatesRegistration;
+import io.fstream.rates.routes.OandaRouteBuilder;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,47 +36,18 @@ public class Main {
       log.info("Stopping Camel context...");
       context.stop();
     }
-
   }
 
   private CamelContext createContext() throws Exception {
-    val properties = new PropertiesComponent("classpath:fstream.properties");
     val context = new DefaultCamelContext();
-    context.addComponent("properties", properties);
     context.addRoutes(createRoutes());
+    context.addComponent("properties", new PropertiesComponent("classpath:fstream.properties"));
 
     return context;
   }
 
   private RouteBuilder createRoutes() {
-    val ratesUri = "quickfix:oanda-fxpractice.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES";
-
-    return new RouteBuilder() {
-
-      @Override
-      public void configure() throws Exception {
-        // On logon request, set password
-        from(ratesUri)
-            .filter(
-                and(header(EVENT_CATEGORY_KEY).isEqualTo(AdminMessageSent),
-                    header(MESSAGE_TYPE_KEY).isEqualTo(LOGON)))
-            .bean(PasswordSetter.class);
-
-        // On logon response, register for streams
-        from(ratesUri)
-            .filter(header(EVENT_CATEGORY_KEY).isEqualTo(SessionLogon))
-            .bean(new RatesRegistration())
-            .to(ratesUri);
-
-        // On rates response, output rates
-        from(ratesUri)
-            .filter(
-                and(header(EVENT_CATEGORY_KEY).isEqualTo(AppMessageReceived),
-                    header(MESSAGE_TYPE_KEY).isEqualTo(MARKET_DATA_SNAPSHOT_FULL_REFRESH)))
-            .bean(new RatesHandler());
-      }
-
-    };
+    return new OandaRouteBuilder("quickfix:oanda-fxpractice.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES");
   }
 
 }
