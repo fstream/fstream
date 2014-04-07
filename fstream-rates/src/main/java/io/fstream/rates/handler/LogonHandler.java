@@ -12,13 +12,13 @@ package io.fstream.rates.handler;
 import org.apache.camel.Body;
 import org.apache.camel.language.Simple;
 
-import quickfix.Message;
 import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
+import quickfix.fix44.Logon;
 
-public class PasswordSetter {
+public class LogonHandler {
 
-  public void set(@Body Message message, @Simple("${properties:oanda.fxpractice.password}") String password) {
+  public void handle(@Body Logon message, @Simple("${properties:oanda.fxpractice.password}") String password) {
     message.setField(new Password(password));
     message.setField(new ResetSeqNumFlag(true));
   }
