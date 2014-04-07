@@ -21,6 +21,7 @@ import io.fstream.rates.handler.PasswordSetter;
 import io.fstream.rates.handler.RatesHandler;
 import io.fstream.rates.handler.RatesRegistration;
 
+import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
 
 public class OandaRouteBuilder extends RouteBuilder {
@@ -33,9 +34,7 @@ public class OandaRouteBuilder extends RouteBuilder {
     //
 
     from("{{oanda.fxpractice.uri}}")
-        .filter(
-            and(header(EVENT_CATEGORY_KEY).isEqualTo(AdminMessageSent),
-                header(MESSAGE_TYPE_KEY).isEqualTo(LOGON)))
+        .filter(logon())
         .bean(PasswordSetter.class);
 
     //
@@ -43,7 +42,7 @@ public class OandaRouteBuilder extends RouteBuilder {
     //
 
     from("{{oanda.fxpractice.uri}}")
-        .filter(header(EVENT_CATEGORY_KEY).isEqualTo(SessionLogon))
+        .filter(sessionLogon())
         .bean(RatesRegistration.class)
         .to("{{oanda.fxpractice.uri}}");
 
@@ -51,10 +50,30 @@ public class OandaRouteBuilder extends RouteBuilder {
     // On rates response, output rates
     //
     from("{{oanda.fxpractice.uri}}")
-        .filter(
-            and(header(EVENT_CATEGORY_KEY).isEqualTo(AppMessageReceived),
-                header(MESSAGE_TYPE_KEY).isEqualTo(MARKET_DATA_SNAPSHOT_FULL_REFRESH)))
+        .filter(marketDataSnapshotFullRefresh())
         .bean(RatesHandler.class);
+
+  }
+
+  private Predicate logon() {
+    return and(
+        header(EVENT_CATEGORY_KEY)
+            .isEqualTo(AdminMessageSent),
+        header(MESSAGE_TYPE_KEY)
+            .isEqualTo(LOGON));
+  }
+
+  private Predicate sessionLogon() {
+    return header(EVENT_CATEGORY_KEY)
+        .isEqualTo(SessionLogon);
+  }
+
+  private Predicate marketDataSnapshotFullRefresh() {
+    return and(
+        header(EVENT_CATEGORY_KEY)
+            .isEqualTo(AppMessageReceived),
+        header(MESSAGE_TYPE_KEY)
+            .isEqualTo(MARKET_DATA_SNAPSHOT_FULL_REFRESH));
   }
 
 }

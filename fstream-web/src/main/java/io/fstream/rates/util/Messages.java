@@ -14,14 +14,13 @@ import static quickfix.MessageUtils.getReverseSessionID;
 import static quickfix.MessageUtils.getSessionID;
 import static quickfix.Session.lookupSession;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.val;
 import quickfix.Message;
+import quickfix.Session;
 
 @NoArgsConstructor(access = PRIVATE)
 public final class Messages {
 
-  @SneakyThrows
   public static String formatMessage(Message message) {
     val session = getSession(message);
     val dataDictionary = session.getDataDictionary();
@@ -30,7 +29,7 @@ public final class Messages {
     return xml;
   }
 
-  private static quickfix.Session getSession(Message message) {
+  public static Session getSession(Message message) {
     val session = lookupSession(getSessionID(message));
     if (session != null) {
       return session;
