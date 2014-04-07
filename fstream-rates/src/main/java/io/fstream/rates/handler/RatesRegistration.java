@@ -14,9 +14,6 @@ import static quickfix.field.MDEntryType.OFFER;
 import static quickfix.field.MDUpdateType.FULL_REFRESH;
 import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
 import lombok.val;
-
-import org.apache.camel.Exchange;
-
 import quickfix.field.MDEntryType;
 import quickfix.field.MDReqID;
 import quickfix.field.MDUpdateType;
@@ -24,14 +21,12 @@ import quickfix.field.MarketDepth;
 import quickfix.field.SubscriptionRequestType;
 import quickfix.field.Symbol;
 import quickfix.fix44.MarketDataRequest;
+import quickfix.fix44.Message;
 
 public class RatesRegistration {
 
-  public void register(Exchange exchange) {
-    val message = createMessage();
-
-    // Attach message to outgoing exchange
-    exchange.getOut().setBody(message);
+  public Message register() {
+    return createMessage();
   }
 
   private MarketDataRequest createMessage() {

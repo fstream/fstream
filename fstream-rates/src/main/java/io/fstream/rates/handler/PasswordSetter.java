@@ -9,12 +9,8 @@
 
 package io.fstream.rates.handler;
 
-import lombok.Setter;
-import lombok.val;
-
-import org.apache.camel.CamelExchangeException;
-import org.apache.camel.Exchange;
-import org.apache.camel.PropertyInject;
+import org.apache.camel.Body;
+import org.apache.camel.language.Simple;
 
 import quickfix.Message;
 import quickfix.field.Password;
@@ -22,12 +18,7 @@ import quickfix.field.ResetSeqNumFlag;
 
 public class PasswordSetter {
 
-  @Setter
-  @PropertyInject("oanda.fxpractice.password")
-  private String password;
-
-  public void set(Exchange exchange) throws CamelExchangeException {
-    val message = exchange.getIn().getMandatoryBody(Message.class);
+  public void set(@Body Message message, @Simple("${properties:oanda.fxpractice.password}") String password) {
     message.setField(new Password(password));
     message.setField(new ResetSeqNumFlag(true));
   }

@@ -23,6 +23,7 @@ import io.fstream.rates.handler.RatesRegistration;
 
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.quickfixj.QuickfixjEventCategory;
 
 public class OandaRouteBuilder extends RouteBuilder {
 
@@ -56,24 +57,23 @@ public class OandaRouteBuilder extends RouteBuilder {
   }
 
   private Predicate logon() {
-    return and(
-        header(EVENT_CATEGORY_KEY)
-            .isEqualTo(AdminMessageSent),
-        header(MESSAGE_TYPE_KEY)
-            .isEqualTo(LOGON));
+    return and(eventCategory(AdminMessageSent), messageType(LOGON));
   }
 
   private Predicate sessionLogon() {
-    return header(EVENT_CATEGORY_KEY)
-        .isEqualTo(SessionLogon);
+    return eventCategory(SessionLogon);
   }
 
   private Predicate marketDataSnapshotFullRefresh() {
-    return and(
-        header(EVENT_CATEGORY_KEY)
-            .isEqualTo(AppMessageReceived),
-        header(MESSAGE_TYPE_KEY)
-            .isEqualTo(MARKET_DATA_SNAPSHOT_FULL_REFRESH));
+    return and(eventCategory(AppMessageReceived), messageType(MARKET_DATA_SNAPSHOT_FULL_REFRESH));
+  }
+
+  private Predicate eventCategory(QuickfixjEventCategory eventCategory) {
+    return header(EVENT_CATEGORY_KEY).isEqualTo(eventCategory);
+  }
+
+  private Predicate messageType(String messageType) {
+    return header(MESSAGE_TYPE_KEY).isEqualTo(messageType);
   }
 
 }
