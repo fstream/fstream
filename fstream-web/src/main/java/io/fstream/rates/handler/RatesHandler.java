@@ -20,8 +20,7 @@ import quickfix.fix44.Message;
 public class RatesHandler {
 
   public void handle(Exchange exchange) {
-    // TODO: send to message queue declaratively and remove this processor
-    // TODO: stub out https://gist.github.com/mardambey/2650743
+    // TODO: Send to message queue declaratively and remove this processor
     val message = exchange.getIn().getBody(Message.class);
     log.info("Rates: {}", message.toXML());
 

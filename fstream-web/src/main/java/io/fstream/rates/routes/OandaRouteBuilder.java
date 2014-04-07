@@ -18,17 +18,12 @@ import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.Sessio
 import static quickfix.field.MsgType.LOGON;
 import static quickfix.field.MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH;
 import io.fstream.rates.handler.PasswordSetter;
+import io.fstream.rates.handler.RatesHandler;
 import io.fstream.rates.handler.RatesRegistration;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import org.apache.camel.builder.RouteBuilder;
 
-@RequiredArgsConstructor
 public class OandaRouteBuilder extends RouteBuilder {
-
-  @NonNull
-  private final String ratesUri;
 
   @Override
   public void configure() throws Exception {
@@ -37,7 +32,7 @@ public class OandaRouteBuilder extends RouteBuilder {
     // On logon request, set password
     //
 
-    from(ratesUri)
+    from("{{oanda.fxpractice.uri}}")
         .filter(
             and(header(EVENT_CATEGORY_KEY).isEqualTo(AdminMessageSent),
                 header(MESSAGE_TYPE_KEY).isEqualTo(LOGON)))
@@ -47,19 +42,19 @@ public class OandaRouteBuilder extends RouteBuilder {
     // On logon response, register for streams
     //
 
-    from(ratesUri)
+    from("{{oanda.fxpractice.uri}}")
         .filter(header(EVENT_CATEGORY_KEY).isEqualTo(SessionLogon))
         .bean(RatesRegistration.class)
-        .to(ratesUri);
+        .to("{{oanda.fxpractice.uri}}");
 
     //
     // On rates response, output rates
     //
-    from(ratesUri)
+    from("{{oanda.fxpractice.uri}}")
         .filter(
             and(header(EVENT_CATEGORY_KEY).isEqualTo(AppMessageReceived),
                 header(MESSAGE_TYPE_KEY).isEqualTo(MARKET_DATA_SNAPSHOT_FULL_REFRESH)))
-        .bean(RatesRegistration.class);
+        .bean(RatesHandler.class);
   }
 
 }

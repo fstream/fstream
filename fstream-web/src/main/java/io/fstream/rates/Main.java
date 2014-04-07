@@ -13,7 +13,6 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.impl.DefaultCamelContext;
 
@@ -30,7 +29,7 @@ public class Main {
     context.start();
 
     try {
-      log.info("*** Press enter to stop application");
+      log.info("\n\n*** Press enter to stop application\n\n");
       System.in.read();
     } finally {
       log.info("Stopping Camel context...");
@@ -40,14 +39,10 @@ public class Main {
 
   private CamelContext createContext() throws Exception {
     val context = new DefaultCamelContext();
-    context.addRoutes(createRoutes());
+    context.addRoutes(new OandaRouteBuilder());
     context.addComponent("properties", new PropertiesComponent("classpath:fstream.properties"));
 
     return context;
-  }
-
-  private RouteBuilder createRoutes() {
-    return new OandaRouteBuilder("quickfix:oanda-fxpractice.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES");
   }
 
 }

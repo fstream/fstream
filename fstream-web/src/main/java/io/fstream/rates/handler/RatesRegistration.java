@@ -54,6 +54,7 @@ public class RatesRegistration {
     val relatedSymbols = new MarketDataRequest.NoRelatedSym();
     relatedSymbols.set(new Symbol("EUR/USD"));
     message.addGroup(relatedSymbols);
+
     return message;
   }
 

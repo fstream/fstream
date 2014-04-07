@@ -9,7 +9,7 @@
 
 package io.fstream.rates.handler;
 
-import lombok.Data;
+import lombok.Setter;
 import lombok.val;
 
 import org.apache.camel.CamelExchangeException;
@@ -20,9 +20,9 @@ import quickfix.Message;
 import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
 
-@Data
 public class PasswordSetter {
 
+  @Setter
   @PropertyInject("oanda.fxpractice.password")
   private String password;
 
