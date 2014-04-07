@@ -14,12 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.Body;
 
-import quickfix.fix44.Message;
+import quickfix.fix44.MarketDataSnapshotFullRefresh;
 
 @Slf4j
 public class RatesHandler {
 
-  public void handle(@Body Message message) {
+  public void handle(@Body MarketDataSnapshotFullRefresh message) {
     // TODO: Send to message queue declaratively and remove this processor
     log.info("Rates: {}", formatMessage(message));
   }

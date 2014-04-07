@@ -38,6 +38,7 @@ public class Main {
   }
 
   private CamelContext createContext() throws Exception {
+    // Create the context with routes and sourcing the properties from the classpath
     val context = new DefaultCamelContext();
     context.addRoutes(new OandaRouteBuilder());
     context.addComponent("properties", new PropertiesComponent("classpath:fstream.properties"));

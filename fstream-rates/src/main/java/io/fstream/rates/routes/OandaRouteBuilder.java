@@ -39,7 +39,7 @@ public class OandaRouteBuilder extends RouteBuilder {
         .bean(PasswordSetter.class);
 
     //
-    // On logon response, register for streams
+    // On logon response, register for rates
     //
 
     from("{{oanda.fxpractice.uri}}")
