@@ -7,4 +7,7 @@
  * Proprietary and confidential.
  */
 
-
+dependencies {
+    compile 'quickfixj:quickfixj-all:1.5.3'
+    compile 'org.apache.mina:mina-filter-ssl:1.1.7'
+}

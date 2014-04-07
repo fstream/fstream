@@ -29,8 +29,6 @@ subprojects {
 	dependencies {
 		compile 'com.google.guava:guava:16.0.1'
 		compile 'org.projectlombok:lombok:1.12.4'
-        compile 'quickfixj:quickfixj-all:1.5.3'
-        compile 'org.apache.mina:mina-filter-ssl:1.1.7'
 		compile 'ch.qos.logback:logback-classic:1.1.1'
 		testCompile 'junit:junit:4.11'
 	}
