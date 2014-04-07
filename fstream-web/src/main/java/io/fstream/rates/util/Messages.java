@@ -10,6 +10,7 @@
 package io.fstream.rates.util;
 
 import static lombok.AccessLevel.PRIVATE;
+import static quickfix.MessageUtils.getReverseSessionID;
 import static quickfix.MessageUtils.getSessionID;
 import static quickfix.Session.lookupSession;
 import lombok.NoArgsConstructor;
@@ -22,12 +23,20 @@ public final class Messages {
 
   @SneakyThrows
   public static String formatMessage(Message message) {
-    val sessionID = getSessionID(message);
-    val session = lookupSession(sessionID);
+    val session = getSession(message);
     val dataDictionary = session.getDataDictionary();
     val xml = message.toXML(dataDictionary);
 
     return xml;
+  }
+
+  private static quickfix.Session getSession(Message message) {
+    val session = lookupSession(getSessionID(message));
+    if (session != null) {
+      return session;
+    } else {
+      return lookupSession(getReverseSessionID(message));
+    }
   }
 
 }

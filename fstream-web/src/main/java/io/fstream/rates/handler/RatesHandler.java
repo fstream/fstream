@@ -9,6 +9,7 @@
 
 package io.fstream.rates.handler;
 
+import static io.fstream.rates.util.Messages.formatMessage;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +23,7 @@ public class RatesHandler {
   public void handle(Exchange exchange) {
     // TODO: Send to message queue declaratively and remove this processor
     val message = exchange.getIn().getBody(Message.class);
-    log.info("Rates: {}", message.toXML());
+    log.info("Rates: {}", formatMessage(message));
 
   }
 }
