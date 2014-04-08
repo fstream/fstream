@@ -8,7 +8,9 @@
  */
 package io.fstream.rates;
 
-import io.fstream.rates.handler.RatesHandler;
+import static java.lang.System.in;
+import static java.lang.System.out;
+import io.fstream.rates.handler.RatesLogger;
 import io.fstream.rates.routes.OandaRouteBuilder;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -27,21 +29,26 @@ public class Main {
   }
 
   public void run() throws Exception {
-    log.info("Starting Camel context");
+    log.info("Creating Camel context...");
     val context = createContext();
+    log.info("Created Camel context");
+
+    log.info("Starting Camel context...");
     context.start();
+    log.info("Started Camel context");
 
     try {
-      log.info("\n\n*** Press enter to stop application\n\n");
-      System.in.read();
+      out.println("\n\n*** Press enter to stop application\n\n");
+      in.read();
     } finally {
       log.info("Stopping Camel context...");
       context.stop();
+      log.info("Stopped Camel context");
     }
   }
 
   private CamelContext createContext() throws Exception {
-    // Create the context with routes and sourcing the properties from the classpath
+    // Create the context with routes, sourcing the properties from the classpath
     val context = new DefaultCamelContext(createRegistry());
     context.addRoutes(new OandaRouteBuilder());
     context.addComponent("properties", new PropertiesComponent("classpath:fstream.properties"));
@@ -50,9 +57,9 @@ public class Main {
   }
 
   private Registry createRegistry() {
-    // Create beans
+    // Register beans
     val registry = new SimpleRegistry();
-    registry.put("ratesHandler", new RatesHandler());
+    registry.put("ratesLogger", new RatesLogger());
 
     return registry;
   }

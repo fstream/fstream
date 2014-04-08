@@ -18,7 +18,7 @@ import quickfix.fix44.Logon;
 
 public class LogonHandler {
 
-  public void handle(@Body Logon message, @Simple("${properties:oanda.fxpractice.password}") String password) {
+  public void handle(@Body Logon message, @Simple("${properties:oanda.rates.password}") String password) {
     message.setField(new Password(password));
     message.setField(new ResetSeqNumFlag(true));
   }

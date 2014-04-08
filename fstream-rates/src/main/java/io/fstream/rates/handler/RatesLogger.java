@@ -17,10 +17,9 @@ import org.apache.camel.Body;
 import quickfix.fix44.MarketDataSnapshotFullRefresh;
 
 @Slf4j
-public class RatesHandler {
+public class RatesLogger {
 
-  public void handle(@Body MarketDataSnapshotFullRefresh message) {
-    // TODO: Send to message queue declaratively and remove this processor
+  public void log(@Body MarketDataSnapshotFullRefresh message) {
     log.info("Rates: {}", formatMessage(message));
   }
 
