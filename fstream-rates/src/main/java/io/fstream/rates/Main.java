@@ -8,6 +8,7 @@
  */
 package io.fstream.rates;
 
+import io.fstream.rates.handler.RatesHandler;
 import io.fstream.rates.routes.OandaRouteBuilder;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.SimpleRegistry;
+import org.apache.camel.spi.Registry;
 
 @Slf4j
 public class Main {
@@ -39,11 +42,19 @@ public class Main {
 
   private CamelContext createContext() throws Exception {
     // Create the context with routes and sourcing the properties from the classpath
-    val context = new DefaultCamelContext();
+    val context = new DefaultCamelContext(createRegistry());
     context.addRoutes(new OandaRouteBuilder());
     context.addComponent("properties", new PropertiesComponent("classpath:fstream.properties"));
 
     return context;
+  }
+
+  private Registry createRegistry() {
+    // Create beans
+    val registry = new SimpleRegistry();
+    registry.put("ratesHandler", new RatesHandler());
+
+    return registry;
   }
 
 }

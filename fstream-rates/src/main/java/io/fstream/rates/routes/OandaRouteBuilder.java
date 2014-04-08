@@ -18,7 +18,6 @@ import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.Sessio
 import static quickfix.field.MsgType.LOGON;
 import static quickfix.field.MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH;
 import io.fstream.rates.handler.LogonHandler;
-import io.fstream.rates.handler.RatesHandler;
 import io.fstream.rates.handler.RatesRegistration;
 
 import org.apache.camel.Predicate;
@@ -52,7 +51,7 @@ public class OandaRouteBuilder extends RouteBuilder {
     //
     from("{{oanda.fxpractice.uri}}")
         .filter(marketDataSnapshotFullRefresh())
-        .bean(RatesHandler.class);
+        .to("{{fstream.broker.uri}}");
 
   }
 
