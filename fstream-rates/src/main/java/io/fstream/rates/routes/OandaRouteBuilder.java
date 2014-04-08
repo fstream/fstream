@@ -12,6 +12,8 @@ package io.fstream.rates.routes;
 import io.fstream.rates.handler.LogonHandler;
 import io.fstream.rates.handler.RatesRegistration;
 
+import org.apache.camel.component.kafka.KafkaConstants;
+
 public class OandaRouteBuilder extends AbstractRouteBuilder {
 
   @Override
@@ -25,6 +27,7 @@ public class OandaRouteBuilder extends AbstractRouteBuilder {
             .bean(RatesRegistration.class)
             .to("{{oanda.rates.uri}}")
           .when(marketDataSnapshotFullRefresh())
+            .setHeader(KafkaConstants.PARTITION_KEY, constant("1"))
             .to("{{fstream.broker.uri}}");
     // @formatter:on
   }
