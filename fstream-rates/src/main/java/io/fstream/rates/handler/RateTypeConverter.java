@@ -17,6 +17,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.apache.camel.support.TypeConverterSupport;
 
+import quickfix.field.MDEntryPx;
+import quickfix.field.MDEntryType;
 import quickfix.fix44.MarketDataSnapshotFullRefresh;
 
 /**
@@ -31,6 +33,19 @@ public class RateTypeConverter extends TypeConverterSupport {
     val message = (MarketDataSnapshotFullRefresh) value;
     val rate = new Rate();
     rate.setSymbol(message.getSymbol().getValue());
+
+    val noEntries = message.getNoMDEntries().getValue();
+    for (int i = 0; i < noEntries; i++) {
+      MarketDataSnapshotFullRefresh.NoMDEntries group = new MarketDataSnapshotFullRefresh.NoMDEntries();
+      message.getGroup(i + 1, group);
+
+      char currentEntryType = group.getChar(MDEntryType.FIELD);
+      if (currentEntryType == MDEntryType.BID) {
+        rate.setBid(group.getDecimal(MDEntryPx.FIELD));
+      } else if (currentEntryType == MDEntryType.OFFER) {
+        rate.setAsk(group.getDecimal(MDEntryPx.FIELD));
+      }
+    }
 
     return (T) rate;
   }
