@@ -13,9 +13,12 @@ import java.math.BigDecimal;
 
 import lombok.Data;
 
+import org.joda.time.DateTime;
+
 @Data
 public class Rate {
 
+  DateTime dateTime;
   String symbol;
   BigDecimal bid;
   BigDecimal ask;
