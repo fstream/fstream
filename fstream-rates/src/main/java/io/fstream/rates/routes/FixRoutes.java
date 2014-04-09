@@ -22,7 +22,10 @@ import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.quickfixj.QuickfixjEventCategory;
 
-public abstract class AbstractRouteBuilder extends RouteBuilder {
+/**
+ * Convenience class for FIX providers.
+ */
+public abstract class FixRoutes extends RouteBuilder {
 
   protected Predicate logon() {
     return and(eventCategory(AdminMessageSent), messageType(LOGON));

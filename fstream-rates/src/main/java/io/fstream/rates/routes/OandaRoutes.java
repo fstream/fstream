@@ -14,7 +14,7 @@ import io.fstream.rates.handler.RatesRegistration;
 
 import org.apache.camel.component.kafka.KafkaConstants;
 
-public class OandaRouteBuilder extends AbstractRouteBuilder {
+public class OandaRoutes extends FixRoutes {
 
   @Override
   public void configure() throws Exception {

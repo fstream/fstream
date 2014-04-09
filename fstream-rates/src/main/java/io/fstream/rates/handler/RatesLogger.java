@@ -16,6 +16,9 @@ import org.apache.camel.Body;
 
 import quickfix.fix44.MarketDataSnapshotFullRefresh;
 
+/**
+ * Bean that logs rates messages.
+ */
 @Slf4j
 public class RatesLogger {
 
