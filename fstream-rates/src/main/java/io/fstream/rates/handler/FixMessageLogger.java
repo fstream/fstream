@@ -14,15 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.Body;
 
-import quickfix.fix44.MarketDataSnapshotFullRefresh;
+import quickfix.fix44.Message;
 
 /**
  * Bean that logs rates messages.
  */
 @Slf4j
-public class RatesLogger {
+public class FixMessageLogger {
 
-  public void log(@Body MarketDataSnapshotFullRefresh message) {
+  public void log(@Body Message message) {
     log.info("Rates: {}", formatMessage(message));
   }
 

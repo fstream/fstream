@@ -9,12 +9,14 @@
 
 package io.fstream.rates.routes;
 
+import io.fstream.core.model.Rate;
 import io.fstream.rates.handler.LogonHandler;
+import io.fstream.rates.handler.FixMessageLogger;
 import io.fstream.rates.handler.RatesRegistration;
 
 import org.apache.camel.component.kafka.KafkaConstants;
 
-public class OandaRoutes extends FixRoutes {
+public class OandaRoutes extends AbstractFixRoutes {
 
   @Override
   public void configure() throws Exception {
@@ -28,6 +30,9 @@ public class OandaRoutes extends FixRoutes {
             .to("{{oanda.rates.uri}}")
           .when(marketDataSnapshotFullRefresh())
             .setHeader(KafkaConstants.PARTITION_KEY, constant("1"))
+            .bean(FixMessageLogger.class)
+            .convertBodyTo(Rate.class)
+            .log("${body}")
             .to("{{fstream.broker.uri}}");
     // @formatter:on
   }

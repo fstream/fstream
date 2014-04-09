@@ -27,10 +27,18 @@ subprojects {
 	}
 
 	dependencies {
-		compile 'com.google.guava:guava:16.0.1'
+		// Compile-time transformations
 		compile 'org.projectlombok:lombok:1.12.4'
+		
+		// Utilities
+		compile 'com.google.guava:guava:16.0.1'
+		compile 'joda-time:joda-time:2.3'
+		
+		// Logging
 		compile 'ch.qos.logback:logback-classic:1.1.1'
 		compile 'ch.qos.logback:log4j-bridge:0.9.7'
+		
+		// Test
 		testCompile 'junit:junit:4.11'
 	}
 
