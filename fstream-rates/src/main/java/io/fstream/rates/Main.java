@@ -8,9 +8,13 @@
  */
 package io.fstream.rates;
 
-import static io.fstream.rates.factory.ContextFactory.newContext;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.io.Resources.getResource;
+import static com.google.common.io.Resources.readLines;
+import static io.fstream.rates.factory.CamelContextFactory.newContext;
 import static java.lang.System.in;
 import static java.lang.System.out;
+import static joptsimple.internal.Strings.repeat;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 public class Main {
 
   public static void main(String... args) throws Exception {
+    log.info("{}", repeat('-', 100));
+    for (val line : readLines(getResource("banner.txt"), UTF_8)) {
+      log.info(line);
+    }
+    log.info("{}", repeat('-', 100));
+
     new Main().run();
   }
 
@@ -34,7 +44,7 @@ public class Main {
     log.info("Started Camel context");
 
     try {
-      out.println("\n\n*** Press enter to stop application\n\n");
+      out.println("\n\n*** Running rates. Press any key to shutdown\n\n");
       in.read();
     } finally {
       log.info("Stopping Camel context...");

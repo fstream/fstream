@@ -17,11 +17,11 @@ import lombok.val;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 
-public final class EmbeddedKafkaServer extends AbstractIdleService {
+public final class EmbeddedKafka extends AbstractIdleService {
 
   private final KafkaServerStartable server;
 
-  public EmbeddedKafkaServer() {
+  public EmbeddedKafka() {
     val properties = new Properties();
     properties.put("zookeeper.connect", "localhost:21818");
     properties.put("broker.id", "1");

@@ -30,7 +30,7 @@ import quickfix.fix44.MarketDataSnapshotFullRefresh;
  * Factory for context creation.
  */
 @NoArgsConstructor(access = PRIVATE)
-public final class ContextFactory {
+public final class CamelContextFactory {
 
   /**
    * Name of the configuration file.

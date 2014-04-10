@@ -22,7 +22,7 @@ import org.apache.zookeeper.server.ZooKeeperServer;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 @RequiredArgsConstructor
-public class EmbeddedZooKeeperServer extends AbstractIdleService {
+public class EmbeddedZooKeeper extends AbstractIdleService {
 
   private final File workDir;
 

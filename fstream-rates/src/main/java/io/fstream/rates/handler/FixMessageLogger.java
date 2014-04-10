@@ -17,7 +17,7 @@ import org.apache.camel.Body;
 import quickfix.fix44.Message;
 
 /**
- * Bean that logs rates messages.
+ * Bean that logs FIX messages.
  */
 @Slf4j
 public class FixMessageLogger {
