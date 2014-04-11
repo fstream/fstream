@@ -31,7 +31,7 @@ public class EmbeddedKafkaTest {
   @Before
   public void setUp() throws IOException {
     log.info("> Starting embedded ZooKeeper...");
-    zooKeeper = new EmbeddedZooKeeper(tmp.newFolder());
+    zooKeeper = new EmbeddedZooKeeper(tmp.newFolder(), tmp.newFolder());
     zooKeeper.startAsync();
     zooKeeper.awaitRunning();
     log.info("< Started embedded ZooKeeper");
@@ -68,6 +68,7 @@ public class EmbeddedKafkaTest {
     props.put("zookeeper.connect", "localhost:21818");
     props.put("zookeeper.connection.timeout.ms", "1000000");
     props.put("group.id", "1");
+    props.put("broker.id", "0");
 
     val consumerConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
 
@@ -82,7 +83,7 @@ public class EmbeddedKafkaTest {
         @Override
         public void run() {
           for (val event : stream) {
-            log.info("Received message: {}", event.message());
+            log.info("Received message: {}", new String(event.message()));
           }
         }
 

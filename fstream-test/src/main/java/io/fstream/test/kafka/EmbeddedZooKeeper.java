@@ -12,6 +12,7 @@ package io.fstream.test.kafka;
 import java.io.File;
 import java.net.InetSocketAddress;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -24,7 +25,10 @@ import com.google.common.util.concurrent.AbstractIdleService;
 @RequiredArgsConstructor
 public class EmbeddedZooKeeper extends AbstractIdleService {
 
-  private final File workDir;
+  @NonNull
+  private final File snapDir;
+  @NonNull
+  private final File logDir;
 
   private Factory factory;
 
@@ -34,7 +38,7 @@ public class EmbeddedZooKeeper extends AbstractIdleService {
     val numConnections = 5000;
     val tickTime = 2000;
 
-    val server = new ZooKeeperServer(workDir, workDir, tickTime);
+    val server = new ZooKeeperServer(snapDir, logDir, tickTime);
     val factory = new NIOServerCnxn.Factory(new InetSocketAddress(clientPort), numConnections);
 
     factory.startup(server);
