@@ -1,0 +1,5 @@
+<engine-settings>
+	<defaults>
+		<expression math-context="precision=16 roundingMode=CEILING" />
+	</defaults>
+</engine-settings>

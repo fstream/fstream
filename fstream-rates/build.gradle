@@ -21,4 +21,5 @@ dependencies {
     compile "org.apache.camel:camel-core:$camelVersion"
     compile "org.apache.camel:camel-quickfix:$camelVersion"
     compile "org.apache.camel:camel-kafka:$camelVersion"
+    compile "org.apache-extras.camel-extra:camel-esper:2.12.0"
 }

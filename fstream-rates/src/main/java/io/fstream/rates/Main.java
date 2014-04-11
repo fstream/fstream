@@ -35,21 +35,21 @@ public class Main {
   }
 
   public void run() throws Exception {
-    log.info("Creating Camel context...");
+    log.info("> Creating Camel context...");
     val context = newContext();
-    log.info("Created Camel context");
+    log.info("< Created Camel context");
 
-    log.info("Starting Camel context...");
+    log.info("> Starting Camel context...");
     context.start();
-    log.info("Started Camel context");
+    log.info("< Started Camel context");
 
     try {
       out.println("\n\n*** Running rates. Press any key to shutdown\n\n");
       in.read();
     } finally {
-      log.info("Stopping Camel context...");
+      log.info("> Stopping Camel context...");
       context.stop();
-      log.info("Stopped Camel context");
+      log.info("< Stopped Camel context");
     }
   }
 

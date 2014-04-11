@@ -11,11 +11,15 @@ package io.fstream.core.model;
 
 import java.math.BigDecimal;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import org.joda.time.DateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Rate {
 
   DateTime dateTime;

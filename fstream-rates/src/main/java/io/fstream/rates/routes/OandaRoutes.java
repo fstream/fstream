@@ -10,6 +10,7 @@
 package io.fstream.rates.routes;
 
 import io.fstream.core.model.Rate;
+import io.fstream.rates.handler.FixMessageLogger;
 import io.fstream.rates.handler.LogonHandler;
 import io.fstream.rates.handler.RatesRegistration;
 
@@ -33,11 +34,32 @@ public class OandaRoutes extends AbstractFixRoutes {
           .to("{{oanda.rates.uri}}")
           
         .when(marketDataSnapshotFullRefresh())
-          //.bean(FixMessageLogger.class)
           .convertBodyTo(Rate.class)
           .log("${body}")
           .setHeader(KafkaConstants.PARTITION_KEY, constant("1"))
-          .to("{{fstream.broker.uri}}");
+          .multicast()
+            .to("seda:broker", "seda:analytics");
+    
+    // Send to broker
+    from("seda:broker")
+      .log("${body}")
+      .to("{{fstream.broker.uri}}");
+    
+    // Send to process 
+    from("seda:analytics")
+      .to("esper://rates");
+    
+    // See http://esper.codehaus.org/esper-4.11.0/doc/reference/en-US/html_single/index.html#epl-intro
+    from("esper://rates?eql=" + 
+        "SELECT " +
+        "  cast(ask, float) / cast(prior(1, ask), float) AS askPercentChange " + 
+        "FROM " + 
+        "  " + Rate.class.getName() + "") 
+        .log("output: '${body.properties}'");
+    
+    // For debugging
+    from("stub:direct:fix")
+      .bean(FixMessageLogger.class);
     // @formatter:on
   }
 
