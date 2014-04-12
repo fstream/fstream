@@ -10,7 +10,7 @@
 def camelVersion = '2.13.0'
 
 dependencies {
-
+	// fStream
 	compile project(':fstream-core')
 
 	// QuickFIX/J 

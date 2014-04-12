@@ -8,13 +8,16 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
+import kafka.admin.AdminUtils;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.I0Itec.zkclient.ZkClient;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -58,6 +61,8 @@ public class EmbeddedKafkaTest {
 
   @Test
   public void testServer() throws IOException {
+    // createTopic();
+
     registerConsumer();
     out.println("\n\n*** Running embedded Kafka. Press any key to shutdown\n\n");
     in.read();
@@ -89,6 +94,17 @@ public class EmbeddedKafkaTest {
 
       });
     }
+  }
+
+  @Ignore
+  private void createTopic() {
+    val zkClient = new ZkClient("localhost:21818");
+    Properties props = new Properties();
+    String topic = "test";
+    int partitions = 1;
+    int replicationFactor = 1;
+    AdminUtils.createTopic(zkClient, topic, partitions, replicationFactor, props);
+    zkClient.close();
   }
 
 }

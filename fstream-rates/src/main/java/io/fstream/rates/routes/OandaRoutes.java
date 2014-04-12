@@ -36,13 +36,14 @@ public class OandaRoutes extends AbstractFixRoutes {
         .when(marketDataSnapshotFullRefresh())
           .convertBodyTo(Rate.class)
           .log("${body}")
-          .setHeader(KafkaConstants.PARTITION_KEY, constant("1"))
+          .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
           .multicast()
             .to("seda:broker", "seda:analytics");
     
     // Send to broker
     from("seda:broker")
       .log("${body}")
+      // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
       .to("{{fstream.broker.uri}}");
     
     // Send to process 

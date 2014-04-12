@@ -17,6 +17,7 @@ import lombok.val;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.component.kafka.KafkaConstants;
 import org.joda.time.DateTime;
 
 /**
@@ -42,7 +43,8 @@ public class SampleRoutes extends AbstractFixRoutes {
         }
         
       })
-      .to("esper://events");
+      .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
+      .to("{{fstream.broker.uri}}");
       
     from("esper://events?eql=" + 
         "SELECT " +

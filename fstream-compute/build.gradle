@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+dependencies {
+	// fStream
+	compile project(':fstream-core')
+	
+	// Storm
+    // compile 'storm:storm:0.9.0-wip16'
+    // compile 'storm:storm-kafka:0.9.0-wip16a-scala292'
+    
+    compile 'org.apache.storm:storm-core:0.9.1-incubating'
+    compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
+}

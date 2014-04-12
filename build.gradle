@@ -21,9 +21,10 @@ subprojects {
 
 	repositories { 
     	mavenCentral() 
-	    maven {
-	        url 'http://repo.marketcetera.org/maven/'
-	    }
+	    maven { url 'http://repo.marketcetera.org/maven' }
+	    maven { url 'http://clojars.org/repo' }
+	    maven { url 'http://conjars.org/repo' }
+	    maven { url 'http://twitter4j.org/maven2' }
 	}
 
 	dependencies {

@@ -12,4 +12,5 @@ def kafkaScalaVersion = '2.10'
 
 dependencies {
     compile "org.apache.kafka:kafka_$kafkaScalaVersion:$kafkaVersion"
+    //     compile 'storm:storm:0.9.0-wip16'
 }

@@ -14,7 +14,7 @@ import static lombok.AccessLevel.PRIVATE;
 import io.fstream.core.model.Rate;
 import io.fstream.rates.handler.FixMessageLogger;
 import io.fstream.rates.handler.RateTypeConverter;
-import io.fstream.rates.routes.OandaRoutes;
+import io.fstream.rates.routes.SampleRoutes;
 import lombok.NoArgsConstructor;
 import lombok.val;
 
@@ -41,7 +41,8 @@ public final class CamelContextFactory {
     val context = new DefaultCamelContext(newRegistry());
 
     // Configure
-    context.addRoutes(new OandaRoutes());
+    // context.addRoutes(new OandaRoutes());
+    context.addRoutes(new SampleRoutes());
     context.addComponent("properties", newPropertiesComponent());
     context.getTypeConverterRegistry().addTypeConverter(
         Rate.class, MarketDataSnapshotFullRefresh.class, new RateTypeConverter());
