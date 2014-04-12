@@ -9,52 +9,70 @@
 
 package io.fstream.compute;
 
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.io.Resources.getResource;
+import static com.google.common.io.Resources.readLines;
+import static io.fstream.compute.factory.StormFactory.newConfig;
+import static io.fstream.compute.factory.StormFactory.newStormTopology;
 import static java.lang.System.in;
 import static java.lang.System.out;
+import static joptsimple.internal.Strings.repeat;
 import lombok.val;
-import storm.kafka.KafkaSpout;
-import storm.kafka.SpoutConfig;
-import storm.kafka.StringScheme;
-import storm.kafka.ZkHosts;
-import backtype.storm.Config;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.thrift7.TException;
+
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
-import backtype.storm.spout.SchemeAsMultiScheme;
-import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.generated.KillOptions;
+import backtype.storm.generated.NotAliveException;
+import backtype.storm.utils.NimbusClient;
+import backtype.storm.utils.Utils;
 
+@Slf4j
 public class Main {
 
-  public static void main(String[] args) throws Exception {
-    val hosts = new ZkHosts("localhost:21818");
-    hosts.refreshFreqSecs = 1;
-    val kafkaConf = new SpoutConfig(hosts, "test", "/test", "id");
-    kafkaConf.id = "0";
-    kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
+  public static void main(String... args) throws Exception {
+    log.info("{}", repeat('-', 100));
+    for (val line : readLines(getResource("banner.txt"), UTF_8)) {
+      log.info(line);
+    }
+    log.info("{}", repeat('-', 100));
 
-    KafkaSpout kafkaSpout = new KafkaSpout(kafkaConf);
+    new Main().run(args);
+  }
 
-    val builder = new TopologyBuilder();
-    builder.setSpout("spout", kafkaSpout, 2);
-    builder.setBolt("printer", new PrinterBolt()).shuffleGrouping("spout");
+  public void run(String... args) throws Exception {
+    // Parse args
+    val local = args == null || args.length == 0;
+    val name = local ? "kafka" : args[0];
 
-    Config config = new Config();
-    config.setDebug(true);
+    // Setup
+    val topology = newStormTopology();
+    val config = newConfig(local);
 
-    if (args != null && args.length > 0) {
-      config.setNumWorkers(3);
+    if (local) {
+      val cluster = new LocalCluster();
+      cluster.submitTopology(name, config, topology);
 
-      StormSubmitter.submitTopology(args[0], config, builder.createTopology());
-    } else {
-      config.setMaxTaskParallelism(3);
-
-      LocalCluster cluster = new LocalCluster();
-      cluster.submitTopology("kafka", config, builder.createTopology());
-
-      out.println("\n\n*** Running compute. Press any key to shutdown\n\n");
+      out.println("\n\n*** Running [local] compute. Press any key to shutdown\n\n");
       in.read();
 
       cluster.shutdown();
+    } else {
+      StormSubmitter.submitTopology(name, config, topology);
+
+      out.println("\n\n*** Running [cluster] compute. Press any key to shutdown\n\n");
+      in.read();
+
+      killTopology(name);
     }
+  }
+
+  private static void killTopology(String name) throws NotAliveException, TException {
+    val client = NimbusClient.getConfiguredClient(Utils.readStormConfig()).getClient();
+    val killOpts = new KillOptions();
+    client.killTopologyWithOpts(name, killOpts);
   }
 
 }

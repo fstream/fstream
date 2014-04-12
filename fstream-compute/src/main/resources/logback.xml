@@ -3,9 +3,8 @@
   <property name="log.name" value="fstream" />
   <property name="pattern" value="%date{ISO8601} [%thread] %-5level %logger{20} - %msg%n" />
 
-  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
-    <resetJUL>true</resetJUL>
-  </contextListener>
+  <!-- org.apache.storm:storm-core:0.9.1-incubating embeds logback.xml. This mutes the warnings -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -23,11 +22,6 @@
     </encoder>
   </appender>
   
-  <logger name="org.quickfixj" level="WARN"/>
-  <logger name="quickfix" level="WARN"/>
-  <logger name="quickfixj.event" level="WARN"/>
-  <logger name="org.apache.mina" level="WARN"/>
-
   <root level="INFO">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />

@@ -23,11 +23,6 @@
     </encoder>
   </appender>
   
-  <logger name="org.quickfixj" level="WARN"/>
-  <logger name="quickfix" level="WARN"/>
-  <logger name="quickfixj.event" level="WARN"/>
-  <logger name="org.apache.mina" level="WARN"/>
-
   <root level="INFO">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />

@@ -37,8 +37,8 @@ subprojects {
 		
 		// Logging
 		compile 'ch.qos.logback:logback-classic:1.1.1'
-		compile 'ch.qos.logback:log4j-bridge:0.9.7'
 		compile 'org.slf4j:jcl-over-slf4j:1.7.6'
+		compile 'org.slf4j:log4j-over-slf4j:1.7.6'
 		
 		// Test
 		testCompile 'junit:junit:4.11'

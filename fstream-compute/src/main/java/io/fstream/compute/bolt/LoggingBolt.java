@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute;
+package io.fstream.compute.bolt;
 
 import lombok.extern.slf4j.Slf4j;
 import backtype.storm.topology.BasicOutputCollector;
@@ -16,7 +16,7 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 
 @Slf4j
-public class PrinterBolt extends BaseBasicBolt {
+public class LoggingBolt extends BaseBasicBolt {
 
   @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {

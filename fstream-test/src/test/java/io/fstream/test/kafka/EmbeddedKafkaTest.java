@@ -64,7 +64,7 @@ public class EmbeddedKafkaTest {
     // createTopic();
 
     registerConsumer();
-    out.println("\n\n*** Running embedded Kafka. Press any key to shutdown\n\n");
+    out.println("\n\n*** Running embedded ZooKeeper / Kafka. Press any key to shutdown\n\n");
     in.read();
   }
 
