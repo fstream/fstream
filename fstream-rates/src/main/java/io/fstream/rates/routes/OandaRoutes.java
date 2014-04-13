@@ -37,31 +37,11 @@ public class OandaRoutes extends AbstractFixRoutes {
           .convertBodyTo(Rate.class)
           .log("${body}")
           .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
-          .multicast()
-            .to("seda:broker", "seda:analytics");
-    
-    // Send to broker
-    from("seda:broker")
-      .log("${body}")
-      // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
-      .to("{{fstream.broker.uri}}");
-    
-    // Send to process 
-    from("seda:analytics")
-      .to("esper://rates");
-    
-    // See http://esper.codehaus.org/esper-4.11.0/doc/reference/en-US/html_single/index.html#epl-intro
-    from("esper://rates?eql=" + 
-        "SELECT " +
-        "  cast(ask, float) / cast(prior(1, ask), float) AS askPercentChange " + 
-        "FROM " + 
-        "  " + Rate.class.getName() + "") 
-        .log("output: '${body.properties}'");
+          .to("{{fstream.broker.uri}}");  // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
     
     // For debugging
     from("stub:direct:fix")
       .bean(FixMessageLogger.class);
     // @formatter:on
   }
-
 }

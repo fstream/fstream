@@ -17,18 +17,18 @@ import lombok.val;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.joda.time.DateTime;
 
 /**
  * Route definitions for OANDA FIX handling.
  */
-public class SampleRoutes extends AbstractFixRoutes {
+public class StubRoutes extends RouteBuilder {
 
   @Override
   public void configure() throws Exception {
     // @formatter:off
-    
     from("timer://foo?period=1000")
       .process(new Processor() {
         
@@ -45,26 +45,6 @@ public class SampleRoutes extends AbstractFixRoutes {
       })
       .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
       .to("{{fstream.broker.uri}}");
-      
-    from("esper://events?eql=" + 
-        "SELECT " +
-        "  symbol, " + 
-        "  SUM(ask) AS totalAsk, " + 
-        "  AVG(bid) AS avgBid, " + 
-        "  COUNT(*) AS count " + 
-        "FROM " + 
-        "  " + Rate.class.getName() + ".win:time_batch(5 sec) " + 
-        "GROUP BY " + 
-        "  symbol")
-      .log("output: '${body.properties}'");
-    
-    from("esper://events?eql=" + 
-        "SELECT " +
-        "  CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange " + 
-        "FROM " + 
-        "  " + Rate.class.getName() + "") 
-        .log("output: '${body.properties}'");
-    
     // @formatter:on
   }
 }

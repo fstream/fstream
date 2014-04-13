@@ -22,6 +22,10 @@
     </encoder>
   </appender>
   
+  <logger name="storm.kafka" level="WARN"/>
+  <logger name="backtype.storm.daemon" level="WARN"/>
+  <logger name="org.apache.zookeeper" level="WARN"/>
+  
   <root level="INFO">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
