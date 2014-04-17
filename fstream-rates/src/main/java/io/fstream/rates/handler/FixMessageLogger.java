@@ -23,7 +23,7 @@ import quickfix.fix44.Message;
 public class FixMessageLogger {
 
   public void log(@Body Message message) {
-    log.info("Rates: {}", formatMessage(message));
+    log.info("Message: {}", formatMessage(message));
   }
 
 }

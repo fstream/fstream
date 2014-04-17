@@ -10,24 +10,35 @@
 package io.fstream.rates.util;
 
 import static lombok.AccessLevel.PRIVATE;
-import static quickfix.MessageUtils.getReverseSessionID;
-import static quickfix.MessageUtils.getSessionID;
-import static quickfix.Session.lookupSession;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import quickfix.Message;
+import quickfix.MessageUtils;
 import quickfix.Session;
+import quickfix.SessionID;
 
 @NoArgsConstructor(access = PRIVATE)
 public final class Sessions {
 
   public static Session getSession(Message message) {
-    val session = lookupSession(getSessionID(message));
+    val session = resolveSession(resolveSessionID(message));
     if (session != null) {
       return session;
     } else {
-      return lookupSession(getReverseSessionID(message));
+      return resolveSession(resolveReverseSessionID(message));
     }
+  }
+
+  private static Session resolveSession(SessionID sessionID) {
+    return sessionID == null ? null : Session.lookupSession(sessionID);
+  }
+
+  private static SessionID resolveSessionID(Message message) {
+    return message == null ? null : MessageUtils.getSessionID(message);
+  }
+
+  private static SessionID resolveReverseSessionID(Message message) {
+    return message == null ? null : MessageUtils.getReverseSessionID(message);
   }
 
 }

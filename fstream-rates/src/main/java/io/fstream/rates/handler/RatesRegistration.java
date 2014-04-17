@@ -13,7 +13,12 @@ import static quickfix.field.MDEntryType.BID;
 import static quickfix.field.MDEntryType.OFFER;
 import static quickfix.field.MDUpdateType.FULL_REFRESH;
 import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
+import lombok.NonNull;
+import lombok.Value;
 import lombok.val;
+
+import org.apache.camel.Handler;
+
 import quickfix.field.MDEntryType;
 import quickfix.field.MDReqID;
 import quickfix.field.MDUpdateType;
@@ -26,8 +31,13 @@ import quickfix.fix44.Message;
 /**
  * Bean that registers for rate subscriptions.
  */
+@Value
 public class RatesRegistration {
 
+  @NonNull
+  Iterable<String> symbols;
+
+  @Handler
   public Message register() {
     // All these fields are required
     val message = new MarketDataRequest(
@@ -42,12 +52,15 @@ public class RatesRegistration {
     entryTypes.set(new MDEntryType(BID));
     message.addGroup(entryTypes);
     entryTypes.set(new MDEntryType(OFFER));
+
     message.addGroup(entryTypes);
 
     // Symbols
-    val relatedSymbols = new MarketDataRequest.NoRelatedSym();
-    relatedSymbols.set(new Symbol("EUR/USD"));
-    message.addGroup(relatedSymbols);
+    for (val symbol : symbols) {
+      val relatedSymbols = new MarketDataRequest.NoRelatedSym();
+      relatedSymbols.set(new Symbol(symbol));
+      message.addGroup(relatedSymbols);
+    }
 
     return message;
   }

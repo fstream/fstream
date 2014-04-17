@@ -13,13 +13,19 @@ import io.fstream.core.model.Rate;
 import io.fstream.rates.handler.FixMessageLogger;
 import io.fstream.rates.handler.LogonHandler;
 import io.fstream.rates.handler.RatesRegistration;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import org.apache.camel.component.kafka.KafkaConstants;
 
 /**
  * Route definitions for OANDA FIX handling.
  */
+@RequiredArgsConstructor
 public class OandaRoutes extends AbstractFixRoutes {
+
+  @NonNull
+  Iterable<String> symbols;
 
   @Override
   public void configure() throws Exception {
@@ -30,7 +36,7 @@ public class OandaRoutes extends AbstractFixRoutes {
           .bean(LogonHandler.class)
           
         .when(sessionLogon())
-          .bean(RatesRegistration.class)
+          .bean(new RatesRegistration(symbols))
           .to("{{oanda.rates.uri}}")
           
         .when(marketDataSnapshotFullRefresh())
@@ -40,7 +46,7 @@ public class OandaRoutes extends AbstractFixRoutes {
           .to("{{fstream.broker.uri}}");  // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
     
     // For debugging
-    from("stub:direct:fix")
+    from("stub:{{oanda.rates.uri}}")
       .bean(FixMessageLogger.class);
     // @formatter:on
   }

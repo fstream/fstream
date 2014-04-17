@@ -20,6 +20,10 @@ public final class Messages {
 
   public static String formatMessage(Message message) {
     val session = getSession(message);
+    if (session == null) {
+      return "null";
+    }
+
     val dataDictionary = session.getDataDictionary();
     val xml = message.toXML(dataDictionary);
 
