@@ -29,4 +29,4 @@ dependencies {
   // Camel endpoints
   compile "org.apache.camel:camel-quickfix:$camelVersion"
   compile "org.apache.camel:camel-kafka:$camelVersion"
- }
+}

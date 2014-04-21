@@ -10,13 +10,13 @@
 package io.fstream.compute;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Strings.repeat;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.readLines;
 import static io.fstream.compute.factory.StormFactory.newConfig;
 import static io.fstream.compute.factory.StormFactory.newStormTopology;
 import static java.lang.System.in;
 import static java.lang.System.out;
-import static joptsimple.internal.Strings.repeat;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,11 +33,11 @@ import backtype.storm.utils.Utils;
 public class Main {
 
   public static void main(String... args) throws Exception {
-    log.info("{}", repeat('-', 100));
+    log.info("{}", repeat("-", 100));
     for (val line : readLines(getResource("banner.txt"), UTF_8)) {
       log.info(line);
     }
-    log.info("{}", repeat('-', 100));
+    log.info("{}", repeat("-", 100));
 
     new Main().run(args);
   }

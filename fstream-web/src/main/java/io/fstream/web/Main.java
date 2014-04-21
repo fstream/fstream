@@ -6,7 +6,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
-package io.fstream.rates;
+package io.fstream.web;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Strings.repeat;
@@ -14,7 +14,7 @@ import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.readLines;
 import static java.lang.System.in;
 import static java.lang.System.out;
-import io.fstream.rates.config.Config;
+import io.fstream.web.config.Config;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ public class Main {
         .sources(Config.class)
         .run(args);
 
-    out.println("\n\n*** Running rates. Press any key to shutdown\n\n");
+    out.println("\n\n*** Running web. Press any key to shutdown\n\n");
     in.read();
   }
 

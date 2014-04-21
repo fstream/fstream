@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+def camelVersion = '2.13.0'
+
+dependencies {
+  // fStream
+  compile project(':fstream-core')
+  
+  // Spring
+  compile "org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE"
+  compile 'org.springframework.boot:spring-boot-starter-web:1.0.1.RELEASE'
+}
