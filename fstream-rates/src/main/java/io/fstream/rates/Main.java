@@ -11,12 +11,17 @@ package io.fstream.rates;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.readLines;
-import static io.fstream.rates.factory.CamelContextFactory.newContext;
 import static java.lang.System.in;
 import static java.lang.System.out;
 import static joptsimple.internal.Strings.repeat;
+import io.fstream.rates.config.Config;
+
+import java.io.IOException;
+
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
  * Application entry point.
@@ -25,32 +30,23 @@ import lombok.extern.slf4j.Slf4j;
 public class Main {
 
   public static void main(String... args) throws Exception {
+    logBanner();
+
+    new SpringApplicationBuilder()
+        .showBanner(false)
+        .sources(Config.class)
+        .run(args);
+
+    out.println("\n\n*** Running rates. Press any key to shutdown\n\n");
+    in.read();
+  }
+
+  private static void logBanner() throws IOException {
     log.info("{}", repeat('-', 100));
     for (val line : readLines(getResource("banner.txt"), UTF_8)) {
       log.info(line);
     }
     log.info("{}", repeat('-', 100));
-
-    new Main().run();
-  }
-
-  public void run() throws Exception {
-    log.info("> Creating Camel context...");
-    val context = newContext();
-    log.info("< Created Camel context");
-
-    log.info("> Starting Camel context...");
-    context.start();
-    log.info("< Started Camel context");
-
-    try {
-      out.println("\n\n*** Running rates. Press any key to shutdown\n\n");
-      in.read();
-    } finally {
-      log.info("> Stopping Camel context...");
-      context.stop();
-      log.info("< Stopped Camel context");
-    }
   }
 
 }

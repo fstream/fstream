@@ -24,19 +24,25 @@ import quickfix.field.SendingTime;
 import quickfix.fix44.MarketDataSnapshotFullRefresh;
 
 /**
- * Converts FIX to fStream.
+ * Converts FIX messages to fStream rates.
+ * 
  * @see http
  * ://algo-trader.googlecode.com/svn-history/r539/branches/fix-md/code/src/main/java/com/algoTrader/service/fix/
  * FixMessageHandler.java
  */
 public class RateTypeConverter extends TypeConverterSupport {
 
-  @SneakyThrows
   @Override
   @SuppressWarnings("unchecked")
   public <T> T convertTo(Class<T> type, Exchange exchange, Object value) throws TypeConversionException {
     val message = (MarketDataSnapshotFullRefresh) value;
+    val rate = convertTo(message);
 
+    return (T) rate;
+  }
+
+  @SneakyThrows
+  private Rate convertTo(MarketDataSnapshotFullRefresh message) {
     val rate = new Rate();
     rate.setSymbol(message.getSymbol().getValue());
     rate.setDateTime(new DateTime(message.getHeader().getUtcTimeStamp(SendingTime.FIELD)));
@@ -54,7 +60,7 @@ public class RateTypeConverter extends TypeConverterSupport {
       }
     }
 
-    return (T) rate;
+    return rate;
   }
 
 }

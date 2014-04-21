@@ -6,37 +6,30 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
+// @formatter:off
 
 package io.fstream.rates.routes;
 
 import io.fstream.core.model.Rate;
-import io.fstream.rates.handler.FixMessageLogger;
-import io.fstream.rates.handler.LogonHandler;
-import io.fstream.rates.handler.RatesRegistration;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import org.apache.camel.component.kafka.KafkaConstants;
+import org.springframework.stereotype.Component;
 
 /**
  * Route definitions for OANDA FIX handling.
  */
-@RequiredArgsConstructor
+@Component
 public class OandaRoutes extends AbstractFixRoutes {
-
-  @NonNull
-  Iterable<String> symbols;
 
   @Override
   public void configure() throws Exception {
-    // @formatter:off
     from("{{oanda.rates.uri}}")
       .choice()
         .when(logon())
-          .bean(LogonHandler.class)
+          .to("bean:logonHandler")
           
         .when(sessionLogon())
-          .bean(new RatesRegistration(symbols))
+          .to("bean:ratesRegistration")
           .to("{{oanda.rates.uri}}")
           
         .when(marketDataSnapshotFullRefresh())
@@ -47,7 +40,7 @@ public class OandaRoutes extends AbstractFixRoutes {
     
     // For debugging
     from("stub:{{oanda.rates.uri}}")
-      .bean(FixMessageLogger.class);
-    // @formatter:on
+      .to("bean:fixMessageLogger");
   }
+  
 }

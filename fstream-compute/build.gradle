@@ -8,21 +8,21 @@
  */
 
 configurations {
-    compile.exclude module: 'slf4j-simple'
-    compile.exclude module: 'slf4j-log4j12'
-    compile.exclude module: 'storm'
+  compile.exclude module: 'slf4j-simple'
+  compile.exclude module: 'slf4j-log4j12'
+  compile.exclude module: 'storm'
 }
 
 dependencies {
 	// fStream
 	compile project(':fstream-core')
     
-    // Storm
-    compile 'org.apache.storm:storm-core:0.9.1-incubating'
-    
-    // Storm-Kafka 
-    compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
-    
-    // Storm-Esper
-    compile "org.tomdz.storm:storm-esper:0.8.1-SNAPSHOT"
+  // Storm
+  compile 'org.apache.storm:storm-core:0.9.1-incubating'
+  
+  // Storm-Kafka 
+  compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
+  
+  // Storm-Esper
+  compile "org.tomdz.storm:storm-esper:0.8.1-SNAPSHOT"
 }

@@ -6,6 +6,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
+// @formatter:off
 
 package io.fstream.rates.routes;
 
@@ -20,16 +21,17 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 
 /**
- * Route definitions for OANDA FIX handling.
+ * Stub route definitions for OANDA FIX handling.
  */
+@Component
 public class StubRoutes extends RouteBuilder {
 
   @Override
   public void configure() throws Exception {
-    // @formatter:off
-    from("timer://foo?period=1000")
+    from("stub:timer://foo?period=1000")
       .process(new Processor() {
         
         int bid = 1;
@@ -45,6 +47,6 @@ public class StubRoutes extends RouteBuilder {
       })
       .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
       .to("{{fstream.broker.uri}}");
-    // @formatter:on
   }
+
 }

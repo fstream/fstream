@@ -13,11 +13,16 @@ import static quickfix.field.MDEntryType.BID;
 import static quickfix.field.MDEntryType.OFFER;
 import static quickfix.field.MDUpdateType.FULL_REFRESH;
 import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
-import lombok.NonNull;
-import lombok.Value;
+
+import java.util.List;
+
+import lombok.Setter;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.Handler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import quickfix.field.MDEntryType;
 import quickfix.field.MDReqID;
@@ -31,14 +36,18 @@ import quickfix.fix44.Message;
 /**
  * Bean that registers for rate subscriptions.
  */
-@Value
+@Slf4j
+@Setter
+@Component
 public class RatesRegistration {
 
-  @NonNull
-  Iterable<String> symbols;
+  @Value("${oanda.rates.symbols}")
+  private List<String> symbols;
 
   @Handler
   public Message register() {
+    log.info("Registering {}...", symbols);
+
     // All these fields are required
     val message = new MarketDataRequest(
         new MDReqID("fstream-rates"),

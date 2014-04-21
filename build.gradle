@@ -12,21 +12,30 @@ defaultTasks 'build'
 subprojects {
 	version = '0.0.1-SNAPSHOT'
 	group = 'io.fstream'
-
+	
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
-
+	
 	sourceCompatibility = JavaVersion.VERSION_1_6
 	targetCompatibility = project.sourceCompatibility
-
+	
 	repositories { 
-    	mavenCentral() 
+		mavenCentral() 
 	    maven { url 'http://repo.marketcetera.org/maven' }
 	    maven { url 'http://clojars.org/repo' }
 	    maven { url 'http://conjars.org/repo' }
 	    maven { url 'http://twitter4j.org/maven2' }
 	}
-
+	
+	configurations {
+		compile.exclude module: 'slf4j-simple'
+		compile.exclude module: 'slf4j-log4j12'
+		
+		all*.exclude group: 'javax.jms', module: 'jms'
+		all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
+		all*.exclude group: 'com.sun.jmx', module: 'jmxri'
+	}
+	
 	dependencies {
 		// Compile-time transformations
 		compile 'org.projectlombok:lombok:1.12.4'
@@ -36,14 +45,14 @@ subprojects {
 		compile 'joda-time:joda-time:2.3'
 		
 		// Logging
-		compile 'ch.qos.logback:logback-classic:1.1.1'
+		compile 'ch.qos.logback:logback-classic:1.1.2'
 		compile 'org.slf4j:jcl-over-slf4j:1.7.6'
 		compile 'org.slf4j:log4j-over-slf4j:1.7.6'
 		
 		// Test
 		testCompile 'junit:junit:4.11'
 	}
-
+	
 	jar {
 		manifest {
 			attributes 'Provider': 'gradle', 'Implementation-Title': project.name, 'Implementation-Version': project.version

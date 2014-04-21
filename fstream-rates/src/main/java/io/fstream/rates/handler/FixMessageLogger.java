@@ -13,6 +13,7 @@ import static io.fstream.rates.util.Messages.formatMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.Body;
+import org.springframework.stereotype.Component;
 
 import quickfix.fix44.Message;
 
@@ -20,6 +21,7 @@ import quickfix.fix44.Message;
  * Bean that logs FIX messages.
  */
 @Slf4j
+@Component
 public class FixMessageLogger {
 
   public void log(@Body Message message) {
