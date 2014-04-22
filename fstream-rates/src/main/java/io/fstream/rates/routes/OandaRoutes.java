@@ -13,17 +13,16 @@ package io.fstream.rates.routes;
 import io.fstream.core.model.Rate;
 
 import org.apache.camel.component.kafka.KafkaConstants;
-import org.springframework.stereotype.Component;
 
 /**
  * Route definitions for OANDA FIX handling.
  */
-@Component
+//@Component
 public class OandaRoutes extends AbstractFixRoutes {
 
   @Override
   public void configure() throws Exception {
-    from("{{oanda.rates.uri}}")
+    from("stub:{{oanda.rates.uri}}")
       .choice()
         .when(logon())
           .to("bean:logonHandler")

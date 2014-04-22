@@ -7,9 +7,12 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.esper;
+package io.fstream.compute.bolt;
 
 import static lombok.AccessLevel.PRIVATE;
+import io.fstream.compute.esper.EventTypeDescriptor;
+import io.fstream.compute.esper.StreamId;
+import io.fstream.compute.esper.TupleTypeDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,7 +87,7 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
         return eventType;
       }
     }
-  
+
     return null;
   }
 
@@ -98,26 +101,26 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
   @Override
   public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
     this.collector = collector;
-  
+
     Configuration configuration = new Configuration();
-  
+
     setupEventTypes(context, configuration);
-  
+
     this.esperSink = EPServiceProviderManager.getProvider(this.toString(), configuration);
     this.esperSink.initialize();
     this.runtime = esperSink.getEPRuntime();
     this.admin = esperSink.getEPAdministrator();
-  
+
     for (String stmt : statements) {
       EPStatement statement = admin.createEPL(stmt);
-  
+
       statement.addListener(this);
     }
   }
 
   private String getEventTypeName(String componentId, String streamId) {
     String alias = inputAliases.get(new StreamId(componentId, streamId));
-  
+
     if (alias == null) {
       alias = String.format("%s_%s", componentId, streamId);
     }
@@ -126,13 +129,13 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
 
   private void setupEventTypes(TopologyContext context, Configuration configuration) {
     Set<GlobalStreamId> sourceIds = context.getThisSources().keySet();
-  
+
     for (GlobalStreamId id : sourceIds) {
       String eventTypeName = getEventTypeName(id.get_componentId(), id.get_streamId());
       Fields fields = context.getComponentOutputFields(id.get_componentId(), id.get_streamId());
       TupleTypeDescriptor typeDesc = tupleTypes.get(new StreamId(id.get_componentId(), id.get_streamId()));
       Map<String, Object> props = setupEventTypeProperties(fields, typeDesc);
-  
+
       configuration.addEventType(eventTypeName, props);
     }
   }
@@ -140,14 +143,14 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
   private Map<String, Object> setupEventTypeProperties(Fields fields, TupleTypeDescriptor typeDesc) {
     Map<String, Object> properties = new HashMap<String, Object>();
     int numFields = fields.size();
-  
+
     for (int idx = 0; idx < numFields; idx++) {
       String fieldName = fields.get(idx);
       Class<?> clazz = null;
-  
+
       if (typeDesc != null) {
         String clazzName = typeDesc.getFieldType(fieldName);
-  
+
         if (clazzName != null) {
           try {
             clazz = Class.forName(clazzName);
@@ -156,13 +159,13 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
           }
         }
       }
-  
+
       if (clazz == null) {
         clazz = Object.class;
       }
       properties.put(fieldName, clazz);
     }
-  
+
     return properties;
   }
 
@@ -172,14 +175,14 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
     Map<String, Object> data = new HashMap<String, Object>();
     Fields fields = tuple.getFields();
     int numFields = fields.size();
-  
+
     for (int idx = 0; idx < numFields; idx++) {
       String name = fields.get(idx);
       Object value = tuple.getValue(idx);
-  
+
       data.put(name, value);
     }
-  
+
     runtime.sendEvent(data, eventType);
     collector.ack(tuple);
   }
@@ -189,7 +192,7 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
     if (newEvents != null) {
       for (EventBean newEvent : newEvents) {
         EventTypeDescriptor eventType = getEventType(newEvent.getEventType().getName());
-  
+
         if (eventType == null) {
           // anonymous event ?
           eventType = getEventType(null);
@@ -204,7 +207,7 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
   private List<Object> toTuple(EventBean event, Fields fields) {
     int numFields = fields.size();
     List<Object> tuple = new ArrayList<Object>(numFields);
-  
+
     for (int idx = 0; idx < numFields; idx++) {
       tuple.add(event.get(fields.get(idx)));
     }

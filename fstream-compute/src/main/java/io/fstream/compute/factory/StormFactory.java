@@ -10,9 +10,14 @@
 package io.fstream.compute.factory;
 
 import static lombok.AccessLevel.PRIVATE;
+import io.fstream.compute.bolt.AdapterBolt;
+import io.fstream.compute.bolt.EsperBolt;
+import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
-import io.fstream.compute.esper.EsperBolt;
 import io.fstream.core.model.Rate;
+
+import java.util.Properties;
+
 import lombok.NoArgsConstructor;
 import lombok.val;
 import storm.kafka.KafkaSpout;
@@ -37,6 +42,13 @@ public final class StormFactory {
     val config = new Config();
     config.setDebug(true);
 
+    Properties props = new Properties();
+    props.put("metadata.broker.list", "localhost:6667");
+    props.put("request.required.acks", "1");
+    props.put("serializer.class", "kafka.serializer.StringEncoder");
+
+    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
+    config.put(KafkaBolt.TOPIC, "analysis");
     if (local) {
       config.setMaxTaskParallelism(3);
     } else {
@@ -54,8 +66,10 @@ public final class StormFactory {
         .shuffleGrouping(spoutId);
     builder.setBolt("compute", newComputeBolt())
         .shuffleGrouping(spoutId);
-    // builder.setBolt("computeLogger", newLoggingBolt())
-    // .shuffleGrouping("compute");
+    builder.setBolt("adapter", new AdapterBolt())
+        .shuffleGrouping(spoutId);
+    builder.setBolt("kafka", new KafkaBolt<String, String>())
+        .shuffleGrouping("adapter");
 
     return builder.createTopology();
   }

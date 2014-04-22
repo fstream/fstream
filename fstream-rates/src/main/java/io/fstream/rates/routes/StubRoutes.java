@@ -31,7 +31,7 @@ public class StubRoutes extends RouteBuilder {
 
   @Override
   public void configure() throws Exception {
-    from("stub:timer://foo?period=1000")
+    from("timer://rates?period=1000")
       .process(new Processor() {
         
         int bid = 1;
@@ -46,6 +46,7 @@ public class StubRoutes extends RouteBuilder {
         
       })
       .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
+      .log("${body}")
       .to("{{fstream.broker.uri}}");
   }
 
