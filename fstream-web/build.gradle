@@ -16,4 +16,9 @@ dependencies {
   // Spring
   compile "org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE"
   compile 'org.springframework.boot:spring-boot-starter-web:1.0.1.RELEASE'
+  compile 'org.springframework.boot:spring-boot-starter-websocket:1.0.1.RELEASE'
+  compile "org.springframework:spring-messaging:4.0.3.RELEASE"
+  
+  // Kafka
+  compile 'org.apache.kafka:kafka_2.10:0.8.1'
 }

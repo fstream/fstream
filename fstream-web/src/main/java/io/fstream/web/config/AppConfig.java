@@ -9,16 +9,14 @@
 
 package io.fstream.web.config;
 
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * Java config for Spring consumption.
  */
 @Configuration
-@ComponentScan("io.fstream.web")
-@PropertySource("classpath:fstream.properties")
-public class Config {
+@EnableAutoConfiguration
+public class AppConfig {
 
 }

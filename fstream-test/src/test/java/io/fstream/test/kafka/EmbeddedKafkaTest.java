@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.ZkClient;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -63,11 +62,12 @@ public class EmbeddedKafkaTest {
   public void testServer() throws IOException {
     // createTopic();
 
-    registerConsumer();
+    // registerConsumer();
     out.println("\n\n*** Running embedded ZooKeeper / Kafka. Press any key to shutdown\n\n");
     in.read();
   }
 
+  @SuppressWarnings("unused")
   private void registerConsumer() {
     val props = new Properties();
     props.put("zookeeper.connect", "localhost:21818");
@@ -96,7 +96,7 @@ public class EmbeddedKafkaTest {
     }
   }
 
-  @Ignore
+  @SuppressWarnings("unused")
   private void createTopic() {
     val zkClient = new ZkClient("localhost:21818");
     Properties props = new Properties();
