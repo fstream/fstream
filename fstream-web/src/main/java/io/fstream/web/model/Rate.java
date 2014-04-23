@@ -9,9 +9,11 @@
 
 package io.fstream.web.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Rate {
 
   private String value;

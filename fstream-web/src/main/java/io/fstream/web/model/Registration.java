@@ -9,13 +9,13 @@
 
 package io.fstream.web.model;
 
-import lombok.NonNull;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Value
+@Data
+@AllArgsConstructor
 public class Registration {
 
-  @NonNull
-  String instrument;
+  private String instrument;
 
 }

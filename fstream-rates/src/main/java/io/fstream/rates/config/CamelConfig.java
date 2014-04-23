@@ -12,8 +12,12 @@ package io.fstream.rates.config;
 import static io.fstream.rates.util.PropertiesComponents.newPropertiesComponent;
 import io.fstream.core.model.Rate;
 import io.fstream.rates.handler.RateTypeConverter;
+import lombok.val;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.component.jackson.JacksonDataFormat;
+import org.apache.camel.impl.DefaultDataFormatResolver;
+import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,12 +26,23 @@ import org.springframework.core.env.Environment;
 
 import quickfix.fix44.MarketDataSnapshotFullRefresh;
 
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+
 /**
  * Java config for Spring consumption.
  */
 @Configuration
 public class CamelConfig extends CamelConfiguration {
 
+  /**
+   * Constants.
+   */
+  private static final String CAMEL_JSON_JACKSON_DATA_FORMAT = "json-jackson";
+  private static final String CAMEL_PROPERTIES_NAME = "properties";
+
+  /**
+   * Runtime properties.
+   */
   @Autowired
   private Environment environment;
 
@@ -36,9 +51,38 @@ public class CamelConfig extends CamelConfiguration {
     return new RateTypeConverter();
   }
 
+  @Bean
+  public JacksonDataFormat jacksonDataFormat() {
+    val dataFormat = new JacksonDataFormat();
+    dataFormat.setUnmarshalType(Rate.class);
+
+    val mapper = dataFormat.getObjectMapper();
+    mapper.registerModule(new JodaModule());
+
+    return dataFormat;
+  }
+
   @Override
   protected void setupCamelContext(CamelContext camelContext) throws Exception {
-    camelContext.addComponent("properties", newPropertiesComponent(environment));
+    camelContext.addComponent(CAMEL_PROPERTIES_NAME, newPropertiesComponent(environment));
+
+    val jacksonDataFormat = jacksonDataFormat();
+    camelContext.setDataFormatResolver(new DefaultDataFormatResolver() {
+
+      @Override
+      public DataFormat resolveDataFormat(String name, CamelContext context) {
+        val target = name.equals(CAMEL_JSON_JACKSON_DATA_FORMAT);
+        if (target) {
+          // Override
+          return jacksonDataFormat;
+        } else {
+          // Delgate
+          return super.resolveDataFormat(name, context);
+        }
+      }
+
+    });
+
     camelContext.getTypeConverterRegistry().addTypeConverter(
         Rate.class, MarketDataSnapshotFullRefresh.class, rateTypeConverter());
   }

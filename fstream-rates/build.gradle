@@ -29,4 +29,8 @@ dependencies {
   // Camel endpoints
   compile "org.apache.camel:camel-quickfix:$camelVersion"
   compile "org.apache.camel:camel-kafka:$camelVersion"
+  compile "org.apache.camel:camel-jackson:$camelVersion"
+  
+  // Joda Time
+  compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
 }

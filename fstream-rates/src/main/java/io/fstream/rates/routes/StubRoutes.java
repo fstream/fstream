@@ -10,10 +10,12 @@
 
 package io.fstream.rates.routes;
 
+import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
 import io.fstream.core.model.Rate;
 
 import java.math.BigDecimal;
 
+import lombok.Setter;
 import lombok.val;
 
 import org.apache.camel.Exchange;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Stub route definitions for OANDA FIX handling.
  */
+@Setter
 @Component
 public class StubRoutes extends RouteBuilder {
 
@@ -47,6 +50,7 @@ public class StubRoutes extends RouteBuilder {
       })
       .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
       .log("${body}")
+      .marshal().json(Jackson)
       .to("{{fstream.broker.uri}}");
   }
 
