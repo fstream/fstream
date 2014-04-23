@@ -32,7 +32,7 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 @Slf4j
 @Service
-public class KafkaMessageService extends AbstractExecutionThreadService {
+public class RatesMessageService extends AbstractExecutionThreadService {
 
   @Autowired
   private SimpMessagingTemplate template;

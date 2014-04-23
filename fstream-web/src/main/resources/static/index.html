@@ -21,7 +21,7 @@
                 setConnected(true);
                 console.log('Connected: ' + frame);
                 stompClient.subscribe('/topic/greetings', function(greeting){
-                    showGreeting(JSON.parse(greeting.body).content);
+                    showGreeting(greeting.body.toString());
                 });
             });
         }
@@ -55,8 +55,10 @@
         <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
     </div>
     <div id="conversationDiv">
+    <!-- 
         <label>What is your name?</label><input type="text" id="name" />
         <button id="sendName" onclick="sendName();">Send</button>
+     -->
         <p id="response"></p>
     </div>
 </div>
