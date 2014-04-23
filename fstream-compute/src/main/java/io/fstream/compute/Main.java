@@ -55,14 +55,14 @@ public class Main {
       val cluster = new LocalCluster();
       cluster.submitTopology(name, config, topology);
 
-      out.println("\n\n*** Running [local] compute. Press any key to shutdown\n\n");
+      out.println("\n\n*** Running [local] compute. Press enter to shutdown\n\n");
       in.read();
 
       cluster.shutdown();
     } else {
       StormSubmitter.submitTopology(name, config, topology);
 
-      out.println("\n\n*** Running [cluster] compute. Press any key to shutdown\n\n");
+      out.println("\n\n*** Running [cluster] compute. Press enter to shutdown\n\n");
       in.read();
 
       killTopology(name);

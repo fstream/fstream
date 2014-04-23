@@ -40,7 +40,7 @@ public class Main {
         .sources(Main.class)
         .run(args);
 
-    out.println("\n\n*** Running web. Press any key to shutdown\n\n");
+    out.println("\n\n*** Running web. Press enter to shutdown\n\n");
     in.read();
   }
 

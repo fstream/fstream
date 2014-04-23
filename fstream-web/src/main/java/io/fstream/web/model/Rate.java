@@ -9,13 +9,11 @@
 
 package io.fstream.web.model;
 
-import lombok.NonNull;
-import lombok.Value;
+import lombok.Data;
 
-@Value
-public class Greeting {
+@Data
+public class Rate {
 
-  @NonNull
-  String content;
+  private String value;
 
 }

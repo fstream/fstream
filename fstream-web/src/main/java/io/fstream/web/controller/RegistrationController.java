@@ -9,21 +9,23 @@
 
 package io.fstream.web.controller;
 
-import io.fstream.web.model.Greeting;
-import io.fstream.web.model.HelloMessage;
+import io.fstream.web.model.RegisterMessage;
+import io.fstream.web.model.Registration;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
+@Slf4j
 @Controller
-public class MessageController {
+public class RegistrationController {
 
-  @MessageMapping("/hello")
-  @SendTo("/topic/greetings")
-  public Greeting greeting(HelloMessage message) throws Exception {
-    Thread.sleep(3000); // simulated delay
-    return new Greeting("Hello, " + message.getName() + "!");
+  @MessageMapping("/register")
+  @SendTo("/topic/events")
+  public Registration register(RegisterMessage message) throws Exception {
+    log.info("Registering '{}'", message);
+    return new Registration(message.getInstrument());
   }
 
 }

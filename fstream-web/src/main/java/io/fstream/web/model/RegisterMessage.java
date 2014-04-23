@@ -9,13 +9,11 @@
 
 package io.fstream.web.model;
 
-import lombok.NonNull;
-import lombok.Value;
+import lombok.Data;
 
-@Value
-public class HelloMessage {
+@Data
+public class RegisterMessage {
 
-  @NonNull
-  String name;
+  private String instrument;
 
 }

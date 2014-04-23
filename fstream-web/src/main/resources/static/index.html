@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello WebSocket</title>
+    <title>fStream - Web</title>
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
     <script src="stomp.js"></script>
     <script type="text/javascript">
@@ -10,19 +10,24 @@
         function setConnected(connected) {
             document.getElementById('connect').disabled = connected;
             document.getElementById('disconnect').disabled = !connected;
-            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
-            document.getElementById('response').innerHTML = '';
+            document.getElementById('conversation').style.visibility = connected ? 'visible' : 'hidden';
+            document.getElementById('events').innerHTML = '';
+            document.getElementById('rates').innerHTML = '';
         }
 
         function connect() {
-            var socket = new SockJS('/hello');
+            var socket = new SockJS('/server');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/greetings', function(greeting){
-                    showGreeting(greeting.body.toString());
+                
+                stompClient.subscribe('/topic/rates', function(rate){
+                    showRate(rate.body.toString());
                 });
+                stompClient.subscribe('/topic/events', function(event){
+                	showEvent(event.body.toString());
+                });                
             });
         }
 
@@ -32,13 +37,21 @@
             console.log("Disconnected");
         }
 
-        function sendName() {
-            var name = document.getElementById('name').value;
-            stompClient.send("/app/hello", {}, JSON.stringify({ 'name': name }));
+        function registerInstrument() {
+            var instrument = document.getElementById('instrument').value;
+            stompClient.send("/web/register", {}, JSON.stringify({ 'instrument': instrument }));
         }
 
-        function showGreeting(message) {
-            var response = document.getElementById('response');
+        function showRate(message) {
+            var response = document.getElementById('rates');
+            var p = document.createElement('p');
+            p.style.wordWrap = 'break-word';
+            p.appendChild(document.createTextNode(message));
+            response.appendChild(p);
+        }
+        
+        function showEvent(message) {
+            var response = document.getElementById('events');
             var p = document.createElement('p');
             p.style.wordWrap = 'break-word';
             p.appendChild(document.createTextNode(message));
@@ -54,12 +67,11 @@
         <button id="connect" onclick="connect();">Connect</button>
         <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
     </div>
-    <div id="conversationDiv">
-    <!-- 
-        <label>What is your name?</label><input type="text" id="name" />
-        <button id="sendName" onclick="sendName();">Send</button>
-     -->
-        <p id="response"></p>
+    <div id="conversation">
+        <label>Register Instrument</label><input type="text" id="instrument" value="EUR/USD" />
+        <button onclick="registerInstrument();">Register</button>
+        <p id="events"></p>
+        <p id="rates"></p>
     </div>
 </div>
 </body>

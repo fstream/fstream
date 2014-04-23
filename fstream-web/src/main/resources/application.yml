@@ -1,0 +1,21 @@
+---
+
+#
+# Copyright (c) 2014 fStream. All Rights Reserved.
+# 
+# Project and contact information: https://bitbucket.org/fstream/fstream
+# 
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# Proprietary and confidential.
+#
+
+
+
+kafka:
+   consumerProperties:
+      zookeeper.connect: localhost:21818
+      zookeeper.connection.timeout.ms: 1000000
+      group.id: 1
+      broker.id: 0
+   topics:
+      - test

@@ -10,8 +10,7 @@
 package io.fstream.web.service;
 
 import static com.google.common.collect.ImmutableMap.of;
-
-import java.util.Properties;
+import io.fstream.web.config.KafkaProperties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -34,28 +33,25 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
 @Service
 public class RatesMessageService extends AbstractExecutionThreadService {
 
+  /**
+   * Dependencies.
+   */
   @Autowired
   private SimpMessagingTemplate template;
+  @Autowired
+  private KafkaProperties kafka;
 
+  /**
+   * State.
+   */
   private KafkaStream<byte[], byte[]> stream;
   private ConsumerConnector consumerConnector;
 
   @PostConstruct
   public void init() throws Exception {
     log.info("Initializing...");
-    val props = new Properties();
-    props.put("zookeeper.connect", "localhost:21818");
-    props.put("zookeeper.connection.timeout.ms", "1000000");
-    props.put("group.id", "1");
-    props.put("broker.id", "0");
-
-    this.consumerConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-
-    val count = 1;
-    val topicMessageStreams = consumerConnector.createMessageStreams(of("test", count));
-    val streams = topicMessageStreams.get("test");
-
-    this.stream = streams.get(0);
+    this.consumerConnector = createConsumerConnector();
+    this.stream = createStream();
 
     startAsync();
   }
@@ -78,8 +74,22 @@ public class RatesMessageService extends AbstractExecutionThreadService {
       val text = new String(message);
 
       log.info("Received: {}", text);
-      template.send("/topic/greetings", MessageBuilder.withPayload(message).build());
+      template.send("/topic/rates", MessageBuilder.withPayload(message).build());
     }
+  }
+
+  private ConsumerConnector createConsumerConnector() {
+    return Consumer.createJavaConsumerConnector(new ConsumerConfig(kafka.getConsumerProperties()));
+  }
+
+  private KafkaStream<byte[], byte[]> createStream() {
+    val topicName = "test";
+    val topicStreamCount = 1;
+
+    val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));
+    val streams = topicMessageStreams.get(topicName);
+
+    return streams.get(0);
   }
 
 }
