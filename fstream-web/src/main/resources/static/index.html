@@ -1,78 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>fStream - Web</title>
-    <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-    <script src="stomp.js"></script>
-    <script type="text/javascript">
-        var stompClient = null;
-
-        function setConnected(connected) {
-            document.getElementById('connect').disabled = connected;
-            document.getElementById('disconnect').disabled = !connected;
-            document.getElementById('conversation').style.visibility = connected ? 'visible' : 'hidden';
-            document.getElementById('events').innerHTML = '';
-            document.getElementById('rates').innerHTML = '';
-        }
-
-        function connect() {
-            var socket = new SockJS('/server');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function(frame) {
-                setConnected(true);
-                console.log('Connected: ' + frame);
-                
-                stompClient.subscribe('/topic/rates', function(rate){
-                    showRate(rate.body.toString());
-                });
-                stompClient.subscribe('/topic/events', function(event){
-                	showEvent(event.body.toString());
-                });                
-            });
-        }
-
-        function disconnect() {
-            stompClient.disconnect();
-            setConnected(false);
-            console.log("Disconnected");
-        }
-
-        function registerInstrument() {
-            var instrument = document.getElementById('instrument').value;
-            stompClient.send("/web/register", {}, JSON.stringify({ 'instrument': instrument }));
-        }
-
-        function showRate(message) {
-            var response = document.getElementById('rates');
-            var p = document.createElement('p');
-            p.style.wordWrap = 'break-word';
-            p.appendChild(document.createTextNode(message));
-            response.appendChild(p);
-        }
-        
-        function showEvent(message) {
-            var response = document.getElementById('events');
-            var p = document.createElement('p');
-            p.style.wordWrap = 'break-word';
-            p.appendChild(document.createTextNode(message));
-            response.appendChild(p);
-        }
-    </script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->    
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
-<div>
-    <div>
-        <button id="connect" onclick="connect();">Connect</button>
-        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+	<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+	    Javascript and reload this page!</h2></noscript>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">fStream Web</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
     </div>
-    <div id="conversation">
-        <label>Register Instrument</label><input type="text" id="instrument" value="EUR/USD" />
-        <button onclick="registerInstrument();">Register</button>
-        <p id="events"></p>
-        <p id="rates"></p>
-    </div>
-</div>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+    </div>    
+	<div class="container">
+		<div class="panel panel-default">
+		  <div class="panel-body">
+		  	<div class="btn-group">
+			  <button type="button" class="btn btn-default" id="connect" onclick="connect();">Connect</button>
+			  <button type="button" class="btn btn-default" id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+			</div>
+		  </div>
+		</div>
+		<form class="navbar-form navbar-left" role="search">
+		  <div class="form-group">
+		    <input type="text" class="form-control" placeholder="USD/JPY, etc." id="instrument">
+		  </div>
+	      <a class="btn btn-primary" role="button" onclick="registerInstrument();">Register &raquo;</a>
+		</form>
+	    <div id="conversation">
+	        <div id='charts'></div>
+	        <div>
+     			<h4>Events</h4>
+			    <div class="alert alert-warning" id="events"></div>
+	        </div>
+	        <div>
+			    <h4>Rates</h4>
+			    <div class="alert alert-success" id="rates"></div>
+			  </div>
+	    </div>
+	</div>
+    <script language='javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script language='javascript' src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script language='javascript' src="//cdn.sockjs.org/sockjs-0.3.min.js"></script>
+    <script language='javascript' src="js/stomp.js"></script>
+    <script language='javascript' src='js/d3.v2.min.js'></script>
+    <script language='javascript' src='js/cubism.v1.min.js'></script>    
+    <script language='javascript' src='js/application.js'></script>    
 </body>
 </html>

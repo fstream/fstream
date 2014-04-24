@@ -24,7 +24,7 @@ public class Rate {
 
   DateTime dateTime;
   String symbol;
-  BigDecimal bid;
   BigDecimal ask;
+  BigDecimal bid;
 
 }
