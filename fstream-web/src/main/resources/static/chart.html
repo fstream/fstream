@@ -7,6 +7,71 @@
     <script language='javascript' src='http://code.jquery.com/jquery-1.11.0.min.js'></script>
     <script language='javascript' src='d3.v2.min.js'></script>
     <script language='javascript' src='cubism.v1.min.js'></script>    
+<style>
+            html {
+                min-width: 1040px;
+            }
+            body {
+                font-family: 'Helvetica Neue', Helvetica, sans-serif;
+                width: 960px;
+            }
+
+            .horizon {
+                border-bottom: solid 1px black;
+                overflow: hidden;
+                border-top: solid 1px black;
+                position: relative;
+            }
+            .horizon + .horizon {
+                border-top: none;
+            }
+            .horizon .title,
+            .horizon .value {
+                bottom: 0;
+                line-height: 30px;
+                margin: 0 6px;
+                position: absolute;
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+                white-space: nowrap;
+            }
+
+            .horizon .title {
+                left: 0;
+            }
+
+            .horizon .value {
+                right: 0;
+            }
+
+            .horizon canvas {
+                display: block;
+            }
+
+            .axis {
+                font: 10px sans-serif;
+            }
+
+            .axis text {
+                transition: fill-opacity 250ms linear;
+            }
+
+            .axis path {
+                display: none;
+            }
+
+            .line {
+                /* No idea why 8px margin left is needed here :( */
+                margin-left: 8px;
+                background: black;
+                opacity: 0.2;
+                z-index: 2;
+            }
+            .axis .line {
+                stroke: black;
+                shape-rendering: crispEdges;
+            }
+        </style>
+    
     <script type="text/javascript">
         var stompClient = null;
 
@@ -66,10 +131,6 @@
        
        updateChart = null;
 $(function() {
-
-
-    var analog_keys = ['vcell', 'current', 'temp'];
-
     (function() {
         function make_realtime(key) {
             var buf = [], callbacks = [];
@@ -89,21 +150,16 @@ $(function() {
         };
 
         var realtime = {
-            vcell: make_realtime('vcell'),
-            current: make_realtime('current'),
-            temp: make_realtime('temp'),
-            rawcap: make_realtime('rawcap'),
+            bid: make_realtime('bid'),
+            ask: make_realtime('ask'),
         };
 
-        /* This websocket sends homogenous messages in the form
-         * {timestamp: 1234567, analog: {vcell: 3.3, current: 2.3, temp: 20}}
-         * where timestamp is a Unix timestamp
-         */
-         //{"dateTime":1398308418977,"symbol":"EUR/USD","bid":1.3818,"ask":1.38191}
+        // This websocket sends homogenous messages in the form
+        //{"dateTime":1398308418977,"symbol":"EUR/USD","bid":1.3818,"ask":1.38191}
         updateChart = function(data) {
         	console.log(data);
-        	realtime['vcell'].data(data.dateTime, data.bid);
-        	realtime['current'].data(data.dateTime, data.ask);
+        	realtime['ask'].data(data.dateTime, data.ask);
+        	realtime['bid'].data(data.dateTime, data.bid);
         };
 
         var context = cubism.context().step(1000).size(960);
@@ -160,21 +216,21 @@ $(function() {
             .call(context.rule());
 
         charts = {
-            vcell: {
+            ask: {
+                title: 'Ask',
+                unit: '$',
+                extent: [0, 2]
+            },
+            bid: {
                 title: 'Bid',
                 unit: '$',
-                extent: [0, 5]
-            },
-            current: {
-                title: 'Aks',
-                unit: '$',
-                extent: [0, 5]
+                extent: [0, 2]
             }
         };
 
         Object.keys(charts).map(function (key) {
             var cht = charts[key];
-            var num_fmt = d3.format('.3r');
+            var num_fmt = d3.format('.5r');
             d3.select('#charts')
                 .insert('div', '.bottom')
                 .datum(metric(key, cht.title))
