@@ -23,13 +23,12 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.joda.time.DateTime;
-import org.springframework.stereotype.Component;
 
 /**
  * Stub route definitions for OANDA FIX handling.
  */
 @Setter
-@Component
+//@Component
 public class StubRoutes extends RouteBuilder {
 
   @Override
