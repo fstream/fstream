@@ -1,0 +1,27 @@
+<div class="container" style="margin-top: 70px">
+	<div class="panel panel-default">
+	  <div class="panel-body">
+	  	<div class="btn-group">
+		  <button type="button" class="btn btn-default" id="connect" onclick="connect();">Connect</button>
+		  <button type="button" class="btn btn-default" id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+		</div>
+	  </div>
+	</div>
+	<form class="navbar-form navbar-left" role="search">
+	  <div class="form-group">
+	    <input type="text" class="form-control" placeholder="USD/JPY, etc." id="instrument">
+	  </div>
+      <a class="btn btn-primary" role="button" onclick="registerInstrument();">Register &raquo;</a>
+	</form>
+       <div id='charts'></div>
+    <div id="conversation">
+        <div>
+    			<h4>Events</h4>
+		    <div class="alert alert-warning" id="events"></div>
+        </div>
+        <div>
+		    <h4>Rates</h4>
+		    <div class="alert alert-success" id="rates"></div>
+		  </div>
+    </div>
+</div>

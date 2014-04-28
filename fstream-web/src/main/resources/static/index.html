@@ -15,7 +15,7 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->    
 </head>
-<body>
+<body ng-app="FStreamApp" ng-controller="ratesController">
 	<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
 	    Javascript and reload this page!</h2></noscript>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -42,50 +42,31 @@
         </div><!--/.navbar-collapse -->
       </div>
     </div>
-	<div class="container" style="margin-top: 70px">
-		<div class="panel panel-default">
-		  <div class="panel-body">
-		  	<div class="btn-group">
-			  <button type="button" class="btn btn-default" id="connect" onclick="connect();">Connect</button>
-			  <button type="button" class="btn btn-default" id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
-			</div>
-		  </div>
-		</div>
-		<form class="navbar-form navbar-left" role="search">
-		  <div class="form-group">
-		    <input type="text" class="form-control" placeholder="USD/JPY, etc." id="instrument">
-		  </div>
-	      <a class="btn btn-primary" role="button" onclick="registerInstrument();">Register &raquo;</a>
-		</form>
-	    <div id="conversation">
-	        <div id='charts'></div>
-	        <div>
-     			<h4>Events</h4>
-			    <div class="alert alert-warning" id="events"></div>
-	        </div>
-	        <div>
-			    <h4>Rates</h4>
-			    <div class="alert alert-success" id="rates"></div>
-			  </div>
-	    </div>
-	</div>
+    <div ng-include src="'partials/main.html'"></div> 
 	
-	<!-- Developer versions -->
-	<script src="js/vendor/jquery-2.1.0.js"></script>
-	<script src="js/vendor/bootstrap.js"></script>
-	<script src="js/vendor/sockjs-0.3.4.js"></script>
-	<script src="js/vendor/stomp.js"></script>
-	<script src="js/vendor/d3.js" charset="utf-8"></script>
-	<script src="js/vendor/cubism.v1.js"></script>
+	<!-- Developer vendor versions -->
+	<script src="vendor/jquery-2.1.0.js"></script>
+	<script src="vendor/angular.js"></script>
+	<script src="vendor/bootstrap.js"></script>
+	<script src="vendor/sockjs-0.3.4.js"></script>
+	<script src="vendor/stomp.js"></script>
+	<script src="vendor/d3.js" charset="utf-8"></script>
+	<script src="vendor/cubism.v1.js"></script>
 	
-	<!-- CDN versions
+	<!-- CDN vendor versions
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.1/stomp.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.6/d3.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/cubism/1.6.0/cubism.v1.min.js"></script>
 	 -->
-	<script src="js/application.js"></script>
+	 
+	<!-- Application -->
+	<script src="js/tmp.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/controllers.js"></script>
+	<script src="js/services.js"></script>	
 </body>
 </html>

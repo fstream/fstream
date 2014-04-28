@@ -1,3 +1,7 @@
+#charts {
+	position: relative;
+}
+
 .horizon {
     border-bottom: solid 1px black;
     overflow: hidden;
@@ -42,8 +46,6 @@
 }
 
 .line {
-    /* No idea why 8px margin left is needed here :( */
-    margin-left: 8px;
     background: black;
     opacity: 0.2;
     z-index: 2;
