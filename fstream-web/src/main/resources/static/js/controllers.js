@@ -1,29 +1,15 @@
 angular.module('FStreamApp.controllers', []).
-controller('ratesController', function($scope) {
-	$scope.init = init;
+controller('ratesController', function($scope, ratesService) {
+	$scope.connect = function() {
+		init();
+		ratesService.connect();
+	};
 	
-    $scope.driversList = [
-      {
-          Driver: {
-              givenName: 'Sebastian',
-              familyName: 'Vettel'
-          },
-          points: 322,
-          nationality: "German",
-          Constructors: [
-              {name: "Red Bull"}
-          ]
-      },
-      {
-          Driver: {
-          givenName: 'Fernando',
-              familyName: 'Alonso'
-          },
-          points: 207,
-          nationality: "Spanish",
-          Constructors: [
-              {name: "Ferrari"}
-          ]
-      }
-    ];
+	$scope.disconnect = function() {
+		ratesService.disconnect();
+	}
+	
+	$scope.register = function() {
+		ratesService.register();
+	}
 });

@@ -23,6 +23,7 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -74,8 +75,12 @@ public class RatesMessageService extends AbstractExecutionThreadService {
       val text = new String(message);
 
       log.info("Received: {}", text);
-      template.send("/topic/rates", MessageBuilder.withPayload(message).build());
+      template.send("/topic/rates", convert(message));
     }
+  }
+
+  private static Message<byte[]> convert(final byte[] message) {
+    return MessageBuilder.withPayload(message).build();
   }
 
   private ConsumerConnector createConsumerConnector() {

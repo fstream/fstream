@@ -1,42 +1,9 @@
-// TODO: Move to angular components
-var stompClient = null;
-
 function setConnected(connected) {
     document.getElementById('connect').disabled = connected;
     document.getElementById('disconnect').disabled = !connected;
     document.getElementById('conversation').style.visibility = connected ? 'visible' : 'hidden';
     document.getElementById('events').innerHTML = '';
     document.getElementById('rates').innerHTML = '';
-}
-
-function connect() {
-	init();
-	
-    var socket = new SockJS('/server');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function(frame) {
-        setConnected(true);
-        console.log('Connected: ' + frame);
-        
-        stompClient.subscribe('/topic/rates', function(rate){
-            showRate(rate.body.toString());
-            updateChart(eval("(" + rate.body + ")"));
-        });
-        stompClient.subscribe('/topic/events', function(event){
-        	showEvent(event.body.toString());
-        });                
-    });
-}
-
-function disconnect() {
-    stompClient.disconnect();
-    setConnected(false);
-    console.log("Disconnected");
-}
-
-function registerInstrument() {
-    var instrument = document.getElementById('instrument').value;
-    stompClient.send("/web/register", {}, JSON.stringify({ 'instrument': instrument }));
 }
 
 function showRate(message) {
@@ -54,30 +21,30 @@ function showEvent(message) {
     p.appendChild(document.createTextNode(message));
     response.appendChild(p);
 }
-   
+
+function makeRealtime(key) {
+    var buf = [], callbacks = [];
+    return {
+        data: function(ts, val) {
+            buf.push({ts: ts, val: val});
+            callbacks = callbacks.reduce(function(result, cb) {
+                if (!cb(buf))
+                    result.push(cb);
+                return result
+            }, []);
+        },
+        addCallback: function(cb) {
+            callbacks.push(cb);
+        }
+    }
+};
+
 updateChart = null;
 
 function init() {
-    function make_realtime(key) {
-        var buf = [], callbacks = [];
-        return {
-            data: function(ts, val) {
-                buf.push({ts: ts, val: val});
-                callbacks = callbacks.reduce(function(result, cb) {
-                    if (!cb(buf))
-                        result.push(cb);
-                    return result
-                }, []);
-            },
-            add_callback: function(cb) {
-                callbacks.push(cb);
-            }
-        }
-    };
-
     var realtime = {
-        ask: make_realtime('ask'),
-        bid: make_realtime('bid')
+        ask: makeRealtime('ask'),
+        bid: makeRealtime('bid')
     };
 
     // This websocket sends homogenous messages in the form
@@ -97,7 +64,7 @@ function init() {
             start = start.getTime();
             stop = stop.getTime();
 
-            rt.add_callback(function(buf) {
+            rt.addCallback(function(buf) {
                 if (!(buf.length > 1 && 
                       buf[buf.length - 1].ts > stop + step)) {
                     // Not ready, wait for more data

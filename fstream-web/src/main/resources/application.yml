@@ -9,8 +9,6 @@
 # Proprietary and confidential.
 #
 
-
-
 kafka:
    consumerProperties:
       zookeeper.connect: localhost:21818
