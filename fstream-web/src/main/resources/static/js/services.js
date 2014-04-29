@@ -1,32 +1,172 @@
 angular.module('FStreamApp.services', []).
-  factory('ratesService', function() {
+factory('ratesService', function($rootScope) {
+	
+	//
+	// Private
+	//
 	var stompClient;
-	 
-    return {
-    	connect: function() {
-    		stompClient = Stomp.over(new SockJS('/server'));
-    		stompClient.connect({}, function(frame) {
-    	        setConnected(true);
-    	        console.log('Connected: ' + frame);
-    	        
-    	        stompClient.subscribe('/topic/rates', function(rate){
-    	            showRate(rate.body.toString());
-    	            updateChart(eval("(" + rate.body + ")"));
-    	        });
-    	        stompClient.subscribe('/topic/events', function(event){
-    	        	showEvent(event.body.toString());
-    	        });                
-    	    });
-    		
+ 
+	return {
+		
+		//
+		// Methods
+		//
+		
+		connect: function() {
+			stompClient = Stomp.over(new SockJS('/server'));
+			stompClient.connect({}, function(frame) {
+		        $rootScope.$broadcast('connected'); 
+		        
+		        stompClient.subscribe('/topic/rates', function(frame){
+		        	var rate = angular.fromJson(frame.body);
+		        	$rootScope.$broadcast('rate', rate); 
+		        });
+		        stompClient.subscribe('/topic/events', function(frame){
+		        	var event = angular.fromJson(frame.body);
+		        	$rootScope.$broadcast('event', event); 
+		        });                
+		    });
+			
 		},
+		
 	    disconnect: function() {
 	        stompClient.disconnect();
-	        setConnected(false);
-	        console.log("Disconnected");
+	        $rootScope.$broadcast('disconnected'); 
 	    },
-	    register: function(){
-    	    var instrument = document.getElementById('instrument').value;
-    	    stompClient.send("/web/register", {}, JSON.stringify({ 'instrument': instrument }));
+	    
+	    register: function(instrument){
+		    stompClient.send("/web/register", {}, angular.toJson({ 'instrument': instrument }));
 	    }
-    } 
-  });
+	    
+	} 
+}).
+factory('chartService', function($rootScope) {
+	function makeRealtime(key) {
+	    var buf = [], callbacks = [];
+	    return {
+	        data: function(ts, val) {
+	            buf.push({ts: ts, val: val});
+	            callbacks = callbacks.reduce(function(result, cb) {
+	                if (!cb(buf))
+	                    result.push(cb);
+	                return result
+	            }, []);
+	        },
+	        addCallback: function(cb) {
+	            callbacks.push(cb);
+	        }
+	    }
+	};
+	
+    var realtime = {
+        ask: makeRealtime('ask'),
+        bid: makeRealtime('bid')
+    };
+
+    // This websocket sends homogenous messages in the form
+    //{"dateTime":1398308418977,"symbol":"EUR/USD","bid":1.3818,"ask":1.38191}
+    var updateChart = function(data) {
+    	console.log(data);
+    	realtime['ask'].data(data.dateTime, data.ask);
+    	realtime['bid'].data(data.dateTime, data.bid);
+    };
+
+    var context = cubism.context().step(1000).size(960);
+
+    var metric = function (key, title) {
+        var rt = realtime[key];
+
+        return context.metric(function (start, stop, step, callback) {
+            start = start.getTime();
+            stop = stop.getTime();
+
+            rt.addCallback(function(buf) {
+                if (!(buf.length > 1 && 
+                      buf[buf.length - 1].ts > stop + step)) {
+                    // Not ready, wait for more data
+                    return false;
+                }
+
+                var r = d3.range(start, stop, step);
+
+                /* Don't like using a linear search here, but I don't
+                 * know enough about cubism to really optimize. I had
+                 * assumed that once a timestamp was requested, it would
+                 * never be needed again so I could drop it. That doesn't
+                 * seem to be true!
+                 */
+                var i = 0;
+                var point = buf[i];
+
+                callback(null, r.map(function (ts) {
+                    if (ts < point.ts) {
+                        // We have to drop points if no data is available
+                        return null;
+                    }
+                    for (; buf[i].ts < ts; i++);
+                    return buf[i].val;
+                }));
+
+                // opaque, but this tells the callback handler to
+                // remove this function from its queue
+                return true;
+            });
+        }, title);
+    };
+
+    var init = function() {
+	    ['top', 'bottom'].map(function (d) {
+	        d3.select('#charts').append('div')
+	            .attr('class', d + ' axis')
+	            .call(context.axis().ticks(12).orient(d));
+	
+	    });
+	
+	    d3.select('#charts').append('div').attr('class', 'rule')
+	        .call(context.rule());
+	
+	    charts = {
+	        ask: {
+	            title: 'Ask',
+	            unit: '$',
+	            extent: [0, 2]
+	        },
+	        bid: {
+	            title: 'Bid',
+	            unit: '$',
+	            extent: [0, 2]
+	        }
+	    };
+	
+	    Object.keys(charts).map(function (key) {
+	        var cht = charts[key];
+	        var num_fmt = d3.format('.5r');
+	        d3.select('#charts')
+	            .insert('div', '.bottom')
+	            .datum(metric(key, cht.title))
+	            .attr('class', 'horizon')
+	            .call(context.horizon()
+	                .extent(cht.extent)
+	                .title(cht.title)
+	                .format(function (n) { 
+	                    return num_fmt(n) + ' ' + cht.unit; 
+	                })
+	            );
+	    });
+	
+	    context.on('focus', function (i) {
+	        if (i !== null) {
+	            d3.selectAll('.value').style('right',
+	                                         context.size() - i + 'px');
+	        }
+	        else {
+	            d3.selectAll('.value').style('right', null)
+	        }
+	    });
+    }
+    
+    return {
+    	init: init,
+    	updateChart: updateChart
+    };
+});
