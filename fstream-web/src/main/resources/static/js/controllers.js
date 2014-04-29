@@ -7,8 +7,6 @@ controller('ratesController', function($scope, ratesService, chartService) {
 	
 	var 
 		setConnected = function setConnected(connected) {
-		    document.getElementById('connect').disabled = connected;
-		    document.getElementById('disconnect').disabled = !connected;
 		    document.getElementById('conversation').style.visibility = connected ? 'visible' : 'hidden';
 		    document.getElementById('events').innerHTML = '';
 		    document.getElementById('rates').innerHTML = '';
@@ -21,6 +19,9 @@ controller('ratesController', function($scope, ratesService, chartService) {
 		    return p;
 		}
 	
+		
+	$scope.connected = false;
+		
 	//
 	// Methods
 	//
@@ -41,10 +42,15 @@ controller('ratesController', function($scope, ratesService, chartService) {
 	//
 	
 	$scope.$on('connected', function(e) {
+		$scope.connected = true;
+		$scope.$digest();
+		
 		chartService.init();
 		setConnected(true);
 	});
 	$scope.$on('disconnected', function(e) {
+		$scope.connected = false;
+		
         setConnected(false);
 	});
     $scope.$on('rate', function(e, rate) {
