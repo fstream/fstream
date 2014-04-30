@@ -154,6 +154,7 @@ factory('chartService', function($rootScope) {
 	            .datum(metric(key, cht.title))
 	            .attr('class', 'horizon chart-container')
 	            .call(context.horizon()
+	            	.colors(["#bae4b3","#74c476","#31a354","#006d2c", "#08519c","#3182bd","#6baed6","#bdd7e7"])
             		.height(200)
 	                .extent(cht.extent)
 	                .title(cht.title)
@@ -164,13 +165,7 @@ factory('chartService', function($rootScope) {
 	    });
 	
 	    context.on('focus', function (i) {
-	        if (i !== null) {
-	            d3.selectAll('.value').style('right',
-	                                         context.size() - i + 'px');
-	        }
-	        else {
-	            d3.selectAll('.value').style('right', null)
-	        }
+            d3.selectAll('.value').style('right', i && context.size() - i + 'px');
 	    });
     }
     

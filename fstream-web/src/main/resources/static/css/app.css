@@ -1,8 +1,13 @@
+.connect-button {
+	height: 100%;
+}
+
+/**
+ * Charts
+ */
+
 #charts {
 	position: relative;
-}
-.line {
-	margin: 15px;
 }
 
 .horizon {
