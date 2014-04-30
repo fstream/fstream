@@ -22,13 +22,13 @@
 				<a class="navbar-brand" href="#">fStream Web</a>
 			</div>
 			<div class="navbar-collapse collapse">
-				<form class="navbar-form navbar-left" role="search">
-					<button type="button" class="btn btn-default" id="disconnect" ng-disabled="!connected" ng-click="disconnect();">Disconnect</button>
-					<button type="button" class="btn btn-default" id="connect" ng-disabled="connected" ng-click="connect();">Connect</button>
-					<div class="form-group">
+				<form class="navbar-form navbar-left">
+					<button type="button" class="btn btn-success" id="connect" ng-disabled="connected" ng-click="connect();">Connect</button>
+					<button type="button" class="btn btn-danger" id="disconnect" ng-disabled="!connected" ng-click="disconnect();">Disconnect</button>
+					<div class="form-group" ng-show="connected">
 						<input type="text" class="form-control" placeholder="USD/JPY, etc." id="instrument">
+						<a class="btn btn-primary" role="button" ng-disabled="!connected" ng-click="register();">Register &raquo;</a>
 					</div>
-					<a class="btn btn-primary" role="button" ng-disabled="!connected" ng-click="register();">Register &raquo;</a>
 				</form>
 				<form class="navbar-form navbar-right" role="form">
 					<div class="form-group">
@@ -37,7 +37,7 @@
 					<div class="form-group">
 						<input type="password" placeholder="Password" class="form-control">
 					</div>
-					<button type="submit" class="btn btn-success">Sign in</button>
+					<button type="submit" class="btn btn-primary">Sign in</button>
 				</form>
 			</div>
 		</div>
