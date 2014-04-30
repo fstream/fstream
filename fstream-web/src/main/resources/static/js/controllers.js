@@ -33,7 +33,7 @@ controller('ratesController', function($scope, ratesService, chartService) {
 		ratesService.disconnect();
 	}
 	$scope.register = function() {
-	    var instrument = document.getElementById('instrument').value;
+	    var instrument = $('#instrument').val();
 		ratesService.register(instrument);
 	}
 	

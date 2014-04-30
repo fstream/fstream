@@ -152,7 +152,7 @@ factory('chartService', function($rootScope) {
 	        d3.select('#charts')
 	            .insert('div', '.bottom')
 	            .datum(metric(key, cht.title))
-	            .attr('class', 'horizon')
+	            .attr('class', 'horizon chart-container')
 	            .call(context.horizon()
 	                .extent(cht.extent)
 	                .title(cht.title)
