@@ -29,8 +29,8 @@ factory('ratesService', function($rootScope, $timeout) {
 		        	publishEvent("rate", frame);
 		        });
 		        
-		        stompClient.subscribe('/topic/events', function(frame){
-		        	publishEvent("event", frame);
+		        stompClient.subscribe('/topic/commands', function(frame){
+		        	publishEvent("command", frame);
 		        });                
 		    });
 			

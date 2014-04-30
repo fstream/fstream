@@ -7,14 +7,14 @@ controller('ratesController', function($scope, ratesService, chartService) {
 	
 	var 
 		setConnected = function setConnected(connected) {
-		    document.getElementById('conversation').style.visibility = connected ? 'visible' : 'hidden';
-		    document.getElementById('events').innerHTML = '';
-		    document.getElementById('rates').innerHTML = '';
+			$('#commands').html('');
+			$('#rates').html('');
 		}, 
 		createElement = function(message) {
-		    var p = document.createElement('p');
+		    var p = document.createElement('code');
 		    p.style.wordWrap = 'break-word';
-		    p.appendChild(document.createTextNode(message));
+		    p.style.display = 'block'
+		    p.appendChild(document.createTextNode(angular.toJson(message)));
 		    
 		    return p;
 		}
@@ -43,8 +43,7 @@ controller('ratesController', function($scope, ratesService, chartService) {
 	
 	$scope.$on('connected', function(e) {
 		$scope.connected = true;
-		
-		chartService.init();
+
 		setConnected(true);
 	});
 	$scope.$on('disconnected', function(e) {
@@ -53,11 +52,14 @@ controller('ratesController', function($scope, ratesService, chartService) {
         setConnected(false);
 	});
     $scope.$on('rate', function(e, rate) {
-        document.getElementById('rates').appendChild(createElement(rate.toString()));
+    	$('#rates').append(createElement(rate));
         chartService.updateChart(rate);
     });
-    $scope.$on('event', function(e, event) {
-    	document.getElementById('events').appendChild(createElement(event.toString()));
+    $scope.$on('command', function(e, command) {
+    	$('#commands').append(createElement(command));
     });
     
+}).
+controller('chartController', function($scope, chartService) {
+	chartService.init();
 });

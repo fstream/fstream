@@ -22,7 +22,7 @@ import org.springframework.stereotype.Controller;
 public class RegistrationController {
 
   @MessageMapping("/register")
-  @SendTo("/topic/events")
+  @SendTo("/topic/commands")
   public Registration register(RegisterMessage message) throws Exception {
     log.info("Registering '{}'", message);
     return new Registration(message.getInstrument());
