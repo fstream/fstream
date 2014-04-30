@@ -157,7 +157,7 @@ factory('chartService', function($rootScope) {
 	                .extent(cht.extent)
 	                .title(cht.title)
 	                .format(function (n) { 
-	                    return num_fmt(n) + ' ' + cht.unit; 
+	                    return n && num_fmt(n) + ' ' + cht.unit; 
 	                })
 	            );
 	    });
