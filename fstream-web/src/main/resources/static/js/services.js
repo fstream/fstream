@@ -1,10 +1,17 @@
 angular.module('FStreamApp.services', []).
-factory('ratesService', function($rootScope) {
+factory('ratesService', function($rootScope, $timeout) {
 	
 	//
 	// Private
 	//
-	var stompClient;
+	
+	var stompClient,
+		publishEvent = function (eventName, frame){
+			$timeout(function() {
+				var event = frame && angular.fromJson(frame.body);
+	        	$rootScope.$broadcast(eventName, event); 
+			});
+		};
  
 	return {
 		
@@ -14,16 +21,16 @@ factory('ratesService', function($rootScope) {
 		
 		connect: function() {
 			stompClient = Stomp.over(new SockJS('/server'));
+			
 			stompClient.connect({}, function(frame) {
-		        $rootScope.$broadcast('connected'); 
-		        
+				publishEvent("connected");
+				
 		        stompClient.subscribe('/topic/rates', function(frame){
-		        	var rate = angular.fromJson(frame.body);
-		        	$rootScope.$broadcast('rate', rate); 
+		        	publishEvent("rate", frame);
 		        });
+		        
 		        stompClient.subscribe('/topic/events', function(frame){
-		        	var event = angular.fromJson(frame.body);
-		        	$rootScope.$broadcast('event', event); 
+		        	publishEvent("event", frame);
 		        });                
 		    });
 			
@@ -31,7 +38,8 @@ factory('ratesService', function($rootScope) {
 		
 	    disconnect: function() {
 	        stompClient.disconnect();
-	        $rootScope.$broadcast('disconnected'); 
+	        
+	        publishEvent("disconnected");
 	    },
 	    
 	    register: function(instrument){

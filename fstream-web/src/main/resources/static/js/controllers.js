@@ -43,7 +43,6 @@ controller('ratesController', function($scope, ratesService, chartService) {
 	
 	$scope.$on('connected', function(e) {
 		$scope.connected = true;
-		$scope.$digest();
 		
 		chartService.init();
 		setConnected(true);
