@@ -154,6 +154,7 @@ factory('chartService', function($rootScope) {
 	            .datum(metric(key, cht.title))
 	            .attr('class', 'horizon chart-container')
 	            .call(context.horizon()
+            		.height(200)
 	                .extent(cht.extent)
 	                .title(cht.title)
 	                .format(function (n) { 
