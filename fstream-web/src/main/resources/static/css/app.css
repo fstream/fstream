@@ -3,6 +3,19 @@
 }
 
 /**
+ * Transitions
+ */
+ 
+.view-container[disabled] {
+	pointer-events: none;
+	cursor: not-allowed;
+	opacity: .30;
+	filter: alpha(opacity=30);
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+/**
  * Charts
  */
 

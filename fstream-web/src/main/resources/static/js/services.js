@@ -55,8 +55,11 @@ factory('chartService', function($rootScope) {
 		}
 	});
 	
-	var series;
+	var size = 50, 
+	    data = [], 
+	    series;
 	
+	while(size--) data.push(0);
 	
 	return {
 		init: function() {
@@ -74,7 +77,8 @@ factory('chartService', function($rootScope) {
 						}
 					},
 					
-					height: 600
+					height: 600,
+					zoomType: 'xy'
 				},
 				
 				rangeSelector: {
@@ -98,12 +102,16 @@ factory('chartService', function($rootScope) {
 			        max: 1.8
 			    },
 				
+		        tooltip: {
+		            crosshairs: [true, true]
+		        },			    
+			    
 				series : [{
 					name : 'Ask',
-					data : [0,0,0,0,0,0,0,0]
+					data : data
 				}, {
 					name : 'Bid',
-					data : [0,0,0,0,0,0,0,0]
+					data : data
 				}]
 			});
 		},
