@@ -25,7 +25,7 @@
 				<form class="navbar-form navbar-left">
 					<button type="button" class="btn btn-success glyphicon glyphicon-off connect-button" id="connect" ng-show="!connected" ng-click="connect();"></button>
 					<button type="button" class="btn btn-danger glyphicon glyphicon-off connect-button" id="disconnect" ng-show="connected" ng-click="disconnect();"></button>
-					<div class="form-group" ng-visible="connected">
+					<div class="form-group" ng-visible="connected && false">
 						<input type="text" class="form-control" placeholder="Instrument" id="instrument">
 						<a class="btn btn-primary" role="button" ng-click="register();">Register &raquo;</a>
 					</div>
@@ -43,7 +43,7 @@
 		</div>
 	</div>
 	<div class="container" style="margin-top: 100px">
-		<div ng-include src="'partials/main.html'"></div>
+		<div ng-include src="'partials/tabs.html'"></div>
 	</div>
 
 	<!-- Developer vendor versions -->
@@ -53,6 +53,7 @@
 	<script src="js/lib/sockjs-0.3.4.js"></script>
 	<script src="js/lib/stomp.js"></script>
 	<script src="js/lib/d3.js" charset="utf-8"></script>
+	<script src="js/lib/highstock.src.js"></script>
 	<script src="js/lib/cubism.v1.js"></script>
 
 	<!-- CDN vendor versions --

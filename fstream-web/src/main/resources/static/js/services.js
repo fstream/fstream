@@ -49,6 +49,71 @@ factory('ratesService', function($rootScope, $timeout) {
 	} 
 }).
 factory('chartService', function($rootScope) {
+	Highcharts.setOptions({
+		global : {
+			useUTC : false
+		}
+	});
+	
+	var series;
+	
+	
+	return {
+		init: function() {
+			// Create the chart
+			$('#charts-container').highcharts('StockChart', {
+				
+				credits: {
+					enabled: false
+				},
+				
+				chart : {
+					events : {
+						load : function() {
+							series = this.series;
+						}
+					},
+					
+					height: 600
+				},
+				
+				rangeSelector: {
+					buttons: [{
+						count: 1,
+						type: 'minute',
+						text: '1M'
+					}, {
+						count: 5,
+						type: 'minute',
+						text: '5M'
+					}, {
+						type: 'all',
+						text: 'All'
+					}],
+					inputEnabled: false,
+					selected: 0
+				},
+				
+			    yAxis: {
+			        max: 1.8
+			    },
+				
+				series : [{
+					name : 'Ask',
+					data : [0,0,0,0,0,0,0,0]
+				}, {
+					name : 'Bid',
+					data : [0,0,0,0,0,0,0,0]
+				}]
+			});
+		},
+    	updateChart: function(rate) {
+    		series[0].addPoint([rate.dateTime, rate.ask], true, true);
+    		series[1].addPoint([rate.dateTime, rate.bid], true, true);
+    	}
+    };	
+}).
+factory('cubismService', function($rootScope) {
 	function makeRealtime(key) {
 	    var buf = [], callbacks = [];
 	    return {
