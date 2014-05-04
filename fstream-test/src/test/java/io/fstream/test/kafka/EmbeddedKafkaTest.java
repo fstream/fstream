@@ -78,8 +78,8 @@ public class EmbeddedKafkaTest {
     val consumerConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
 
     val count = 1;
-    val topicMessageStreams = consumerConnector.createMessageStreams(of("test", count));
-    val streams = topicMessageStreams.get("test");
+    val topicMessageStreams = consumerConnector.createMessageStreams(of("rates", count));
+    val streams = topicMessageStreams.get("rates");
     val executor = Executors.newFixedThreadPool(count);
 
     for (val stream : streams) {
@@ -100,7 +100,7 @@ public class EmbeddedKafkaTest {
   private void createTopic() {
     val zkClient = new ZkClient("localhost:21818");
     Properties props = new Properties();
-    String topic = "test";
+    String topic = "rates";
     int partitions = 1;
     int replicationFactor = 1;
     AdminUtils.createTopic(zkClient, topic, partitions, replicationFactor, props);

@@ -91,7 +91,7 @@ public class RatesMessageService extends AbstractExecutionThreadService {
   }
 
   private KafkaStream<byte[], byte[]> createStream() {
-    val topicName = "test";
+    val topicName = "rates";
     val topicStreamCount = 1;
 
     val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));

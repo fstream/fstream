@@ -25,4 +25,4 @@ oanda:
 # fStream
 fstream:
    broker:
-      uri: kafka:localhost:6667?topic=test&groupId=1&zookeeperHost=localhost&zookeeperPort=21818&partitioner=kafka.producer.DefaultPartitioner
+      uri: kafka:localhost:6667?topic=rates&groupId=1&zookeeperHost=localhost&zookeeperPort=21818&partitioner=kafka.producer.DefaultPartitioner

@@ -28,12 +28,13 @@ import com.espertech.esper.client.EPAdministrator;
 import com.espertech.esper.client.EPRuntime;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
-import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ComputeBolt extends BaseRichBolt implements UpdateListener {
+
+  public static final String EPL = "epl";
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -49,7 +50,10 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
 
   @Override
   public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
+    val epl = (String) conf.get(EPL);
+
     val configuration = new Configuration();
+    configuration.addEventType("Rate", Rate.class.getName());
 
     this.collector = collector;
     this.esperSink = EPServiceProviderManager.getProvider(this.toString(), configuration);
@@ -57,15 +61,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     this.runtime = esperSink.getEPRuntime();
     this.admin = esperSink.getEPAdministrator();
 
-    // @formatter:off
-    EPStatement statement = admin.createEPL(
-        "SELECT " +
-        "  CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange " +
-        "FROM " +
-        "  " + Rate.class.getName() + ""
-        );
-    // @formatter:on
-
+    val statement = admin.createEPL(epl);
     statement.addListener(this);
   }
 

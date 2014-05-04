@@ -45,8 +45,17 @@ public final class StormFactory {
     props.put("request.required.acks", "1");
     props.put("serializer.class", "kafka.serializer.StringEncoder");
 
+    // @formatter:off
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
     config.put(KafkaBolt.TOPIC, "alerts");
+    config.put(ComputeBolt.EPL,
+      "SELECT " +
+      "  CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange " +
+      "FROM " +
+      "  Rate"
+      );
+    // @formatter:on
+
     if (local) {
       config.setMaxTaskParallelism(3);
     } else {
@@ -73,7 +82,7 @@ public final class StormFactory {
   public static IRichSpout newKafkaSpout() {
     val hosts = new ZkHosts("localhost:21818");
     hosts.refreshFreqSecs = 1;
-    val kafkaConf = new SpoutConfig(hosts, "test", "/test", "id");
+    val kafkaConf = new SpoutConfig(hosts, "rates", "/test", "id");
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
 
     return new KafkaSpout(kafkaConf);

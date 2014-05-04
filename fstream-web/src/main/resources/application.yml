@@ -16,4 +16,4 @@ kafka:
       group.id: 1
       broker.id: 0
    topics:
-      - test
+      - rates
