@@ -29,6 +29,10 @@ factory('ratesService', function($rootScope, $timeout) {
 		        	publishEvent("rate", frame);
 		        });
 		        
+		        stompClient.subscribe('/topic/alerts', function(frame){
+		        	publishEvent("alert", frame);
+		        });
+		        
 		        stompClient.subscribe('/topic/commands', function(frame){
 		        	publishEvent("command", frame);
 		        });                
@@ -57,6 +61,7 @@ factory('chartService', function($rootScope) {
 	
 	var size = 50, 
 	    data = [], 
+	    chart,
 	    series;
 	
 	while(size--) data.push(0);
@@ -64,13 +69,15 @@ factory('chartService', function($rootScope) {
 	return {
 		init: function() {
 			// Create the chart
-			$('#charts-container').highcharts('StockChart', {
+			chart = new Highcharts.StockChart({
 				
 				credits: {
 					enabled: false
 				},
 				
 				chart : {
+					type: 'spline',
+					renderTo: 'charts-container',
 					events : {
 						load : function() {
 							series = this.series;
@@ -98,6 +105,11 @@ factory('chartService', function($rootScope) {
 					selected: 0
 				},
 				
+	            xAxis: {
+	                type: 'datetime',
+	                tickPixelInterval: 150
+	            },
+	            
 			    yAxis: {
 			        max: 1.8
 			    },
@@ -115,9 +127,10 @@ factory('chartService', function($rootScope) {
 				}]
 			});
 		},
+		
     	updateChart: function(rate) {
-    		series[0].addPoint([rate.dateTime, rate.ask], true, true);
-    		series[1].addPoint([rate.dateTime, rate.bid], true, true);
+    		series[0].addPoint([rate.dateTime, rate.ask], true, false);
+    		series[1].addPoint([rate.dateTime, rate.bid], true, false);
     	}
     };	
 }).

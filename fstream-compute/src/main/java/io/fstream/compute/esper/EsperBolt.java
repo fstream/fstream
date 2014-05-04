@@ -7,12 +7,9 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.bolt;
+package io.fstream.compute.esper;
 
 import static lombok.AccessLevel.PRIVATE;
-import io.fstream.compute.esper.EventTypeDescriptor;
-import io.fstream.compute.esper.StreamId;
-import io.fstream.compute.esper.TupleTypeDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -172,10 +169,10 @@ public class EsperBolt extends BaseRichBolt implements UpdateListener {
   @Override
   public void execute(Tuple tuple) {
     String eventType = getEventTypeName(tuple.getSourceComponent(), tuple.getSourceStreamId());
-    Map<String, Object> data = new HashMap<String, Object>();
     Fields fields = tuple.getFields();
     int numFields = fields.size();
 
+    Map<String, Object> data = new HashMap<String, Object>();
     for (int idx = 0; idx < numFields; idx++) {
       String name = fields.get(idx);
       Object value = tuple.getValue(idx);

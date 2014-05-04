@@ -9,6 +9,8 @@
 
 package io.fstream.compute.bolt;
 
+import lombok.SneakyThrows;
+import lombok.val;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -19,8 +21,11 @@ import backtype.storm.tuple.Values;
 public class AdapterBolt extends BaseBasicBolt {
 
   @Override
+  @SneakyThrows
   public void execute(Tuple tuple, BasicOutputCollector collector) {
-    collector.emit(new Values("1", tuple.getValue(0)));
+    val value = (String) tuple.getValue(0);
+
+    collector.emit(new Values("1", value));
   }
 
   @Override

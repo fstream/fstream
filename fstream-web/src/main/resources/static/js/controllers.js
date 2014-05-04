@@ -55,6 +55,9 @@ controller('ratesController', function($scope, ratesService, chartService) {
     	$('#rates').append(createElement(rate));
         chartService.updateChart(rate);
     });
+    $scope.$on('alert', function(e, alert) {
+    	$('#alerts').append(createElement(alert));
+    });
     $scope.$on('command', function(e, command) {
     	$('#commands').append(createElement(command));
     });

@@ -14,12 +14,11 @@ import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
 import io.fstream.core.model.Rate;
 
 import org.apache.camel.component.kafka.KafkaConstants;
-import org.springframework.stereotype.Component;
 
 /**
  * Route definitions for OANDA FIX handling.
  */
-@Component
+//@Component
 public class OandaRoutes extends AbstractFixRoutes {
   
   @Override

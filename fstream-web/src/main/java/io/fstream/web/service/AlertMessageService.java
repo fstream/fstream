@@ -33,7 +33,7 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 @Slf4j
 @Service
-public class RatesMessageService extends AbstractExecutionThreadService {
+public class AlertMessageService extends AbstractExecutionThreadService {
 
   /**
    * Dependencies.
@@ -78,7 +78,7 @@ public class RatesMessageService extends AbstractExecutionThreadService {
       val text = new String(message);
 
       log.info("Received: {}", text);
-      template.send("/topic/rates", convert(message));
+      template.send("/topic/alerts", convert(message));
     }
   }
 
@@ -91,7 +91,7 @@ public class RatesMessageService extends AbstractExecutionThreadService {
   }
 
   private KafkaStream<byte[], byte[]> createStream() {
-    val topicName = "test";
+    val topicName = "alerts";
     val topicStreamCount = 1;
 
     val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));

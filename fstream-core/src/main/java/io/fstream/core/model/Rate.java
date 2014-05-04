@@ -9,6 +9,7 @@
 
 package io.fstream.core.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import org.joda.time.DateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Rate {
+public class Rate implements Serializable {
 
   DateTime dateTime;
   String symbol;

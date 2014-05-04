@@ -10,11 +10,9 @@
 package io.fstream.compute.factory;
 
 import static lombok.AccessLevel.PRIVATE;
-import io.fstream.compute.bolt.AdapterBolt;
-import io.fstream.compute.bolt.EsperBolt;
+import io.fstream.compute.bolt.ComputeBolt;
 import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
-import io.fstream.core.model.Rate;
 
 import java.util.Properties;
 
@@ -48,7 +46,7 @@ public final class StormFactory {
     props.put("serializer.class", "kafka.serializer.StringEncoder");
 
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
-    config.put(KafkaBolt.TOPIC, "analysis");
+    config.put(KafkaBolt.TOPIC, "alerts");
     if (local) {
       config.setMaxTaskParallelism(3);
     } else {
@@ -66,10 +64,8 @@ public final class StormFactory {
         .shuffleGrouping(spoutId);
     builder.setBolt("compute", newComputeBolt())
         .shuffleGrouping(spoutId);
-    builder.setBolt("adapter", new AdapterBolt())
-        .shuffleGrouping(spoutId);
     builder.setBolt("kafka", new KafkaBolt<String, String>())
-        .shuffleGrouping("adapter");
+        .shuffleGrouping("compute");
 
     return builder.createTopology();
   }
@@ -88,33 +84,7 @@ public final class StormFactory {
   }
 
   public static IRichBolt newComputeBolt() {
-    // "SELECT " +
-    // "  symbol, " +
-    // "  SUM(ask) AS totalAsk, " +
-    // "  AVG(bid) AS avgBid, " +
-    // "  COUNT(*) AS count " +
-    // "FROM " +
-    // "  " + Rate.class.getName() + ".win:time_batch(5 sec) " +
-    // "GROUP BY " +
-    // "  symbol"
-
-    // @formatter:off
-    return new EsperBolt.Builder()
-        .inputs()
-          .aliasComponent("compute-spout")
-          .withFields("askPercentChange")
-          .ofType(Rate.class)
-          .toEventType("Rate")
-        .outputs()
-          .outputs().onDefaultStream().emit("askPercentChange")
-        .statements()
-          .add(
-              "SELECT " +
-              "  CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange " +
-              "FROM " +
-              "  " + Rate.class.getName() + "")
-        .build();
-    // @formatter:on
+    return new ComputeBolt();
   }
 
 }
