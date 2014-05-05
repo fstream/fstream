@@ -42,7 +42,7 @@ public class StubRoutes extends RouteBuilder {
         
         @Override
         public void process(Exchange exchange) throws Exception {
-          val rate = new Rate(new DateTime(), "EUR/USD", new BigDecimal(bid+=1), new BigDecimal(ask+=2));
+          val rate = new Rate(new DateTime(), "EUR/USD", new BigDecimal(ask+=2), new BigDecimal(bid+=1));
           
           exchange.getOut().setBody(rate);
         }
