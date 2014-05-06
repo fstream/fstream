@@ -1,4 +1,4 @@
-angular.module('FStreamApp.controllers', []).
+angular.module('FStreamApp.controllers', ['ngTable']).
 controller('ratesController', function($scope, ratesService, chartService) {
 	
 	//
@@ -56,7 +56,6 @@ controller('ratesController', function($scope, ratesService, chartService) {
         chartService.addRate(rate);
     });
     $scope.$on('alert', function(e, alert) {
-    	$('#alerts').append(createElement(alert));
     	chartService.addAlert(alert);
     });
     $scope.$on('command', function(e, command) {
@@ -66,4 +65,29 @@ controller('ratesController', function($scope, ratesService, chartService) {
 }).
 controller('chartController', function($scope, chartService) {
 	chartService.init();
+}).
+controller('alertController', function($scope, $filter, ngTableParams) {
+    var alerts = [];
+    $scope.$on('alert', function(e, alert) {
+    	alerts.unshift({ dateTime: new Date(), message: alert.askPercentChange });
+    	$scope.tableParams.reload();
+    });
+    
+    $scope.tableParams = new ngTableParams({
+        page: 1,
+        count: 10
+    }, {
+        total: alerts.length, // length of data
+        getData: function($defer, params) {
+            // use build-in angular filter
+            var orderedData = params.filter() ?
+                   $filter('filter')(alerts, params.filter()) :
+            	   alerts;
+
+            $scope.alerts = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count());
+
+            params.total(orderedData.length); // set total for recalc pagination
+            $defer.resolve($scope.alerts);
+        }
+    });	
 });
