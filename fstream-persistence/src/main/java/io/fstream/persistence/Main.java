@@ -15,8 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.MiniHBaseCluster;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -41,6 +44,52 @@ public class Main {
   @SneakyThrows
   private void run() {
     testingCluster();
+    createTable();
+    scanTable();
+  }
+
+  @SneakyThrows
+  private void createTable() {
+    HBaseAdmin admin = new HBaseAdmin(configuration);
+    HTableDescriptor tableDesc = new HTableDescriptor("test");
+    HColumnDescriptor dataColumnDesc = new HColumnDescriptor("data");
+    tableDesc.addFamily(dataColumnDesc);
+    HColumnDescriptor metaColumnDesc = new HColumnDescriptor("meta");
+    tableDesc.addFamily(metaColumnDesc);
+    HColumnDescriptor rawColumnDesc = new HColumnDescriptor("raw");
+    tableDesc.addFamily(rawColumnDesc);
+    admin.createTable(tableDesc);
+    admin.close();
+  }
+
+  @SneakyThrows
+  private void scanTable() {
+    HTable table = new HTable(configuration, "test");
+    Put p = new Put(Bytes.toBytes("myLittleRow"));
+    p.add(Bytes.toBytes("data"), Bytes.toBytes("bid"),
+        Bytes.toBytes("1.21"));
+    table.put(p);
+
+    Scan s = new Scan();
+    s.addColumn(Bytes.toBytes("data"), Bytes.toBytes("bid"));
+    ResultScanner scanner = table.getScanner(s);
+    try {
+      // Scanners return Result instances.
+      // Now, for the actual iteration. One way is to use a while loop like so:
+      for (Result rr = scanner.next(); rr != null; rr = scanner.next()) {
+        // print out the row we found and the columns we were looking for
+        log.info("Found row: " + rr);
+      }
+
+      // The other approach is to use a foreach loop. Scanners are iterable!
+      // for (Result rr : scanner) {
+      // System.out.println("Found row: " + rr);
+      // }
+    } finally {
+      // Make sure you close your scanners when you are done!
+      // Thats why we have it inside a try/finally clause
+      scanner.close();
+    }
   }
 
   @SneakyThrows
