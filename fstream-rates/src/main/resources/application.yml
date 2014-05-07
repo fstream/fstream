@@ -12,7 +12,7 @@
 #
 # Note that all properties in this file may be overriden on the command line:
 # 
-#   -Doanda.rates.password=foobarbaz
+#   -Drates.password=foobarbaz
 #
 
 # OANDA
@@ -81,7 +81,7 @@ rates:
      - SGD/HKD
      - SGD/JPY
 #     - S&P 500 Index
-#     - TRY/JPY
+     - TRY/JPY
 #     - FTSE 100 Index
 #     - Dow Jones 30 Index
 #     - USD/AUD
