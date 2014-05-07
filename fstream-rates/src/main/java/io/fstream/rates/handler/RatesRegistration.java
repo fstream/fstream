@@ -13,12 +13,13 @@ import static quickfix.field.MDEntryType.BID;
 import static quickfix.field.MDEntryType.OFFER;
 import static quickfix.field.MDUpdateType.FULL_REFRESH;
 import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
+import io.fstream.rates.config.RatesProperties;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.Handler;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import quickfix.field.MDEntryType;
@@ -30,8 +31,6 @@ import quickfix.field.Symbol;
 import quickfix.fix44.MarketDataRequest;
 import quickfix.fix44.Message;
 
-import com.google.common.base.Splitter;
-
 /**
  * Bean that registers for rate subscriptions.
  */
@@ -40,12 +39,12 @@ import com.google.common.base.Splitter;
 @Component
 public class RatesRegistration {
 
-  @Value("${oanda.rates.symbols}")
-  private String symbols;
+  @Autowired
+  private RatesProperties properties;
 
   @Handler
   public Message register() {
-    log.info("Registering {}...", symbols);
+    log.info("Registering {}...", properties.getSymbols());
 
     // All these fields are required
     val message = new MarketDataRequest(
@@ -64,18 +63,13 @@ public class RatesRegistration {
     message.addGroup(entryTypes);
 
     // Symbols
-    for (val symbol : getSymbols()) {
+    for (val symbol : properties.getSymbols()) {
       val relatedSymbols = new MarketDataRequest.NoRelatedSym();
       relatedSymbols.set(new Symbol(symbol));
       message.addGroup(relatedSymbols);
     }
 
     return message;
-  }
-
-  private Iterable<String> getSymbols() {
-    // See https://github.com/spring-projects/spring-boot/issues/501
-    return Splitter.on(',').trimResults().split(symbols);
   }
 
 }

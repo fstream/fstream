@@ -25,7 +25,7 @@ import quickfix.fix44.Logon;
 @Component
 public class LogonHandler {
 
-  @Value("${oanda.rates.password}")
+  @Value("${rates.password}")
   private String password;
 
   public void handle(@Body Logon message) {

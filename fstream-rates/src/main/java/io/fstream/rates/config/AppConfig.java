@@ -9,16 +9,13 @@
 
 package io.fstream.rates.config;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
+@EnableAutoConfiguration
+@EnableConfigurationProperties
 public class AppConfig {
-
-  @Bean
-  public PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-    return new PropertySourcesPlaceholderConfigurer();
-  }
 
 }

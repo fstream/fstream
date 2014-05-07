@@ -16,11 +16,131 @@
 #
 
 # OANDA
-oanda:
-   rates:
-      password: <defined in -Doanda.rates.password=xxxxxx>
-      uri: quickfix:oanda.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES
-      symbols: EUR/USD,USD/CAD
+rates:
+  password: <defined in -Doanda.rates.password=xxxxxx>
+  uri: quickfix:oanda.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES
+  symbols:
+     - AUD/CAD
+     - AUD/CHF
+     - AUD/HKD
+     - AUD/JPY
+     - AUD/NZD
+     - AUD/SGD
+     - AUD/USD
+#     - Brent Crude Oil
+     - CAD/CHF
+     - CAD/HKD
+     - CAD/JPY
+     - CAD/SGD
+     - CHF/HKD
+     - CHF/JPY
+#     - CHF/USD
+     - CHF/ZAR
+#     - Corn
+#     - German 30 Index
+     - EUR/AUD
+     - EUR/CAD
+     - EUR/CHF
+     - EUR/CZK
+     - EUR/DKK
+     - EUR/GBP
+     - EUR/HKD
+     - EUR/HUF
+     - EUR/JPY
+     - EUR/NOK
+     - EUR/NZD
+     - EUR/PLN
+     - EUR/SEK
+     - EUR/SGD
+     - EUR/TRY
+     - EUR/USD
+     - EUR/ZAR
+     - GBP/AUD
+     - GBP/CAD
+     - GBP/CHF
+     - GBP/HKD
+     - GBP/JPY
+     - GBP/NZD
+     - GBP/PLN
+     - GBP/SGD
+     - GBP/USD
+     - GBP/ZAR
+     
+#     - Hang Seng 33 Index
+     - HKD/JPY
+#     - Nikkei 225 Index
+#     - JPY/USD
+#     - Nasdaq 100 Index
+     - NZD/CAD
+     - NZD/CHF
+     - NZD/HKD
+     - NZD/JPY
+     - NZD/SGD
+     - NZD/USD
+     - SGD/CHF
+     - SGD/HKD
+     - SGD/JPY
+#     - S&P 500 Index
+#     - TRY/JPY
+#     - FTSE 100 Index
+#     - Dow Jones 30 Index
+#     - USD/AUD
+#     - USD/CAD
+#     - USD/CHF
+#     - USD/CNY
+#     - USD/CZK
+#     - USD/DKK
+#     - USD/EUR
+#     - USD/GBP
+#     - USD/HKD
+#     - USD/HUF
+#     - USD/INR
+     - USD/JPY
+#     - USD/MXN
+#     - USD/NOK
+#     - USD/PLN
+#     - USD/SAR
+#     - USD/SEK
+#     - USD/SGD
+#     - USD/THB
+#     - USD/TRY
+#     - USD/TWD
+#     - USD/ZAR
+#     - Wheat
+
+     - XAG/AUD
+     - XAG/CAD
+     - XAG/CHF
+     - XAG/EUR
+     - XAG/GBP
+     - XAG/HKD
+     - XAG/JPY
+     - XAG/NZD
+     - XAG/SGD
+     - XAG/USD
+     - XAU/AUD
+     - XAU/CAD
+     - XAU/CHF
+     - XAU/EUR
+     - XAU/GBP
+     - XAU/HKD
+     - XAU/JPY
+     - XAU/NZD
+     - XAU/SGD
+     - XAU/USD
+     - XAU/XAG
+#     - XPD/USD
+#     - XPT/USD
+#     - XXX/AUD
+#     - XXX/CAD
+#     - XXX/CHF
+#     - XXX/EUR
+#     - XXX/GBP
+#     - XXX/HKD
+#     - XXX/JPY
+#     - XXX/SGD
+#     - XXX/USD
+     - ZAR/JPY
 
 # fStream
 fstream:
