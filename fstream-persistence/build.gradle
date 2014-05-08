@@ -40,4 +40,8 @@ dependencies {
   
   // Joda Time
   compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
+  
+  // kafka
+  // Kafka
+  compile 'org.apache.kafka:kafka_2.10:0.8.1'
 }

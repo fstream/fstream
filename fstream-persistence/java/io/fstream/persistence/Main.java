@@ -46,6 +46,7 @@ public class Main {
     testingCluster();
     createTable();
     scanTable();
+    System.out.println(configuration.toString());
   }
 
   @SneakyThrows
