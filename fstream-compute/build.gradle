@@ -14,12 +14,15 @@ configurations {
 }
 
 dependencies {
-	// fStream
-	compile project(':fstream-core')
-    
+  // fStream
+  compile project(':fstream-core')
+
+  // Spring
+  compile 'org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE'
+      
   // Storm
   //compile 'org.apache.storm:storm-core:0.9.1-incubating'
-	compile 'storm:storm:0.9.0'
+  compile 'storm:storm:0.9.0'
   
   // Storm-Kafka 
   compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
