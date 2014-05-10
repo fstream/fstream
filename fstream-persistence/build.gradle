@@ -1,0 +1,47 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+def camelVersion = '2.13.0'
+
+dependencies {
+  // fStream
+  compile project(':fstream-core')
+  
+  // Spring
+  compile 'org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE'
+  compile("org.apache.camel:camel-spring-javaconfig:$camelVersion") {
+    exclude group: 'org.springframework'
+  }
+  
+  // hbase
+  compile 'org.apache.hbase:hbase-client:0.96.2-hadoop1'
+  compile 'org.apache.hbase:hbase-testing-util:0.96.2-hadoop1'
+  
+  
+  // hadoop-core
+  compile 'org.apache.hadoop:hadoop-core:1.1.2'
+  
+  // hadoop-test
+  compile 'org.apache.hadoop:hadoop-test:1.2.1'
+  
+  // Camel
+  compile "org.apache.camel:camel-core:$camelVersion"
+  
+  // Camel endpoints
+  compile "org.apache.camel:camel-quickfix:$camelVersion"
+  compile "org.apache.camel:camel-kafka:$camelVersion"
+  compile "org.apache.camel:camel-jackson:$camelVersion"
+  
+  // Joda Time
+  compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
+  
+  // kafka
+  // Kafka
+  compile 'org.apache.kafka:kafka_2.10:0.8.1'
+}
