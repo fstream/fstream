@@ -1,39 +1,61 @@
-package io.fstream.test.kafka;
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
 
-import static com.google.common.collect.ImmutableMap.of;
+package io.fstream.test;
+
 import static java.lang.System.in;
 import static java.lang.System.out;
+import io.fstream.test.kafka.EmbeddedKafka;
+import io.fstream.test.kafka.EmbeddedZooKeeper;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
 import kafka.admin.AdminUtils;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.I0Itec.zkclient.ZkClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+
+import com.google.common.collect.ImmutableMap;
 
 @Slf4j
-public class EmbeddedKafkaTest {
+public class Main {
 
-  public @Rule
-  TemporaryFolder tmp = new TemporaryFolder();
-
+  File tmp;
   EmbeddedZooKeeper zooKeeper;
   EmbeddedKafka kafka;
 
-  @Before
+  @SneakyThrows
+  public static void main(String[] args) {
+    val main = new Main();
+    try {
+      main.tmp = Files.createTempDirectory("fstream-test").toFile();
+      main.setUp();
+      main.testServer();
+    } finally {
+      main.tearDown();
+      main.tmp.delete();
+    }
+  }
+
   public void setUp() throws IOException {
+    log.info("Testing storage: {}", tmp);
+    
     log.info("> Starting embedded ZooKeeper...");
-    zooKeeper = new EmbeddedZooKeeper(tmp.newFolder(), tmp.newFolder());
+    zooKeeper = new EmbeddedZooKeeper(tmp, tmp);
     zooKeeper.startAsync();
     zooKeeper.awaitRunning();
     log.info("< Started embedded ZooKeeper");
@@ -45,7 +67,6 @@ public class EmbeddedKafkaTest {
     log.info("< Started embedded Kafka");
   }
 
-  @After
   public void tearDown() throws IOException {
     log.info("> Stopping embedded Kafka...");
     kafka.stopAsync();
@@ -58,7 +79,6 @@ public class EmbeddedKafkaTest {
     log.info("Stopped embedded ZooKeeper");
   }
 
-  @Test
   public void testServer() throws IOException {
     // createTopic();
 
@@ -78,7 +98,8 @@ public class EmbeddedKafkaTest {
     val consumerConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
 
     val count = 1;
-    val topicMessageStreams = consumerConnector.createMessageStreams(of("rates", count));
+    val definition = ImmutableMap.of("rates", count);
+    val topicMessageStreams = consumerConnector.createMessageStreams(definition);
     val streams = topicMessageStreams.get("rates");
     val executor = Executors.newFixedThreadPool(count);
 

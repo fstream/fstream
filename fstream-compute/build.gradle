@@ -7,6 +7,8 @@
  * Proprietary and confidential.
  */
 
+apply plugin: 'spring-boot'
+ 
 configurations {
   compile.exclude module: 'slf4j-simple'
   compile.exclude module: 'slf4j-log4j12'

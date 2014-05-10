@@ -9,6 +9,8 @@
 
 def camelVersion = '2.13.0'
 
+apply plugin: 'spring-boot'
+
 dependencies {
   // fStream
   compile project(':fstream-core')
