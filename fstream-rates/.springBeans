@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.5.0.201404011509-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+		<config>java:io.fstream.rates.config.AppConfig</config>
+		<config>java:io.fstream.rates.config.CamelConfig</config>
+		<config>java:io.fstream.rates.handler.FixMessageLogger</config>
+		<config>java:io.fstream.rates.handler.LogonHandler</config>
+		<config>java:io.fstream.rates.Main</config>
+		<config>java:io.fstream.rates.handler.RatesRegistration</config>
+	</configs>
+	<autoconfigs>
+	</autoconfigs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

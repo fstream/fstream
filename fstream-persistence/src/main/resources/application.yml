@@ -1,0 +1,32 @@
+---
+
+#
+# Copyright (c) 2014 fStream. All Rights Reserved.
+# 
+# Project and contact information: https://bitbucket.org/fstream/fstream
+# 
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# Proprietary and confidential.
+#
+
+# OANDA
+oanda:
+   rates:
+      password: <defined in -Doanda.rates.password=xxxxxx>
+      uri: quickfix:oanda.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES
+      symbols: AUD/JPY
+
+
+
+#oanda:
+#	tables:
+#		name: oandaticks
+#		columnfamily:
+#			name: data
+#				columns:
+#					bid : bid
+#					ask : ask
+#			name: other
+#				columns:
+#					name: buyterms
+#					name: sellterms
