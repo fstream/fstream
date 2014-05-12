@@ -7,14 +7,11 @@
  * Proprietary and confidential.
  */
 
-def kafkaVersion = '0.8.1'
-def kafkaScalaVersion = '2.10'
-
 configurations {
   all*.exclude group: 'javax.jms', module: 'jms'
 }
 
 dependencies {
   // Kafka
-  compile "org.apache.kafka:kafka_$kafkaScalaVersion:$kafkaVersion"
+  compile libraries.kafka
 }

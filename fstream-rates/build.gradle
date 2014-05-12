@@ -7,8 +7,6 @@
  * Proprietary and confidential.
  */
 
-def camelVersion = '2.13.0'
-
 apply plugin: 'spring-boot'
 
 dependencies {
@@ -16,7 +14,7 @@ dependencies {
   compile project(':fstream-core')
   
   // Spring
-  compile 'org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE'
+  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
   compile("org.apache.camel:camel-spring-javaconfig:$camelVersion") {
     exclude group: 'org.springframework'
   }
@@ -34,5 +32,5 @@ dependencies {
   compile "org.apache.camel:camel-jackson:$camelVersion"
   
   // Joda Time
-  compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
 }

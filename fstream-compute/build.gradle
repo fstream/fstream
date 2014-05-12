@@ -12,7 +12,6 @@ apply plugin: 'spring-boot'
 configurations {
   compile.exclude module: 'slf4j-simple'
   compile.exclude module: 'slf4j-log4j12'
-  //compile.exclude module: 'storm'
 }
 
 dependencies {
@@ -20,7 +19,7 @@ dependencies {
   compile project(':fstream-core')
 
   // Spring
-  compile 'org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE'
+  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
       
   // Storm
   //compile 'org.apache.storm:storm-core:0.9.1-incubating'
@@ -32,5 +31,5 @@ dependencies {
   // Storm-Esper
   compile "org.tomdz.storm:storm-esper:0.8.1-SNAPSHOT"
   
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
+  compile libraries.jacksonDatabind
 }
