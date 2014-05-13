@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.stream.persistence.hbase;
+package io.fstream.persistence.hbase;
 
 import io.fstream.core.model.Rate;
 

@@ -9,7 +9,7 @@
 
 package io.fstream.persistence;
 
-import io.stream.persistence.hbase.KafkaConsumer;
+import io.fstream.persistence.hbase.KafkaConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 

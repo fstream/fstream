@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.stream.persistence.hbase;
+package io.fstream.persistence.schema;
 
 import io.fstream.core.model.Rate;
 
@@ -29,54 +29,64 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.joda.time.DateTime;
 import lombok.*;
 
+
+
 /**
  * 
  */
 @Slf4j
-public class Client {
+public class FstreamHbaseSchema {
 
-  private static final String TABLENAME = "oanda";
-  private static final String CFDATA = "data";
-  private static final String CFMETA = "meta";
+  private static String TABLENAME = "oanda";
+  private static String CFDATA = "data";
+  private static String CFMETA = "meta";
+  private static String CTIME = "time";
+  private static String CINST = "instrument";
+  private static String CPRICE = "Price";
+  private static String CBID = "bid";
+  private static String COFFER = "offer";
+  private static String ASSETSEGMENT = "segment";
+  private static String EVENTTYPE = "event";
+  private static String VOLUME = "volume";
   private static Configuration config;
   private static HTable table;
 
   private static final String[] sampledata = { "1399538895", "EURUSD", "1.0005", "1.0004", "QUOTE" };
   SimpleDateFormat timeformat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss.S");
 
-  public Client() {
-    // TODO for now the config file is set in the class path. need to set this programmatically
+  public FstreamHbaseSchema() {
+    // set
     config = HBaseConfiguration.create();
     initializeTable(TABLENAME);
   }
 
   public static void main(String[] args) {
-    Client schema = new Client();
+    FstreamHbaseSchema schema = new FstreamHbaseSchema();
+    //schema.createTable(TABLENAME);
+    //schema.populateTable(TABLENAME);
   }
-
-  /**
-   * Initializes table so it exists and ready to receive data
-   * @param tablename
-   */
+  
   @SneakyThrows
-  private void initializeTable(String tablename) {
+  private void initializeTable (String tablename) {
+    HConnection connectionn = HConnectionManager.createConnection(config);
+    log.info("connected to hbase");
     HBaseAdmin admin = new HBaseAdmin(config);
     if (admin.tableExists(tablename)) {
-      //TODO assuming schema is created as per design. Schema validation would be nice
-      if (admin.isTableDisabled(tablename)) { 
+      if (admin.isTableDisabled(tablename)) { // assuming table schema is defined as per expected
         admin.enableTable(tablename);
       }
-      log.info("table {} exists and is enabled", tablename);
+      log.info("table {} exists and is enabled",tablename);
     }
     else { // create table
       HTableDescriptor tdescriptor = new HTableDescriptor(tablename);
       tdescriptor.addFamily(new HColumnDescriptor(CFDATA));
       tdescriptor.addFamily(new HColumnDescriptor(CFMETA));
       admin.createTable(tdescriptor);
-      log.info("table {} was created and enabled", tablename);
+      log.info("created table " + tablename);
+      // admin.addColumn(tablename, new HColumnDescriptor(CFDATA));
+      admin.close();
     }
-    admin.close();
-    table = new HTable(config, tablename);
+   table = new HTable(config, tablename);
   }
 
   @SneakyThrows
@@ -95,11 +105,11 @@ public class Client {
         Bytes.toBytes(sampledata[3]));
     table.put(row);
   }
-
+  
   @SneakyThrows
   public void addRow(Rate rate) {
-    val timerounded = rate.getDateTime().hourOfDay().roundCeilingCopy();
-    val row = new Put(Bytes.toBytes(timerounded.getMillis() + rate.getDateTime().getMillis() + rate.getSymbol()));
+    //val timerounded = rate.getDateTime().hourOfDay().roundCeilingCopy();
+    val row = new Put(Bytes.toBytes(rate.getDateTime().getMillis() + rate.getSymbol()));
     row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
         Bytes.toBytes(rate.getBid()));
     row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:ask"),
@@ -107,7 +117,7 @@ public class Client {
     row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("symbol"),
         Bytes.toBytes(rate.getSymbol()));
     table.put(row);
-
+    
   }
 
   @SneakyThrows
