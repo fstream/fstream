@@ -47,6 +47,8 @@ public class Client {
   public Client() {
     // TODO for now the config file is set in the class path. need to set this programmatically
     config = HBaseConfiguration.create();
+    config.set("hbase.rootdir","/Users/bdevani/data/hbase");
+    config.set("base.zookeeper.property.dataDir","/Users/bdevani/data/hbase/zookeeper");
     initializeTable(TABLENAME);
   }
 
