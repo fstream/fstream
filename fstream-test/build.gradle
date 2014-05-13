@@ -7,11 +7,12 @@
  * Proprietary and confidential.
  */
 
-configurations {
-  all*.exclude group: 'javax.jms', module: 'jms'
-}
+apply plugin: 'spring-boot'
 
 dependencies {
+  // Spring
+  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+  
   // Kafka
   compile libraries.kafka
 }

@@ -61,6 +61,7 @@ subprojects {
 		compile.exclude module: 'slf4j-simple'
 		compile.exclude module: 'slf4j-log4j12'
 		
+		all*.exclude group: 'log4j', module: 'log4j'
 		all*.exclude group: 'javax.jms', module: 'jms'
 		all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
 		all*.exclude group: 'com.sun.jmx', module: 'jmxri'
@@ -89,3 +90,4 @@ subprojects {
 		}
 	}
 }
+

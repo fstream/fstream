@@ -24,6 +24,9 @@ public class RatesRoutes extends AbstractFixRoutes {
   
   @Override
   public void configure() throws Exception {
+    onException(Throwable.class)
+      .handled(true);
+    
     from("{{rates.uri}}")
       .choice()
         .when(logon())
