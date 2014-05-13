@@ -82,6 +82,8 @@ subprojects {
 		
 		// Test
 		testCompile 'junit:junit:4.11'
+		testCompile 'org.assertj:assertj-core:1.6.0'
+		testCompile 'org.mockito:mockito-all:1.9.5'
 	}
 	
 	jar {
