@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
@@ -27,6 +28,7 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.joda.time.DateTime;
+
 import lombok.*;
 
 /**
@@ -47,6 +49,8 @@ public class Client {
   public Client() {
     // TODO for now the config file is set in the class path. need to set this programmatically
     config = HBaseConfiguration.create();
+    config.set("hbase.rootdir","/Users/bdevani/data/hbase");
+    config.set("base.zookeeper.property.dataDir","/Users/bdevani/data/hbase/zookeeper");
     initializeTable(TABLENAME);
   }
 
@@ -69,7 +73,7 @@ public class Client {
       log.info("table {} exists and is enabled", tablename);
     }
     else { // create table
-      HTableDescriptor tdescriptor = new HTableDescriptor(tablename);
+      HTableDescriptor tdescriptor = new HTableDescriptor(TableName.valueOf(tablename));
       tdescriptor.addFamily(new HColumnDescriptor(CFDATA));
       tdescriptor.addFamily(new HColumnDescriptor(CFMETA));
       admin.createTable(tdescriptor);
@@ -77,23 +81,6 @@ public class Client {
     }
     admin.close();
     table = new HTable(config, tablename);
-  }
-
-  @SneakyThrows
-  private void populateTable(String tablename) {
-    HTable table = new HTable(config, tablename);
-    DateTime time = new DateTime(Long.parseLong(sampledata[0]) * 1000);
-    DateTime timerounded = time.hourOfDay().roundFloorCopy();
-
-    // System.out.println(timeformat.format(time.getMillis()));
-    // System.out.println(timeformat.format(timerounded.getMillis()));
-
-    Put row = new Put(Bytes.toBytes(timerounded.getMillis() + sampledata[1]));
-    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
-        Bytes.toBytes(sampledata[2]));
-    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:ask"),
-        Bytes.toBytes(sampledata[3]));
-    table.put(row);
   }
 
   @SneakyThrows
