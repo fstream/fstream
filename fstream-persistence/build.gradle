@@ -7,41 +7,24 @@
  * Proprietary and confidential.
  */
 
-def camelVersion = '2.13.0'
-
 dependencies {
   // fStream
   compile project(':fstream-core')
   
   // Spring
-  compile 'org.springframework.boot:spring-boot-starter-actuator:1.0.1.RELEASE'
-  compile("org.apache.camel:camel-spring-javaconfig:$camelVersion") {
-    exclude group: 'org.springframework'
-  }
+  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
   
-  // hbase
-  compile 'org.apache.hbase:hbase-client:0.96.2-hadoop1'
-  compile 'org.apache.hbase:hbase-testing-util:0.96.2-hadoop1'
+  // HBase
+  compile "org.apache.hbase:hbase-client:$hbaseVersion"
+  compile "org.apache.hbase:hbase-testing-util:$hbaseVersion" // This should be test scope
   
-  
-  // hadoop-core
+  // Hadoop
   compile 'org.apache.hadoop:hadoop-core:1.1.2'
-  
-  // hadoop-test
-  compile 'org.apache.hadoop:hadoop-test:1.2.1'
-  
-  // Camel
-  compile "org.apache.camel:camel-core:$camelVersion"
-  
-  // Camel endpoints
-  compile "org.apache.camel:camel-quickfix:$camelVersion"
-  compile "org.apache.camel:camel-kafka:$camelVersion"
-  compile "org.apache.camel:camel-jackson:$camelVersion"
+  compile 'org.apache.hadoop:hadoop-test:1.2.1' // This should be test scope
   
   // Joda Time
   compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
   
   // kafka
-  // Kafka
-  compile 'org.apache.kafka:kafka_2.10:0.8.1'
+  compile libraries.kafka
 }

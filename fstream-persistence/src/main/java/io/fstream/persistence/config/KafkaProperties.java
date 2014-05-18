@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.web.config;
+package io.fstream.persistence.config;
 
 import java.util.Properties;
 

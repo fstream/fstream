@@ -7,68 +7,53 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.schema;
+package io.fstream.persistence.service;
 
 import io.fstream.core.model.Rate;
 
 import java.text.SimpleDateFormat;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HConnection;
-import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.joda.time.DateTime;
-import lombok.*;
+import org.springframework.stereotype.Service;
 
-
-
-/**
- * 
- */
 @Slf4j
-public class FstreamHbaseSchema {
+@Service
+public class SchemaService {
 
   private static String TABLENAME = "oanda";
   private static String CFDATA = "data";
   private static String CFMETA = "meta";
-  private static String CTIME = "time";
-  private static String CINST = "instrument";
-  private static String CPRICE = "Price";
-  private static String CBID = "bid";
-  private static String COFFER = "offer";
-  private static String ASSETSEGMENT = "segment";
-  private static String EVENTTYPE = "event";
-  private static String VOLUME = "volume";
   private static Configuration config;
   private static HTable table;
 
   private static final String[] sampledata = { "1399538895", "EURUSD", "1.0005", "1.0004", "QUOTE" };
   SimpleDateFormat timeformat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss.S");
 
-  public FstreamHbaseSchema() {
+  public SchemaService() {
     // set
     config = HBaseConfiguration.create();
     initializeTable(TABLENAME);
   }
 
   public static void main(String[] args) {
-    FstreamHbaseSchema schema = new FstreamHbaseSchema();
-    //schema.createTable(TABLENAME);
-    //schema.populateTable(TABLENAME);
+     new SchemaService();
   }
   
   @SneakyThrows
   private void initializeTable (String tablename) {
-    HConnection connectionn = HConnectionManager.createConnection(config);
     log.info("connected to hbase");
     HBaseAdmin admin = new HBaseAdmin(config);
     if (admin.tableExists(tablename)) {
@@ -78,7 +63,7 @@ public class FstreamHbaseSchema {
       log.info("table {} exists and is enabled",tablename);
     }
     else { // create table
-      HTableDescriptor tdescriptor = new HTableDescriptor(tablename);
+      HTableDescriptor tdescriptor = new HTableDescriptor(TableName.valueOf(tablename));
       tdescriptor.addFamily(new HColumnDescriptor(CFDATA));
       tdescriptor.addFamily(new HColumnDescriptor(CFMETA));
       admin.createTable(tdescriptor);
@@ -95,9 +80,6 @@ public class FstreamHbaseSchema {
     DateTime time = new DateTime(Long.parseLong(sampledata[0]) * 1000);
     DateTime timerounded = time.hourOfDay().roundFloorCopy();
 
-    // System.out.println(timeformat.format(time.getMillis()));
-    // System.out.println(timeformat.format(timerounded.getMillis()));
-
     Put row = new Put(Bytes.toBytes(timerounded.getMillis() + sampledata[1]));
     row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
         Bytes.toBytes(sampledata[2]));
@@ -108,7 +90,6 @@ public class FstreamHbaseSchema {
   
   @SneakyThrows
   public void addRow(Rate rate) {
-    //val timerounded = rate.getDateTime().hourOfDay().roundCeilingCopy();
     val row = new Put(Bytes.toBytes(rate.getDateTime().getMillis() + rate.getSymbol()));
     row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
         Bytes.toBytes(rate.getBid()));
@@ -122,16 +103,15 @@ public class FstreamHbaseSchema {
 
   @SneakyThrows
   private void createTable(String tablename) {
-    HConnection connectionn = HConnectionManager.createConnection(config);
     log.info("connected to hbase");
     HBaseAdmin admin = new HBaseAdmin(config);
-    HTableDescriptor tdescriptor = new HTableDescriptor(tablename);
+    HTableDescriptor tdescriptor = new HTableDescriptor(TableName.valueOf(tablename));
     tdescriptor.addFamily(new HColumnDescriptor(CFDATA));
     tdescriptor.addFamily(new HColumnDescriptor(CFMETA));
+    
     admin.createTable(tdescriptor);
     log.info("created table " + tablename);
-    // admin.addColumn(tablename, new HColumnDescriptor(CFDATA));
     admin.close();
-
   }
+  
 }

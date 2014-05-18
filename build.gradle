@@ -18,6 +18,7 @@ ext.springBootVersion = '1.0.2.RELEASE'
 ext.jacksonVersion    = '2.3.3'
 ext.camelVersion      = '2.13.0'
 ext.kafkaVersion      = '0.8.1'
+ext.hbaseVersion      = '0.96.2-hadoop1'
 
 //
 // Libraries

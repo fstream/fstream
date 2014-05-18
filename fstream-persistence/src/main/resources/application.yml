@@ -9,24 +9,11 @@
 # Proprietary and confidential.
 #
 
-# OANDA
-oanda:
-   rates:
-      password: <defined in -Doanda.rates.password=xxxxxx>
-      uri: quickfix:oanda.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES
-      symbols: AUD/JPY
-
-
-
-#oanda:
-#	tables:
-#		name: oandaticks
-#		columnfamily:
-#			name: data
-#				columns:
-#					bid : bid
-#					ask : ask
-#			name: other
-#				columns:
-#					name: buyterms
-#					name: sellterms
+kafka:
+   consumerProperties:
+      zookeeper.connect: localhost:21818
+      zookeeper.connection.timeout.ms: 1000000
+      group.id: 1
+      broker.id: 0
+   topics:
+      - rates

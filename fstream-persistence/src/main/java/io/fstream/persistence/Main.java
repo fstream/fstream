@@ -9,20 +9,47 @@
 
 package io.fstream.persistence;
 
-import io.fstream.persistence.hbase.KafkaConsumer;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Strings.repeat;
+import static com.google.common.io.Resources.getResource;
+import static com.google.common.io.Resources.readLines;
+import static java.lang.System.out;
+
+import java.io.IOException;
+
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * entry point for kafka-consumer
+ * Application entry point.
  */
-//TODO springify it later
 @Slf4j
+@Configuration
+@ComponentScan
 public class Main {
 
-  public static void main (String[] args) {
-    KafkaConsumer kafkaconsumer = new KafkaConsumer();
-    kafkaconsumer.run();
+  public static void main(String[] args) throws Exception {
+    logBanner();
+
+    new SpringApplicationBuilder()
+        .showBanner(false)
+        .sources(Main.class)
+        .run(args);
+
+    out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
+    Thread.sleep(Long.MAX_VALUE);
+  }
+
+  private static void logBanner() throws IOException {
+    log.info("{}", repeat("-", 100));
+    for (val line : readLines(getResource("banner.txt"), UTF_8)) {
+      log.info(line);
+    }
+    log.info("{}", repeat("-", 100));
   }
 
 }
