@@ -22,3 +22,4 @@ dependencies {
   // Kafka
   compile libraries.kafka
 }
+

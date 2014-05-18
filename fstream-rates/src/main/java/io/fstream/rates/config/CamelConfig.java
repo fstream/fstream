@@ -64,6 +64,7 @@ public class CamelConfig extends CamelConfiguration {
 
   @Override
   protected void setupCamelContext(CamelContext camelContext) throws Exception {
+
     camelContext.addComponent(CAMEL_PROPERTIES_NAME, newPropertiesComponent(environment));
 
     val jacksonDataFormat = jacksonDataFormat();

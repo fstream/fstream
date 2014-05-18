@@ -29,7 +29,7 @@ public class LogonHandler {
   private String password;
 
   public void handle(@Body Logon message) {
-    log.info("Setting password...");
+    log.info("Setting password to '<{} characters>' ...", password.length());
     message.setField(new Password(password));
     message.setField(new ResetSeqNumFlag(true));
   }

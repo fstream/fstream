@@ -12,7 +12,6 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Strings.repeat;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.readLines;
-import static java.lang.System.in;
 import static java.lang.System.out;
 
 import java.io.IOException;
@@ -40,8 +39,8 @@ public class Main {
         .sources(Main.class)
         .run(args);
 
-    out.println("\n\n*** Running rates. Press enter to shutdown\n\n");
-    in.read();
+    out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
+    Thread.sleep(Long.MAX_VALUE);
   }
 
   private static void logBanner() throws IOException {
