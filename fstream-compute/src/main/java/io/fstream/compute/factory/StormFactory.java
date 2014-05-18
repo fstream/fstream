@@ -14,9 +14,11 @@ import io.fstream.compute.bolt.ComputeBolt;
 import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 
+import java.util.List;
 import java.util.Properties;
 
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
@@ -30,13 +32,18 @@ import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Factory for storm component creation.
  */
 @NoArgsConstructor(access = PRIVATE)
 public final class StormFactory {
 
-  public static Config newConfig(boolean local) {
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+
+  @SneakyThrows
+  public static Config newStormConfig(boolean local, List<String> epl) {
     val config = new Config();
     config.setDebug(true);
 
@@ -45,16 +52,9 @@ public final class StormFactory {
     props.put("request.required.acks", "1");
     props.put("serializer.class", "kafka.serializer.StringEncoder");
 
-    // @formatter:off
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
     config.put(KafkaBolt.TOPIC, "alerts");
-    config.put(ComputeBolt.EPL,
-      "SELECT " +
-      "  CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange " +
-      "FROM " +
-      "  Rate"
-      );
-    // @formatter:on
+    config.put(ComputeBolt.EPL, MAPPER.writeValueAsString(epl));
 
     if (local) {
       config.setMaxTaskParallelism(3);

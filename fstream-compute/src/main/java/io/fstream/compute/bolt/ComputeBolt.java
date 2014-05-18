@@ -11,10 +11,13 @@ package io.fstream.compute.bolt;
 
 import io.fstream.core.model.Rate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -30,8 +33,10 @@ import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Slf4j
 public class ComputeBolt extends BaseRichBolt implements UpdateListener {
 
   public static final String EPL = "epl";
@@ -50,8 +55,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
 
   @Override
   public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
-    val epl = (String) conf.get(EPL);
-
+    log.info("Preparing...");
     val configuration = new Configuration();
     configuration.addEventType("Rate", Rate.class.getName());
 
@@ -61,8 +65,15 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     this.runtime = esperSink.getEPRuntime();
     this.admin = esperSink.getEPAdministrator();
 
-    val statement = admin.createEPL(epl);
-    statement.addListener(this);
+    val values = getEplValues(conf);
+    for (val epl : values) {
+      log.info("Registering statement: {}", epl);
+      val statement = admin.createEPL(epl);
+
+      statement.addListener(this);
+    }
+
+    log.info("Finished preparing.");
   }
 
   @Override
@@ -93,6 +104,12 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     if (esperSink != null) {
       esperSink.destroy();
     }
+  }
+
+  @SneakyThrows
+  private List<String> getEplValues(@SuppressWarnings("rawtypes") Map conf) {
+    val epl = (String) conf.get(EPL);
+    return MAPPER.readValue(epl, new TypeReference<ArrayList<String>>() {});
   }
 
 }

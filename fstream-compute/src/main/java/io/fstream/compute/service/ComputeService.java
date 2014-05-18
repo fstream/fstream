@@ -9,7 +9,7 @@
 
 package io.fstream.compute.service;
 
-import static io.fstream.compute.factory.StormFactory.newStormTopology;
+import io.fstream.compute.config.EsperProperties;
 import io.fstream.compute.factory.StormFactory;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +19,7 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.thrift7.TException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -36,14 +37,16 @@ public class ComputeService {
 
   private final String name = "kafka";
 
-  @Value("#{local}")
+  @Value("${local}")
   private boolean local;
+  @Autowired
+  private EsperProperties properties;
 
   @PostConstruct
   public void execute() throws Exception {
     // Setup
-    val topology = newStormTopology();
-    val config = StormFactory.newConfig(local);
+    val topology = StormFactory.newStormTopology();
+    val config = StormFactory.newStormConfig(local, properties.getEpl());
 
     if (local) {
       log.info("Submitting local topology...");
