@@ -24,7 +24,7 @@ public class KafkaProperties {
   private static final Properties DEFAULT_CONSUMER_PROPERTIES = new Properties() {
 
     {
-      put("zookeeper.connect", "localhost:2181");
+      put("zookeeper.connect", "localhost:21812");
       put("zookeeper.connection.timeout.ms", "1000000");
       put("group.id", "1");
       put("broker.id", "0");

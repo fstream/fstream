@@ -9,28 +9,28 @@
 
 package io.fstream.test.hbase;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import lombok.val;
 
-import lombok.SneakyThrows;
-
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 
-public class EmbeddedHBase {
+import com.google.common.util.concurrent.AbstractIdleService;
+
+public class EmbeddedHBase extends AbstractIdleService {
 
   private HBaseTestingUtility utility;
 
-  @SneakyThrows
-  @PostConstruct
-  public void launch() {
-    utility = new HBaseTestingUtility();
+  @Override
+  protected void startUp() throws Exception {
+    val config = HBaseConfiguration.create();
+    config.set("test.hbase.zookeeper.property.clientPort", "21812");
+    utility = new HBaseTestingUtility(config);
 
     utility.startMiniCluster();
   }
 
-  @PreDestroy
-  @SneakyThrows
-  public void shutdown() {
+  @Override
+  protected void shutDown() throws Exception {
     utility.shutdownMiniCluster();
   }
 

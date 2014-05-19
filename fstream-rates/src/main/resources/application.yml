@@ -145,4 +145,4 @@ rates:
 # fStream
 fstream:
    broker:
-      uri: kafka:localhost:6667?topic=rates&groupId=1&zookeeperHost=localhost&zookeeperPort=2181&partitioner=kafka.producer.DefaultPartitioner
+      uri: kafka:localhost:6667?topic=rates&groupId=1&zookeeperHost=localhost&zookeeperPort=21812&partitioner=kafka.producer.DefaultPartitioner

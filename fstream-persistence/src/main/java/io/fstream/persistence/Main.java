@@ -40,7 +40,7 @@ public class Main {
         .sources(Main.class)
         .run(args);
 
-    out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
+    out.println("\n\n*** Running persist. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);
   }
 

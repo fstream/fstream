@@ -31,7 +31,7 @@ public class EmbeddedZooKeeper extends AbstractIdleService {
 
   @Override
   protected void startUp() throws Exception {
-    val clientPort = 2181; // non-standard
+    val clientPort = 21812; // non-standard
 
     server = new TestingServer(clientPort, snapDir);
   }

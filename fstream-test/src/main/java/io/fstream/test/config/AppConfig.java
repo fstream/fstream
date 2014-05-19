@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
-import io.fstream.test.zk.EmbeddedZooKeeper;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -54,26 +53,26 @@ public class AppConfig {
   }
   
   @Bean
-  @SneakyThrows
-  public EmbeddedZooKeeper embeddedZooKeeper() {
-    return new EmbeddedZooKeeper(tmp(), tmp());
+  public EmbeddedHBase embeddedHbase() {
+    return new EmbeddedHBase();
   }
   
+//  @Bean
+//  @SneakyThrows
+//  public EmbeddedZooKeeper embeddedZooKeeper() {
+//    return new EmbeddedZooKeeper(tmp(), tmp());
+//  }
+//  
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
     return new EmbeddedKafka();
   }
   
-  @Bean
-  public EmbeddedHBase embeddedHbase() {
-    return new EmbeddedHBase();
-  }
-  
   @PostConstruct
   public void init() {
     log.info("> Starting embedded ZooKeeper...");
-    embeddedZooKeeper().startAndWait();
+    embeddedHbase().startAndWait();
     log.info("< Started embedded ZooKeeper");
 
     log.info("> Starting embedded Kafka...");
@@ -88,14 +87,14 @@ public class AppConfig {
     log.info("< Stopped embedded Kafka");
 
     log.info("Stopping embedded ZooKeeper...");
-    embeddedZooKeeper().stopAndWait();
+    embeddedHbase().stopAndWait();
     log.info("Stopped embedded ZooKeeper");
   }
 
   @SuppressWarnings("unused")
   private void registerConsumer() {
     val props = new Properties();
-    props.put("zookeeper.connect", "localhost:2181");
+    props.put("zookeeper.connect", "localhost:21812");
     props.put("zookeeper.connection.timeout.ms", "1000000");
     props.put("group.id", "1");
     props.put("broker.id", "0");
@@ -124,7 +123,7 @@ public class AppConfig {
 
   @SuppressWarnings("unused")
   private void createTopic() {
-    val zkClient = new ZkClient("localhost:2181");
+    val zkClient = new ZkClient("localhost:21812");
     Properties props = new Properties();
     String topic = "rates";
     int partitions = 1;
