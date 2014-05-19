@@ -28,8 +28,8 @@ dependencies {
   // Storm-Kafka 
   compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
   
-  // Storm-Esper
-  compile "org.tomdz.storm:storm-esper:0.8.1-SNAPSHOT"
+  // Esper
+  compile 'com.espertech:esper:4.11.0'
   
   compile libraries.jacksonDatabind
 }

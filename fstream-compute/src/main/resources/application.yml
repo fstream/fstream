@@ -13,9 +13,21 @@ local: true
 
 esper:
    epl:
+      # Create the partitions
       - |
-         SELECT
-            CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange
-         FROM
-            Rate
+        CREATE CONTEXT 
+           SegmentedBySymbol
+        PARTITION BY 
+           symbol 
+        FROM
+           Rate
+           
+      # Business statements
+      - |
+        CONTEXT SegmentedBySymbol
+        SELECT
+           CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange
+        FROM
+           Rate
+
            

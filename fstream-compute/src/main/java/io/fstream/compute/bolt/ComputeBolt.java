@@ -91,7 +91,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   @SneakyThrows
   public void update(EventBean[] newEvents, EventBean[] oldEvents) {
     if (newEvents != null) {
-      for (EventBean newEvent : newEvents) {
+      for (val newEvent : newEvents) {
         val alert = newEvent.getUnderlying();
         val content = MAPPER.writeValueAsString(alert);
         collector.emit(new Values("1", content));

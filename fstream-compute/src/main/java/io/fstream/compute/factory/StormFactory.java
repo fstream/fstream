@@ -67,6 +67,7 @@ public final class StormFactory {
 
   public static StormTopology newStormTopology() {
     val spoutId = "fstream-rates";
+
     val builder = new TopologyBuilder();
     builder.setSpout(spoutId, newKafkaSpout(), 2);
     builder.setBolt("rateLogger", newLoggingBolt())

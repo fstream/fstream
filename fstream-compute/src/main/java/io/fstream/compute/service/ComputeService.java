@@ -15,6 +15,7 @@ import io.fstream.compute.factory.StormFactory;
 import javax.annotation.PostConstruct;
 
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,17 +50,35 @@ public class ComputeService {
     val config = StormFactory.newStormConfig(local, properties.getEpl());
 
     if (local) {
-      log.info("Submitting local topology...");
+      log.info("Submitting local topology '{}'...", name);
       val cluster = new LocalCluster();
       cluster.submitTopology(name, config, topology);
 
-      cluster.shutdown();
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+
+        @Override
+        public void run() {
+          cluster.shutdown();
+          log.info("Shut down '{}'", name);
+        }
+
+      });
     } else {
-      log.info("Submitting cluster topology...");
+      log.info("Submitting cluster topology '{}'...", name);
       StormSubmitter.submitTopology(name, config, topology);
 
-      killTopology(name);
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+
+        @Override
+        @SneakyThrows
+        public void run() {
+          killTopology(name);
+          log.info("Shut down '{}'", name);
+        }
+
+      });
     }
+
   }
 
   private static void killTopology(String name) throws NotAliveException, TException {
