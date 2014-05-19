@@ -31,6 +31,7 @@ dependencies {
   // Esper
   compile 'com.espertech:esper:4.11.0'
   
+  // Utilities
   compile libraries.guava
   compile libraries.jacksonDatabind
 }

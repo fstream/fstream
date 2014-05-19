@@ -20,11 +20,12 @@ dependencies {
   // Hadoop
   compile 'org.apache.hadoop:hadoop-core:1.1.2'
   
-  // Joda Time
+  // Jackson
   compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
   
-  // kafka
+  // Kafka
   compile libraries.kafka
   
+  // Utilities
   compile libraries.guava
 }

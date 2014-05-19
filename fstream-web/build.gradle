@@ -22,6 +22,7 @@ dependencies {
   // Kafka
   compile libraries.kafka
   
+  // Utilities
   compile libraries.guava
 }
 

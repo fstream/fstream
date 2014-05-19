@@ -2,7 +2,7 @@
 .project
 .classpath
 org.eclipse.core.resources.prefs
-.settings/gradle
+.settings
 
 # Maven
 target/

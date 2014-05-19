@@ -20,7 +20,6 @@ dependencies {
   
   // Zookeeper
   compile 'org.apache.curator:curator-test:2.4.2'
-  compile 'com.google.guava:guava:12.0' // Override
   
   // Hadoop
   compile "org.apache.hadoop:hadoop-test:$hadoopVersion"
@@ -29,4 +28,7 @@ dependencies {
   // HBase
   compile "org.apache.hbase:hbase-client:$hbaseVersion"
   compile "org.apache.hbase:hbase-testing-util:$hbaseVersion"
+  
+  // Utilities
+  compile 'com.google.guava:guava:12.0' // Override due to conflicts
 }
