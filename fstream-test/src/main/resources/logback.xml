@@ -23,6 +23,8 @@
     </encoder>
   </appender>
   
+  <logger name="org.apache.hadoop.metrics2.util.MBeans" level="ERROR"/>
+  
   <root level="INFO">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />

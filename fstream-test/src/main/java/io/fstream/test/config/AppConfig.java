@@ -18,8 +18,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
-import io.fstream.test.kafka.EmbeddedZooKeeper;
+import io.fstream.test.zk.EmbeddedZooKeeper;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -64,30 +65,30 @@ public class AppConfig {
     return new EmbeddedKafka();
   }
   
+  @Bean
+  public EmbeddedHBase embeddedHbase() {
+    return new EmbeddedHBase();
+  }
   
   @PostConstruct
   public void init() {
     log.info("> Starting embedded ZooKeeper...");
-    embeddedZooKeeper().startAsync();
-    embeddedZooKeeper().awaitRunning();
+    embeddedZooKeeper().startAndWait();
     log.info("< Started embedded ZooKeeper");
 
     log.info("> Starting embedded Kafka...");
-    embeddedKafka().startAsync();
-    embeddedKafka().awaitRunning();
+    embeddedKafka().startAndWait();
     log.info("< Started embedded Kafka");
   }
   
   @PreDestroy
   public void destroy() {
     log.info("> Stopping embedded Kafka...");
-    embeddedKafka().stopAsync();
-    embeddedKafka().awaitTerminated();
+    embeddedKafka().stopAndWait();
     log.info("< Stopped embedded Kafka");
 
     log.info("Stopping embedded ZooKeeper...");
-    embeddedZooKeeper().stopAsync();
-    embeddedZooKeeper().awaitTerminated();
+    embeddedZooKeeper().stopAndWait();
     log.info("Stopped embedded ZooKeeper");
   }
 

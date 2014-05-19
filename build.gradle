@@ -15,16 +15,19 @@ defaultTasks 'build'
 
 ext.springVersion     = '4.0.3.RELEASE'
 ext.springBootVersion = '1.0.2.RELEASE'
-ext.jacksonVersion    = '2.3.3'
 ext.camelVersion      = '2.13.0'
 ext.kafkaVersion      = '0.8.1'
-ext.hbaseVersion      = '0.96.2-hadoop1'
+ext.hbaseVersion      = '0.98.2-hadoop1'
+ext.hadoopVersion     = '1.2.1'
+ext.guavaVersion      = '17.0'
+ext.jacksonVersion    = '2.3.3'
 
 //
 // Libraries
 //
 
 ext.libraries = [
+	guava:              "com.google.guava:guava:$guavaVersion",
 	springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
 	jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
 	kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion"
@@ -73,7 +76,6 @@ subprojects {
 		compile 'org.projectlombok:lombok:1.12.4'
 		
 		// Utilities
-		compile 'com.google.guava:guava:17.0'
 		compile 'joda-time:joda-time:2.3'
 		
 		// Logging

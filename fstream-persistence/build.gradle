@@ -16,15 +16,15 @@ dependencies {
   
   // HBase
   compile "org.apache.hbase:hbase-client:$hbaseVersion"
-  compile "org.apache.hbase:hbase-testing-util:$hbaseVersion" // This should be test scope
   
   // Hadoop
   compile 'org.apache.hadoop:hadoop-core:1.1.2'
-  compile 'org.apache.hadoop:hadoop-test:1.2.1' // This should be test scope
   
   // Joda Time
   compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
   
   // kafka
   compile libraries.kafka
+  
+  compile libraries.guava
 }

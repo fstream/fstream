@@ -7,18 +7,15 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.test.kafka;
+package io.fstream.test.zk;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import org.apache.zookeeper.server.NIOServerCnxn;
-import org.apache.zookeeper.server.NIOServerCnxn.Factory;
-import org.apache.zookeeper.server.ZooKeeperServer;
+import org.apache.curator.test.TestingServer;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 
@@ -30,23 +27,18 @@ public class EmbeddedZooKeeper extends AbstractIdleService {
   @NonNull
   private final File logDir;
 
-  private Factory factory;
+  private TestingServer server;
 
   @Override
   protected void startUp() throws Exception {
     val clientPort = 21818; // non-standard
-    val numConnections = 5000;
-    val tickTime = 2000;
-
-    val server = new ZooKeeperServer(snapDir, logDir, tickTime);
-    val factory = new NIOServerCnxn.Factory(new InetSocketAddress(clientPort), numConnections);
-
-    factory.startup(server);
+    
+    server = new TestingServer(clientPort, snapDir);
   }
 
   @Override
   protected void shutDown() throws Exception {
-    factory.shutdown();
+    server.stop();
   }
 
 }

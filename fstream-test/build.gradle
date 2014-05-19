@@ -14,5 +14,19 @@ dependencies {
   compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
   
   // Kafka
-  compile libraries.kafka
+  compile(libraries.kafka) {
+    exclude group: 'org.apache.zookeeper'
+  }
+  
+  // Zookeeper
+  compile 'org.apache.curator:curator-test:2.4.2'
+  compile 'com.google.guava:guava:12.0' // Override
+  
+  // Hadoop
+  compile "org.apache.hadoop:hadoop-test:$hadoopVersion"
+  compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+  
+  // HBase
+  compile "org.apache.hbase:hbase-client:$hbaseVersion"
+  compile "org.apache.hbase:hbase-testing-util:$hbaseVersion"
 }
