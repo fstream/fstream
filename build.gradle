@@ -6,42 +6,43 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
-
+ 
+ 
 defaultTasks 'build'
-
-//
-// Versions
-//
-
-ext.springVersion     = '4.0.3.RELEASE'
-ext.springBootVersion = '1.0.2.RELEASE'
-ext.camelVersion      = '2.13.0'
-ext.kafkaVersion      = '0.8.1'
-ext.hbaseVersion      = '0.98.2-hadoop1'
-ext.hadoopVersion     = '1.2.1'
-ext.guavaVersion      = '17.0'
-ext.jacksonVersion    = '2.3.3'
-
-//
-// Libraries
-//
-
-ext.libraries = [
-	guava:              "com.google.guava:guava:$guavaVersion",
-	springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
-	jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-	kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion"
-]
-
+ 
 buildscript {
-	repositories {
-		maven { url "http://repo.spring.io/libs-snapshot" }
-		mavenLocal()
-	}
 	
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.2.RELEASE")
-	}
+   //
+   // Versions
+   //
+   ext.springVersion     = '4.0.3.RELEASE'
+   ext.springBootVersion = "1.0.2.RELEASE"
+   ext.camelVersion      = '2.13.0'
+   ext.kafkaVersion      = '0.8.1'
+   ext.hbaseVersion      = '0.98.2-hadoop1'
+   ext.hadoopVersion     = '1.2.1'
+   ext.guavaVersion      = '17.0'
+   ext.jacksonVersion    = '2.3.3'
+   
+   //
+   // Libraries
+   //
+   
+   ext.libraries = [
+	   guava:              "com.google.guava:guava:$guavaVersion",
+	   springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
+	   jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion"
+   ]
+   
+   repositories {
+   	 maven { url "http://repo.spring.io/libs-snapshot" }
+   	 mavenLocal()
+   }
+   
+   dependencies {
+   	 classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+   }
 }
 
 subprojects {
@@ -50,8 +51,7 @@ subprojects {
 	
 	apply plugin: 'java'
 	
-	sourceCompatibility = JavaVersion.VERSION_1_7
-	targetCompatibility = project.sourceCompatibility
+	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_7
 	
 	repositories { 
 		mavenCentral() 
@@ -62,9 +62,8 @@ subprojects {
 	}
 	
 	configurations {
-		compile.exclude module: 'slf4j-simple'
-		compile.exclude module: 'slf4j-log4j12'
-		
+		all*.exclude group: 'org.slf4j', module: 'slf4j-simple'
+		all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 		all*.exclude group: 'log4j', module: 'log4j'
 		all*.exclude group: 'javax.jms', module: 'jms'
 		all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
@@ -73,7 +72,7 @@ subprojects {
 	
 	dependencies {
 		// Compile-time transformations
-		compile 'org.projectlombok:lombok:1.12.4'
+		compile 'org.projectlombok:lombok:1.12.6'
 		
 		// Utilities
 		compile 'joda-time:joda-time:2.3'

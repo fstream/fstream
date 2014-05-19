@@ -12,6 +12,7 @@ package io.fstream.persistence.service;
 import io.fstream.core.model.Rate;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -22,12 +23,18 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for persisting to the long-term backing store.
+ * <p>
+ * This class is <em>not</em> thread-safe.
+ */
 @Slf4j
 @Service
 public class PersistenceService {
@@ -35,9 +42,12 @@ public class PersistenceService {
   /**
    * Constants.
    */
-  private static final String TABLENAME = "oanda";
-  private static final String CFDATA = "data";
-  private static final String CFMETA = "meta";
+  private static final TableName TABLE_NAME = TableName.valueOf("oanda");
+  private static final byte[] CF_DATA = Bytes.toBytes("data");
+  private static final byte[] CF_META = Bytes.toBytes("meta");
+  private static final byte[] COLUMN_BID = Bytes.toBytes("Price:bid");
+  private static final byte[] COLUMN_ASK = Bytes.toBytes("Price:ask");
+  private static final byte[] COLUMN_SYMBOL = Bytes.toBytes("symbol");
 
   /**
    * Dependencies.
@@ -46,57 +56,87 @@ public class PersistenceService {
   @Autowired
   private HBaseAdmin admin;
 
-  @SneakyThrows
-  @PostConstruct
-  private void initializeTable() {
-    val tableName = TABLENAME;
-    log.info("Initializing table '{}'...", tableName);
+  /**
+   * State.
+   */
+  private HConnection connection;
 
-    if (admin.tableExists(tableName)) {
-      if (admin.isTableDisabled(tableName)) {
-        // Assuming table schema is defined as per expected
-        admin.enableTable(tableName);
-      }
-      log.info("Table '{}' exists and is enabled", tableName);
+  @PostConstruct
+  public void initialize() {
+    log.info("Initializing table '{}'...", TABLE_NAME.getNameAsString());
+
+    if (tableExists()) {
+      enableTable();
     } else {
-      createTable(tableName);
+      createTable();
     }
+
+    this.connection = createConnection();
   }
 
   @SneakyThrows
-  public void persist(Rate rate) {
-    // TODO: Use connection pooling
-    val connection = HConnectionManager.createConnection(admin.getConfiguration());
-    val table = connection.getTable(TABLENAME);
-
-    try {
-      val key = rate.getDateTime().getMillis() + rate.getSymbol();
-
-      val row = new Put(Bytes.toBytes(key));
-      row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
-          Bytes.toBytes(rate.getBid()));
-      row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:ask"),
-          Bytes.toBytes(rate.getAsk()));
-      row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("symbol"),
-          Bytes.toBytes(rate.getSymbol()));
-
-      log.info("**** Putting row");
-      table.put(row);
-    } finally {
-      table.close();
+  @PreDestroy
+  public void destroy() {
+    if (connection != null) {
       connection.close();
     }
   }
 
   @SneakyThrows
-  private void createTable(String tableName) {
-    val descriptor = new HTableDescriptor(TableName.valueOf(tableName));
-    descriptor.addFamily(new HColumnDescriptor(CFDATA));
-    descriptor.addFamily(new HColumnDescriptor(CFMETA));
+  public void persist(Rate rate) {
+    val table = connection.getTable(TABLE_NAME);
+    try {
+      val key = createKey(rate);
 
-    log.info("Creating table '{}'...", tableName);
+      val row = new Put(Bytes.toBytes(key));
+      row.add(CF_DATA, COLUMN_BID, Bytes.toBytes(rate.getBid()));
+      row.add(CF_DATA, COLUMN_ASK, Bytes.toBytes(rate.getAsk()));
+      row.add(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(rate.getSymbol()));
+
+      log.info("**** Putting row");
+      table.put(row);
+    } finally {
+      table.close();
+    }
+  }
+
+  @SneakyThrows
+  private boolean tableExists() {
+    return admin.tableExists(TABLE_NAME);
+  }
+
+  @SneakyThrows
+  private void createTable() {
+    val descriptor = new HTableDescriptor(TABLE_NAME);
+    descriptor.addFamily(new HColumnDescriptor(CF_DATA));
+    descriptor.addFamily(new HColumnDescriptor(CF_META));
+
+    log.info("Creating table '{}'...", TABLE_NAME.getNameAsString());
     admin.createTable(descriptor);
-    log.info("Created table '{}'", tableName);
+    log.info("Tabled created.");
+  }
+
+  @SneakyThrows
+  private void enableTable() {
+    if (admin.isTableDisabled(TABLE_NAME)) {
+      // Assuming table schema is defined as per expected
+      admin.enableTable(TABLE_NAME);
+    }
+
+    log.info("Table '{}' exists and is enabled", TABLE_NAME.getNameAsString());
+  }
+
+  private String createKey(Rate rate) {
+    return rate.getDateTime().getMillis() + rate.getSymbol();
+  }
+
+  @SneakyThrows
+  private HConnection createConnection() {
+    log.info("Creating connection...");
+    val connection = HConnectionManager.createConnection(admin.getConfiguration());
+    log.info("Connection created.");
+
+    return connection;
   }
 
 }
