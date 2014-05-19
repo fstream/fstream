@@ -88,7 +88,7 @@ public class KafkaService extends AbstractExecutionThreadService {
 
       log.info("Received: {}", text);
       val rate = MAPPER.readValue(text, Rate.class);
-      service.addRow(rate);
+      service.persist(rate);
     }
   }
 

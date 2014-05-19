@@ -18,12 +18,11 @@ import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +44,7 @@ public class PersistenceService {
    */
   @Setter
   @Autowired
-  private static Configuration config;
-  @Setter
-  @Autowired
   private HBaseAdmin admin;
-
-  /**
-   * State.
-   */
-  private HTable table;
 
   @SneakyThrows
   @PostConstruct
@@ -70,23 +61,30 @@ public class PersistenceService {
     } else {
       createTable(tableName);
     }
-
-    table = new HTable(config, tableName);
   }
 
   @SneakyThrows
-  public void addRow(Rate rate) {
-    val key = rate.getDateTime().getMillis() + rate.getSymbol();
+  public void persist(Rate rate) {
+    // TODO: Use connection pooling
+    val connection = HConnectionManager.createConnection(admin.getConfiguration());
+    val table = connection.getTable(TABLENAME);
 
-    val row = new Put(Bytes.toBytes(key));
-    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
-        Bytes.toBytes(rate.getBid()));
-    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:ask"),
-        Bytes.toBytes(rate.getAsk()));
-    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("symbol"),
-        Bytes.toBytes(rate.getSymbol()));
+    try {
+      val key = rate.getDateTime().getMillis() + rate.getSymbol();
 
-    table.put(row);
+      val row = new Put(Bytes.toBytes(key));
+      row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
+          Bytes.toBytes(rate.getBid()));
+      row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:ask"),
+          Bytes.toBytes(rate.getAsk()));
+      row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("symbol"),
+          Bytes.toBytes(rate.getSymbol()));
+
+      table.put(row);
+    } finally {
+      table.close();
+      connection.close();
+    }
   }
 
   @SneakyThrows
