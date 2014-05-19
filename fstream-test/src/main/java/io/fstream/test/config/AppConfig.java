@@ -95,7 +95,7 @@ public class AppConfig {
   @SuppressWarnings("unused")
   private void registerConsumer() {
     val props = new Properties();
-    props.put("zookeeper.connect", "localhost:21818");
+    props.put("zookeeper.connect", "localhost:2181");
     props.put("zookeeper.connection.timeout.ms", "1000000");
     props.put("group.id", "1");
     props.put("broker.id", "0");
@@ -124,7 +124,7 @@ public class AppConfig {
 
   @SuppressWarnings("unused")
   private void createTopic() {
-    val zkClient = new ZkClient("localhost:21818");
+    val zkClient = new ZkClient("localhost:2181");
     Properties props = new Properties();
     String topic = "rates";
     int partitions = 1;

@@ -2,7 +2,6 @@
 .project
 .classpath
 .springBeans
-.settings
 
 # Maven
 target/

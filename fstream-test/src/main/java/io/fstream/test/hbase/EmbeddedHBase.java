@@ -14,21 +14,18 @@ import javax.annotation.PreDestroy;
 
 import lombok.SneakyThrows;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 
 public class EmbeddedHBase {
 
   private HBaseTestingUtility utility;
-  private Configuration conf;
 
   @SneakyThrows
   @PostConstruct
   public void launch() {
     utility = new HBaseTestingUtility();
+
     utility.startMiniCluster();
-    conf = utility.getHBaseCluster().getConfiguration();
-    conf.set("hbase.zookeeper.property.clientPort", "21818");
   }
 
   @PreDestroy

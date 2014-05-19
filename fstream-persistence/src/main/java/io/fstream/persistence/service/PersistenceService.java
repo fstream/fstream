@@ -9,98 +9,95 @@
 
 package io.fstream.persistence.service;
 
-import static com.google.common.collect.ImmutableMap.of;
 import io.fstream.core.model.Rate;
-import io.fstream.persistence.config.KafkaProperties;
-import io.fstream.persistence.hbase.Client;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
-import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.KafkaStream;
-import kafka.javaapi.consumer.ConsumerConnector;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.util.concurrent.AbstractExecutionThreadService;
-
 @Slf4j
 @Service
-public class PersistenceService extends AbstractExecutionThreadService {
-  
+public class PersistenceService {
+
   /**
    * Constants.
    */
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final String TABLENAME = "oanda";
+  private static final String CFDATA = "data";
+  private static final String CFMETA = "meta";
 
   /**
    * Dependencies.
    */
   @Setter
   @Autowired
-  private KafkaProperties kafka;
+  private static Configuration config;
   @Setter
   @Autowired
-  private Client client;
+  private HBaseAdmin admin;
 
   /**
    * State.
    */
-  private KafkaStream<byte[], byte[]> stream;
-  private ConsumerConnector consumerConnector;
+  private HTable table;
 
+  @SneakyThrows
   @PostConstruct
-  public void init() throws Exception {
-    log.info("Initializing...");
-    this.consumerConnector = createConsumerConnector();
-    this.stream = createStream();
+  private void initializeTable() {
+    val tableName = TABLENAME;
+    log.info("Initializing table '{}'...", tableName);
 
-    startAsync();
-  }
-
-  @PreDestroy
-  public void destroy() throws Exception {
-    log.info("Destroying...");
-    stopAsync();
-
-    consumerConnector.commitOffsets();
-    consumerConnector.shutdown();
-  }
-
-  @Override
-  protected void run() throws Exception {
-    log.info("Running!");
-
-    for (val messageAndMetadata : stream) {
-      val message = messageAndMetadata.message();
-      val text = new String(message);
-
-      log.info("Received: {}", text);
-      val rate = MAPPER.readValue(text, Rate.class);
-      client.addRow(rate);
+    if (admin.tableExists(tableName)) {
+      if (admin.isTableDisabled(tableName)) {
+        // Assuming table schema is defined as per expected
+        admin.enableTable(tableName);
+      }
+      log.info("Table '{}' exists and is enabled", tableName);
+    } else {
+      createTable(tableName);
     }
+
+    table = new HTable(config, tableName);
   }
 
+  @SneakyThrows
+  public void addRow(Rate rate) {
+    val key = rate.getDateTime().getMillis() + rate.getSymbol();
 
-  private ConsumerConnector createConsumerConnector() {
-    return Consumer.createJavaConsumerConnector(new ConsumerConfig(kafka.getConsumerProperties()));
+    val row = new Put(Bytes.toBytes(key));
+    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:bid"),
+        Bytes.toBytes(rate.getBid()));
+    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("Price:ask"),
+        Bytes.toBytes(rate.getAsk()));
+    row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("symbol"),
+        Bytes.toBytes(rate.getSymbol()));
+
+    table.put(row);
   }
 
-  private KafkaStream<byte[], byte[]> createStream() {
-    val topicName = "rates";
-    val topicStreamCount = 1;
+  @SneakyThrows
+  private void createTable(String tableName) {
+    val descriptor = new HTableDescriptor(TableName.valueOf(tableName));
+    descriptor.addFamily(new HColumnDescriptor(CFDATA));
+    descriptor.addFamily(new HColumnDescriptor(CFMETA));
 
-    val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));
-    val streams = topicMessageStreams.get(topicName);
-
-    return streams.get(0);
+    log.info("Creating table '{}'...", tableName);
+    admin.createTable(descriptor);
+    log.info("Created table '{}'", tableName);
   }
 
 }

@@ -81,7 +81,7 @@ public final class StormFactory {
   }
 
   public static IRichSpout newKafkaSpout() {
-    val hosts = new ZkHosts("localhost:21818");
+    val hosts = new ZkHosts("localhost:2181");
     hosts.refreshFreqSecs = 1;
     val kafkaConf = new SpoutConfig(hosts, "rates", "/test", "id");
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
