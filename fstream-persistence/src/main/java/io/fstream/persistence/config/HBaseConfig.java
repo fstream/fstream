@@ -23,10 +23,7 @@ public class HBaseConfig {
   @Bean
   public org.apache.hadoop.conf.Configuration config() {
     val config = HBaseConfiguration.create();
-    config.set("hbase.rootdir", "/var/lib/hbase/data/hbase");
     config.set("hbase.zookeeper.property.clientPort", "21812");
-    config.set("zookeeper.znode.parent", "/hbase");
-    config.set("base.zookeeper.property.dataDir", "/var/lib/hbase/data/zookeeper");
 
     return config;
   }

@@ -80,6 +80,7 @@ public class PersistenceService {
       row.add(Bytes.toBytes(CFDATA), Bytes.toBytes("symbol"),
           Bytes.toBytes(rate.getSymbol()));
 
+      log.info("**** Putting row");
       table.put(row);
     } finally {
       table.close();
