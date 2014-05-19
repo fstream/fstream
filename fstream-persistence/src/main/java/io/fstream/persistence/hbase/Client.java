@@ -39,8 +39,8 @@ public class Client {
   SimpleDateFormat timeformat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss.S");
 
   public Client() {
-    // TODO for now the config file is set in the class path. need to set this programmatically
     config = HBaseConfiguration.create();
+    config.set("hbase.zookeeper.property.clientPort", "21818");
     config.set("hbase.rootdir", "/var/lib/hbase/data/hbase");
     config.set("base.zookeeper.property.dataDir", "/var/lib/hbase/data/zookeeper");
     initializeTable(TABLENAME);
