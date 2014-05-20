@@ -9,11 +9,11 @@
 
 package io.fstream.persistence.config;
 
+import static org.apache.hadoop.hbase.HConstants.ZOOKEEPER_CLIENT_PORT;
 import lombok.SneakyThrows;
 import lombok.val;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ public class HBaseConfig {
   @Bean
   public org.apache.hadoop.conf.Configuration config() {
     val config = HBaseConfiguration.create();
-    config.set(HConstants.ZOOKEEPER_CLIENT_PORT, zkConnect);
+    config.set(ZOOKEEPER_CLIENT_PORT, zkConnect);
 
     return config;
   }

@@ -36,6 +36,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Factory for storm component creation.
+ * <p>
+ * @see https://github.com/nathanmarz/storm-contrib/tree/master/storm-kafka
  */
 @NoArgsConstructor(access = PRIVATE)
 public final class StormFactory {
@@ -53,7 +55,7 @@ public final class StormFactory {
     config.setDebug(true);
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
-    config.put(ComputeBolt.EPL, MAPPER.writeValueAsString(epl));
+    config.put(ComputeBolt.EPL_CONFIG_KEY, MAPPER.writeValueAsString(epl));
 
     if (local) {
       config.setMaxTaskParallelism(3);
@@ -68,21 +70,32 @@ public final class StormFactory {
     val spoutId = "fstream-rates";
 
     val builder = new TopologyBuilder();
+
+    // Input
     builder.setSpout(spoutId, newKafkaSpout(zkConnect), 2);
-    builder.setBolt("rateLogger", newLoggingBolt())
-        .shuffleGrouping(spoutId);
-    builder.setBolt("compute", newComputeBolt())
-        .shuffleGrouping(spoutId);
-    builder.setBolt("kafka", new KafkaBolt<String, String>())
-        .shuffleGrouping("compute");
+
+    // Paths
+    builder.setBolt("rateLogger", newLoggingBolt()).shuffleGrouping(spoutId);
+    builder.setBolt("compute", newComputeBolt()).shuffleGrouping(spoutId);
+    builder.setBolt("kafka", newKafkaBolt()).shuffleGrouping("compute");
 
     return builder.createTopology();
+  }
+
+  public static KafkaBolt<String, String> newKafkaBolt() {
+    return new KafkaBolt<String, String>();
   }
 
   public static IRichSpout newKafkaSpout(String zkConnect) {
     val hosts = new ZkHosts(zkConnect);
     hosts.refreshFreqSecs = 1;
-    val kafkaConf = new SpoutConfig(hosts, RATES_TOPIC_NAME, "/test", "id");
+
+    val kafkaConf = new SpoutConfig(
+        hosts,// list of Kafka brokers
+        RATES_TOPIC_NAME, // Topic to read from
+        "/kafkastorm", // The root path in Zookeeper for the spout to store the consumer offsets
+        "discovery"); // An id for this consumer for storing the consumer offsets in Zookeeper
+
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
 
     return new KafkaSpout(kafkaConf);

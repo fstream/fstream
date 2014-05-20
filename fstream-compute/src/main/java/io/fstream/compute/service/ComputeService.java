@@ -25,10 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.KillOptions;
 import backtype.storm.generated.NotAliveException;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 
@@ -38,7 +42,7 @@ import backtype.storm.utils.Utils;
 public class ComputeService {
 
   /**
-   * Contants.
+   * Constants.
    */
   private static final String TOPOLOGY_NAME = "compute-topology";
 
@@ -57,48 +61,55 @@ public class ComputeService {
     // Setup
     val local = stormProperities.isLocal();
     val topology = StormFactory.newStormTopology(zkConnect);
-    val config = StormFactory.newStormConfig(
-        local,
-        stormProperities.getProperties(),
-        esperProperties.getEpl());
+    val config = StormFactory.newStormConfig(local, stormProperities.getProperties(), esperProperties.getEpl());
 
     if (local) {
-      log.info("Submitting local topology '{}'...", TOPOLOGY_NAME);
-      val cluster = new LocalCluster();
-      cluster.submitTopology(TOPOLOGY_NAME, config, topology);
-
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-
-        @Override
-        public void run() {
-          cluster.shutdown();
-          log.info("Shut down topoloy '{}'", TOPOLOGY_NAME);
-        }
-
-      });
+      executeLocal(topology, config);
     } else {
-      log.info("Submitting cluster topology '{}'...", TOPOLOGY_NAME);
-      StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
-
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-
-        @Override
-        @SneakyThrows
-        public void run() {
-          killTopology(TOPOLOGY_NAME);
-          log.info("Shut down topoloy '{}'", TOPOLOGY_NAME);
-        }
-
-      });
+      executeCluster(topology, config);
     }
+  }
 
+  private void executeLocal(StormTopology topology, Config config) {
+    log.info("Submitting local topology '{}'...", TOPOLOGY_NAME);
+    val cluster = new LocalCluster();
+    cluster.submitTopology(TOPOLOGY_NAME, config, topology);
+
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+
+      @Override
+      public void run() {
+        log.info("Shutting down cluster...");
+        cluster.shutdown();
+        log.info("Shut down cluster.");
+      }
+
+    });
+  }
+
+  private void executeCluster(StormTopology topology, Config config)
+      throws AlreadyAliveException, InvalidTopologyException {
+    log.info("Submitting cluster topology '{}'...", TOPOLOGY_NAME);
+    StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
+
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+
+      @Override
+      @SneakyThrows
+      public void run() {
+        killTopology(TOPOLOGY_NAME);
+      }
+
+    });
   }
 
   private static void killTopology(String name) throws NotAliveException, TException {
     val client = NimbusClient.getConfiguredClient(Utils.readStormConfig()).getClient();
     val killOpts = new KillOptions();
 
+    log.info("Killing topology '{}'", name);
     client.killTopologyWithOpts(name, killOpts);
+    log.info("Killed topology '{}'.", name);
   }
 
 }

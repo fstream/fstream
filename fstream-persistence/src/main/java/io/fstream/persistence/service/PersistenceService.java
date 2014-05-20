@@ -71,7 +71,7 @@ public class PersistenceService {
       createTable();
     }
 
-    this.connection = createConnection();
+    connect();
   }
 
   @SneakyThrows
@@ -98,6 +98,10 @@ public class PersistenceService {
     } finally {
       table.close();
     }
+  }
+
+  private void connect() {
+    this.connection = createConnection();
   }
 
   @SneakyThrows

@@ -11,8 +11,8 @@
 
 # ZooKeeper
 zk:
-   port: 21812
    host: localhost
+   port: 21812
    connect: ${zk.host}:${zk.port}
 
 # Kafka

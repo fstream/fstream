@@ -48,7 +48,7 @@ public class KafkaService extends AbstractExecutionThreadService {
   private KafkaProperties kafka;
   @Setter
   @Autowired
-  private PersistenceService service;
+  private PersistenceService persistenceService;
   
   /**
    * Configuration.
@@ -89,7 +89,7 @@ public class KafkaService extends AbstractExecutionThreadService {
 
       log.info("Received: {}", text);
       val rate = MAPPER.readValue(text, Rate.class);
-      service.persist(rate);
+      persistenceService.persist(rate);
     }
   }
 

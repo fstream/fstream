@@ -18,9 +18,9 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 @ConfigurationProperties(prefix = "rates")
-@Getter
 public class RatesProperties {
 
   private List<String> symbols = newArrayList();

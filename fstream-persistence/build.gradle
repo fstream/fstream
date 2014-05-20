@@ -17,9 +17,6 @@ dependencies {
   // HBase
   compile "org.apache.hbase:hbase-client:$hbaseVersion"
   
-  // Hadoop
-  compile 'org.apache.hadoop:hadoop-core:1.1.2'
-  
   // Jackson
   compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
   

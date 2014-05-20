@@ -39,13 +39,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 public class ComputeBolt extends BaseRichBolt implements UpdateListener {
 
-  public static final String EPL = "epl";
-
+  /**
+   * Constants.
+   */
+  private static final String KAFKA_TOPIC_KEY = "1";
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
+  /**
+   * Configuration keys.
+   */
+  public static final String EPL_CONFIG_KEY = "epl";
+
+  /**
+   * Esper.
+   */
   private transient EPServiceProvider esperSink;
   private transient EPRuntime runtime;
   private transient EPAdministrator admin;
+
+  /**
+   * Storm.
+   */
   private transient OutputCollector collector;
 
   @Override
@@ -94,7 +108,8 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
       for (val newEvent : newEvents) {
         val alert = newEvent.getUnderlying();
         val content = MAPPER.writeValueAsString(alert);
-        collector.emit(new Values("1", content));
+
+        collector.emit(new Values(KAFKA_TOPIC_KEY, content));
       }
     }
   }
@@ -108,8 +123,8 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
 
   @SneakyThrows
   private List<String> getEplValues(Map<?, ?> conf) {
-    val epl = (String) conf.get(EPL);
-    
+    val epl = (String) conf.get(EPL_CONFIG_KEY);
+
     return MAPPER.readValue(epl, new TypeReference<ArrayList<String>>() {});
   }
 

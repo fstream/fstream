@@ -15,7 +15,7 @@ buildscript {
    //
    // Versions
    //
-   ext.springVersion     = '4.0.3.RELEASE'
+   ext.springVersion     = '4.0.4.RELEASE'
    ext.springBootVersion = "1.0.2.RELEASE"
    ext.camelVersion      = '2.13.0'
    ext.kafkaVersion      = '0.8.1'
