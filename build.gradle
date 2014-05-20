@@ -21,6 +21,7 @@ buildscript {
    ext.kafkaVersion      = '0.8.1'
    ext.hbaseVersion      = '0.98.2-hadoop1'
    ext.hadoopVersion     = '1.2.1'
+   ext.curatorVersion    = '2.4.2'
    ext.guavaVersion      = '17.0'
    ext.jacksonVersion    = '2.3.3'
    

@@ -31,6 +31,9 @@ dependencies {
   compile "org.apache.camel:camel-kafka:$camelVersion"
   compile "org.apache.camel:camel-jackson:$camelVersion"
   
+  // Zookeeper
+  compile "org.apache.curator:curator-recipes:$curatorVersion"
+  
   // Jackson
   compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
   
