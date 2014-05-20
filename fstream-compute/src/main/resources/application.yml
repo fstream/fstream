@@ -29,5 +29,8 @@ esper:
            CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange
         FROM
            Rate
+        WHERE 
+        	CAST(ask, float) / CAST(prior(1, ask), float) > 1.0001
+        
 
            
