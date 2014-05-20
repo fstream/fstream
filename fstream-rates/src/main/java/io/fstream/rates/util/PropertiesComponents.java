@@ -23,9 +23,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.component.properties.PropertiesResolver;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
 
 /**
  * Utilities for working with {@link PropertiesComponent}s.
@@ -49,35 +47,33 @@ public final class PropertiesComponents {
     }
 
     val component = new PropertiesComponent(names.toArray(new String[names.size()]));
-    component.setPropertiesResolver(new SpringPropertiesResolver(propertySources));
+    component.setPropertiesResolver(new EnvironmentPropertiesResolver(environment));
 
     return component;
   }
 
   @RequiredArgsConstructor
-  private static final class SpringPropertiesResolver implements PropertiesResolver {
+  private static final class EnvironmentPropertiesResolver implements PropertiesResolver {
 
     @NonNull
-    private final MutablePropertySources propertySources;
+    private final Environment environment;
 
     @Override
     public Properties resolveProperties(CamelContext context, boolean ignoreMissingLocation, String... names)
         throws Exception {
-      val properties = new Properties();
+      return new Properties() {
 
-      // Add in reverse order to preserve precedence.
-      for (int i = names.length - 1; i >= 0; i--) {
-        val propertySource = propertySources.get(names[i]);
-        if (propertySource instanceof EnumerablePropertySource) {
-          val propertyNames = ((EnumerablePropertySource<?>) propertySource).getPropertyNames();
-
-          for (val propertyName : propertyNames) {
-            properties.put(propertyName, propertySource.getProperty(propertyName));
-          }
+        @Override
+        public String getProperty(String key) {
+          return environment.getProperty(key);
         }
-      }
 
-      return properties;
+        @Override
+        public String getProperty(String key, String defaultValue) {
+          return environment.getProperty(key, defaultValue);
+        }
+
+      };
     }
 
   }

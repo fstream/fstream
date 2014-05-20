@@ -9,29 +9,20 @@
 
 package io.fstream.persistence.config;
 
-import java.util.Properties;
+import static com.google.common.collect.Maps.newHashMap;
+
+import java.util.Map;
 
 import lombok.Getter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 @ConfigurationProperties(prefix = "kafka")
-@Getter
 public class KafkaProperties {
 
-  private static final Properties DEFAULT_CONSUMER_PROPERTIES = new Properties() {
-
-    {
-      put("zookeeper.connect", "localhost:21812");
-      put("zookeeper.connection.timeout.ms", "1000000");
-      put("group.id", "1");
-      put("broker.id", "0");
-    }
-
-  };
-
-  private final Properties consumerProperties = DEFAULT_CONSUMER_PROPERTIES;
+  private Map<String, String> consumerProperties = newHashMap();
 
 }

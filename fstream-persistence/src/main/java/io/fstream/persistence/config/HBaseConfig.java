@@ -13,17 +13,22 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class HBaseConfig {
 
+  @Value("${zk.port}")
+  private String zkConnect;
+
   @Bean
   public org.apache.hadoop.conf.Configuration config() {
     val config = HBaseConfiguration.create();
-    config.set("hbase.zookeeper.property.clientPort", "21812");
+    config.set(HConstants.ZOOKEEPER_CLIENT_PORT, zkConnect);
 
     return config;
   }

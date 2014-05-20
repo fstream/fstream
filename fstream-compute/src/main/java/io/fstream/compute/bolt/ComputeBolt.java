@@ -107,8 +107,9 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   }
 
   @SneakyThrows
-  private List<String> getEplValues(@SuppressWarnings("rawtypes") Map conf) {
+  private List<String> getEplValues(Map<?, ?> conf) {
     val epl = (String) conf.get(EPL);
+    
     return MAPPER.readValue(epl, new TypeReference<ArrayList<String>>() {});
   }
 
