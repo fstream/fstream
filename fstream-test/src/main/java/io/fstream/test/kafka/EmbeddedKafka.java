@@ -21,9 +21,9 @@ public final class EmbeddedKafka extends AbstractIdleService {
 
   private final KafkaServerStartable server;
 
-  public EmbeddedKafka() {
+  public EmbeddedKafka(String zkConnect) {
     val properties = new Properties();
-    properties.put("zookeeper.connect", "localhost:21812");
+    properties.put("zookeeper.connect", zkConnect);
     properties.put("broker.id", "0");
 
     server = new KafkaServerStartable(new KafkaConfig(properties));

@@ -14,6 +14,7 @@ import javax.annotation.PreDestroy;
 
 import lombok.val;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -43,9 +44,13 @@ import com.google.common.collect.ImmutableMap;
 @EnableConfigurationProperties
 public class AppConfig {
 
+  @Value("${zk.connect}")
+  private String zkConnect;
+  
   @Bean
   @SneakyThrows
   public File tmp() {
+    System.out.println(zkConnect);
    val tmp = Files.createTempDirectory("fstream-test").toFile();
    log.info("Testing storage: {}", tmp);
    
@@ -54,19 +59,13 @@ public class AppConfig {
   
   @Bean
   public EmbeddedHBase embeddedHbase() {
-    return new EmbeddedHBase();
+    return new EmbeddedHBase(zkConnect);
   }
   
-//  @Bean
-//  @SneakyThrows
-//  public EmbeddedZooKeeper embeddedZooKeeper() {
-//    return new EmbeddedZooKeeper(tmp(), tmp());
-//  }
-//  
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
-    return new EmbeddedKafka();
+    return new EmbeddedKafka(zkConnect);
   }
   
   @PostConstruct
@@ -94,7 +93,7 @@ public class AppConfig {
   @SuppressWarnings("unused")
   private void registerConsumer() {
     val props = new Properties();
-    props.put("zookeeper.connect", "localhost:21812");
+    props.put("zookeeper.connect", zkConnect);
     props.put("zookeeper.connection.timeout.ms", "1000000");
     props.put("group.id", "1");
     props.put("broker.id", "0");
@@ -123,7 +122,7 @@ public class AppConfig {
 
   @SuppressWarnings("unused")
   private void createTopic() {
-    val zkClient = new ZkClient("localhost:21812");
+    val zkClient = new ZkClient(zkConnect);
     Properties props = new Properties();
     String topic = "rates";
     int partitions = 1;

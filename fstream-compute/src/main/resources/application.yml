@@ -9,8 +9,21 @@
 # Proprietary and confidential.
 #
 
-local: true
+# ZooKeeper
+zk:
+   host: localhost
+   port: 21812
+   connect: ${zk.host}:${zk.port}
 
+# Storm
+storm:
+   local: true
+   properties:
+      metadata.broker.list: localhost:6667
+      request.required.acks: 1
+      serializer.class: kafka.serializer.StringEncoder
+ 
+# Esper      
 esper:
    epl:
       # Create the partitions
@@ -31,6 +44,3 @@ esper:
            Rate
         WHERE 
         	CAST(ask, float) / CAST(prior(1, ask), float) > 1.0001
-        
-
-           

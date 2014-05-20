@@ -9,11 +9,16 @@
 # Proprietary and confidential.
 #
 
-#
-# Note that all properties in this file may be overriden on the command line:
-# 
-#   -Drates.password=foobarbaz
-#
+# ZooKeeper
+zk:
+   port: 21812
+   host: localhost
+   connect: ${zk.host}:${zk.port}
+
+# fStream
+fstream:
+   broker:
+      uri: kafka:localhost:6667?topic=rates&groupId=1&zookeeperHost=${zk.host}&zookeeperPort=${zk.port}&partitioner=kafka.producer.DefaultPartitioner
 
 # OANDA
 rates:
@@ -141,8 +146,3 @@ rates:
 #     - XXX/SGD
 #     - XXX/USD
      - ZAR/JPY
-
-# fStream
-fstream:
-   broker:
-      uri: kafka:localhost:6667?topic=rates&groupId=1&zookeeperHost=localhost&zookeeperPort=21812&partitioner=kafka.producer.DefaultPartitioner

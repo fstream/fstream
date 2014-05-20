@@ -15,7 +15,7 @@ import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -40,20 +40,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @NoArgsConstructor(access = PRIVATE)
 public final class StormFactory {
 
+  /**
+   * Constants.
+   */
+  private static final String RATES_TOPIC_NAME = "rates";
+  private static final String ALERTS_TOPIC_NAME = "alerts";
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @SneakyThrows
-  public static Config newStormConfig(boolean local, List<String> epl) {
+  public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<String> epl) {
     val config = new Config();
     config.setDebug(true);
-
-    Properties props = new Properties();
-    props.put("metadata.broker.list", "localhost:6667");
-    props.put("request.required.acks", "1");
-    props.put("serializer.class", "kafka.serializer.StringEncoder");
-
-    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, props);
-    config.put(KafkaBolt.TOPIC, "alerts");
+    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
+    config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
     config.put(ComputeBolt.EPL, MAPPER.writeValueAsString(epl));
 
     if (local) {
@@ -65,11 +64,11 @@ public final class StormFactory {
     return config;
   }
 
-  public static StormTopology newStormTopology() {
+  public static StormTopology newStormTopology(String zkConnect) {
     val spoutId = "fstream-rates";
 
     val builder = new TopologyBuilder();
-    builder.setSpout(spoutId, newKafkaSpout(), 2);
+    builder.setSpout(spoutId, newKafkaSpout(zkConnect), 2);
     builder.setBolt("rateLogger", newLoggingBolt())
         .shuffleGrouping(spoutId);
     builder.setBolt("compute", newComputeBolt())
@@ -80,10 +79,10 @@ public final class StormFactory {
     return builder.createTopology();
   }
 
-  public static IRichSpout newKafkaSpout() {
-    val hosts = new ZkHosts("localhost:21812");
+  public static IRichSpout newKafkaSpout(String zkConnect) {
+    val hosts = new ZkHosts(zkConnect);
     hosts.refreshFreqSecs = 1;
-    val kafkaConf = new SpoutConfig(hosts, "rates", "/test", "id");
+    val kafkaConf = new SpoutConfig(hosts, RATES_TOPIC_NAME, "/test", "id");
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
 
     return new KafkaSpout(kafkaConf);

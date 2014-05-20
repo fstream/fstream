@@ -9,20 +9,22 @@
 
 package io.fstream.compute.config;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 
-import java.util.List;
+import java.util.Map;
 
-import lombok.Getter;
+import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
-@ConfigurationProperties(prefix = "esper")
-@Getter
-public class EsperProperties {
+@Data
+@Configuration
+@ConfigurationProperties("storm")
+public class StormProperties {
 
-  private List<String> epl = newArrayList();
+  private boolean local;
+
+  private Map<String, String> properties = newHashMap();
 
 }

@@ -9,11 +9,16 @@
 # Proprietary and confidential.
 #
 
+# ZooKeeper
+zk:
+   port: 21812
+   host: localhost
+   connect: ${zk.host}:${zk.port}
+
+# Kafka
 kafka:
    consumerProperties:
-      zookeeper.connect: localhost:21812
+      zookeeper.connect: ${zk.connect}
       zookeeper.connection.timeout.ms: 1000000
       group.id: 1
       broker.id: 0
-   topics:
-      - rates

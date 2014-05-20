@@ -10,6 +10,7 @@
 package io.fstream.compute.service;
 
 import io.fstream.compute.config.EsperProperties;
+import io.fstream.compute.config.StormProperties;
 import io.fstream.compute.factory.StormFactory;
 
 import javax.annotation.PostConstruct;
@@ -36,44 +37,56 @@ import backtype.storm.utils.Utils;
 @Setter
 public class ComputeService {
 
-  private final String name = "kafka";
+  /**
+   * Contants.
+   */
+  private static final String TOPOLOGY_NAME = "compute-topology";
 
-  @Value("${local}")
-  private boolean local;
+  /**
+   * Configuration.
+   */
+  @Value("${zk.connect}")
+  private String zkConnect;
   @Autowired
-  private EsperProperties properties;
+  private StormProperties stormProperities;
+  @Autowired
+  private EsperProperties esperProperties;
 
   @PostConstruct
   public void execute() throws Exception {
     // Setup
-    val topology = StormFactory.newStormTopology();
-    val config = StormFactory.newStormConfig(local, properties.getEpl());
+    val local = stormProperities.isLocal();
+    val topology = StormFactory.newStormTopology(zkConnect);
+    val config = StormFactory.newStormConfig(
+        local,
+        stormProperities.getProperties(),
+        esperProperties.getEpl());
 
     if (local) {
-      log.info("Submitting local topology '{}'...", name);
+      log.info("Submitting local topology '{}'...", TOPOLOGY_NAME);
       val cluster = new LocalCluster();
-      cluster.submitTopology(name, config, topology);
+      cluster.submitTopology(TOPOLOGY_NAME, config, topology);
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
 
         @Override
         public void run() {
           cluster.shutdown();
-          log.info("Shut down '{}'", name);
+          log.info("Shut down topoloy '{}'", TOPOLOGY_NAME);
         }
 
       });
     } else {
-      log.info("Submitting cluster topology '{}'...", name);
-      StormSubmitter.submitTopology(name, config, topology);
+      log.info("Submitting cluster topology '{}'...", TOPOLOGY_NAME);
+      StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
 
         @Override
         @SneakyThrows
         public void run() {
-          killTopology(name);
-          log.info("Shut down '{}'", name);
+          killTopology(TOPOLOGY_NAME);
+          log.info("Shut down topoloy '{}'", TOPOLOGY_NAME);
         }
 
       });

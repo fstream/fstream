@@ -7,16 +7,14 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.service;
+package io.fstream.web.service;
 
 import static io.fstream.core.util.PropertiesUtils.getProperties; 
 import static com.google.common.collect.ImmutableMap.of;
-import io.fstream.core.model.Rate;
-import io.fstream.persistence.config.KafkaProperties;
+import io.fstream.web.config.KafkaProperties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
@@ -26,34 +24,24 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 @Slf4j
-@Service
-public class KafkaService extends AbstractExecutionThreadService {
-  
-  /**
-   * Constants.
-   */
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+public abstract class AbstractMessageService extends AbstractExecutionThreadService {
 
   /**
    * Dependencies.
    */
   @Setter
   @Autowired
-  private KafkaProperties kafka;
+  protected SimpMessagingTemplate template;
   @Setter
   @Autowired
-  private PersistenceService service;
-  
-  /**
-   * Configuration.
-   */
-  private final String topicName = "rates";
+  protected KafkaProperties kafka;
 
   /**
    * State.
@@ -81,16 +69,22 @@ public class KafkaService extends AbstractExecutionThreadService {
 
   @Override
   protected void run() throws Exception {
-    log.info("Running!");
+    log.info("Reading from '{}' and writing to '{}'", getTopicName(), getMessageDestination());
 
     for (val messageAndMetadata : stream) {
       val message = messageAndMetadata.message();
       val text = new String(message);
 
       log.info("Received: {}", text);
-      val rate = MAPPER.readValue(text, Rate.class);
-      service.persist(rate);
+      template.send(getMessageDestination(), convert(message));
     }
+  }
+
+  protected abstract String getMessageDestination();
+  protected abstract String getTopicName();
+  
+  private static Message<byte[]> convert(final byte[] message) {
+    return MessageBuilder.withPayload(message).build();
   }
 
   private ConsumerConnector createConsumerConnector() {
@@ -98,6 +92,7 @@ public class KafkaService extends AbstractExecutionThreadService {
   }
 
   private KafkaStream<byte[], byte[]> createStream() {
+    val topicName = getTopicName();
     val topicStreamCount = 1;
 
     val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));
