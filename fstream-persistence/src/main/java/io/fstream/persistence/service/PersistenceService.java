@@ -131,7 +131,9 @@ public class PersistenceService {
   }
 
   private String createKey(Rate rate) {
-    return rate.getDateTime().getMillis() + rate.getSymbol();
+    val hourFloor = rate.getDateTime().hourOfDay().roundFloorCopy();
+
+    return hourFloor.getMillis() + rate.getSymbol();
   }
 
   @SneakyThrows
