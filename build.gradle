@@ -21,6 +21,7 @@ buildscript {
    ext.kafkaVersion      = '0.8.1'
    ext.hbaseVersion      = '0.98.2-hadoop1'
    ext.hadoopVersion     = '1.2.1'
+   ext.curatorVersion    = '2.4.2'
    ext.guavaVersion      = '17.0'
    ext.jacksonVersion    = '2.3.3'
    
@@ -32,7 +33,10 @@ buildscript {
 	   guava:              "com.google.guava:guava:$guavaVersion",
 	   springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
 	   jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion"
+	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion",
+	   curator:            "org.apache.curator:curator-recipes:$curatorVersion",
+       hadoop:             "org.apache.hadoop:hadoop-core:$hadoopVersion",
+	   hadoopTest:         "org.apache.hadoop:hadoop-test:$hadoopVersion"
    ]
    
    repositories {
