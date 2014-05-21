@@ -19,6 +19,9 @@ dependencies {
   compile "org.springframework.boot:spring-boot-starter-websocket:$springBootVersion"
   compile "org.springframework:spring-messaging:$springVersion"
   
+  // ZooKepper
+  compile libraries.curator
+  
   // Kafka
   compile libraries.kafka
   

@@ -7,10 +7,12 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.service;
+package io.fstream.web.service;
 
 import static com.google.common.io.Closeables.close;
-import io.fstream.rates.config.RatesProperties;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -23,10 +25,10 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
@@ -44,8 +46,6 @@ public class ConfigService {
    */
   @Value("${zk.connect}")
   private String zkConnect;
-  @Autowired
-  private RatesProperties properties;
 
   /**
    * State.
@@ -66,9 +66,6 @@ public class ConfigService {
     log.info("Starting cache...");
     cache.start();
     log.info("Started cache.");
-
-    // Perform update
-    update();
   }
 
   @SneakyThrows
@@ -84,24 +81,17 @@ public class ConfigService {
   }
 
   @SneakyThrows
-  public void update() {
-    val bytes = serialize();
-
-    val exists = client.checkExists().forPath(PATH) != null;
-    if (exists) {
-      log.info("Updating existing configuration at path '{}'...", PATH);
-      client.setData().forPath(PATH, bytes);
-      log.info("Updated configuration at path '{}'.", PATH);
-    } else {
-      log.info("Creating configuration at path '{}'...", PATH);
-      client.create().creatingParentsIfNeeded().forPath(PATH, bytes);
-      log.info("Created configuration at path '{}'.", PATH);
-    }
+  public List<String> read() {
+    log.info("Getting configuration at path '{}'...", PATH);
+    val bytes = client.getData().forPath(PATH);
+    log.info("Got configuration at path '{}'.", PATH);
+   
+    return deserialize(bytes);
   }
 
   @SneakyThrows
-  public byte[] serialize() {
-    return MAPPER.writeValueAsBytes(properties.getSymbols());
+  private List<String> deserialize(byte[] bytes) {
+    return MAPPER.readValue(bytes, new TypeReference<ArrayList<String>>() {});
   }
 
 }

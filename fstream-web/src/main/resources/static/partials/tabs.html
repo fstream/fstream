@@ -10,6 +10,15 @@
 	<!-- Tab panes -->
 	<div class="tab-content">
 		<div class="tab-pane active" id="charts">
+			<div class="btn-group">
+		        <a class="btn dropdown-toggle">
+		          Instruments
+		          <span class="caret"></span>
+		        </a>
+		        <ul class="dropdown-menu">
+		            <li ng-repeat="item in [1,2,3]"><a ng-click="$parent.current = item">Dynamic set {{item}}</a></li>
+		        </ul>
+			</div>
 			<div id="charts-container"></div>
 		</div>
 		<div class="tab-pane" id="commands"></div>

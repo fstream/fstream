@@ -33,7 +33,10 @@ buildscript {
 	   guava:              "com.google.guava:guava:$guavaVersion",
 	   springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
 	   jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion"
+	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion",
+	   curator:            "org.apache.curator:curator-recipes:$curatorVersion",
+       hadoop:             "org.apache.hadoop:hadoop-core:$hadoopVersion",
+	   hadoopTest:         "org.apache.hadoop:hadoop-test:$hadoopVersion"
    ]
    
    repositories {

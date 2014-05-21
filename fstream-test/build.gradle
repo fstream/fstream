@@ -22,8 +22,8 @@ dependencies {
   compile "org.apache.curator:curator-test:$curatorVersion"
   
   // Hadoop
-  compile "org.apache.hadoop:hadoop-test:$hadoopVersion"
-  compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+  compile libraries.hadoop
+  compile libraries.hadoopTest
   
   // HBase
   compile "org.apache.hbase:hbase-client:$hbaseVersion"
