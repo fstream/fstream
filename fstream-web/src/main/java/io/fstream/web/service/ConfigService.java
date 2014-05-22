@@ -17,6 +17,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +27,11 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -48,6 +53,13 @@ public class ConfigService {
    */
   @Value("${zk.connect}")
   private String zkConnect;
+
+  /**
+   * Dependencies.
+   */
+  @Setter
+  @Autowired
+  protected SimpMessagingTemplate template;
 
   /**
    * State.
@@ -73,8 +85,9 @@ public class ConfigService {
 
       @Override
       public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-        // TODO: Send to websocket
+        // TODO: Decouple websocket communication from service via events
         log.info("Configuration updated: {}", event);
+        template.send("/topic/commands", convert(event.getData().getData()));
       }
 
     });
@@ -104,6 +117,10 @@ public class ConfigService {
   @SneakyThrows
   private List<String> deserialize(byte[] bytes) {
     return MAPPER.readValue(bytes, STRING_LIST);
+  }
+
+  private static Message<byte[]> convert(final byte[] message) {
+    return MessageBuilder.withPayload(message).build();
   }
 
 }

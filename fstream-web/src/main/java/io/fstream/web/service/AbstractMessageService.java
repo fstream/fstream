@@ -9,12 +9,15 @@
 
 package io.fstream.web.service;
 
-import static io.fstream.core.util.PropertiesUtils.getProperties; 
 import static com.google.common.collect.ImmutableMap.of;
+import static io.fstream.core.util.PropertiesUtils.getProperties;
 import io.fstream.web.config.KafkaProperties;
+
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
@@ -81,8 +84,9 @@ public abstract class AbstractMessageService extends AbstractExecutionThreadServ
   }
 
   protected abstract String getMessageDestination();
+
   protected abstract String getTopicName();
-  
+
   private static Message<byte[]> convert(final byte[] message) {
     return MessageBuilder.withPayload(message).build();
   }
@@ -96,7 +100,9 @@ public abstract class AbstractMessageService extends AbstractExecutionThreadServ
     val topicStreamCount = 1;
 
     val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));
-    val streams = topicMessageStreams.get(topicName);
+
+    // Lombok: No val here
+    List<KafkaStream<byte[], byte[]>> streams = topicMessageStreams.get(topicName);
 
     return streams.get(0);
   }

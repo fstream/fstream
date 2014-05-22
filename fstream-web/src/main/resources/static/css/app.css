@@ -1,3 +1,8 @@
+/**
+ * Angular Bootstrap overrides
+ */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; } 
+
 .connect-button {
 	height: 100%;
 }
