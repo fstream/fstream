@@ -18,12 +18,13 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.SneakyThrows;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class ConfigService {
    */
   private static final String PATH = "/fstream/config";
   private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final TypeReference<ArrayList<String>> STRING_LIST = new TypeReference<ArrayList<String>>() {};
 
   /**
    * Configuration.
@@ -53,8 +55,8 @@ public class ConfigService {
   private CuratorFramework client;
   private PathChildrenCache cache;
 
-  @SneakyThrows
   @PostConstruct
+  @SneakyThrows
   public void initialize() {
     this.client = CuratorFrameworkFactory.newClient(zkConnect, new ExponentialBackoffRetry(1000, 3));
     this.cache = new PathChildrenCache(client, PATH, true);
@@ -66,10 +68,20 @@ public class ConfigService {
     log.info("Starting cache...");
     cache.start();
     log.info("Started cache.");
+
+    cache.getListenable().addListener(new PathChildrenCacheListener() {
+
+      @Override
+      public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+        // TODO: Send to websocket
+        log.info("Configuration updated: {}", event);
+      }
+
+    });
   }
 
-  @SneakyThrows
   @PreDestroy
+  @SneakyThrows
   public void destroy() {
     log.info("Closing cache...");
     close(cache, true);
@@ -83,15 +95,15 @@ public class ConfigService {
   @SneakyThrows
   public List<String> read() {
     log.info("Getting configuration at path '{}'...", PATH);
-    val bytes = client.getData().forPath(PATH);
+    byte[] bytes = client.getData().forPath(PATH);
     log.info("Got configuration at path '{}'.", PATH);
-   
+
     return deserialize(bytes);
   }
 
   @SneakyThrows
   private List<String> deserialize(byte[] bytes) {
-    return MAPPER.readValue(bytes, new TypeReference<ArrayList<String>>() {});
+    return MAPPER.readValue(bytes, STRING_LIST);
   }
 
 }

@@ -1,11 +1,10 @@
 angular.module('FStreamApp.controllers', ['ngTable']).
 controller('ratesController', function($scope, $http, ratesService, chartService) {
 	
-	$http({ method: 'GET', url: '/config' }).
-	  success(function (data, status, headers, config) {
-		  console.log(data);
-		  $scope.instruments = data;
-      });
+	// Bootstrap configuration
+	$http.get('/config').success(function(data) {
+	  $scope.instruments = data;
+	});
 	
 	//
 	// Private

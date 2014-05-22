@@ -85,7 +85,7 @@ public class ConfigService {
 
   @SneakyThrows
   public void write() {
-    val bytes = serialize();
+    byte[] bytes = serialize();
 
     val exists = client.checkExists().forPath(PATH) != null;
     if (exists) {
