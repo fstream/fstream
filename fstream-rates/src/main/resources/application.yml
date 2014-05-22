@@ -25,6 +25,14 @@ rates:
   password: ${PASSWORD:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
   uri: quickfix:oanda.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES
   symbols:
+     - EUR/USD
+     - GBP/EUR
+     - EUR/JPY 
+     - AUD/JPY     
+
+# Stubbed (effectively commented out), but validated instrumets
+stub.rates:
+  symbols:
      - AUD/CAD
      - AUD/CHF
      - AUD/HKD

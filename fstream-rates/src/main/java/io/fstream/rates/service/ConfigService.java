@@ -68,7 +68,7 @@ public class ConfigService {
     log.info("Started cache.");
 
     // Perform update
-    update();
+    write();
   }
 
   @SneakyThrows
@@ -84,7 +84,7 @@ public class ConfigService {
   }
 
   @SneakyThrows
-  public void update() {
+  public void write() {
     val bytes = serialize();
 
     val exists = client.checkExists().forPath(PATH) != null;
