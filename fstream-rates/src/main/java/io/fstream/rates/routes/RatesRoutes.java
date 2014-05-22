@@ -25,6 +25,7 @@ public class RatesRoutes extends AbstractFixRoutes {
   @Override
   public void configure() throws Exception {
     onException(Throwable.class)
+      .log("${exception}")
       .handled(true);
     
     from("{{rates.uri}}")
@@ -41,7 +42,11 @@ public class RatesRoutes extends AbstractFixRoutes {
           .log("${body}")
           .marshal().json(Jackson)
           .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
-          .to("{{fstream.broker.uri}}");  // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
+          .to("{{fstream.broker.uri}}")  // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
+    
+        .when(marketDataRequestReject())
+          .to("bean:fixMessageLogger")
+          .throwException(new RuntimeException("marketDataRequestReject"));
     
     // For debugging
     from("stub:{{rates.uri}}")

@@ -26,7 +26,7 @@ rates:
   uri: quickfix:oanda.cfg?sessionID=FIX.4.4:baijud->OANDA/RATES
   symbols:
      - EUR/USD
-     - GBP/EUR
+     - EUR/GBP
      - EUR/JPY 
      - AUD/JPY     
 

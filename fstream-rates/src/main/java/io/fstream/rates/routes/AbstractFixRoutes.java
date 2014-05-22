@@ -16,6 +16,7 @@ import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.AdminM
 import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.AppMessageReceived;
 import static org.apache.camel.component.quickfixj.QuickfixjEventCategory.SessionLogon;
 import static quickfix.field.MsgType.LOGON;
+import static quickfix.field.MsgType.MARKET_DATA_REQUEST_REJECT;
 import static quickfix.field.MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH;
 
 import org.apache.camel.Predicate;
@@ -37,6 +38,10 @@ public abstract class AbstractFixRoutes extends RouteBuilder {
 
   protected Predicate marketDataSnapshotFullRefresh() {
     return and(eventCategory(AppMessageReceived), messageType(MARKET_DATA_SNAPSHOT_FULL_REFRESH));
+  }
+
+  protected Predicate marketDataRequestReject() {
+    return and(eventCategory(AppMessageReceived), messageType(MARKET_DATA_REQUEST_REJECT));
   }
 
   protected Predicate eventCategory(QuickfixjEventCategory eventCategory) {
