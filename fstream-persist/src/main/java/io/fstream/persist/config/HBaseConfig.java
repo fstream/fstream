@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.config;
+package io.fstream.persist.config;
 
 import static org.apache.hadoop.hbase.HConstants.ZOOKEEPER_CLIENT_PORT;
 import lombok.SneakyThrows;

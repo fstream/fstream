@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.config;
+package io.fstream.persist.config;
 
 import static com.google.common.collect.Maps.newHashMap;
 

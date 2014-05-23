@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence;
+package io.fstream.persist;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Strings.repeat;

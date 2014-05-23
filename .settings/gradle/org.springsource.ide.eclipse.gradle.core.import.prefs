@@ -7,4 +7,4 @@ enableAfterTasks=true
 enableBeforeTasks=true
 enableDSLD=false
 enableDependendencyManagement=true
-projects=fstream-persistence;
+projects=fstream-persist;

@@ -7,13 +7,13 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.service;
+package io.fstream.persist.service;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static io.fstream.core.util.PropertiesUtils.getProperties;
 import io.fstream.core.model.event.TickEvent;
 import io.fstream.core.util.Codec;
-import io.fstream.persistence.config.KafkaProperties;
+import io.fstream.persist.config.KafkaProperties;
 
 import java.util.List;
 import java.util.Map;

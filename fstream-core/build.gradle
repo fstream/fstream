@@ -8,10 +8,8 @@
  */
 
 dependencies {
-  // Jackson
-  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
-  
   // Utilities
   compile libraries.guava
   compile libraries.jacksonDatabind
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
 }

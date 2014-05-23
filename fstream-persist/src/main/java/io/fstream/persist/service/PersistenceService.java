@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.service;
+package io.fstream.persist.service;
 
 import io.fstream.core.model.event.TickEvent;
 

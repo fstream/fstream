@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persistence.config;
+package io.fstream.persist.config;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
