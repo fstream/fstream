@@ -40,7 +40,6 @@ public class AppConfig {
   @Bean
   @SneakyThrows
   public File tmp() {
-    System.out.println(zkConnect);
     val tmp = Files.createTempDirectory("fstream-test").toFile();
     log.info("Testing storage: {}", tmp);
 

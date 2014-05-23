@@ -11,7 +11,7 @@ package io.fstream.rates.config;
 
 import static io.fstream.rates.camel.PropertiesComponents.newPropertiesComponent;
 import io.fstream.core.model.event.TickEvent;
-import io.fstream.rates.handler.TickEventTypeConverter;
+import io.fstream.rates.camel.TickEventTypeConverter;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
