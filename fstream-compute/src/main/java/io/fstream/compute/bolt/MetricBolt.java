@@ -10,8 +10,8 @@
 package io.fstream.compute.bolt;
 
 import io.fstream.core.model.definition.Metric;
-import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
+import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.util.Codec;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class MetricBolt extends EsperBolt {
 
   @Override
   protected Event createEvent(Object data) {
-    return new AlertEvent(new DateTime(), data);
+    return new MetricEvent(new DateTime(), data);
   }
 
   @SneakyThrows

@@ -33,6 +33,10 @@ factory('ratesService', function($rootScope, $timeout) {
 		        	publishEvent("alert", frame);
 		        });
 		        
+		        stompClient.subscribe('/topic/metrics', function(frame){
+		        	publishEvent("metric", frame);
+		        });
+		        
 		        stompClient.subscribe('/topic/commands', function(frame){
 		        	publishEvent("command", frame);
 		        });                

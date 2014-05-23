@@ -9,6 +9,9 @@
 
 package io.fstream.compute.factory;
 
+import static io.fstream.core.model.topic.Topic.ALERTS;
+import static io.fstream.core.model.topic.Topic.METRICS;
+import static io.fstream.core.model.topic.Topic.RATES;
 import static lombok.AccessLevel.PRIVATE;
 import io.fstream.compute.bolt.AlertBolt;
 import io.fstream.compute.bolt.EsperBolt;
@@ -41,21 +44,12 @@ import backtype.storm.topology.TopologyBuilder;
 @NoArgsConstructor(access = PRIVATE)
 public final class StormFactory {
 
-  /**
-   * Constants.
-   */
-  private static final String RATES_TOPIC_NAME = "rates";
-  private static final String ALERTS_TOPIC_NAME = "alerts";
-
   @SneakyThrows
   public static Config newStormConfig(boolean local, KafkaProperties kafkaProperties, ComputeProperties compute) {
     val config = new Config();
     config.setDebug(true);
 
-    // TODO: Configure per bolt?
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
-    config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
-
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(compute.getStatements()));
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(compute.getAlerts()));
     config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(compute.getMetrics()));
@@ -81,8 +75,10 @@ public final class StormFactory {
     builder.setBolt("rateLogger", newLoggingBolt()).shuffleGrouping(spoutId);
     builder.setBolt("alerts", newAlertBolt()).shuffleGrouping(spoutId);
     builder.setBolt("metrics", newMetricBolt()).shuffleGrouping(spoutId);
-    builder.setBolt("kafka-alerts", newKafkaBolt()).shuffleGrouping("alerts");
-    builder.setBolt("kafka-metrics", newKafkaBolt()).shuffleGrouping("metrics");
+    builder.setBolt("kafka-alerts", newKafkaBolt()).shuffleGrouping("alerts")
+        .addConfiguration(KafkaBolt.TOPIC, METRICS.getId());
+    builder.setBolt("kafka-metrics", newKafkaBolt()).shuffleGrouping("metrics")
+        .addConfiguration(KafkaBolt.TOPIC, ALERTS.getId());
 
     return builder.createTopology();
   }
@@ -97,7 +93,7 @@ public final class StormFactory {
 
     val kafkaConf = new SpoutConfig(
         hosts,// list of Kafka brokers
-        RATES_TOPIC_NAME, // Topic to read from
+        RATES.getId(), // Topic to read from
         "/kafkastorm", // The root path in Zookeeper for the spout to store the consumer offsets
         "discovery"); // An id for this consumer for storing the consumer offsets in Zookeeper
 

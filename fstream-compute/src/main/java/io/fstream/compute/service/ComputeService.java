@@ -37,6 +37,9 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 
+/**
+ * Service responsible for launching topologies.
+ */
 @Slf4j
 @Service
 @Setter

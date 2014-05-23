@@ -11,6 +11,7 @@ package io.fstream.web.service;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static io.fstream.core.util.PropertiesUtils.getProperties;
+import io.fstream.core.model.topic.Topic;
 import io.fstream.web.config.KafkaProperties;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +36,13 @@ import org.springframework.messaging.support.MessageBuilder;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 @Slf4j
-public abstract class AbstractMessageService extends AbstractExecutionThreadService {
+@RequiredArgsConstructor
+public class TopicMessageService extends AbstractExecutionThreadService {
+
+  /**
+   * Configuration.
+   */
+  protected final Topic topic;
 
   /**
    * Dependencies.
@@ -54,20 +62,22 @@ public abstract class AbstractMessageService extends AbstractExecutionThreadServ
 
   @PostConstruct
   public void init() throws Exception {
-    log.info("Initializing...");
+    log.info("Initializing '{}' service...", getTopicName());
     this.consumerConnector = createConsumerConnector();
     this.stream = createStream();
 
     startAsync();
+    log.info("Finished initializing '{}' service", getTopicName());
   }
 
   @PreDestroy
   public void destroy() throws Exception {
-    log.info("Destroying...");
+    log.info("Destroying '{}' service...", getTopicName());
     stopAsync();
 
     consumerConnector.commitOffsets();
     consumerConnector.shutdown();
+    log.info("Finished destroying '{}' service...", getTopicName());
   }
 
   @Override
@@ -82,10 +92,6 @@ public abstract class AbstractMessageService extends AbstractExecutionThreadServ
       template.send(getMessageDestination(), convert(message));
     }
   }
-
-  protected abstract String getMessageDestination();
-
-  protected abstract String getTopicName();
 
   private static Message<byte[]> convert(final byte[] message) {
     return MessageBuilder.withPayload(message).build();
@@ -105,6 +111,14 @@ public abstract class AbstractMessageService extends AbstractExecutionThreadServ
     List<KafkaStream<byte[], byte[]>> streams = topicMessageStreams.get(topicName);
 
     return streams.get(0);
+  }
+
+  private String getTopicName() {
+    return topic.getId();
+  }
+
+  private String getMessageDestination() {
+    return "/topic/" + getTopicName();
   }
 
 }

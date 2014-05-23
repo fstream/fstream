@@ -57,6 +57,8 @@ public class KafkaBolt<K, V> extends BaseRichBolt {
 
     this.topic = (String) stormConf.get(TOPIC);
     this.collector = collector;
+
+    log.info("Registered topic '{}'", topic);
   }
 
   @Override
