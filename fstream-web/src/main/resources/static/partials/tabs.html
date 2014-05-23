@@ -13,11 +13,11 @@
           <div id="rates"></div>
        </tab>
        <tab heading="Alerts">
-          <div id="alerts">
+          <div id="alerts" ng-controller="alertController">
 			<table ng-table="tableParams" show-filter="true" class="table">
 				<tr ng-repeat="alert in $data">
 					<td data-title="'Time'">{{ alert.dateTime }}</td>
-					<td data-title="'Message'" filter="{ 'message': 'text' }">{{ alert.message }}</td>
+					<td data-title="'Message'" filter="{ 'message': 'text' }">{{ alert }}</td>
 				</tr>
 			</table>       
           </div>

@@ -76,7 +76,7 @@ controller('chartController', function($scope, $timeout, chartService) {
 controller('alertController', function($scope, $filter, ngTableParams) {
     var alerts = [];
     $scope.$on('alert', function(e, alert) {
-    	alerts.unshift({ dateTime: new Date(), message: alert.askPercentChange });
+    	alerts.unshift({ dateTime: new Date(), message: alert });
     	$scope.tableParams.reload();
     });
     
