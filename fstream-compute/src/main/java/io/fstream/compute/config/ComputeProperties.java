@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("compute")
 public class ComputeProperties {
 
+  private List<String> statements = newArrayList();
   private List<Alert> alerts = newArrayList();
   private List<Metric> metrics = newArrayList();
 

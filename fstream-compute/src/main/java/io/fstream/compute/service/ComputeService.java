@@ -61,11 +61,7 @@ public class ComputeService {
     // Setup
     val local = stormProperities.isLocal();
     val topology = StormFactory.newStormTopology(zkConnect);
-    val config = StormFactory.newStormConfig(
-        local,
-        stormProperities.getProperties(),
-        computeProperties.getAlerts(),
-        computeProperties.getMetrics());
+    val config = StormFactory.newStormConfig(local, stormProperities, computeProperties);
 
     if (local) {
       executeLocal(topology, config);

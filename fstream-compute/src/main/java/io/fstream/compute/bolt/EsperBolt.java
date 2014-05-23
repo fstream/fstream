@@ -9,9 +9,7 @@
 
 package io.fstream.compute.bolt;
 
-import io.fstream.core.model.definition.Alert;
-import io.fstream.core.model.definition.Metric;
-import io.fstream.core.model.event.AlertEvent;
+import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.TickEvent;
 import io.fstream.core.util.Codec;
 
@@ -22,9 +20,6 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
-import org.joda.time.DateTime;
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -43,7 +38,7 @@ import com.espertech.esper.client.UpdateListener;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
-public class ComputeBolt extends BaseRichBolt implements UpdateListener {
+public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
 
   /**
    * Constants.
@@ -53,8 +48,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   /**
    * Configuration keys.
    */
-  public static final String ALERTS_CONFIG_KEY = "io.fstream.alerts";
-  public static final String METRICS_CONFIG_KEY = "io.fstream.metrics";
+  public static final String STATEMENTS_CONFIG_KEY = "io.fstream.alerts";
 
   /**
    * Esper.
@@ -85,24 +79,30 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     this.runtime = esperSink.getEPRuntime();
     this.admin = esperSink.getEPAdministrator();
 
-    val alerts = getAlerts(conf);
-    for (val alert : alerts) {
-      log.info("Registering alert: {}", alert);
-      val statement = admin.createEPL(alert.getStatement());
+    log.info("Creating common statements...");
+    for (val statement : getStatements(conf)) {
+      log.info("Registering statement: {}", statement);
+      val epl = admin.createEPL(statement);
 
-      statement.addListener(this);
+      epl.addListener(this);
     }
+    log.info("Finished creating common statements.");
 
-    val metrics = getMetrics(conf);
-    for (val metric : metrics) {
-      log.info("Registering metric: {}", metric);
-      val statement = admin.createEPL(metric.getStatement());
-
-      statement.addListener(this);
-    }
-
-    log.info("Finished preparing.");
+    // Delegate to child
+    log.info("Creating '{}' statements...", this.getClass().getSimpleName());
+    createStatements(conf, admin);
+    log.info("Finished creating '{}' statements.", this.getClass().getSimpleName());
   }
+
+  /**
+   * Template methods.
+   */
+  protected abstract void createStatements(Map<?, ?> conf, EPAdministrator admin);
+
+  /**
+   * Template methods.
+   */
+  protected abstract Event createEvent(Object data);
 
   @Override
   @SneakyThrows
@@ -121,7 +121,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     if (newEvents != null) {
       for (val newEvent : newEvents) {
         val data = newEvent.getUnderlying();
-        val event = new AlertEvent(new DateTime(), data);
+        val event = createEvent(data);
         val value = Codec.encodeText(event);
 
         collector.emit(new Values(KAFKA_TOPIC_KEY, value));
@@ -137,17 +137,10 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   }
 
   @SneakyThrows
-  private List<Alert> getAlerts(Map<?, ?> conf) {
-    val value = (String) conf.get(ALERTS_CONFIG_KEY);
+  private static List<String> getStatements(Map<?, ?> conf) {
+    val value = (String) conf.get(STATEMENTS_CONFIG_KEY);
 
-    return Codec.decodeText(value, new TypeReference<ArrayList<Alert>>() {});
-  }
-
-  @SneakyThrows
-  private List<Metric> getMetrics(Map<?, ?> conf) {
-    val value = (String) conf.get(METRICS_CONFIG_KEY);
-
-    return Codec.decodeText(value, new TypeReference<ArrayList<Metric>>() {});
+    return Codec.decodeText(value, new TypeReference<ArrayList<String>>() {});
   }
 
 }

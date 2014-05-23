@@ -10,16 +10,14 @@
 package io.fstream.compute.factory;
 
 import static lombok.AccessLevel.PRIVATE;
-import io.fstream.compute.bolt.ComputeBolt;
+import io.fstream.compute.bolt.AlertBolt;
+import io.fstream.compute.bolt.EsperBolt;
 import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
-import io.fstream.core.model.definition.Alert;
-import io.fstream.core.model.definition.Metric;
+import io.fstream.compute.bolt.MetricBolt;
+import io.fstream.compute.config.ComputeProperties;
+import io.fstream.compute.config.StormProperties;
 import io.fstream.core.util.Codec;
-
-import java.util.List;
-import java.util.Map;
-
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -50,14 +48,17 @@ public final class StormFactory {
   private static final String ALERTS_TOPIC_NAME = "alerts";
 
   @SneakyThrows
-  public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<Alert> alerts,
-      List<Metric> metrics) {
+  public static Config newStormConfig(boolean local, StormProperties stormProperties, ComputeProperties compute) {
     val config = new Config();
     config.setDebug(true);
-    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
+
+    // TODO: Configure per bolt?
+    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, stormProperties.getProperties());
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
-    config.put(ComputeBolt.ALERTS_CONFIG_KEY, Codec.encodeText(alerts));
-    config.put(ComputeBolt.METRICS_CONFIG_KEY, Codec.encodeText(metrics));
+
+    config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(compute.getStatements()));
+    config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(compute.getAlerts()));
+    config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(compute.getMetrics()));
 
     if (local) {
       config.setMaxTaskParallelism(3);
@@ -78,8 +79,10 @@ public final class StormFactory {
 
     // Paths
     builder.setBolt("rateLogger", newLoggingBolt()).shuffleGrouping(spoutId);
-    builder.setBolt("compute", newComputeBolt()).shuffleGrouping(spoutId);
-    builder.setBolt("kafka", newKafkaBolt()).shuffleGrouping("compute");
+    builder.setBolt("alerts", newAlertBolt()).shuffleGrouping(spoutId);
+    builder.setBolt("metrics", newMetricBolt()).shuffleGrouping(spoutId);
+    builder.setBolt("kafka-alerts", newKafkaBolt()).shuffleGrouping("alerts");
+    builder.setBolt("kafka-metrics", newKafkaBolt()).shuffleGrouping("metrics");
 
     return builder.createTopology();
   }
@@ -107,8 +110,12 @@ public final class StormFactory {
     return new LoggingBolt();
   }
 
-  public static IRichBolt newComputeBolt() {
-    return new ComputeBolt();
+  public static IRichBolt newAlertBolt() {
+    return new AlertBolt();
+  }
+
+  public static IRichBolt newMetricBolt() {
+    return new MetricBolt();
   }
 
 }

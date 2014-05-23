@@ -35,18 +35,20 @@ storm:
 
 # Compute     
 compute:
-   alerts:
 
-      - name: Symbol context
-        description: Named segmentation by instruments
-        statement: |
-           CREATE CONTEXT 
-              SegmentedBySymbol
-           PARTITION BY 
-              symbol 
-           FROM
-              Rate
+   # Common statements
+   statements:
+
+      - |
+        CREATE CONTEXT 
+           SegmentedBySymbol
+        PARTITION BY 
+           symbol 
+        FROM
+           Rate
       
+   alerts:
+         
       - name: Relative tick threshold
         description: Tick-to-tick percentage is greater than 1%
         statement: |
