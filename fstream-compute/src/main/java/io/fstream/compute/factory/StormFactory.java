@@ -16,7 +16,7 @@ import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.compute.bolt.MetricBolt;
 import io.fstream.compute.config.ComputeProperties;
-import io.fstream.compute.config.StormProperties;
+import io.fstream.compute.config.KafkaProperties;
 import io.fstream.core.util.Codec;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -48,12 +48,12 @@ public final class StormFactory {
   private static final String ALERTS_TOPIC_NAME = "alerts";
 
   @SneakyThrows
-  public static Config newStormConfig(boolean local, StormProperties stormProperties, ComputeProperties compute) {
+  public static Config newStormConfig(boolean local, KafkaProperties kafkaProperties, ComputeProperties compute) {
     val config = new Config();
     config.setDebug(true);
 
     // TODO: Configure per bolt?
-    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, stormProperties.getProperties());
+    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
 
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(compute.getStatements()));

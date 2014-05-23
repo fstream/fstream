@@ -10,6 +10,7 @@
 package io.fstream.compute.service;
 
 import io.fstream.compute.config.ComputeProperties;
+import io.fstream.compute.config.KafkaProperties;
 import io.fstream.compute.config.StormProperties;
 import io.fstream.compute.factory.StormFactory;
 
@@ -52,16 +53,18 @@ public class ComputeService {
   @Value("${zk.connect}")
   private String zkConnect;
   @Autowired
-  private StormProperties stormProperities;
+  private StormProperties stormProperties;
+  @Autowired
+  private KafkaProperties kafkaProperties;
   @Autowired
   private ComputeProperties computeProperties;
 
   @PostConstruct
   public void execute() throws Exception {
     // Setup
-    val local = stormProperities.isLocal();
+    val local = stormProperties.isLocal();
     val topology = StormFactory.newStormTopology(zkConnect);
-    val config = StormFactory.newStormConfig(local, stormProperities, computeProperties);
+    val config = StormFactory.newStormConfig(local, kafkaProperties, computeProperties);
 
     if (local) {
       executeLocal(topology, config);

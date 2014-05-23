@@ -9,11 +9,9 @@
 
 package io.fstream.compute.config;
 
-import static com.google.common.collect.Lists.newArrayList;
-import io.fstream.core.model.definition.Alert;
-import io.fstream.core.model.definition.Metric;
+import static com.google.common.collect.Maps.newHashMap;
 
-import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -22,11 +20,9 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties("compute")
-public class ComputeProperties {
+@ConfigurationProperties("kafka")
+public class KafkaProperties {
 
-  private List<String> statements = newArrayList();
-  private List<Alert> alerts = newArrayList();
-  private List<Metric> metrics = newArrayList();
+  private Map<String, String> producerProperties = newHashMap();
 
 }

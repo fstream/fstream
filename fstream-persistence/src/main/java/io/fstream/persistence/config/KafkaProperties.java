@@ -13,14 +13,14 @@ import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Map;
 
-import lombok.Getter;
+import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Getter
+@Data
 @Component
-@ConfigurationProperties(prefix = "kafka")
+@ConfigurationProperties("kafka")
 public class KafkaProperties {
 
   private Map<String, String> consumerProperties = newHashMap();

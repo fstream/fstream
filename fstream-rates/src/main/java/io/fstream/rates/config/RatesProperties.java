@@ -13,14 +13,14 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import lombok.Getter;
+import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Getter
+@Data
 @Component
-@ConfigurationProperties(prefix = "rates")
+@ConfigurationProperties("rates")
 public class RatesProperties {
 
   private List<String> symbols = newArrayList();
