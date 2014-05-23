@@ -16,8 +16,8 @@
           <div id="alerts" ng-controller="alertController">
 			<table ng-table="tableParams" show-filter="true" class="table">
 				<tr ng-repeat="alert in $data">
-					<td data-title="'Time'">{{ alert.dateTime }}</td>
-					<td data-title="'Message'" filter="{ 'message': 'text' }">{{ alert }}</td>
+					<td data-title="'Time'">{{ alert.dateTime | date:'yyyy-MM-dd HH:mm:ss Z' }}</td>
+					<td data-title="'Data'" filter="{ 'data': 'text' }"><code>{{ alert.data }}</code></td>
 				</tr>
 			</table>       
           </div>

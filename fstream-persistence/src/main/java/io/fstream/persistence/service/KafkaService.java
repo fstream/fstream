@@ -9,10 +9,14 @@
 
 package io.fstream.persistence.service;
 
-import static io.fstream.core.util.PropertiesUtils.getProperties; 
 import static com.google.common.collect.ImmutableMap.of;
+import static io.fstream.core.util.PropertiesUtils.getProperties;
 import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.util.Codec;
 import io.fstream.persistence.config.KafkaProperties;
+
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -28,17 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 @Slf4j
 @Service
 public class KafkaService extends AbstractExecutionThreadService {
-  
-  /**
-   * Constants.
-   */
-  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
    * Dependencies.
@@ -49,7 +47,7 @@ public class KafkaService extends AbstractExecutionThreadService {
   @Setter
   @Autowired
   private PersistenceService persistenceService;
-  
+
   /**
    * Configuration.
    */
@@ -88,7 +86,7 @@ public class KafkaService extends AbstractExecutionThreadService {
       val text = new String(message);
 
       log.info("Received: {}", text);
-      val rate = MAPPER.readValue(text, TickEvent.class);
+      val rate = Codec.decode(text, TickEvent.class);
       persistenceService.persist(rate);
     }
   }
@@ -100,8 +98,10 @@ public class KafkaService extends AbstractExecutionThreadService {
   private KafkaStream<byte[], byte[]> createStream() {
     val topicStreamCount = 1;
 
-    val topicMessageStreams = consumerConnector.createMessageStreams(of(topicName, topicStreamCount));
-    val streams = topicMessageStreams.get(topicName);
+    // lombok: issue with byte[] and generics
+    Map<String, List<KafkaStream<byte[], byte[]>>> topicMessageStreams =
+        consumerConnector.createMessageStreams(of(topicName, topicStreamCount));
+    List<KafkaStream<byte[], byte[]>> streams = topicMessageStreams.get(topicName);
 
     return streams.get(0);
   }

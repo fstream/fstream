@@ -15,6 +15,7 @@ import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Metric;
+import io.fstream.core.util.Codec;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,6 @@ import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Factory for storm component creation.
  * <p>
@@ -49,7 +48,6 @@ public final class StormFactory {
    */
   private static final String RATES_TOPIC_NAME = "rates";
   private static final String ALERTS_TOPIC_NAME = "alerts";
-  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @SneakyThrows
   public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<Alert> alerts,
@@ -58,8 +56,8 @@ public final class StormFactory {
     config.setDebug(true);
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
-    config.put(ComputeBolt.ALERTS_CONFIG_KEY, MAPPER.writeValueAsString(alerts));
-    config.put(ComputeBolt.METRICS_CONFIG_KEY, MAPPER.writeValueAsString(metrics));
+    config.put(ComputeBolt.ALERTS_CONFIG_KEY, Codec.encode(alerts));
+    config.put(ComputeBolt.METRICS_CONFIG_KEY, Codec.encode(metrics));
 
     if (local) {
       config.setMaxTaskParallelism(3);

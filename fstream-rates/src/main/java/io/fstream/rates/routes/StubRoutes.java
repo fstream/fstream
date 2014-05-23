@@ -10,8 +10,8 @@
 
 package io.fstream.rates.routes;
 
-import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
 import io.fstream.core.model.event.TickEvent;
+import io.fstream.rates.util.CodecDataFormat;
 import lombok.Setter;
 import lombok.val;
 
@@ -46,7 +46,7 @@ public class StubRoutes extends RouteBuilder {
       })
       .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
       .log("${body}")
-      .marshal().json(Jackson)
+      .marshal(new CodecDataFormat())
       .to("{{fstream.broker.uri}}");
   }
 

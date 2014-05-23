@@ -76,7 +76,13 @@ controller('chartController', function($scope, $timeout, chartService) {
 controller('alertController', function($scope, $filter, ngTableParams) {
     var alerts = [];
     $scope.$on('alert', function(e, alert) {
-    	alerts.unshift({ dateTime: new Date(), message: alert });
+    	alerts.unshift(alert);
+    	
+    	// Limit to 50 events
+    	if (alerts.length >= 50) {
+    		alerts.pop();
+    	}
+    	
     	$scope.tableParams.reload();
     });
     

@@ -10,6 +10,7 @@
 package io.fstream.rates.service;
 
 import static com.google.common.io.Closeables.close;
+import io.fstream.core.util.Codec;
 import io.fstream.rates.config.RatesProperties;
 
 import javax.annotation.PostConstruct;
@@ -27,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Slf4j
 @Service
 public class ConfigService {
@@ -37,7 +36,6 @@ public class ConfigService {
    * Constants.
    */
   private static final String PATH = "/fstream/config";
-  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
    * Configuration.
@@ -101,7 +99,7 @@ public class ConfigService {
 
   @SneakyThrows
   public byte[] serialize() {
-    return MAPPER.writeValueAsBytes(properties.getSymbols());
+    return Codec.encodeBytes(properties.getSymbols());
   }
 
 }

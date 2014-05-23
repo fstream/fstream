@@ -10,6 +10,7 @@
 package io.fstream.web.service;
 
 import static com.google.common.io.Closeables.close;
+import io.fstream.core.util.Codec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -45,7 +45,6 @@ public class ConfigService {
    * Constants.
    */
   private static final String PATH = "/fstream/config";
-  private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final TypeReference<ArrayList<String>> STRING_LIST = new TypeReference<ArrayList<String>>() {};
 
   /**
@@ -116,7 +115,7 @@ public class ConfigService {
 
   @SneakyThrows
   private List<String> deserialize(byte[] bytes) {
-    return MAPPER.readValue(bytes, STRING_LIST);
+    return Codec.decodeBytes(bytes, STRING_LIST);
   }
 
   private static Message<byte[]> convert(final byte[] message) {

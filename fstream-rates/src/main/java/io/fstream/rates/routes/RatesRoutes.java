@@ -10,8 +10,8 @@
 
 package io.fstream.rates.routes;
 
-import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
 import io.fstream.core.model.event.TickEvent;
+import io.fstream.rates.util.CodecDataFormat;
 
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ public class RatesRoutes extends AbstractFixRoutes {
         .when(marketDataSnapshotFullRefresh())
           .convertBodyTo(TickEvent.class)
           .log("${body}")
-          .marshal().json(Jackson)
+          .marshal(new CodecDataFormat())
           .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
           .to("{{fstream.broker.uri}}")  // Note: http://grokbase.com/t/kafka/users/138vqq1x07/getting-leadernotavailableexception-in-console-producer-after-increasing-partitions-from-4-to-16
     
