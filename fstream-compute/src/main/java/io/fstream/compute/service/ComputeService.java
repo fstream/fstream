@@ -64,7 +64,8 @@ public class ComputeService {
     val config = StormFactory.newStormConfig(
         local,
         stormProperities.getProperties(),
-        computeProperties.getAlerts());
+        computeProperties.getAlerts(),
+        computeProperties.getMetrics());
 
     if (local) {
       executeLocal(topology, config);

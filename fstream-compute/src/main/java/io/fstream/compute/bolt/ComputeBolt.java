@@ -10,6 +10,7 @@
 package io.fstream.compute.bolt;
 
 import io.fstream.core.model.definition.Alert;
+import io.fstream.core.model.definition.Metric;
 import io.fstream.core.model.event.TickEvent;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
    * Configuration keys.
    */
   public static final String ALERTS_CONFIG_KEY = "io.fstream.alerts";
+  public static final String METRICS_CONFIG_KEY = "io.fstream.metrics";
 
   /**
    * Esper.
@@ -83,7 +85,15 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     val alerts = getAlerts(conf);
     for (val alert : alerts) {
       log.info("Registering alert: {}", alert);
-      val statement = admin.createEPL(alert.getDefinition());
+      val statement = admin.createEPL(alert.getStatement());
+
+      statement.addListener(this);
+    }
+
+    val metrics = getMetrics(conf);
+    for (val metric : metrics) {
+      log.info("Registering metric: {}", metric);
+      val statement = admin.createEPL(metric.getStatement());
 
       statement.addListener(this);
     }
@@ -127,6 +137,13 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     val value = (String) conf.get(ALERTS_CONFIG_KEY);
 
     return MAPPER.readValue(value, new TypeReference<ArrayList<Alert>>() {});
+  }
+
+  @SneakyThrows
+  private List<Metric> getMetrics(Map<?, ?> conf) {
+    val value = (String) conf.get(METRICS_CONFIG_KEY);
+
+    return MAPPER.readValue(value, new TypeReference<ArrayList<Metric>>() {});
   }
 
 }

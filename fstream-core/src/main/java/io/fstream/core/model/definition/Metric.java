@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Alert extends Definition {
+public class Metric extends Definition {
 
   private String statement;
 

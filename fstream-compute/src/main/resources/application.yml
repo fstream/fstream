@@ -37,27 +37,19 @@ storm:
 compute:
    alerts:
 
-      # -----------------------------------------------
-      # Definitions
-      # -----------------------------------------------
-
-      - name: Symbol content
+      - name: Symbol context
         description: Named segmentation by instruments
-        definition: |
+        statement: |
            CREATE CONTEXT 
               SegmentedBySymbol
            PARTITION BY 
               symbol 
            FROM
               Rate
-
-      # -----------------------------------------------
-      # Alerts
-      # -----------------------------------------------
       
       - name: Relative tick threshold
         description: Tick-to-tick percentage is greater than 1%
-        definition: |
+        statement: |
            CONTEXT SegmentedBySymbol
            SELECT
               ask / prior(1, ask) AS askPercentChange
@@ -66,9 +58,25 @@ compute:
            WHERE
               ask / prior(1, ask) > 1.01
 
+      - name: Flat pricing
+        description: Coded to fire many times. Final implementation would count < 1 every 60 secs.
+        statement: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+               symbol, 
+               COUNT(*) AS eventCnt 
+           FROM
+               Rate.win:time(10 sec)
+           GROUP BY 
+               symbol
+           HAVING
+               COUNT(*) < 5
+
+   metrics:
+
       - name: Simple stats
         description: Used to trigger at least one event every 5s for testing.
-        definition: |
+        statement: |
            CONTEXT SegmentedBySymbol
            SELECT
                symbol,
@@ -81,21 +89,3 @@ compute:
                MAX(bid)   AS maxBid
            FROM
                Rate.win:time_batch(5 sec)
-
-      - name: Flat pricing
-        description: Coded to fire many times. Final implementation would count < 1 every 60 secs.
-        definition: |
-           CONTEXT SegmentedBySymbol
-           SELECT
-               symbol, 
-               COUNT(*) AS eventCnt 
-           FROM
-               Rate.win:time(10 sec)
-           GROUP BY 
-               symbol
-           HAVING
-               COUNT(*) < 5
-
-      # -----------------------------------------------
-      # Metrics
-      # -----------------------------------------------

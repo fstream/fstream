@@ -10,12 +10,11 @@
 package io.fstream.core.model.definition;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class Alert extends Definition {
+public class Definition {
 
-  private String statement;
+  private String name;
+  private String description;
 
 }

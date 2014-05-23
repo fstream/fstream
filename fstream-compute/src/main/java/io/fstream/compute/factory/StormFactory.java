@@ -14,6 +14,7 @@ import io.fstream.compute.bolt.ComputeBolt;
 import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.core.model.definition.Alert;
+import io.fstream.core.model.definition.Metric;
 
 import java.util.List;
 import java.util.Map;
@@ -51,12 +52,14 @@ public final class StormFactory {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @SneakyThrows
-  public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<Alert> alerts) {
+  public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<Alert> alerts,
+      List<Metric> metrics) {
     val config = new Config();
     config.setDebug(true);
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
     config.put(ComputeBolt.ALERTS_CONFIG_KEY, MAPPER.writeValueAsString(alerts));
+    config.put(ComputeBolt.METRICS_CONFIG_KEY, MAPPER.writeValueAsString(metrics));
 
     if (local) {
       config.setMaxTaskParallelism(3);

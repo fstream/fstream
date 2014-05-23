@@ -11,6 +11,7 @@ package io.fstream.compute.config;
 
 import static com.google.common.collect.Lists.newArrayList;
 import io.fstream.core.model.definition.Alert;
+import io.fstream.core.model.definition.Metric;
 
 import java.util.List;
 
@@ -25,5 +26,6 @@ import org.springframework.stereotype.Component;
 public class ComputeProperties {
 
   private List<Alert> alerts = newArrayList();
+  private List<Metric> metrics = newArrayList();
 
 }
