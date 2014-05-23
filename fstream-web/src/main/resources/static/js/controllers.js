@@ -68,8 +68,10 @@ controller('ratesController', function($scope, $http, ratesService, chartService
     });
     
 }).
-controller('chartController', function($scope, chartService) {
-	chartService.init();
+controller('chartController', function($scope, $timeout, chartService) {
+	$timeout(function(){
+		chartService.init();
+	}, 0);
 }).
 controller('alertController', function($scope, $filter, ngTableParams) {
     var alerts = [];
