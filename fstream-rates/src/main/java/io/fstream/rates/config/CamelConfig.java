@@ -10,8 +10,8 @@
 package io.fstream.rates.config;
 
 import static io.fstream.rates.util.PropertiesComponents.newPropertiesComponent;
-import io.fstream.core.model.Rate;
-import io.fstream.rates.handler.RateTypeConverter;
+import io.fstream.core.model.event.TickEvent;
+import io.fstream.rates.handler.TickEventTypeConverter;
 import lombok.val;
 
 import org.apache.camel.CamelContext;
@@ -47,14 +47,14 @@ public class CamelConfig extends CamelConfiguration {
   private Environment environment;
 
   @Bean
-  public RateTypeConverter rateTypeConverter() {
-    return new RateTypeConverter();
+  public TickEventTypeConverter rateTypeConverter() {
+    return new TickEventTypeConverter();
   }
 
   @Bean
   public JacksonDataFormat jacksonDataFormat() {
     val dataFormat = new JacksonDataFormat();
-    dataFormat.setUnmarshalType(Rate.class);
+    dataFormat.setUnmarshalType(TickEvent.class);
 
     val mapper = dataFormat.getObjectMapper();
     mapper.registerModule(new JodaModule());
@@ -85,7 +85,7 @@ public class CamelConfig extends CamelConfiguration {
     });
 
     camelContext.getTypeConverterRegistry().addTypeConverter(
-        Rate.class, MarketDataSnapshotFullRefresh.class, rateTypeConverter());
+        TickEvent.class, MarketDataSnapshotFullRefresh.class, rateTypeConverter());
   }
 
 }

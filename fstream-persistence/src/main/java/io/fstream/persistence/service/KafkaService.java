@@ -11,7 +11,7 @@ package io.fstream.persistence.service;
 
 import static io.fstream.core.util.PropertiesUtils.getProperties; 
 import static com.google.common.collect.ImmutableMap.of;
-import io.fstream.core.model.Rate;
+import io.fstream.core.model.event.TickEvent;
 import io.fstream.persistence.config.KafkaProperties;
 
 import javax.annotation.PostConstruct;
@@ -88,7 +88,7 @@ public class KafkaService extends AbstractExecutionThreadService {
       val text = new String(message);
 
       log.info("Received: {}", text);
-      val rate = MAPPER.readValue(text, Rate.class);
+      val rate = MAPPER.readValue(text, TickEvent.class);
       persistenceService.persist(rate);
     }
   }

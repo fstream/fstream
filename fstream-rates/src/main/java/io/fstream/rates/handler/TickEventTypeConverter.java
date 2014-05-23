@@ -9,7 +9,7 @@
 
 package io.fstream.rates.handler;
 
-import io.fstream.core.model.Rate;
+import io.fstream.core.model.event.TickEvent;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -30,7 +30,7 @@ import quickfix.fix44.MarketDataSnapshotFullRefresh;
  * ://algo-trader.googlecode.com/svn-history/r539/branches/fix-md/code/src/main/java/com/algoTrader/service/fix/
  * FixMessageHandler.java
  */
-public class RateTypeConverter extends TypeConverterSupport {
+public class TickEventTypeConverter extends TypeConverterSupport {
 
   @Override
   @SuppressWarnings("unchecked")
@@ -42,10 +42,10 @@ public class RateTypeConverter extends TypeConverterSupport {
   }
 
   @SneakyThrows
-  private Rate convertTo(MarketDataSnapshotFullRefresh message) {
-    val rate = new Rate();
-    rate.setSymbol(message.getSymbol().getValue());
-    rate.setDateTime(new DateTime(message.getHeader().getUtcTimeStamp(SendingTime.FIELD)));
+  private TickEvent convertTo(MarketDataSnapshotFullRefresh message) {
+    val event = new TickEvent();
+    event.setSymbol(message.getSymbol().getValue());
+    event.setDateTime(new DateTime(message.getHeader().getUtcTimeStamp(SendingTime.FIELD)));
 
     val entryCount = message.getNoMDEntries().getValue();
     for (int i = 0; i < entryCount; i++) {
@@ -54,13 +54,13 @@ public class RateTypeConverter extends TypeConverterSupport {
 
       val entryType = group.getMDEntryType().getValue();
       if (entryType == MDEntryType.BID) {
-        rate.setBid((float) group.getDouble(MDEntryPx.FIELD));
+        event.setBid((float) group.getDouble(MDEntryPx.FIELD));
       } else if (entryType == MDEntryType.OFFER) {
-        rate.setAsk((float) group.getDouble(MDEntryPx.FIELD));
+        event.setAsk((float) group.getDouble(MDEntryPx.FIELD));
       }
     }
 
-    return rate;
+    return event;
   }
 
 }

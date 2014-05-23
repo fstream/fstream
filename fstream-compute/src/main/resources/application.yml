@@ -9,6 +9,11 @@
 # Proprietary and confidential.
 #
 
+# Spring
+spring:
+   config:
+      location: classpath:application-compute.yml
+      
 # ZooKeeper
 zk:
    host: localhost
@@ -27,50 +32,70 @@ storm:
       metadata.broker.list:  ${kafka.host}:${kafka.port}
       request.required.acks: 1
       serializer.class: kafka.serializer.StringEncoder
- 
-# Esper      
-esper:
-   epl:
-      # Create the partitions
-      - |
-        CREATE CONTEXT 
-           SegmentedBySymbol
-        PARTITION BY 
-           symbol 
-        FROM
-           Rate
-           
-      # Business statements
-      - |
-        CONTEXT SegmentedBySymbol
-        SELECT
-           CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange
-        FROM
-           Rate
-        WHERE
-           CAST(ask, float) / CAST(prior(1, ask), float) > 1.0001
-        
-      # Simple count
-      - |
-        CONTEXT SegmentedBySymbol
-        SELECT
-            COUNT(ask) AS count,
-            AVG(ask)   AS avgAsk,
-            MIN(ask)   AS minAsk,
-            MAX(ask)   AS maxAsk
-        FROM
-            Rate.win:time_batch(5 sec)
-            
-      # flat pricing
-      # coded to fire many times. Final implementation would count < 1 every 60 secs
-      - |
-        CONTEXT SegmentedBySymbol
-        SELECT
-            symbol,count(*) as eventCnt 
-        FROM
-            Rate.win:time(10 sec)
-        GROUP BY 
-            symbol
-        HAVING
-            count(*) < 5
-            
+
+# Compute     
+compute:
+   alerts:
+
+      # -----------------------------------------------
+      # Definitions
+      # -----------------------------------------------
+
+      - name: Symbol content
+        description: Named segmentation by instruments
+        definition: |
+           CREATE CONTEXT 
+              SegmentedBySymbol
+           PARTITION BY 
+              symbol 
+           FROM
+              Rate
+
+      # -----------------------------------------------
+      # Alerts
+      # -----------------------------------------------
+      
+      - name: Relative tick threshold
+        description: Tick-to-tick percentage is greater than 1%
+        definition: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+              ask / prior(1, ask) AS askPercentChange
+           FROM
+              Rate
+           WHERE
+              ask / prior(1, ask) > 1.01
+
+      - name: Simple stats
+        description: Used to trigger at least one event every 5s for testing.
+        definition: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+               symbol,
+               COUNT(ask) AS count,
+               AVG(ask)   AS avgAsk,
+               AVG(bid)   AS avgBid,
+               MIN(ask)   AS minAsk,
+               MIN(bid)   AS minBid,
+               MAX(ask)   AS maxAsk,
+               MAX(bid)   AS maxBid
+           FROM
+               Rate.win:time_batch(5 sec)
+
+      - name: Flat pricing
+        description: Coded to fire many times. Final implementation would count < 1 every 60 secs.
+        definition: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+               symbol, 
+               COUNT(*) AS eventCnt 
+           FROM
+               Rate.win:time(10 sec)
+           GROUP BY 
+               symbol
+           HAVING
+               COUNT(*) < 5
+
+      # -----------------------------------------------
+      # Metrics
+      # -----------------------------------------------

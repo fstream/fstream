@@ -13,6 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 import io.fstream.compute.bolt.ComputeBolt;
 import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
+import io.fstream.core.model.definition.Alert;
 
 import java.util.List;
 import java.util.Map;
@@ -50,12 +51,12 @@ public final class StormFactory {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @SneakyThrows
-  public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<String> epl) {
+  public static Config newStormConfig(boolean local, Map<String, String> kafkaProperties, List<Alert> alerts) {
     val config = new Config();
     config.setDebug(true);
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
-    config.put(ComputeBolt.EPL_CONFIG_KEY, MAPPER.writeValueAsString(epl));
+    config.put(ComputeBolt.ALERTS_CONFIG_KEY, MAPPER.writeValueAsString(alerts));
 
     if (local) {
       config.setMaxTaskParallelism(3);

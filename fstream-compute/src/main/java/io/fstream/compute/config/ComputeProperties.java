@@ -10,6 +10,7 @@
 package io.fstream.compute.config;
 
 import static com.google.common.collect.Lists.newArrayList;
+import io.fstream.core.model.definition.Alert;
 
 import java.util.List;
 
@@ -20,9 +21,9 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@ConfigurationProperties(prefix = "esper")
-public class EsperProperties {
+@ConfigurationProperties("compute")
+public class ComputeProperties {
 
-  private List<String> epl = newArrayList();
+  private List<Alert> alerts = newArrayList();
 
 }

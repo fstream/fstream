@@ -9,7 +9,7 @@
 
 package io.fstream.compute.service;
 
-import io.fstream.compute.config.EsperProperties;
+import io.fstream.compute.config.ComputeProperties;
 import io.fstream.compute.config.StormProperties;
 import io.fstream.compute.factory.StormFactory;
 
@@ -54,14 +54,17 @@ public class ComputeService {
   @Autowired
   private StormProperties stormProperities;
   @Autowired
-  private EsperProperties esperProperties;
+  private ComputeProperties computeProperties;
 
   @PostConstruct
   public void execute() throws Exception {
     // Setup
     val local = stormProperities.isLocal();
     val topology = StormFactory.newStormTopology(zkConnect);
-    val config = StormFactory.newStormConfig(local, stormProperities.getProperties(), esperProperties.getEpl());
+    val config = StormFactory.newStormConfig(
+        local,
+        stormProperities.getProperties(),
+        computeProperties.getAlerts());
 
     if (local) {
       executeLocal(topology, config);

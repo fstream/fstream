@@ -9,7 +9,8 @@
 
 package io.fstream.compute.bolt;
 
-import io.fstream.core.model.Rate;
+import io.fstream.core.model.definition.Alert;
+import io.fstream.core.model.event.TickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   /**
    * Configuration keys.
    */
-  public static final String EPL_CONFIG_KEY = "epl";
+  public static final String ALERTS_CONFIG_KEY = "io.fstream.alerts";
 
   /**
    * Esper.
@@ -71,7 +72,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
     log.info("Preparing...");
     val configuration = new Configuration();
-    configuration.addEventType("Rate", Rate.class.getName());
+    configuration.addEventType("Rate", TickEvent.class.getName());
 
     this.collector = collector;
     this.esperSink = EPServiceProviderManager.getProvider(this.toString(), configuration);
@@ -79,10 +80,10 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
     this.runtime = esperSink.getEPRuntime();
     this.admin = esperSink.getEPAdministrator();
 
-    val values = getEplValues(conf);
-    for (val epl : values) {
-      log.info("Registering statement: {}", epl);
-      val statement = admin.createEPL(epl);
+    val alerts = getAlerts(conf);
+    for (val alert : alerts) {
+      log.info("Registering alert: {}", alert);
+      val statement = admin.createEPL(alert.getDefinition());
 
       statement.addListener(this);
     }
@@ -94,9 +95,9 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   @SneakyThrows
   public void execute(Tuple tuple) {
     val content = (String) tuple.getValue(0);
-    val rate = MAPPER.readValue(content, Rate.class);
+    val event = MAPPER.readValue(content, TickEvent.class);
 
-    runtime.sendEvent(rate);
+    runtime.sendEvent(event);
 
     collector.ack(tuple);
   }
@@ -122,10 +123,10 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   }
 
   @SneakyThrows
-  private List<String> getEplValues(Map<?, ?> conf) {
-    val epl = (String) conf.get(EPL_CONFIG_KEY);
+  private List<Alert> getAlerts(Map<?, ?> conf) {
+    val value = (String) conf.get(ALERTS_CONFIG_KEY);
 
-    return MAPPER.readValue(epl, new TypeReference<ArrayList<String>>() {});
+    return MAPPER.readValue(value, new TypeReference<ArrayList<Alert>>() {});
   }
 
 }

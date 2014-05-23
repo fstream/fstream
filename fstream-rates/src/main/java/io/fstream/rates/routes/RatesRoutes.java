@@ -11,7 +11,7 @@
 package io.fstream.rates.routes;
 
 import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
-import io.fstream.core.model.Rate;
+import io.fstream.core.model.event.TickEvent;
 
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.springframework.stereotype.Component;
@@ -38,7 +38,7 @@ public class RatesRoutes extends AbstractFixRoutes {
           .to("{{rates.uri}}")
           
         .when(marketDataSnapshotFullRefresh())
-          .convertBodyTo(Rate.class)
+          .convertBodyTo(TickEvent.class)
           .log("${body}")
           .marshal().json(Jackson)
           .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))

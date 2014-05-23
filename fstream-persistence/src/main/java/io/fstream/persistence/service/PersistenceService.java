@@ -9,7 +9,7 @@
 
 package io.fstream.persistence.service;
 
-import io.fstream.core.model.Rate;
+import io.fstream.core.model.event.TickEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -83,15 +83,15 @@ public class PersistenceService {
   }
 
   @SneakyThrows
-  public void persist(Rate rate) {
+  public void persist(TickEvent event) {
     val table = connection.getTable(TABLE_NAME);
     try {
-      val key = createKey(rate);
+      val key = createKey(event);
 
       val row = new Put(Bytes.toBytes(key));
-      row.add(CF_DATA, COLUMN_BID, Bytes.toBytes(rate.getBid()));
-      row.add(CF_DATA, COLUMN_ASK, Bytes.toBytes(rate.getAsk()));
-      row.add(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(rate.getSymbol()));
+      row.add(CF_DATA, COLUMN_BID, Bytes.toBytes(event.getBid()));
+      row.add(CF_DATA, COLUMN_ASK, Bytes.toBytes(event.getAsk()));
+      row.add(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(event.getSymbol()));
 
       log.info("**** Putting row");
       table.put(row);
@@ -130,7 +130,7 @@ public class PersistenceService {
     log.info("Table '{}' exists and is enabled", TABLE_NAME.getNameAsString());
   }
 
-  private String createKey(Rate rate) {
+  private String createKey(TickEvent rate) {
     val hourFloor = rate.getDateTime().hourOfDay().roundFloorCopy();
 
     return hourFloor.getMillis() + rate.getSymbol();

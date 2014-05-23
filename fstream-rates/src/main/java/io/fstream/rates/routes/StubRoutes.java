@@ -11,7 +11,7 @@
 package io.fstream.rates.routes;
 
 import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
-import io.fstream.core.model.Rate;
+import io.fstream.core.model.event.TickEvent;
 import lombok.Setter;
 import lombok.val;
 
@@ -38,9 +38,9 @@ public class StubRoutes extends RouteBuilder {
         
         @Override
         public void process(Exchange exchange) throws Exception {
-          val rate = new Rate(new DateTime(), "EUR/USD", ask+=2, bid+=1);
+          val event = new TickEvent(new DateTime(), "EUR/USD", ask+=2, bid+=1);
           
-          exchange.getOut().setBody(rate);
+          exchange.getOut().setBody(event);
         }
         
       })

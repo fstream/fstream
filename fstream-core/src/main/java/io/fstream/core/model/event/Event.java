@@ -7,24 +7,19 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.core.model;
+package io.fstream.core.model.event;
 
 import java.io.Serializable;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.joda.time.DateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Rate implements Serializable {
+/**
+ * Central event abstraction in the system.
+ */
+public interface Event extends Serializable {
 
-  DateTime dateTime;
-  String symbol;
-  float ask;
-  float bid;
+  DateTime getDateTime();
+
+  EventType getType();
 
 }
