@@ -60,3 +60,17 @@ esper:
             MAX(ask)   AS maxAsk
         FROM
             Rate.win:time_batch(5 sec)
+            
+      # flat pricing
+      # coded to fire many times. Final implementation would count < 1 every 60 secs
+      - |
+        CONTEXT SegmentedBySymbol
+        SELECT
+            symbol,count(*) as eventCnt 
+        FROM
+            Rate.win:time(10 sec)
+        GROUP BY 
+            symbol
+        HAVING
+            count(*) < 5
+            
