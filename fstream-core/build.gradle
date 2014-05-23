@@ -8,7 +8,6 @@
  */
 
 dependencies {
-  
   // Jackson
   compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
   

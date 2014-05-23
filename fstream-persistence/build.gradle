@@ -12,16 +12,16 @@ dependencies {
   compile project(':fstream-core')
   
   // Spring
-  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+  compile libraries.springBootActuator
   
   // Hadoop
   compile libraries.hadoop
   
   // HBase
-  compile "org.apache.hbase:hbase-client:$hbaseVersion"
+  compile libraries.hbaseClient
   
   // Jackson
-  compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3'
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.3"
   
   // Kafka
   compile libraries.kafka

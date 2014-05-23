@@ -25,14 +25,11 @@ dependencies {
   compile "org.apache.camel:camel-kafka:$camelVersion"
   
   // QuickFIX/J 
-  compile 'quickfixj:quickfixj-all:1.5.3'
+  compile "quickfixj:quickfixj-all:$quickfixjVersion"
   compile 'org.apache.mina:mina-filter-ssl:1.1.7'
   
   // Zookeeper
   compile libraries.curator
-  
-  // Jackson
-  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
   
   // Utilities
   compile libraries.guava

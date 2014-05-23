@@ -11,7 +11,15 @@ apply plugin: 'spring-boot'
 
 dependencies {
   // Spring
-  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+  compile libraries.springBootActuator
+  
+  // Hadoop
+  compile libraries.hadoop
+  compile libraries.hadoopTest
+  
+  // HBase
+  compile libraries.hbaseClient
+  compile "org.apache.hbase:hbase-testing-util:$hbaseVersion"
   
   // Kafka
   compile(libraries.kafka) {
@@ -19,15 +27,7 @@ dependencies {
   }
   
   // Zookeeper
-  compile "org.apache.curator:curator-test:$curatorVersion"
-  
-  // Hadoop
-  compile libraries.hadoop
-  compile libraries.hadoopTest
-  
-  // HBase
-  compile "org.apache.hbase:hbase-client:$hbaseVersion"
-  compile "org.apache.hbase:hbase-testing-util:$hbaseVersion"
+  compile libraries.curatorTest
   
   // Utilities
   compile 'com.google.guava:guava:12.0' // Override due to conflicts

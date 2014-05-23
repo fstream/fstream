@@ -14,16 +14,16 @@ dependencies {
   compile project(':fstream-core')
   
   // Spring
-  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-  compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+  compile libraries.springBootActuator
+  compile libraries.springBootWeb
   compile "org.springframework.boot:spring-boot-starter-websocket:$springBootVersion"
   compile "org.springframework:spring-messaging:$springVersion"
   
-  // ZooKepper
-  compile libraries.curator
-  
   // Kafka
   compile libraries.kafka
+  
+  // ZooKeeper
+  compile libraries.curator
   
   // Utilities
   compile libraries.guava
