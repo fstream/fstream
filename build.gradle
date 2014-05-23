@@ -15,15 +15,18 @@ buildscript {
    //
    // Versions
    //
-   ext.springVersion     = '4.0.4.RELEASE'
+   ext.springVersion     = '4.0.5.RELEASE'
    ext.springBootVersion = "1.0.2.RELEASE"
-   ext.camelVersion      = '2.13.0'
+   ext.camelVersion      = '2.13.1'
    ext.kafkaVersion      = '0.8.1'
+   ext.stormVersion      = '0.9.0'
    ext.hbaseVersion      = '0.98.2-hadoop1'
    ext.hadoopVersion     = '1.2.1'
+   ext.esperVersion      = '4.11.0'
    ext.curatorVersion    = '2.4.2'
    ext.guavaVersion      = '17.0'
    ext.jacksonVersion    = '2.3.3'
+   ext.lombokVersion     = '1.12.6'
    
    //
    // Libraries
@@ -77,7 +80,7 @@ subprojects {
 	
 	dependencies {
 		// Compile-time transformations
-		compile 'org.projectlombok:lombok:1.12.6'
+		compile "org.projectlombok:lombok:$lombokVersion"
 		
 		// Utilities
 		compile 'joda-time:joda-time:2.3'

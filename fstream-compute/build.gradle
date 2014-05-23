@@ -9,29 +9,22 @@
 
 apply plugin: 'spring-boot'
  
-configurations {
-  compile.exclude module: 'slf4j-simple'
-  compile.exclude module: 'slf4j-log4j12'
-}
-
 dependencies {
   // fStream
   compile project(':fstream-core')
 
   // Spring
-  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+  compile libraries.springBootActuator
       
   // Storm
-  //compile 'org.apache.storm:storm-core:0.9.1-incubating'
-  compile 'storm:storm:0.9.0'
+  compile "storm:storm:${stormVersion}"
   
   // Storm-Kafka 
   compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
   
   // Esper
-  compile 'com.espertech:esper:4.11.0'
+  compile "com.espertech:esper:${esperVersion}"
   
   // Utilities
   compile libraries.guava
-  compile libraries.jacksonDatabind
 }

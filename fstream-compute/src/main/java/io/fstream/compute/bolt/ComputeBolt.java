@@ -108,7 +108,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   @SneakyThrows
   public void execute(Tuple tuple) {
     val value = (String) tuple.getValue(0);
-    val event = Codec.decode(value, TickEvent.class);
+    val event = Codec.decodeText(value, TickEvent.class);
 
     runtime.sendEvent(event);
 
@@ -122,7 +122,7 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
       for (val newEvent : newEvents) {
         val data = newEvent.getUnderlying();
         val event = new AlertEvent(new DateTime(), data);
-        val value = Codec.encode(event);
+        val value = Codec.encodeText(event);
 
         collector.emit(new Values(KAFKA_TOPIC_KEY, value));
       }
@@ -140,14 +140,14 @@ public class ComputeBolt extends BaseRichBolt implements UpdateListener {
   private List<Alert> getAlerts(Map<?, ?> conf) {
     val value = (String) conf.get(ALERTS_CONFIG_KEY);
 
-    return Codec.decode(value, new TypeReference<ArrayList<Alert>>() {});
+    return Codec.decodeText(value, new TypeReference<ArrayList<Alert>>() {});
   }
 
   @SneakyThrows
   private List<Metric> getMetrics(Map<?, ?> conf) {
     val value = (String) conf.get(METRICS_CONFIG_KEY);
 
-    return Codec.decode(value, new TypeReference<ArrayList<Metric>>() {});
+    return Codec.decodeText(value, new TypeReference<ArrayList<Metric>>() {});
   }
 
 }

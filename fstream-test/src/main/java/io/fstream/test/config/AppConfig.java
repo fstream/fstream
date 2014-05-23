@@ -9,34 +9,24 @@
 
 package io.fstream.test.config;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import lombok.val;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Properties;
-import java.util.concurrent.Executors;
 
-import kafka.admin.AdminUtils;
-import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerConfig;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import lombok.SneakyThrows;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.I0Itec.zkclient.ZkClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-
-import com.google.common.collect.ImmutableMap;
+import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
@@ -46,28 +36,28 @@ public class AppConfig {
 
   @Value("${zk.connect}")
   private String zkConnect;
-  
+
   @Bean
   @SneakyThrows
   public File tmp() {
     System.out.println(zkConnect);
-   val tmp = Files.createTempDirectory("fstream-test").toFile();
-   log.info("Testing storage: {}", tmp);
-   
-   return tmp;
+    val tmp = Files.createTempDirectory("fstream-test").toFile();
+    log.info("Testing storage: {}", tmp);
+
+    return tmp;
   }
-  
+
   @Bean
   public EmbeddedHBase embeddedHbase() {
     return new EmbeddedHBase(zkConnect);
   }
-  
+
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
     return new EmbeddedKafka(zkConnect);
   }
-  
+
   @PostConstruct
   public void init() {
     log.info("> Starting embedded ZooKeeper...");
@@ -78,7 +68,7 @@ public class AppConfig {
     embeddedKafka().startAndWait();
     log.info("< Started embedded Kafka");
   }
-  
+
   @PreDestroy
   public void destroy() {
     log.info("> Stopping embedded Kafka...");
@@ -90,45 +80,4 @@ public class AppConfig {
     log.info("Stopped embedded ZooKeeper");
   }
 
-  @SuppressWarnings("unused")
-  private void registerConsumer() {
-    val props = new Properties();
-    props.put("zookeeper.connect", zkConnect);
-    props.put("zookeeper.connection.timeout.ms", "1000000");
-    props.put("group.id", "1");
-    props.put("broker.id", "0");
-
-    val consumerConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-
-    val count = 1;
-    val definition = ImmutableMap.of("rates", count);
-    val topicMessageStreams = consumerConnector.createMessageStreams(definition);
-    val streams = topicMessageStreams.get("rates");
-    val executor = Executors.newFixedThreadPool(count);
-
-    for (val stream : streams) {
-      executor.submit(new Runnable() {
-
-        @Override
-        public void run() {
-          for (val event : stream) {
-            log.info("Received message: {}", new String(event.message()));
-          }
-        }
-
-      });
-    }
-  }
-
-  @SuppressWarnings("unused")
-  private void createTopic() {
-    val zkClient = new ZkClient(zkConnect);
-    Properties props = new Properties();
-    String topic = "rates";
-    int partitions = 1;
-    int replicationFactor = 1;
-    AdminUtils.createTopic(zkClient, topic, partitions, replicationFactor, props);
-    zkClient.close();
-  }
-  
 }

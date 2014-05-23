@@ -9,7 +9,7 @@
 
 package io.fstream.rates.config;
 
-import static io.fstream.rates.util.PropertiesComponents.newPropertiesComponent;
+import static io.fstream.rates.camel.PropertiesComponents.newPropertiesComponent;
 import io.fstream.core.model.event.TickEvent;
 import io.fstream.rates.handler.TickEventTypeConverter;
 

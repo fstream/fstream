@@ -19,11 +19,15 @@ zk:
 kafka:
    host: localhost
    port: 6667
+   producerProperties:
+      partitioner.class: kafka.producer.DefaultPartitioner
+      #serializer.class: kafka.serializer.DefaultEncoder
+      serializer.class: kafka.serializer.StringEncoder
 
 # fStream
 fstream:
    broker:
-      uri: kafka:${kafka.host}:${kafka.port}?topic=rates&groupId=1&zookeeperHost=${zk.host}&zookeeperPort=${zk.port}&partitioner=kafka.producer.DefaultPartitioner
+      uri: kafka:${kafka.host}:${kafka.port}?topic=rates&groupId=1&zookeeperHost=${zk.host}&zookeeperPort=${zk.port}&partitioner=${kafka.producerProperties.partitioner.class}&serializerClass=${kafka.producerProperties.serializer.class}
 
 # FIX
 fix:

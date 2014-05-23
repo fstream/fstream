@@ -56,8 +56,8 @@ public final class StormFactory {
     config.setDebug(true);
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties);
     config.put(KafkaBolt.TOPIC, ALERTS_TOPIC_NAME);
-    config.put(ComputeBolt.ALERTS_CONFIG_KEY, Codec.encode(alerts));
-    config.put(ComputeBolt.METRICS_CONFIG_KEY, Codec.encode(metrics));
+    config.put(ComputeBolt.ALERTS_CONFIG_KEY, Codec.encodeText(alerts));
+    config.put(ComputeBolt.METRICS_CONFIG_KEY, Codec.encodeText(metrics));
 
     if (local) {
       config.setMaxTaskParallelism(3);

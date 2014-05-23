@@ -11,7 +11,7 @@
 package io.fstream.rates.routes;
 
 import io.fstream.core.model.event.TickEvent;
-import io.fstream.rates.util.CodecDataFormat;
+import io.fstream.rates.camel.CodecDataFormat;
 import lombok.Setter;
 import lombok.val;
 

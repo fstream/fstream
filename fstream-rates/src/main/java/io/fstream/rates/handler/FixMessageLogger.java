@@ -9,7 +9,7 @@
 
 package io.fstream.rates.handler;
 
-import static io.fstream.rates.util.Messages.formatMessage;
+import static io.fstream.rates.fix.Messages.formatMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.camel.Body;

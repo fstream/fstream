@@ -14,22 +14,19 @@ dependencies {
   compile project(':fstream-core')
   
   // Spring
-  compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+  compile libraries.springBootActuator
+
+    // Camel
   compile("org.apache.camel:camel-spring-javaconfig:$camelVersion") {
     exclude group: 'org.springframework'
   }
+  compile "org.apache.camel:camel-core:$camelVersion"
+  compile "org.apache.camel:camel-quickfix:$camelVersion"
+  compile "org.apache.camel:camel-kafka:$camelVersion"
   
   // QuickFIX/J 
   compile 'quickfixj:quickfixj-all:1.5.3'
   compile 'org.apache.mina:mina-filter-ssl:1.1.7'
-  
-  // Camel
-  compile "org.apache.camel:camel-core:$camelVersion"
-  
-  // Camel endpoints
-  compile "org.apache.camel:camel-quickfix:$camelVersion"
-  compile "org.apache.camel:camel-kafka:$camelVersion"
-  compile "org.apache.camel:camel-jackson:$camelVersion"
   
   // Zookeeper
   compile libraries.curator

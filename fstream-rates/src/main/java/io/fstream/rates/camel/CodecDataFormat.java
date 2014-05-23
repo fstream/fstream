@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.util;
+package io.fstream.rates.camel;
 
 import io.fstream.core.model.event.TickEvent;
 import io.fstream.core.util.Codec;
@@ -22,12 +22,12 @@ public class CodecDataFormat implements DataFormat {
 
   @Override
   public void marshal(Exchange exchange, Object graph, OutputStream stream) throws Exception {
-    Codec.encode(stream, graph);
+    Codec.encodeBytes(stream, graph);
   }
 
   @Override
   public Object unmarshal(Exchange exchange, InputStream stream) throws Exception {
-    return Codec.decode(stream, TickEvent.class);
+    return Codec.decodeBytes(stream, TickEvent.class);
   }
 
 }

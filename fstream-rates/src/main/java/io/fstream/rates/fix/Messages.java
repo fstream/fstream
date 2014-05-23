@@ -7,9 +7,9 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.util;
+package io.fstream.rates.fix;
 
-import static io.fstream.rates.util.Sessions.getSession;
+import static io.fstream.rates.fix.Sessions.getSession;
 import static lombok.AccessLevel.PRIVATE;
 import lombok.NoArgsConstructor;
 import lombok.val;

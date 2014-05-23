@@ -7,21 +7,15 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.util;
+package io.fstream.rates.camel;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static lombok.AccessLevel.PRIVATE;
-
-import java.util.Properties;
-
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.component.properties.PropertiesComponent;
-import org.apache.camel.component.properties.PropertiesResolver;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
@@ -50,32 +44,6 @@ public final class PropertiesComponents {
     component.setPropertiesResolver(new EnvironmentPropertiesResolver(environment));
 
     return component;
-  }
-
-  @RequiredArgsConstructor
-  private static final class EnvironmentPropertiesResolver implements PropertiesResolver {
-
-    @NonNull
-    private final Environment environment;
-
-    @Override
-    public Properties resolveProperties(CamelContext context, boolean ignoreMissingLocation, String... names)
-        throws Exception {
-      return new Properties() {
-
-        @Override
-        public String getProperty(String key) {
-          return environment.getProperty(key);
-        }
-
-        @Override
-        public String getProperty(String key, String defaultValue) {
-          return environment.getProperty(key, defaultValue);
-        }
-
-      };
-    }
-
   }
 
 }

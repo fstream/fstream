@@ -27,33 +27,38 @@ public final class Codec {
   private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JodaModule());
 
   @SneakyThrows
-  public static <T> String encode(T value) {
+  public static <T> String encodeText(T value) {
     return MAPPER.writeValueAsString(value);
   }
 
   @SneakyThrows
-  public static <T> void encode(OutputStream stream, T value) {
+  public static <T> void encodeText(OutputStream stream, T value) {
     MAPPER.writeValue(stream, value);
   }
 
   @SneakyThrows
-  public static <T> T decode(String text, Class<T> type) {
+  public static <T> T decodeText(String text, Class<T> type) {
     return MAPPER.readValue(text, type);
   }
 
   @SneakyThrows
-  public static <T> T decode(InputStream stream, Class<T> type) {
+  public static <T> T decodeText(String text, TypeReference<T> type) {
+    return MAPPER.readValue(text, type);
+  }
+
+  @SneakyThrows
+  public static <T> T decodeText(InputStream stream, Class<T> type) {
     return MAPPER.readValue(stream, type);
-  }
-
-  @SneakyThrows
-  public static <T> T decode(String text, TypeReference<T> type) {
-    return MAPPER.readValue(text, type);
   }
 
   @SneakyThrows
   public static <T> byte[] encodeBytes(T value) {
     return MAPPER.writeValueAsBytes(value);
+  }
+
+  @SneakyThrows
+  public static <T> void encodeBytes(OutputStream stream, T value) {
+    MAPPER.writeValue(stream, value);
   }
 
   @SneakyThrows
@@ -64,6 +69,11 @@ public final class Codec {
   @SneakyThrows
   public static <T> T decodeBytes(byte[] bytes, TypeReference<T> type) {
     return MAPPER.readValue(bytes, type);
+  }
+
+  @SneakyThrows
+  public static <T> T decodeBytes(InputStream stream, Class<T> type) {
+    return MAPPER.readValue(stream, type);
   }
 
 }
