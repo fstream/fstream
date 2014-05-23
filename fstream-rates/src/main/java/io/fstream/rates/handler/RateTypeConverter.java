@@ -54,9 +54,9 @@ public class RateTypeConverter extends TypeConverterSupport {
 
       val entryType = group.getMDEntryType().getValue();
       if (entryType == MDEntryType.BID) {
-        rate.setBid(group.getDecimal(MDEntryPx.FIELD));
+        rate.setBid((float) group.getDouble(MDEntryPx.FIELD));
       } else if (entryType == MDEntryType.OFFER) {
-        rate.setAsk(group.getDecimal(MDEntryPx.FIELD));
+        rate.setAsk((float) group.getDouble(MDEntryPx.FIELD));
       }
     }
 

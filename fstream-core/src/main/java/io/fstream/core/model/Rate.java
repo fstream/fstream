@@ -10,7 +10,6 @@
 package io.fstream.core.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +24,7 @@ public class Rate implements Serializable {
 
   DateTime dateTime;
   String symbol;
-  BigDecimal ask;
-  BigDecimal bid;
+  float ask;
+  float bid;
 
 }

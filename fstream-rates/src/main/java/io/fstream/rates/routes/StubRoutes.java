@@ -12,9 +12,6 @@ package io.fstream.rates.routes;
 
 import static org.apache.camel.model.dataformat.JsonLibrary.Jackson;
 import io.fstream.core.model.Rate;
-
-import java.math.BigDecimal;
-
 import lombok.Setter;
 import lombok.val;
 
@@ -41,7 +38,7 @@ public class StubRoutes extends RouteBuilder {
         
         @Override
         public void process(Exchange exchange) throws Exception {
-          val rate = new Rate(new DateTime(), "EUR/USD", new BigDecimal(ask+=2), new BigDecimal(bid+=1));
+          val rate = new Rate(new DateTime(), "EUR/USD", ask+=2, bid+=1);
           
           exchange.getOut().setBody(rate);
         }

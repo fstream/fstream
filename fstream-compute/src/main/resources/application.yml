@@ -42,5 +42,16 @@ esper:
            CAST(ask, float) / CAST(prior(1, ask), float) AS askPercentChange
         FROM
            Rate
-        WHERE 
-        	CAST(ask, float) / CAST(prior(1, ask), float) > 1.0001
+        WHERE
+           CAST(ask, float) / CAST(prior(1, ask), float) > 1.0001
+        
+      # Simple count
+      - |
+        CONTEXT SegmentedBySymbol
+        SELECT
+            COUNT(ask) AS count,
+            AVG(ask)   AS avgAsk,
+            MIN(ask)   AS minAsk,
+            MAX(ask)   AS maxAsk
+        FROM
+            Rate.win:time_batch(5 sec)
