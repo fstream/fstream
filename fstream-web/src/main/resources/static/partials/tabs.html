@@ -1,26 +1,26 @@
-<div class="view-container" ng-controller="chartController" ng-disabled="!connected">
+<div class="view-container" ng-disabled="!connected">
 	<!-- Nav tabs -->
-	<ul class="nav nav-tabs">
-		<li class="active"><a href="#charts" data-toggle="tab">Charts</a></li>
-		<li><a href="#commands" data-toggle="tab">Commands</a></li>
-		<li><a href="#rates" data-toggle="tab">Rates</a></li>
-		<li><a href="#alerts" data-toggle="tab">Alerts</a></li>
-	</ul>
-
-	<!-- Tab panes -->
-	<div class="tab-content">
-		<div class="tab-pane active" id="charts">
-			<div id="charts-container"></div>
-		</div>
-		<div class="tab-pane" id="commands"></div>
-		<div class="tab-pane" id="rates"></div>
-		<div class="tab-pane" id="alerts" ng-controller="alertController">
+	<tabset>
+       <tab heading="Charts" >
+       	  <div id="charts" ng-controller="chartController">
+       	  	<div id="chart-container"></div>
+       	  </div>
+       </tab>
+       <tab heading="Commands">
+          <div id="commands"></div>
+       </tab>
+       <tab heading="Rates">
+          <div id="rates"></div>
+       </tab>
+       <tab heading="Alerts">
+          <div id="alerts">
 			<table ng-table="tableParams" show-filter="true" class="table">
 				<tr ng-repeat="alert in $data">
 					<td data-title="'Time'">{{ alert.dateTime }}</td>
 					<td data-title="'Message'" filter="{ 'message': 'text' }">{{ alert.message }}</td>
 				</tr>
-			</table>
-		</div>
-	</div>
+			</table>       
+          </div>
+       </tab>
+    </tabset>
 </div>

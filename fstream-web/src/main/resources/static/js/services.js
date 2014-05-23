@@ -77,7 +77,7 @@ factory('chartService', function($rootScope) {
 				
 				chart : {
 					type: 'spline',
-					renderTo: 'charts-container',
+					renderTo: 'chart-container',
 					events : {
 						load : function() {
 							series = this.series;

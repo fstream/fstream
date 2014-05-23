@@ -15,10 +15,15 @@ zk:
    host: localhost
    connect: ${zk.host}:${zk.port}
 
+# Kafka
+kafka:
+   host: localhost
+   port: 6667
+
 # fStream
 fstream:
    broker:
-      uri: kafka:localhost:6667?topic=rates&groupId=1&zookeeperHost=${zk.host}&zookeeperPort=${zk.port}&partitioner=kafka.producer.DefaultPartitioner
+      uri: kafka:${kafka.host}:${kafka.port}?topic=rates&groupId=1&zookeeperHost=${zk.host}&zookeeperPort=${zk.port}&partitioner=kafka.producer.DefaultPartitioner
 
 # OANDA
 rates:
@@ -30,71 +35,71 @@ rates:
      - EUR/JPY 
      - AUD/JPY     
 
-# Stubbed (effectively commented out), but validated instrumets
-stub.rates:
-  symbols:
-     - AUD/CAD
-     - AUD/CHF
-     - AUD/HKD
-     - AUD/JPY
-     - AUD/NZD
-     - AUD/SGD
-     - AUD/USD
+# Stubbed (effectively commented out), but validated instruments
+#rates:
+#  symbols:
+#     - AUD/CAD
+#     - AUD/CHF
+#     - AUD/HKD
+#     - AUD/JPY
+#     - AUD/NZD
+#     - AUD/SGD
+#     - AUD/USD
 #     - Brent Crude Oil
-     - CAD/CHF
-     - CAD/HKD
-     - CAD/JPY
-     - CAD/SGD
-     - CHF/HKD
-     - CHF/JPY
+#     - CAD/CHF
+#     - CAD/HKD
+#     - CAD/JPY
+#     - CAD/SGD
+#     - CHF/HKD
+#     - CHF/JPY
 #     - CHF/USD
-     - CHF/ZAR
+#     - CHF/ZAR
 #     - Corn
 #     - German 30 Index
-     - EUR/AUD
-     - EUR/CAD
-     - EUR/CHF
-     - EUR/CZK
-     - EUR/DKK
-     - EUR/GBP
-     - EUR/HKD
-     - EUR/HUF
-     - EUR/JPY
-     - EUR/NOK
-     - EUR/NZD
-     - EUR/PLN
-     - EUR/SEK
-     - EUR/SGD
-     - EUR/TRY
-     - EUR/USD
-     - EUR/ZAR
-     - GBP/AUD
-     - GBP/CAD
-     - GBP/CHF
-     - GBP/HKD
-     - GBP/JPY
-     - GBP/NZD
-     - GBP/PLN
-     - GBP/SGD
-     - GBP/USD
-     - GBP/ZAR
-     
+#     - EUR/AUD
+#     - EUR/CAD
+#     - EUR/CHF
+#     - EUR/CZK
+#     - EUR/DKK
+#     - EUR/GBP
+#     - EUR/HKD
+#     - EUR/HUF
+#     - EUR/JPY
+#     - EUR/NOK
+#     - EUR/NZD
+#     - EUR/PLN
+#     - EUR/SEK
+#     - EUR/SGD
+#     - EUR/TRY
+#     - EUR/USD
+#     - EUR/ZAR
+#     - GBP/AUD
+#     - GBP/CAD
+#     - GBP/CHF
+#     - GBP/HKD
+#     - GBP/JPY
+#     - GBP/NZD
+#     - GBP/PLN
+#     - GBP/SGD
+#     - GBP/USD
+#     - GBP/ZAR
+#     
 #     - Hang Seng 33 Index
-     - HKD/JPY
+#     - HKD/JPY
 #     - Nikkei 225 Index
 #     - JPY/USD
 #     - Nasdaq 100 Index
-     - NZD/CAD
-     - NZD/CHF
-     - NZD/HKD
-     - NZD/JPY
-     - NZD/SGD
-     - NZD/USD
-     - SGD/CHF
-     - SGD/HKD
-     - SGD/JPY
+#     - NZD/CAD
+#     - NZD/CHF
+#     - NZD/HKD
+#     - NZD/JPY
+#     - NZD/SGD
+#     - NZD/USD
+#     - SGD/CHF
+#     - SGD/HKD
+#     - SGD/JPY
 #     - S&P 500 Index
-     - TRY/JPY
+#     - TRY/JPY
 #     - FTSE 100 Index
 #     - Dow Jones 30 Index
 #     - USD/AUD
@@ -108,7 +113,7 @@ stub.rates:
 #     - USD/HKD
 #     - USD/HUF
 #     - USD/INR
-     - USD/JPY
+#     - USD/JPY
 #     - USD/MXN
 #     - USD/NOK
 #     - USD/PLN
@@ -120,28 +125,28 @@ stub.rates:
 #     - USD/TWD
 #     - USD/ZAR
 #     - Wheat
-
-     - XAG/AUD
-     - XAG/CAD
-     - XAG/CHF
-     - XAG/EUR
-     - XAG/GBP
-     - XAG/HKD
-     - XAG/JPY
-     - XAG/NZD
-     - XAG/SGD
-     - XAG/USD
-     - XAU/AUD
-     - XAU/CAD
-     - XAU/CHF
-     - XAU/EUR
-     - XAU/GBP
-     - XAU/HKD
-     - XAU/JPY
-     - XAU/NZD
-     - XAU/SGD
-     - XAU/USD
-     - XAU/XAG
+#
+#     - XAG/AUD
+#     - XAG/CAD
+#     - XAG/CHF
+#     - XAG/EUR
+#     - XAG/GBP
+#     - XAG/HKD
+#     - XAG/JPY
+#     - XAG/NZD
+#     - XAG/SGD
+#     - XAG/USD
+#     - XAU/AUD
+#     - XAU/CAD
+#     - XAU/CHF
+#     - XAU/EUR
+#     - XAU/GBP
+#     - XAU/HKD
+#     - XAU/JPY
+#     - XAU/NZD
+#     - XAU/SGD
+#     - XAU/USD
+#     - XAU/XAG
 #     - XPD/USD
 #     - XPT/USD
 #     - XXX/AUD
@@ -153,4 +158,4 @@ stub.rates:
 #     - XXX/JPY
 #     - XXX/SGD
 #     - XXX/USD
-     - ZAR/JPY
+#     - ZAR/JPY

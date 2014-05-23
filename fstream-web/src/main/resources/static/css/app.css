@@ -25,58 +25,7 @@
  */
 
 #charts {
-	position: relative;
 }
 
-.horizon {
-    border-bottom: solid 1px black;
-    overflow: hidden;
-    border-top: solid 1px black;
-    position: relative;
-}
-.horizon + .horizon {
-    border-top: none;
-}
-.horizon .title,
-.horizon .value {
-    bottom: 0;
-    line-height: 30px;
-    margin: 0 6px;
-    position: absolute;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    white-space: nowrap;
-}
-
-.horizon .title {
-    left: 0;
-}
-
-.horizon .value {
-    right: 0;
-}
-
-.horizon canvas {
-    display: block;
-}
-
-.axis {
-    font: 10px sans-serif;
-}
-
-.axis text {
-    transition: fill-opacity 250ms linear;
-}
-
-.axis path {
-    display: none;
-}
-
-.line {
-    background: black;
-    opacity: 0.2;
-    z-index: 2;
-}
-.axis .line {
-    stroke: black;
-    shape-rendering: crispEdges;
+#chart-container {
 }
