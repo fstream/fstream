@@ -7,7 +7,10 @@
  * Proprietary and confidential.
  */
 
-apply plugin: 'spring-boot'
+// Can't use Boot's nested jar packagin due to the way Hadoop's Server loads web.xml
+apply plugin:'application'
+
+mainClassName = "io.fstream.test.Main"
 
 dependencies {
   // Spring

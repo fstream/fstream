@@ -14,31 +14,48 @@ import java.io.File;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.curator.test.TestingServer;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 
+@Slf4j
 @RequiredArgsConstructor
 public class EmbeddedZooKeeper extends AbstractIdleService {
 
+  /**
+   * Configuration.
+   */
   @NonNull
-  private final File snapDir;
+  private final String zkConnect;
   @NonNull
-  private final File logDir;
+  private final File tempDir;
 
+  /**
+   * State.
+   */
   private TestingServer server;
 
   @Override
   protected void startUp() throws Exception {
-    val clientPort = 21812; // non-standard
+    val clientPort = getZkClientPort();
 
-    server = new TestingServer(clientPort, snapDir);
+    log.info("Starting testing server...");
+    server = new TestingServer(clientPort, tempDir);
+    log.info("Finished starting testing server");
   }
 
   @Override
   protected void shutDown() throws Exception {
+    log.info("Stopping testing server...");
     server.stop();
+    log.info("Finished topting testing server");
+  }
+
+  private int getZkClientPort() {
+    log.info("Parsing client port with zkConnect = '{}'", zkConnect);
+    return Integer.valueOf(zkConnect.split(":")[1]);
   }
 
 }

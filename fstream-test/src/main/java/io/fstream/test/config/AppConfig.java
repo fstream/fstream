@@ -59,9 +59,9 @@ public class AppConfig {
 
   @PostConstruct
   public void init() {
-    log.info("> Starting embedded ZooKeeper...");
+    log.info("> Starting embedded HBase...");
     embeddedHbase().startAndWait();
-    log.info("< Started embedded ZooKeeper");
+    log.info("< Started embedded HBase");
 
     log.info("> Starting embedded Kafka...");
     embeddedKafka().startAndWait();
@@ -74,9 +74,9 @@ public class AppConfig {
     embeddedKafka().stopAndWait();
     log.info("< Stopped embedded Kafka");
 
-    log.info("Stopping embedded ZooKeeper...");
+    log.info("> Stopping embedded HBase...");
     embeddedHbase().stopAndWait();
-    log.info("Stopped embedded ZooKeeper");
+    log.info("< Stopped embedded HBase");
   }
 
 }

@@ -48,7 +48,7 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
   /**
    * Configuration keys.
    */
-  public static final String STATEMENTS_CONFIG_KEY = "io.fstream.alerts";
+  public static final String STATEMENTS_CONFIG_KEY = EsperBolt.class.getName();
 
   /**
    * Esper.

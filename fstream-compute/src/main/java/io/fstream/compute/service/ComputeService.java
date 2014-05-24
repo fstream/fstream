@@ -9,10 +9,7 @@
 
 package io.fstream.compute.service;
 
-import io.fstream.compute.config.ComputeProperties;
-import io.fstream.compute.config.KafkaProperties;
 import io.fstream.compute.config.StormProperties;
-import io.fstream.compute.factory.StormFactory;
 
 import javax.annotation.PostConstruct;
 
@@ -23,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.thrift7.TException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import backtype.storm.Config;
@@ -53,23 +49,22 @@ public class ComputeService {
   /**
    * Configuration.
    */
-  @Value("${zk.connect}")
-  private String zkConnect;
   @Autowired
   private StormProperties stormProperties;
+
+  /**
+   * Dependencies.
+   */
   @Autowired
-  private KafkaProperties kafkaProperties;
-  @Autowired
-  private ComputeProperties computeProperties;
+  private StormService stormService;
 
   @PostConstruct
   public void execute() throws Exception {
     // Setup
-    val local = stormProperties.isLocal();
-    val topology = StormFactory.newStormTopology(zkConnect);
-    val config = StormFactory.newStormConfig(local, kafkaProperties, computeProperties);
+    val topology = stormService.createTopology();
+    val config = stormService.createConfig();
 
-    if (local) {
+    if (stormProperties.isLocal()) {
       executeLocal(topology, config);
     } else {
       executeCluster(topology, config);
@@ -81,7 +76,7 @@ public class ComputeService {
     val cluster = new LocalCluster();
     cluster.submitTopology(TOPOLOGY_NAME, config, topology);
 
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+    onShutdown(new Runnable() {
 
       @Override
       public void run() {
@@ -98,7 +93,7 @@ public class ComputeService {
     log.info("Submitting cluster topology '{}'...", TOPOLOGY_NAME);
     StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
 
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+    onShutdown(new Runnable() {
 
       @Override
       @SneakyThrows
@@ -116,6 +111,10 @@ public class ComputeService {
     log.info("Killing topology '{}'", name);
     client.killTopologyWithOpts(name, killOpts);
     log.info("Killed topology '{}'.", name);
+  }
+
+  private static void onShutdown(Runnable runnable) {
+    Runtime.getRuntime().addShutdownHook(new Thread(runnable));
   }
 
 }
