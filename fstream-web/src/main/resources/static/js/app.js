@@ -4,3 +4,6 @@ angular.module('FStreamApp', [
   'FStreamApp.services',
   'ui.bootstrap',
 ]);
+angular.module('FStreamApp.controllers', ['ngTable']);
+angular.module('FStreamApp.services', []);
+angular.module('FStreamApp.directives', []);
