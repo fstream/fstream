@@ -149,7 +149,7 @@ factory('chartService', function($rootScope) {
     	
 		addAlert: function(alert) {
 			series[2].addPoint({
-				x: new Date().getTime(),
+				x: alert.dateTime,
 				title: 'Alert',
 				text: angular.toJson(alert)
 			}, true, false);
