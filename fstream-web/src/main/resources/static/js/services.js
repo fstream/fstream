@@ -65,6 +65,7 @@ factory('chartService', function($rootScope) {
 	
 	var chart,
 	    size = 50,
+	    enabled = true,
 	    series;
 
 	return {
@@ -144,7 +145,7 @@ factory('chartService', function($rootScope) {
     		var shift = series[0].data.length >= size,
     		    animate = false;
     		series[0].addPoint([rate.dateTime, rate.ask], false, shift, animate);
-    		series[1].addPoint([rate.dateTime, rate.bid], true, shift, animate);
+    		series[1].addPoint([rate.dateTime, rate.bid], enabled, shift, animate);
     	},
     	
 		addAlert: function(alert) {
@@ -152,7 +153,18 @@ factory('chartService', function($rootScope) {
 				x: alert.dateTime,
 				title: 'Alert',
 				text: angular.toJson(alert, true)
-			}, true, false);
+			}, enabled, false);
+		},
+		
+		enable: function () {
+			if (!enabled) {
+				enabled = true;
+				chart.redraw();
+			} 
+		},
+		
+		disable: function () {
+			enabled = false;
 		}
     };	
 });

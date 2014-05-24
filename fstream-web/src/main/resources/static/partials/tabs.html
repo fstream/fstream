@@ -1,8 +1,8 @@
 <div class="view-container" ng-disabled="!connected">
 	<!-- Nav tabs -->
 	<tabset>
-       <tab heading="Charts" >
-       	  <div id="charts" ng-controller="chartController">
+       <tab heading="Charts" select="enableChart()" deselect="disableChart()" ng-controller="chartController">
+       	  <div id="charts">
        	  	<div id="chart-container"></div>
        	  </div>
        </tab>

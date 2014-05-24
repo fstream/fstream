@@ -57,6 +57,9 @@ controller('chartController', function($scope, $timeout, chartService) {
 	$timeout(function(){
 		chartService.init();
 	});
+	
+	$scope.enableChart = chartService.enable;
+	$scope.disableChart = chartService.disable;
 }).
 controller('alertController', function($scope, $filter, ngTableParams) {
     var alerts = [];
@@ -78,13 +81,13 @@ controller('alertController', function($scope, $filter, ngTableParams) {
         total: alerts.length, // length of data
         getData: function($defer, params) {
             // use build-in angular filter
-            var orderedData = params.filter() ?
+            var orderdAlerts = params.filter() ?
                    $filter('filter')(alerts, params.filter()) :
             	   alerts;
 
-            $scope.alerts = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count());
+            $scope.alerts = orderdAlerts.slice((params.page() - 1) * params.count(), params.page() * params.count());
 
-            params.total(orderedData.length); // set total for recalc pagination
+            params.total(orderdAlerts.length); // set total for recalc pagination
             $defer.resolve($scope.alerts);
         }
     });	
