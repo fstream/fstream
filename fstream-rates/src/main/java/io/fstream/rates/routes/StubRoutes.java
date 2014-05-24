@@ -20,12 +20,13 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 
 /**
  * Stub route definitions for OANDA FIX handling.
  */
 @Setter
-// @Component
+@Component
 public class StubRoutes extends RouteBuilder {
 
   @Override
@@ -33,12 +34,14 @@ public class StubRoutes extends RouteBuilder {
     from("timer://rates?period=1000")
       .process(new Processor() {
         
-        int bid = 1;
-        int ask = 1;
+        float bid = 1.0f;
+        float ask = 1.0f;
         
         @Override
         public void process(Exchange exchange) throws Exception {
-          val event = new TickEvent(new DateTime(), "EUR/USD", ask+=2, bid+=1);
+          ask = (float)Math.random()+1;
+          bid = ask - 0.001f;
+          val event = new TickEvent(new DateTime(), "EUR/USD", ask, bid);
           
           exchange.getOut().setBody(event);
         }
