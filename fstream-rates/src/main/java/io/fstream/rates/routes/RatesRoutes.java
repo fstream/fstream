@@ -14,11 +14,13 @@ import io.fstream.core.model.event.TickEvent;
 import io.fstream.rates.camel.CodecDataFormat;
 
 import org.apache.camel.component.kafka.KafkaConstants;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
  * Route definitions for FIX handling.
  */
+@Profile("!simulation")
 @Component
 public class RatesRoutes extends AbstractFixRoutes {
   
