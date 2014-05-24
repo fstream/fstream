@@ -7,17 +7,17 @@
        	  </div>
        </tab>
        <tab heading="Commands">
-          <div id="commands"></div>
+          <div id="commands"><pre ng-repeat="command in commands">{{ command | json }}</pre></div>
        </tab>
        <tab heading="Rates">
-          <div id="rates"></div>
+          <div id="rates"><pre ng-repeat="rate in rates">{{ rate | json }}</pre></div>
        </tab>
        <tab heading="Alerts">
           <div id="alerts" ng-controller="alertController">
 			<table ng-table="tableParams" show-filter="true" class="table">
-				<tr ng-repeat="alert in $data">
+				<tr ng-repeat="alert in alerts">
 					<td data-title="'Time'">{{ alert.dateTime | date:'yyyy-MM-dd HH:mm:ss Z' }}</td>
-					<td data-title="'Data'" filter="{ 'data': 'text' }"><code>{{ alert.data }}</code></td>
+					<td data-title="'Data'" filter="{ 'data': 'text' }"><pre>{{ alert.data | json }}</pre></td>
 				</tr>
 			</table>       
           </div>

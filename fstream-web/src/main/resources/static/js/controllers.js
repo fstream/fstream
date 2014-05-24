@@ -5,27 +5,13 @@ controller('ratesController', function($scope, $http, ratesService, chartService
 	$http.get('/config').success(function(data) {
 	  $scope.instruments = data;
 	});
-	
-	//
-	// Private
-	//
-	
-	var 
-		setConnected = function setConnected(connected) {
-			$('#commands').html('');
-			$('#rates').html('');
-		}, 
-		createElement = function(message) {
-		    var p = document.createElement('code');
-		    p.style.wordWrap = 'break-word';
-		    p.style.display = 'block'
-		    p.appendChild(document.createTextNode(angular.toJson(message)));
-		    
-		    return p;
-		}
-	
-		
+
+	// Initialize
 	$scope.connected = false;
+	$scope.rates = [];
+	$scope.alerts = [];
+	$scope.commands = [];
+	$scope.instruments = [];
 		
 	//
 	// Methods
@@ -48,30 +34,29 @@ controller('ratesController', function($scope, $http, ratesService, chartService
 	
 	$scope.$on('connected', function(e) {
 		$scope.connected = true;
-
-		setConnected(true);
+		$scope.rates = [];
+		$scope.alerts = [];
+		$scope.commands = [];
 	});
 	$scope.$on('disconnected', function(e) {
 		$scope.connected = false;
-		
-        setConnected(false);
 	});
     $scope.$on('rate', function(e, rate) {
-    	$('#rates').append(createElement(rate));
+    	$scope.rates.unshift(rate);
         chartService.addRate(rate);
     });
     $scope.$on('alert', function(e, alert) {
     	chartService.addAlert(alert);
     });
     $scope.$on('command', function(e, command) {
-    	$('#commands').append(createElement(command));
+    	$scope.commands.unshift(command);
     });
     
 }).
 controller('chartController', function($scope, $timeout, chartService) {
 	$timeout(function(){
 		chartService.init();
-	}, 0);
+	});
 }).
 controller('alertController', function($scope, $filter, ngTableParams) {
     var alerts = [];
