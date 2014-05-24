@@ -64,11 +64,15 @@ factory('chartService', function($rootScope) {
 	});
 	
 	var size = 50, 
-	    data = [], 
+	    asks = [], 
+	    bids = [], 
 	    chart,
 	    series;
 	
-	while(size--) data.push(0);
+	while(size--) {
+		asks.push(0);
+		bids.push(0);
+	}
 	
 	return {
 		init: function() {
@@ -110,7 +114,6 @@ factory('chartService', function($rootScope) {
 				
 	            xAxis: {
 	                type: 'datetime',
-	                tickPixelInterval: 150
 	            },
 	            
 		        tooltip: {
@@ -121,11 +124,11 @@ factory('chartService', function($rootScope) {
 					id: 'Ask',
 					name : 'Ask',
 					step: true,
-					data : data
+					data : asks
 				}, {
 					name : 'Bid',
 					step: true,
-					data : data
+					data : bids
 				}, {
 					type: 'flags',
 					color: '#C12E2A',
@@ -145,8 +148,10 @@ factory('chartService', function($rootScope) {
 		},
 		
     	addRate: function(rate) {
-    		series[0].addPoint([rate.dateTime, rate.ask], true, true);
-    		series[1].addPoint([rate.dateTime, rate.bid], true, true);
+    		var shift = true,
+    		    animate = false;
+    		series[0].addPoint([rate.dateTime, rate.ask], false, shift, animate);
+    		series[1].addPoint([rate.dateTime, rate.bid], true, shift, animate);
     	},
     	
 		addAlert: function(alert) {
