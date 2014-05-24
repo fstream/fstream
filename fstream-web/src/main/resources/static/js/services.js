@@ -63,17 +63,10 @@ factory('chartService', function($rootScope) {
 		}
 	});
 	
-	var size = 50, 
-	    asks = [], 
-	    bids = [], 
-	    chart,
+	var chart,
+	    size = 50,
 	    series;
-	
-	while(size--) {
-		asks.push(0);
-		bids.push(0);
-	}
-	
+
 	return {
 		init: function() {
 			// Create the chart
@@ -124,11 +117,11 @@ factory('chartService', function($rootScope) {
 					id: 'Ask',
 					name : 'Ask',
 					step: true,
-					data : asks
+					data : []
 				}, {
 					name : 'Bid',
 					step: true,
-					data : bids
+					data : []
 				}, {
 					type: 'flags',
 					color: '#C12E2A',
@@ -148,7 +141,7 @@ factory('chartService', function($rootScope) {
 		},
 		
     	addRate: function(rate) {
-    		var shift = true,
+    		var shift = series[0].data.length >= size,
     		    animate = false;
     		series[0].addPoint([rate.dateTime, rate.ask], false, shift, animate);
     		series[1].addPoint([rate.dateTime, rate.bid], true, shift, animate);
