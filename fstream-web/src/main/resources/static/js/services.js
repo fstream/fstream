@@ -80,7 +80,6 @@ factory('chartService', function($rootScope) {
 				},
 				
 				chart : {
-					type: 'spline',
 					renderTo: 'chart-container',
 					events : {
 						load : function() {
@@ -121,9 +120,11 @@ factory('chartService', function($rootScope) {
 				series : [{
 					id: 'Ask',
 					name : 'Ask',
+					step: true,
 					data : data
 				}, {
 					name : 'Bid',
+					step: true,
 					data : data
 				}, {
 					type: 'flags',
