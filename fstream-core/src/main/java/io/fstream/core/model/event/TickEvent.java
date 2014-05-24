@@ -27,5 +27,14 @@ public class TickEvent implements Event {
   String symbol;
   float ask;
   float bid;
+  float mid;
+
+  public TickEvent(DateTime dt, String symbol, float ask, float bid) {
+    this.dateTime = dt;
+    this.symbol = symbol;
+    this.ask = ask;
+    this.bid = bid;
+    this.mid = (ask + bid) / 2.0f;
+  }
 
 }
