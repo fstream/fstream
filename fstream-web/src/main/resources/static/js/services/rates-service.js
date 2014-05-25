@@ -1,9 +1,5 @@
 angular.module('FStreamApp.services').factory('ratesService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
 	
-	//
-	// Private
-	//
-	
 	var stompClient,
 		publishEvent = function (eventName, frame){
 			$timeout(function() {
@@ -13,10 +9,6 @@ angular.module('FStreamApp.services').factory('ratesService', ['$rootScope', '$t
 		};
  
 	return {
-		
-		//
-		// Methods
-		//
 		
 		connect: function() {
 			stompClient = Stomp.over(new SockJS('/server'));

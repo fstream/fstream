@@ -1,12 +1,13 @@
-angular.module('FStreamApp.controllers').controller('ratesController', function($scope, $http, ratesService, chartService) {
+angular.module('FStreamApp.controllers').controller('mainController', function($scope, configService, ratesService, chartService) {
 	
 	// Bootstrap configuration
-	$http.get('/config').success(function(data) {
-	  $scope.instruments = data;
+	configService.getConfig().then(function(instruments) {
+	  $scope.instruments = instruments;
 	});
 
 	// Initialize
 	$scope.connected = false;
+	$scope.instrument = 'EUR/USD';
 	$scope.rates = [];
 	$scope.alerts = [];
 	$scope.commands = [];
@@ -23,8 +24,7 @@ angular.module('FStreamApp.controllers').controller('ratesController', function(
 		ratesService.disconnect();
 	}
 	$scope.register = function() {
-	    var instrument = $('#instrument').val();
-		ratesService.register(instrument);
+		ratesService.register($scope.instrument);
 	}
 	
 	//
@@ -40,6 +40,7 @@ angular.module('FStreamApp.controllers').controller('ratesController', function(
 	$scope.$on('disconnected', function(e) {
 		$scope.connected = false;
 	});
+	
     $scope.$on('rate', function(e, rate) {
     	$scope.rates.unshift(rate);
         chartService.addRate(rate);
@@ -50,5 +51,4 @@ angular.module('FStreamApp.controllers').controller('ratesController', function(
     $scope.$on('command', function(e, command) {
     	$scope.commands.unshift(command);
     });
-    
 });
