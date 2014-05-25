@@ -10,7 +10,7 @@
          <button type="button" class="btn btn-success glyphicon glyphicon-off connect-button" id="connect" ng-show="!connected" ng-click="connect();"></button>
          <button type="button" class="btn btn-danger glyphicon glyphicon-off connect-button" id="disconnect" ng-show="connected" ng-click="disconnect();"></button>
 
-          <ui-select ng-model="$parent.instrument" ng-show="connected" theme="bootstrap" style="display: inline-block; width: 200px">
+          <ui-select ng-model="$parent.instrument" ng-show="connected" ng-change="register();" theme="bootstrap" style="display: inline-block; width: 200px">
             <ui-select-match placeholder="Select an instrument...">{{$select.selected}}</ui-select-match>
             <ui-select-choices repeat="item in instruments | filter: $select.search">
               <div ng-bind-html="item | highlight: $select.search"></div>
