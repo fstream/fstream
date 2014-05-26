@@ -25,10 +25,10 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
     execute(
         epl("SELECT ask FROM Rate"),
         givenEvents(
-            tickEvent(second("00:00:00"), "EUR/USD", 1.4, 1.3),
+            tickEvent(second("00:00:00"), "EUR/USD", 1.40, 1.30),
             timeEvent(second("00:00:01")),
             tickEvent(second("00:00:02"), "EUR/USD", 1.41, 1.31),
-            timeEvent(second("00:00:04"))
+            timeEvent(second("00:00:03"))
         ));
   }
 }

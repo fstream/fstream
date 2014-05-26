@@ -11,6 +11,7 @@ package io.stream.compute;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.readLines;
+import static joptsimple.internal.Strings.repeat;
 import static org.assertj.core.util.Lists.newArrayList;
 import io.fstream.core.model.event.TickEvent;
 
@@ -85,17 +86,22 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
   }
 
   protected List<?> execute(String statement, Iterable<?> events) {
+    log.info(repeat('-', 80));
     log.info("Executing: {}", statement);
+    log.info(repeat('-', 80));
     val epl = admin.createEPL(statement);
 
     epl.addListener(this);
     for (val event : events) {
+      log.info("Sending: {}", event);
       runtime.sendEvent(event);
     }
 
+    log.info(repeat('-', 80));
     for (val result : results) {
       log.info("Result: {}", result);
     }
+    log.info(repeat('-', 80));
 
     return results;
   }
