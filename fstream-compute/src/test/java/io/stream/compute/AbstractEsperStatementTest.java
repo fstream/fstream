@@ -22,6 +22,7 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.junit.After;
 import org.junit.Before;
 
@@ -135,6 +136,10 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
 
   protected static String epl(String epl) {
     return epl;
+  }
+
+  public static long second(String value) {
+    return DateTime.parse(value, DateTimeFormat.forPattern("HH:mm:ss")).getMillis();
   }
 
   protected static File eplFile(String fileName) {
