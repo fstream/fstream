@@ -35,6 +35,7 @@ import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
 import com.espertech.esper.client.time.CurrentTimeEvent;
+import com.espertech.esper.client.time.TimerControlEvent;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
@@ -69,6 +70,9 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
 
     this.runtime = provider.getEPRuntime();
     this.admin = provider.getEPAdministrator();
+
+    // Use "external clocking" for the test
+    runtime.sendEvent(new TimerControlEvent(TimerControlEvent.ClockType.CLOCK_EXTERNAL));
   }
 
   @SneakyThrows
@@ -94,6 +98,11 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     epl.addListener(this);
     for (val event : events) {
       log.info("Sending: {}", event);
+      if (event instanceof TickEvent) {
+        val tickEvent = (TickEvent) event;
+        runtime.sendEvent(timeEvent(tickEvent.getDateTime().getMillis()));
+      }
+
       runtime.sendEvent(event);
     }
 
@@ -140,11 +149,15 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     return ImmutableList.copyOf(events);
   }
 
+  protected static File givenEvents(File eventFile) {
+    return eventFile;
+  }
+
   protected static String epl(String epl) {
     return epl;
   }
 
-  public static long second(String value) {
+  protected static long second(String value) {
     return DateTime.parse(value, DateTimeFormat.forPattern("HH:mm:ss")).getMillis();
   }
 

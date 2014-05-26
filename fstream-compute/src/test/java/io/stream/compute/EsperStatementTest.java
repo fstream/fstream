@@ -17,7 +17,8 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
   public void testStatement1File() {
     execute(
         eplFile("statement1.epl"),
-        tickEventFile("tick-events1.json"));
+        givenEvents(
+        tickEventFile("tick-events1.json")));
   }
 
   @Test
@@ -28,7 +29,7 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
             tickEvent(second("00:00:00"), "EUR/USD", 1.40, 1.30),
             timeEvent(second("00:00:01")),
             tickEvent(second("00:00:02"), "EUR/USD", 1.41, 1.31),
-            timeEvent(second("00:00:03"))
-        ));
+            timeEvent(second("00:00:03"))));
   }
+
 }
