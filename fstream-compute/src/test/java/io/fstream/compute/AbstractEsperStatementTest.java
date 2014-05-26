@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.stream.compute;
+package io.fstream.compute;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.readLines;

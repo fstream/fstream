@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.stream.compute;
+package io.fstream.compute;
 
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
     execute(
         eplFile("statement1.epl"),
         givenEvents(
-        tickEventFile("tick-events1.json")));
+            tickEventFile("tick-events1.json")));
   }
 
   @Test
