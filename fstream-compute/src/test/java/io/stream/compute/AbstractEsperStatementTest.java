@@ -19,7 +19,9 @@ import java.util.List;
 
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 
@@ -30,11 +32,13 @@ import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
+import com.espertech.esper.client.time.CurrentTimeEvent;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 
+@Slf4j
 public abstract class AbstractEsperStatementTest implements UpdateListener {
 
   private static final ObjectMapper MAPPER = new ObjectMapper()
@@ -44,10 +48,13 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
   /**
    * Esper state.
    */
-  private EPServiceProvider esperSink;
+  private EPServiceProvider provider;
   private EPRuntime runtime;
   private EPAdministrator admin;
 
+  /**
+   * Intermediate results.
+   */
   private List<Object> results;
 
   @Before
@@ -55,37 +62,38 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     val configuration = new Configuration();
     configuration.addEventType("Rate", TickEvent.class.getName());
 
-    this.esperSink = EPServiceProviderManager.getProvider(this.toString(), configuration);
-    this.esperSink.initialize();
-    this.runtime = esperSink.getEPRuntime();
-    this.admin = esperSink.getEPAdministrator();
+    this.provider = EPServiceProviderManager.getProvider(this.toString(), configuration);
+    this.provider.initialize();
+
+    this.runtime = provider.getEPRuntime();
+    this.admin = provider.getEPAdministrator();
   }
 
   @SneakyThrows
-  protected List<Object> execute(File eplFile, TickEvent... events) {
-    return execute(eplFile, events);
-  }
-
-  @SneakyThrows
-  protected List<Object> execute(File eplFile, Iterable<TickEvent> events) {
+  protected List<?> execute(File eplFile, Iterable<?> events) {
     return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), events);
   }
 
   @SneakyThrows
-  protected List<Object> execute(File eplFile, File tickEventFile) {
+  protected List<?> execute(File eplFile, File tickEventFile) {
     return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), getTicketEvents(tickEventFile));
   }
 
-  protected List<Object> execute(String statement, TickEvent... events) {
+  protected List<?> execute(String statement, TickEvent... events) {
     return execute(statement, events);
   }
 
-  protected List<Object> execute(String statement, Iterable<TickEvent> events) {
+  protected List<?> execute(String statement, Iterable<?> events) {
+    log.info("Executing: {}", statement);
     val epl = admin.createEPL(statement);
 
     epl.addListener(this);
     for (val event : events) {
       runtime.sendEvent(event);
+    }
+
+    for (val result : results) {
+      log.info("Result: {}", result);
     }
 
     return results;
@@ -103,8 +111,8 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
 
   @After
   public void tearDown() {
-    if (esperSink != null) {
-      esperSink.destroy();
+    if (provider != null) {
+      provider.destroy();
     }
   }
 
@@ -121,8 +129,12 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     return builder.build();
   }
 
-  protected static List<TickEvent> tickEvents(TickEvent... tickEvents) {
-    return ImmutableList.copyOf(tickEvents);
+  protected static List<?> givenEvents(Object... events) {
+    return ImmutableList.copyOf(events);
+  }
+
+  protected static String epl(String epl) {
+    return epl;
   }
 
   protected static File eplFile(String fileName) {
@@ -131,6 +143,14 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
 
   protected static File tickEventFile(String fileName) {
     return new File("src/test/resources/tick-events", fileName);
+  }
+
+  protected static TickEvent tickEvent(long time, String symbol, double ask, double bid) {
+    return new TickEvent(new DateTime(time), symbol, (float) ask, (float) bid);
+  }
+
+  protected static CurrentTimeEvent timeEvent(long time) {
+    return new CurrentTimeEvent(time);
   }
 
 }

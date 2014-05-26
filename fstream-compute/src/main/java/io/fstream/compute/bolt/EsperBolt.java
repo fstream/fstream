@@ -53,7 +53,7 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
   /**
    * Esper.
    */
-  private transient EPServiceProvider esperSink;
+  private transient EPServiceProvider provider;
   private transient EPRuntime runtime;
   private transient EPAdministrator admin;
 
@@ -74,10 +74,10 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
     configuration.addEventType("Rate", TickEvent.class.getName());
 
     this.collector = collector;
-    this.esperSink = EPServiceProviderManager.getProvider(this.toString(), configuration);
-    this.esperSink.initialize();
-    this.runtime = esperSink.getEPRuntime();
-    this.admin = esperSink.getEPAdministrator();
+    this.provider = EPServiceProviderManager.getProvider(this.toString(), configuration);
+    this.provider.initialize();
+    this.runtime = provider.getEPRuntime();
+    this.admin = provider.getEPAdministrator();
 
     log.info("Creating common statements...");
     for (val statement : getStatements(conf)) {
@@ -131,8 +131,8 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
 
   @Override
   public void cleanup() {
-    if (esperSink != null) {
-      esperSink.destroy();
+    if (provider != null) {
+      provider.destroy();
     }
   }
 
