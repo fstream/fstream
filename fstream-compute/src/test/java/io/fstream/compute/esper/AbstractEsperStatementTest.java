@@ -7,12 +7,11 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute;
+package io.fstream.compute.esper;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.readLines;
 import static joptsimple.internal.Strings.repeat;
-import static org.assertj.core.util.Lists.newArrayList;
 import io.fstream.core.model.event.TickEvent;
 
 import java.io.File;
@@ -24,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.After;
 import org.junit.Before;
 
@@ -39,11 +39,16 @@ import com.espertech.esper.client.time.TimerControlEvent;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 
 @Slf4j
-public abstract class AbstractEsperStatementTest implements UpdateListener {
+public abstract class AbstractEsperStatementTest {
 
+  /**
+   * Constants.
+   */
+  private static final DateTimeFormatter SECONDS_PATTERN = DateTimeFormat.forPattern("HH:mm:ss");
   private static final ObjectMapper MAPPER = new ObjectMapper()
       .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
       .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
@@ -55,19 +60,17 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
   private EPRuntime runtime;
   private EPAdministrator admin;
 
-  /**
-   * Intermediate results.
-   */
-  private List<Object> results;
-
   @Before
   public void setUp() {
+    // TODO: Rename "Rate" to "TickEvent"
     val configuration = new Configuration();
     configuration.addEventType("Rate", TickEvent.class.getName());
 
-    this.provider = EPServiceProviderManager.getProvider(this.toString(), configuration);
+    // Setup engine
+    this.provider = EPServiceProviderManager.getProvider(this.getClass().getName(), configuration);
     this.provider.initialize();
 
+    // Shorthands
     this.runtime = provider.getEPRuntime();
     this.admin = provider.getEPAdministrator();
 
@@ -82,7 +85,7 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
 
   @SneakyThrows
   protected List<?> execute(File eplFile, File tickEventFile) {
-    return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), getTicketEvents(tickEventFile));
+    return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), readTickEvents(tickEventFile));
   }
 
   protected List<?> execute(String statement, TickEvent... events) {
@@ -90,12 +93,32 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
   }
 
   protected List<?> execute(String statement, Iterable<?> events) {
+    // Statement results
+    val results = Lists.<Object> newArrayList();
+
+    // Setup
+    val epl = admin.createEPL(statement);
+    epl.addListener(new UpdateListener() {
+
+      @Override
+      public void update(EventBean[] newEvents, EventBean[] oldEvents) {
+        if (newEvents == null) {
+          return;
+        }
+
+        // Buffer results
+        for (val newEvent : newEvents) {
+          results.add(newEvent.getUnderlying());
+        }
+
+      }
+    });
+
+    // Apply stimulus
     log.info(repeat('-', 80));
     log.info("Executing: {}", statement);
     log.info(repeat('-', 80));
-    val epl = admin.createEPL(statement);
 
-    epl.addListener(this);
     for (val event : events) {
       log.info("Sending: {}", event);
       if (event instanceof TickEvent) {
@@ -106,23 +129,15 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
       runtime.sendEvent(event);
     }
 
+    // Log results
     log.info(repeat('-', 80));
     for (val result : results) {
       log.info("Result: {}", result);
     }
     log.info(repeat('-', 80));
 
+    // Allow the client to analyze
     return results;
-  }
-
-  @Override
-  public void update(EventBean[] newEvents, EventBean[] oldEvents) {
-    this.results = newArrayList();
-    if (newEvents != null) {
-      for (val newEvent : newEvents) {
-        results.add(newEvent.getUnderlying());
-      }
-    }
   }
 
   @After
@@ -132,17 +147,12 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     }
   }
 
-  @SneakyThrows
-  private static Iterable<TickEvent> getTicketEvents(File tickEventFile) {
-    val lines = readLines(tickEventFile.toURI().toURL(), UTF_8);
+  protected static String epl(String epl) {
+    return epl;
+  }
 
-    val builder = ImmutableList.<TickEvent> builder();
-    for (val line : lines) {
-      val tickEvent = MAPPER.readValue(line, TickEvent.class);
-      builder.add(tickEvent);
-    }
-
-    return builder.build();
+  protected static File eplFile(String fileName) {
+    return new File("src/test/resources/epl", fileName);
   }
 
   protected static List<?> givenEvents(Object... events) {
@@ -153,16 +163,12 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     return eventFile;
   }
 
-  protected static String epl(String epl) {
-    return epl;
-  }
-
   protected static long second(String value) {
-    return DateTime.parse(value, DateTimeFormat.forPattern("HH:mm:ss")).getMillis();
+    return DateTime.parse(value, SECONDS_PATTERN).getMillis();
   }
 
-  protected static File eplFile(String fileName) {
-    return new File("src/test/resources/epl", fileName);
+  protected static CurrentTimeEvent timeEvent(long time) {
+    return new CurrentTimeEvent(time);
   }
 
   protected static File tickEventFile(String fileName) {
@@ -173,8 +179,17 @@ public abstract class AbstractEsperStatementTest implements UpdateListener {
     return new TickEvent(new DateTime(time), symbol, (float) ask, (float) bid);
   }
 
-  protected static CurrentTimeEvent timeEvent(long time) {
-    return new CurrentTimeEvent(time);
+  @SneakyThrows
+  private static Iterable<TickEvent> readTickEvents(File tickEventFile) {
+    val lines = readLines(tickEventFile.toURI().toURL(), UTF_8);
+
+    val builder = ImmutableList.<TickEvent> builder();
+    for (val line : lines) {
+      val tickEvent = MAPPER.readValue(line, TickEvent.class);
+      builder.add(tickEvent);
+    }
+
+    return builder.build();
   }
 
 }

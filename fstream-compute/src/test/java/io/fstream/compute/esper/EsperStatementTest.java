@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute;
+package io.fstream.compute.esper;
 
 import org.junit.Test;
 
