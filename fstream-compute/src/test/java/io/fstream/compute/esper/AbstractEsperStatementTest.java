@@ -68,14 +68,15 @@ public abstract class AbstractEsperStatementTest {
 
     // Setup engine
     this.provider = EPServiceProviderManager.getProvider(this.getClass().getName(), configuration);
-    this.provider.initialize();
 
     // Shorthands
     this.runtime = provider.getEPRuntime();
     this.admin = provider.getEPAdministrator();
 
     // Use "external clocking" for the test
-    runtime.sendEvent(new TimerControlEvent(TimerControlEvent.ClockType.CLOCK_EXTERNAL));
+    val clockType = TimerControlEvent.ClockType.CLOCK_EXTERNAL;
+    log.info("Setting clock type to '{}'", clockType);
+    runtime.sendEvent(new TimerControlEvent(clockType));
   }
 
   @SneakyThrows
@@ -108,7 +109,14 @@ public abstract class AbstractEsperStatementTest {
 
         // Buffer results
         for (val newEvent : newEvents) {
-          results.add(newEvent.getUnderlying());
+          val result = newEvent.getUnderlying();
+
+          // Log results
+          log.info(repeat('-', 80));
+          log.info("Result: {}", result);
+          log.info(repeat('-', 80));
+
+          results.add(result);
         }
 
       }
@@ -121,22 +129,17 @@ public abstract class AbstractEsperStatementTest {
 
     for (val event : events) {
       if (event instanceof TickEvent) {
+        // Advance time
         val tickEvent = (TickEvent) event;
         val timeEvent = timeEvent(tickEvent.getDateTime().getMillis());
         log.info("Sending: {}", timeEvent);
         runtime.sendEvent(timeEvent);
       }
 
+      // Send event
       log.info("Sending: {}", event);
       runtime.sendEvent(event);
     }
-
-    // Log results
-    log.info(repeat('-', 80));
-    for (val result : results) {
-      log.info("Result: {}", result);
-    }
-    log.info(repeat('-', 80));
 
     // Allow the client to analyze
     return results;
