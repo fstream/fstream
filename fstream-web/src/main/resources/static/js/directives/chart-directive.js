@@ -22,7 +22,8 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 		        chart: {
 		            renderTo: $element[0],
 		            height: 325,
-		            width: 550
+		            width: 550,
+		            animation: false
 		        },
 		        
 				credits: {
