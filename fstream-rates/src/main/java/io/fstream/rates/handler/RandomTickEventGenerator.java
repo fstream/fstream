@@ -9,10 +9,10 @@
 
 package io.fstream.rates.handler;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import io.fstream.core.model.event.TickEvent;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -48,7 +48,7 @@ public class RandomTickEventGenerator implements Processor {
 
     // Random timing
     val delay = generateDelay(0, 10);
-    TimeUnit.SECONDS.sleep(delay);
+    SECONDS.sleep(delay);
 
     // Simulated event
 

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  */
 @Profile("!simulation")
 @Component
-public class RatesRoutes extends AbstractFixRoutes {
+public class FixRoutes extends AbstractFixRoutes {
   
   @Override
   public void configure() throws Exception {

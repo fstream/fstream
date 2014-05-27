@@ -12,6 +12,21 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	$scope.alerts = [];
 	$scope.commands = [];
 	$scope.instruments = [];
+	$scope.charts = [
+        {
+			type: "event",
+			symbol: "EUR/USD"
+		}, {
+			type: "event",
+			symbol: "EUR/GBP"
+		}, {
+			type: "event",
+			symbol: "EUR/JPY"
+		}, {
+			type: "event",
+			symbol: "AUD/JPY"
+		}
+	];
 		
 	//
 	// Methods
@@ -43,10 +58,10 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	
     $scope.$on('rate', function(e, rate) {
     	$scope.rates.unshift(rate);
-        chartService.addRate(rate);
+        //chartService.addRate(rate);
     });
     $scope.$on('alert', function(e, alert) {
-    	chartService.addAlert(alert);
+    	//chartService.addAlert(alert);
     });
     $scope.$on('command', function(e, command) {
     	$scope.commands.unshift(command);
