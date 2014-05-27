@@ -14,18 +14,22 @@ import io.fstream.core.model.event.TickEvent;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.joda.time.DateTime;
 
-public class RandomRates implements Processor {
+@RequiredArgsConstructor
+public class RandomTickEventGenerator implements Processor {
 
   /**
    * Configuration.
    */
-  private final String symbol = "EUR/USD";
+  private final String symbol;
+  private final float minMid;
+  private final float maxMid;
 
   /**
    * State.
@@ -35,9 +39,11 @@ public class RandomRates implements Processor {
   @Override
   public void process(Exchange exchange) throws Exception {
     // Random pricing
-    val price = generatePrice(1.2f, 1.5f);
-    val ask = price + 0.01f;
-    val bid = price - 0.01f;
+    val mid = generatePrice(minMid, maxMid);
+    val spread = generateSpread(minMid);
+
+    val ask = mid + spread / 2;
+    val bid = mid - spread / 2;
     val event = new TickEvent(new DateTime(), symbol, ask, bid);
 
     // Random timing
@@ -55,6 +61,10 @@ public class RandomRates implements Processor {
 
   private int generateDelay(int min, int max) {
     return (int) (min + (max - min) * random.nextFloat());
+  }
+
+  private float generateSpread(float price) {
+    return price * 0.01f;
   }
 
 }
