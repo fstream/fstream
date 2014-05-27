@@ -120,12 +120,14 @@ public abstract class AbstractEsperStatementTest {
     log.info(repeat('-', 80));
 
     for (val event : events) {
-      log.info("Sending: {}", event);
       if (event instanceof TickEvent) {
         val tickEvent = (TickEvent) event;
-        runtime.sendEvent(timeEvent(tickEvent.getDateTime().getMillis()));
+        val timeEvent = timeEvent(tickEvent.getDateTime().getMillis());
+        log.info("Sending: {}", timeEvent);
+        runtime.sendEvent(timeEvent);
       }
 
+      log.info("Sending: {}", event);
       runtime.sendEvent(event);
     }
 
