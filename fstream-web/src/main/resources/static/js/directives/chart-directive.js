@@ -37,7 +37,8 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 		        yAxis: {
 		        	title: {
 		        		text: "Price"
-		        	}
+		        	},
+	                alternateGridColor: '#FDFDfD'
 		        },
 		        
 	            xAxis: {
