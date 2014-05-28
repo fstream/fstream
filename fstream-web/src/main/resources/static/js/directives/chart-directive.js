@@ -45,7 +45,8 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 	            },
 	            
 		        tooltip: {
-		            crosshairs: [true, true]
+		            crosshairs: [true, true],
+		            shared: true
 		        },			    
 		        
 				series: [{
