@@ -51,19 +51,27 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 		        tooltip: {
 		            crosshairs: [true, true],
 		            shared: true
-		        },			    
+		        },	
 		        
 				series: [{
-					id: 'Ask',
-					name : 'Ask',
-					step: true,
-					data : [],
-					color: color
+			    	name: 'Price',
+			    	data: [],
+			    	zIndex: 1,
+			    	lineColor: color,
+			    	marker: {
+			    		fillColor: 'white',
+			    		lineWidth: 2,
+			    		lineColor: color
+			    	}
 				}, {
-					name : 'Bid',
-					step: true,
-					data : [],
-					color: "#000"
+			        name: 'Spread',
+			        data: [],
+			        type: 'arearange',
+			        lineWidth: 0.5,
+			    	linkedTo: ':previous',
+			    	color: color,
+			    	fillOpacity: 0.3,
+			    	zIndex: 0
 				}]
 			});
 			
@@ -75,8 +83,8 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 	    		var shift = chart.series[0].data.length >= size,
     		    	animate = false;
 	    		
-	    		chart.series[0].addPoint([rate.dateTime, rate.ask], false, shift, animate);
-	    		chart.series[1].addPoint([rate.dateTime, rate.bid], enabled, shift, animate);
+	    		chart.series[0].addPoint([rate.dateTime, (rate.ask + rate.bid)/2.0], false, shift, animate);
+	    		chart.series[1].addPoint([rate.dateTime, rate.bid, rate.ask], enabled, shift, animate);
 		    });
 		}
 	}
