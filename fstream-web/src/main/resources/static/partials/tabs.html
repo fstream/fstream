@@ -2,9 +2,6 @@
 	<!-- Nav tabs -->
 	<tabset>
        <tab heading="Charts" select="enableChart()" deselect="disableChart()" ng-controller="chartController">
-<!--        	  <div id="charts">
-       	  	<div id="chart-container"></div>
-       	  </div> -->
        	  <chart ng-repeat="chart in charts" options="chart"></chart>
        </tab>
        <tab heading="Commands">

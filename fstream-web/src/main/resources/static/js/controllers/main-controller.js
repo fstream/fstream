@@ -7,6 +7,7 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	  for (var i = 0; i < instruments.length; i++) {
 		  $scope.charts[i] = {
 			type: "event",
+			index: i,
 			symbol: instruments[i]
 		  };
 	  }
