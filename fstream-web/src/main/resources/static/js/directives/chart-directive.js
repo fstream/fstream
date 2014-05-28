@@ -16,7 +16,8 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 			var chart,
 			    index = $scope.options.index,
 			    colors = Highcharts.getOptions().colors,
-			    color = colors[(index + 5)  % colors.length],
+			    color = '#419641',
+			    opacity =  0.5 - (index / 6.0)* 0.5,
 			    size = 50,
 			    enabled = true,
 			    series;
@@ -73,7 +74,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 			        lineWidth: 0.5,
 			    	linkedTo: ':previous',
 			    	color: color,
-			    	fillOpacity: 0.3,
+			    	fillOpacity: opacity,
 			    	zIndex: 0
 				}]
 			});

@@ -9,7 +9,7 @@
 
 package io.fstream.rates.handler;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.fstream.core.model.event.TickEvent;
 
 import java.util.Random;
@@ -47,8 +47,8 @@ public class RandomTickEventGenerator implements Processor {
     val event = new TickEvent(new DateTime(), symbol, ask, bid);
 
     // Random timing
-    val delay = generateDelay(0, 5);
-    SECONDS.sleep(delay);
+    val delay = generateDelay(0, 2000);
+    MILLISECONDS.sleep(delay);
 
     // Simulated event
     exchange.getOut().setBody(event);
@@ -63,7 +63,7 @@ public class RandomTickEventGenerator implements Processor {
   }
 
   private float generateSpread(float price) {
-    return price * 0.01f;
+    return price * 0.10f;
   }
 
 }
