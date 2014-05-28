@@ -58,6 +58,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 			    	data: [],
 			    	zIndex: 1,
 			    	step: true,
+			    	color: color,
 			    	lineColor: color,
 			    	marker: {
 			    		fillColor: 'white',
