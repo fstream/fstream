@@ -57,6 +57,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 			    	name: 'Price',
 			    	data: [],
 			    	zIndex: 1,
+			    	step: true,
 			    	lineColor: color,
 			    	marker: {
 			    		fillColor: 'white',
@@ -66,6 +67,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 				}, {
 			        name: 'Spread',
 			        data: [],
+			        step: true,
 			        type: 'arearange',
 			        lineWidth: 0.5,
 			    	linkedTo: ':previous',
