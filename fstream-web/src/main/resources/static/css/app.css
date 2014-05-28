@@ -3,6 +3,21 @@
  */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; } 
 
+/**
+ * Navigation
+ */
+
+.navbar-inverse {
+	background-color: rgba(0, 0, 0, 0.5);
+	background-image: none;
+}
+	
+.navbar-inverse .navbar-brand {
+	color: white;
+	font-size: 25px;
+	text-shadow: -1px -1px 0 #080808, 1px -1px 0 #080808, -1px 1px 0 #080808, 1px 1px 0 #080808
+}
+
 .connect-button {
 	height: 100%;
 }
@@ -24,13 +39,6 @@
  * Charts
  */
 
-#charts {
-}
-
-#chart-container {
-}
-
 .chart {
    display: inline-block;	
 }	
-}

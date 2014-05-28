@@ -64,6 +64,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 			    	marker: {
 			    		fillColor: 'white',
 			    		lineWidth: 2,
+			    		radius: 3,
 			    		lineColor: color
 			    	}
 				}, {
