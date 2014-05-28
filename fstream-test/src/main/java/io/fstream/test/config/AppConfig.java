@@ -11,6 +11,7 @@ package io.fstream.test.config;
 
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
+import io.fstream.test.zk.EmbeddedZooKeeper;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,8 +49,19 @@ public class AppConfig {
   }
 
   @Bean
+  public boolean hbase() {
+    return false;
+  }
+
+  @Bean
+  @ConditionalOnExpression("false")
   public EmbeddedHBase embeddedHbase() {
     return new EmbeddedHBase(zkConnect);
+  }
+
+  @Bean
+  public EmbeddedZooKeeper embeddedZookeeper() {
+    return new EmbeddedZooKeeper(zkConnect, tmp());
   }
 
   @Bean
@@ -59,9 +72,15 @@ public class AppConfig {
 
   @PostConstruct
   public void init() {
-    log.info("> Starting embedded HBase...");
-    embeddedHbase().startAndWait();
-    log.info("< Started embedded HBase");
+    if (hbase()) {
+      log.info("> Starting embedded HBase...");
+      embeddedHbase().startAndWait();
+      log.info("< Started embedded HBase");
+    } else {
+      log.info("> Starting embedded ZooKeeper...");
+      embeddedZookeeper().startAndWait();
+      log.info("< Started embedded ZooKeeper");
+    }
 
     log.info("> Starting embedded Kafka...");
     embeddedKafka().startAndWait();
@@ -74,9 +93,15 @@ public class AppConfig {
     embeddedKafka().stopAndWait();
     log.info("< Stopped embedded Kafka");
 
-    log.info("> Stopping embedded HBase...");
-    embeddedHbase().stopAndWait();
-    log.info("< Stopped embedded HBase");
+    if (hbase()) {
+      log.info("> Stopping embedded HBase...");
+      embeddedHbase().stopAndWait();
+      log.info("< Stopped embedded HBase");
+    } else {
+      log.info("> Stopping embedded ZooKeeper...");
+      embeddedZookeeper().stopAndWait();
+      log.info("< Stopped embedded ZooKeeper");
+    }
   }
 
 }

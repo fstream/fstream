@@ -44,12 +44,28 @@ rates:
    uri: quickfix:${fix.configFile}?sessionID=${fix.sessionID}
    symbols:
      - EUR/USD
-     - EUR/GBP
-     - EUR/JPY 
-     - AUD/JPY
+     - USD/JPY
+     - GBP/USD
+     - AUD/USD
+     - USD/CHF
+     - USD/CAD
 
 # OANDA
 oanda:
+   majors:
+     - EUR/USD
+     - USD/JPY
+     - GBP/USD
+     - AUD/USD
+     - USD/CHF
+     - USD/CAD
+
+   session:
+     - EUR/USD
+     - EUR/GBP
+     - EUR/JPY
+     - AUD/JPY
+     
    active:
      - AUD/CAD
      - AUD/CHF

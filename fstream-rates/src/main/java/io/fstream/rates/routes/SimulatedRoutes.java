@@ -31,20 +31,26 @@ public class SimulatedRoutes extends RouteBuilder {
   public void configure() throws Exception {
     
     //
-    // Sources
+    // Sources (6 Majors)
     //
     
     from("timer://ticks1?period=100")
       .process(new RandomTickEventGenerator("EUR/USD", 1.2757f, 1.3990f))
       .to("direct:sink");
-    from("timer://ticks2?period=100")
-      .process(new RandomTickEventGenerator("EUR/GBP", 0.8081f, 0.8774f))
+    from("timer://ticks1?period=100")
+      .process(new RandomTickEventGenerator("USD/JPY", 93.8675f, 105.4415f))
       .to("direct:sink");
-    from("timer://ticks3?period=100")
-      .process(new RandomTickEventGenerator("EUR/JPY", 125.0380f, 145.6186f))
+    from("timer://ticks1?period=100")
+      .process(new RandomTickEventGenerator("GBP/USD", 1.4817f, 1.6997f))
       .to("direct:sink");
-    from("timer://ticks4?period=100")
-      .process(new RandomTickEventGenerator("AUD/JPY", 86.4228f, 99.0119f))
+    from("timer://ticks1?period=100")
+      .process(new RandomTickEventGenerator("AUD/USD", 0.8661f, 0.9791f))
+      .to("direct:sink");
+    from("timer://ticks1?period=100")
+      .process(new RandomTickEventGenerator("USD/CHF", 0.8701f, 0.9792f))
+      .to("direct:sink");
+    from("timer://ticks1?period=100")
+      .process(new RandomTickEventGenerator("USD/CAD", 1.0138f, 1.1279f))
       .to("direct:sink");
     
     //

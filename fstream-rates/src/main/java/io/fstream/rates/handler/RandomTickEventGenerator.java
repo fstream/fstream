@@ -47,11 +47,10 @@ public class RandomTickEventGenerator implements Processor {
     val event = new TickEvent(new DateTime(), symbol, ask, bid);
 
     // Random timing
-    val delay = generateDelay(0, 10);
+    val delay = generateDelay(0, 5);
     SECONDS.sleep(delay);
 
     // Simulated event
-
     exchange.getOut().setBody(event);
   }
 

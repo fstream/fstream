@@ -1,45 +1,36 @@
-angular.module('FStreamApp.controllers').controller('mainController', function($scope, configService, ratesService, chartService) {
+angular.module('FStreamApp.controllers').controller('mainController', function($scope, configService, eventService, chartService) {
 	
 	// Bootstrap configuration
 	configService.getConfig().then(function(instruments) {
 	  $scope.instruments = instruments;
+	  $scope.charts = new Array(instruments.length);
+	  for (var i = 0; i < instruments.length; i++) {
+		  $scope.charts[i] = {
+			type: "event",
+			symbol: instruments[i]
+		  };
+	  }
 	});
 
 	// Initialize
 	$scope.connected = false;
-	$scope.instrument = 'EUR/USD';
 	$scope.rates = [];
 	$scope.alerts = [];
 	$scope.commands = [];
 	$scope.instruments = [];
-	$scope.charts = [
-        {
-			type: "event",
-			symbol: "EUR/USD"
-		}, {
-			type: "event",
-			symbol: "EUR/GBP"
-		}, {
-			type: "event",
-			symbol: "EUR/JPY"
-		}, {
-			type: "event",
-			symbol: "AUD/JPY"
-		}
-	];
 		
 	//
 	// Methods
 	//
 	
 	$scope.connect = function() {
-		ratesService.connect();
+		eventService.connect();
 	};
 	$scope.disconnect = function() {
-		ratesService.disconnect();
+		eventService.disconnect();
 	}
 	$scope.register = function() {
-		ratesService.register($scope.instrument);
+		eventService.register($scope.instrument);
 	}
 	
 	//

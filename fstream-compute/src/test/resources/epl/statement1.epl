@@ -1,4 +1,14 @@
 SELECT
-   1 
+   current_timestamp.toDate(),
+   a.symbol,
+   a.dateTime,
+   b.symbol,
+   b.dateTime,
+   c.symbol,
+   c.dateTime
 FROM 
-   Rate
+   pattern [
+         Rate(symbol='AUD/USD') OR
+         Rate(symbol='AUD/NZD') OR 
+         Rate(symbol='NZD/USD')
+     ->  a = Rate(symbol='AUD/USD') AND b = Rate(symbol='AUD/NZD') AND c = Rate(symbol='NZD/USD')].timer:within(6 sec)

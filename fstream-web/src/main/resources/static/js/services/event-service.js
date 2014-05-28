@@ -1,4 +1,4 @@
-angular.module('FStreamApp.services').factory('ratesService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+angular.module('FStreamApp.services').factory('eventService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
 	
 	var stompClient,
 		publishEvent = function (eventName, frame){
