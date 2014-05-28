@@ -3,7 +3,19 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 		global : {
 			useUTC : false
 		}
-	});			
+	});
+	
+	var hashCode = function(value) {
+		var hash = 0;
+		if (value.length == 0) return hash;
+		for (i = 0; i < value.length; i++) {
+			char = value.charCodeAt(i);
+			hash = ((hash<<5)-hash)+char;
+			hash = hash & hash; // Convert to 32bit integer
+		}
+		
+		return hash;
+	}
 	
 	return {
 		restrict : 'E',
@@ -13,7 +25,9 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 	    replace: true,
 		template : '<div class="chart"></div>',
 		link: function($scope, $element, $attr){
+			var colors = Highcharts.getOptions().colors;
 			var chart,
+			    color = colors[hashCode($scope.options.symbol) % colors.length],
 			    size = 50,
 			    enabled = true,
 			    series;
@@ -54,11 +68,13 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 					id: 'Ask',
 					name : 'Ask',
 					step: true,
-					data : []
+					data : [],
+					color: color
 				}, {
 					name : 'Bid',
 					step: true,
-					data : []
+					data : [],
+					color: "#000"
 				}]
 			});
 			
