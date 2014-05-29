@@ -1,4 +1,4 @@
-angular.module('FStreamApp.directives').directive('chart', function() {
+angular.module('FStreamApp.directives').directive('tickChart', function() {
 	Highcharts.setOptions({
 		global : {
 			useUTC : false
@@ -11,7 +11,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 	      options: '='
 	    },
 	    replace: true,
-		template : '<div class="chart"></div>',
+		template : '<div class="tick-chart"></div>',
 		link: function($scope, $element, $attr){
 			var chart,
 			    index = $scope.options.index,
@@ -19,8 +19,7 @@ angular.module('FStreamApp.directives').directive('chart', function() {
 			    color = '#419641',
 			    opacity =  0.5 - (index / 6.0)* 0.5,
 			    size = 50,
-			    enabled = true,
-			    series;
+			    enabled = true;
 			
 			chart = new Highcharts.Chart({
 		        chart: {

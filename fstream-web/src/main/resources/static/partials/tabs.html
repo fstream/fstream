@@ -2,7 +2,7 @@
 	<!-- Nav tabs -->
 	<tabset>
        <tab heading="Charts" select="enableChart()" deselect="disableChart()" ng-controller="chartController">
-       	  <chart ng-repeat="chart in charts" options="chart"></chart>
+       	  <tick-chart ng-repeat="options in tickCharts" options="options"></tick-chart>
        </tab>
        <tab heading="Commands">
           <div id="commands"><pre ng-repeat="command in commands">{{ command | json }}</pre></div>

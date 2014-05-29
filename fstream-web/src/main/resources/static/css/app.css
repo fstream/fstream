@@ -39,6 +39,6 @@
  * Charts
  */
 
-.chart {
+.tick-chart, .alert-chart, .metric-chart {
    display: inline-block;	
 }	

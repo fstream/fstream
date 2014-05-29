@@ -1,5 +1,6 @@
 angular.module('FStreamApp.controllers').controller('alertController', function($scope, $filter, ngTableParams) {
-    var alerts = [];
+    // TODO: Remove the duplication of alerts arrays in system
+	var alerts = [];
     $scope.$on('alert', function(e, alert) {
     	alerts.unshift(alert);
     	

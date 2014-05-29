@@ -1,12 +1,61 @@
-angular.module('FStreamApp.controllers').controller('mainController', function($scope, configService, eventService, chartService) {
+angular.module('FStreamApp.controllers').controller('mainController', function($scope, _, configService, eventService) {
 	
+	//
+	// Methods
+	//
+	
+	var queue = function(a, value, limit) {
+			return a.length >= limit ? a.pop() : a.unshift(value);
+		}, 
+		
+		reset = function() {
+			$scope.rates = [];
+			$scope.alerts = [];
+			$scope.commands = [];
+		},
+		
+		register = function() {
+			
+			// Scope
+			$scope.connect = function() {
+				eventService.connect();
+			};
+			$scope.disconnect = function() {
+				eventService.disconnect();
+			}
+			$scope.register = function() {
+				eventService.register($scope.instrument);
+			}
+			
+			// Events
+			$scope.$on('connected', function(e) {
+				$scope.connected = true;
+				reset();
+			});
+			$scope.$on('disconnected', function(e) {
+				$scope.connected = false;
+			});
+			
+		    $scope.$on('rate', function(e, rate) {
+		    	queue($scope.rates, rate, 50);
+		    });
+		    $scope.$on('alert', function(e, alert) {
+		    	queue($scope.alerts, alert, 50);
+		    });
+		    $scope.$on('command', function(e, command) {
+		    	queue($scope.commands, command, 50);
+		    });
+		    
+		};
+	
+		
 	// Bootstrap configuration
 	configService.getConfig().then(function(instruments) {
 	  $scope.instruments = instruments;
-	  $scope.charts = new Array(instruments.length);
+	  
+	  $scope.tickCharts = new Array(instruments.length);
 	  for (var i = 0; i < instruments.length; i++) {
-		  $scope.charts[i] = {
-			type: "event",
+		  $scope.tickCharts[i] = {
 			index: i,
 			symbol: instruments[i]
 		  };
@@ -15,47 +64,6 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 
 	// Initialize
 	$scope.connected = false;
-	$scope.rates = [];
-	$scope.alerts = [];
-	$scope.commands = [];
-	$scope.instruments = [];
-		
-	//
-	// Methods
-	//
-	
-	$scope.connect = function() {
-		eventService.connect();
-	};
-	$scope.disconnect = function() {
-		eventService.disconnect();
-	}
-	$scope.register = function() {
-		eventService.register($scope.instrument);
-	}
-	
-	//
-	// Events
-	//
-	
-	$scope.$on('connected', function(e) {
-		$scope.connected = true;
-		$scope.rates = [];
-		$scope.alerts = [];
-		$scope.commands = [];
-	});
-	$scope.$on('disconnected', function(e) {
-		$scope.connected = false;
-	});
-	
-    $scope.$on('rate', function(e, rate) {
-    	$scope.rates.unshift(rate);
-        //chartService.addRate(rate);
-    });
-    $scope.$on('alert', function(e, alert) {
-    	//chartService.addAlert(alert);
-    });
-    $scope.$on('command', function(e, command) {
-    	$scope.commands.unshift(command);
-    });
+	reset();
+	register();
 });
