@@ -1,32 +1,17 @@
 angular.module('FStreamApp.controllers').controller('alertController', function($scope, $filter, ngTableParams) {
-    // TODO: Remove the duplication of alerts arrays in system
-	var alerts = [];
     $scope.$on('alert', function(e, alert) {
-    	alerts.unshift(alert);
-    	
-    	// Limit to 50 events
-    	if (alerts.length >= 50) {
-    		alerts.pop();
-    	}
-    	
     	$scope.tableParams.reload();
     });
     
-    $scope.tableParams = new ngTableParams({
-        page: 1,
-        count: 10
-    }, {
-        total: alerts.length, // length of data
+    $scope.tableParams = new ngTableParams({page: 1, count: 10}, {
+        total: $scope.alerts.length,
         getData: function($defer, params) {
-            // use build-in angular filter
-            var orderdAlerts = params.filter() ?
-                   $filter('filter')(alerts, params.filter()) :
-            	   alerts;
+        	var alerts = $scope.alerts,
+            	data = params.filter() ? $filter('filter')(alerts, params.filter()) : alerts;
 
-            $scope.alerts = orderdAlerts.slice((params.page() - 1) * params.count(), params.page() * params.count());
-
-            params.total(orderdAlerts.length); // set total for recalc pagination
-            $defer.resolve($scope.alerts);
+            params.total(data.length);
+            $scope.data = data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+            $defer.resolve($scope.data);
         }
     });	
 });
