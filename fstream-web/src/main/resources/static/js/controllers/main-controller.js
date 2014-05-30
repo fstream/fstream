@@ -38,6 +38,7 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	function initScope() {
 		$scope.connected = false;
 		$scope.instruments = [];
+		$scope.views = [];
 		$scope.connect = connect;
 		$scope.disconnect = disconnect;
 		$scope.register = registerInstrument;
@@ -56,17 +57,19 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		
 	function updateInstruments(instruments) {
 		$scope.instruments = instruments;
-		$scope.tickCharts = _.map(instruments, function(symbol, i) {
-			return {
-				index: i,
-				symbol: symbol
-		    };
-		});
-		$scope.metricCharts = [{
+		$scope.views.push({
+			type: 'metric',
 			title: 'Events per Minute',
 			name: "Events",
 			units: "Count"
-		}];
+		});
+		_.each(instruments, function(symbol, i) {
+			$scope.views.push({
+				type: 'tick',
+				index: i,
+				symbol: symbol
+		    });
+		});
 	};
 		
 	function queueEvent(a, value, limit) {

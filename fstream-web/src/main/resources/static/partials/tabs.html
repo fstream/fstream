@@ -2,8 +2,10 @@
 	<!-- Nav tabs -->
 	<tabset>
        <tab heading="Charts" select="enableChart()" deselect="disableChart()" ng-controller="chartController">
-       	  <metric-chart ng-repeat="options in metricCharts" options="options"></metric-chart>
-       	  <tick-chart ng-repeat="options in tickCharts" options="options"></tick-chart>
+         <div ng-repeat="view in views" ng-switch="view.type" class="view">
+       	  <metric-chart ng-switch-when="metric" options="view"></metric-chart>
+       	  <tick-chart ng-switch-when="tick" options="view"></tick-chart>
+         </div>
        </tab>
        <tab heading="Commands">
           <div id="commands"><pre ng-repeat="command in commands">{{ command | json }}</pre></div>
