@@ -94,13 +94,13 @@ public class StormService {
     val alertsId = "fstream-alerts";
     builder.setBolt(alertsId, new AlertBolt()).shuffleGrouping(ratesId);
     builder.setBolt("kafka-alerts", new KafkaBolt<String, String>()).shuffleGrouping(alertsId)
-        .addConfiguration(KafkaBolt.TOPIC, METRICS.getId());
+        .addConfiguration(KafkaBolt.TOPIC, ALERTS.getId());
 
     // Metrics
     val metricsId = "fstream-metrics";
     builder.setBolt(metricsId, new MetricBolt()).shuffleGrouping(ratesId);
     builder.setBolt("kafka-metrics", new KafkaBolt<String, String>()).shuffleGrouping(metricsId)
-        .addConfiguration(KafkaBolt.TOPIC, ALERTS.getId());
+        .addConfiguration(KafkaBolt.TOPIC, METRICS.getId());
 
     // Logging
     val loggerId = "fstream-logger";

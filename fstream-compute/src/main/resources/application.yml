@@ -91,19 +91,11 @@ compute:
 
    metrics:
 
-      - name: Simple stats
-        description: Used to trigger at least one event every 5s for testing.
+      - name: Events per minute
+        description: Calculates the number of events per minute across all instruments
         statement: |
-           CONTEXT SegmentedBySymbol
            SELECT
-               symbol,
-               COUNT(ask) AS count,
-               AVG(ask)   AS avgAsk,
-               AVG(bid)   AS avgBid,
-               MIN(ask)   AS minAsk,
-               MIN(bid)   AS minBid,
-               MAX(ask)   AS maxAsk,
-               MAX(bid)   AS maxBid
+               COUNT(ask) AS count
            FROM
-               Rate.win:time_batch(5 sec)
+               Rate.win:time_batch(1 min)
                

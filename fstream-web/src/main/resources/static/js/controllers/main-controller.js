@@ -15,6 +15,9 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		$scope.$on('alert', function(e, alert) {
 			queueEvent($scope.alerts, alert, 50);
 		});
+		$scope.$on('metric', function(e, metric) {
+			queueEvent($scope.metrics, metric, 60);
+		});
 		$scope.$on('command', function(e, command) {
 			queueEvent($scope.commands, command, 50);
 		});
@@ -44,6 +47,7 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		$scope.rates = [];
 		$scope.alerts = [];
 		$scope.commands = [];
+		$scope.metrics = [];
 	}
 	
 	function registerInstrument() {
@@ -58,6 +62,11 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 				symbol: symbol
 		    };
 		});
+		$scope.metricCharts = [{
+			title: 'Events per Minute',
+			name: "Events",
+			units: "Count"
+		}];
 	};
 		
 	function queueEvent(a, value, limit) {

@@ -16,8 +16,8 @@ angular.module('FStreamApp.directives').directive('metricChart', function() {
 			var chart,
 			    index = $scope.options.index,
 			    colors = Highcharts.getOptions().colors,
-			    color = '#FF0000',
-			    opacity =  0.5 - (index / 6.0)* 0.5,
+			    color = colors[0],
+			    opacity =  0.5,
 			    size = 50,
 			    enabled = true;
 			
@@ -26,6 +26,7 @@ angular.module('FStreamApp.directives').directive('metricChart', function() {
 		            renderTo: $element[0],
 		            height: 325,
 		            width: 550,
+		            type: 'area',
 		            animation: false
 		        },
 		        
@@ -57,7 +58,6 @@ angular.module('FStreamApp.directives').directive('metricChart', function() {
 			    	name: $scope.options.name,
 			    	data: [],
 			    	zIndex: 1,
-			    	step: true,
 			    	color: color,
 			    	lineColor: color,
 			    	marker: {
@@ -69,16 +69,11 @@ angular.module('FStreamApp.directives').directive('metricChart', function() {
 				}]
 			});
 			
-		    $scope.$on('rate', function(e, rate) {
-		    	if (rate.symbol !== $scope.options.symbol) {
-		    		return;
-		    	}
-		    	
+		    $scope.$on('metric', function(e, metric) {
 	    		var shift = chart.series[0].data.length >= size,
     		    	animate = false;
 	    		
-	    		chart.series[0].addPoint([rate.dateTime, (rate.ask + rate.bid)/2.0], false, shift, animate);
-	    		chart.series[1].addPoint([rate.dateTime, rate.bid, rate.ask], enabled, shift, animate);
+	    		chart.series[0].addPoint([metric.dateTime, metric.data.count], enabled, shift, animate);
 		    });
 		}
 	}
