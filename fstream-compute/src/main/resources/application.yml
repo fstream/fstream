@@ -75,6 +75,20 @@ compute:
            HAVING
                COUNT(*) < 5
 
+      - name: bursty pricing
+        description: A high amout of quote activity per second.
+        statement: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+               symbol, 
+               COUNT(*) AS eventCnt 
+           FROM
+               Rate.win:time(1 sec)
+           GROUP BY 
+               symbol
+           HAVING
+               COUNT(*) > 20
+
    metrics:
 
       - name: Simple stats
@@ -92,3 +106,4 @@ compute:
                MAX(bid)   AS maxBid
            FROM
                Rate.win:time_batch(5 sec)
+               
