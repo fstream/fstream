@@ -57,12 +57,25 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		
 	function updateInstruments(instruments) {
 		$scope.instruments = instruments;
-		$scope.views.push({
+		
+		var metrics = [{
 			type: 'metric',
+			id: 1,
 			title: 'Events per Minute',
 			name: "Events",
 			units: "Count"
+		}, {
+			type: 'metric',
+			id: 2,
+			title: 'Alerts per Minute',
+			name: "Alerts",
+			units: "Count"
+		}]
+		
+		_.each(metrics, function(metric, i) {
+			$scope.views.push(metric);
 		});
+	
 		_.each(instruments, function(symbol, i) {
 			$scope.views.push({
 				type: 'tick',

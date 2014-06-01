@@ -11,11 +11,14 @@ package io.fstream.test.kafka;
 
 import java.util.Properties;
 
+import kafka.admin.AdminUtils;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
+import org.I0Itec.zkclient.ZkClient;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 
@@ -61,4 +64,18 @@ public class EmbeddedKafka extends AbstractIdleService {
     return properties;
   }
 
+  @SuppressWarnings("unused")
+  private void createTopics() {
+    val zkClient = new ZkClient(zkConnect);
+    val numPartitions = 1;
+    val replicationFactor = 1;
+    val topicConfig = new Properties();
+
+    for (val topicName : new String[] { "alerts" }) {
+      log.info("***** Creating topic '{}'...", topicName);
+      AdminUtils.createTopic(zkClient, topicName, numPartitions, replicationFactor, topicConfig);
+      log.info("***** Finished creating topic '{}'", topicName);
+    }
+
+  }
 }

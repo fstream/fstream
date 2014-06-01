@@ -21,6 +21,7 @@ import org.joda.time.DateTime;
 @AllArgsConstructor
 public class AlertEvent implements Event {
 
+  int id;
   DateTime dateTime;
   final EventType type = ALERT;
 

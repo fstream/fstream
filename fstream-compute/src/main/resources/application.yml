@@ -9,11 +9,6 @@
 # Proprietary and confidential.
 #
 
-# Spring
-spring:
-   config:
-      location: classpath:application-compute.yml
-      
 # ZooKeeper
 zk:
    host: localhost
@@ -50,7 +45,8 @@ compute:
       
    alerts:
          
-      - name: Relative tick threshold
+      - id: 1
+        name: Relative tick threshold
         description: Tick-to-tick percentage is greater than 1%
         statement: |
            CONTEXT SegmentedBySymbol
@@ -61,7 +57,8 @@ compute:
            WHERE
               ask / prior(1, ask) > 1.01
 
-      - name: Flat pricing
+      - id: 2
+        name: Flat pricing
         description: Coded to fire many times. Final implementation would count < 1 every 60 secs.
         statement: |
            CONTEXT SegmentedBySymbol
@@ -75,8 +72,9 @@ compute:
            HAVING
                COUNT(*) < 5
 
-      - name: bursty pricing
-        description: A high amout of quote activity per second.
+      - id: 3
+        name: Bursty pricing
+        description: A high amount of quote activity per second.
         statement: |
            CONTEXT SegmentedBySymbol
            SELECT
@@ -91,11 +89,21 @@ compute:
 
    metrics:
 
-      - name: Events per minute
+      - id: 1
+        name: Events per minute
         description: Calculates the number of events per minute across all instruments
         statement: |
            SELECT
-               COUNT(ask) AS count
+               COUNT(*) AS count
            FROM
                Rate.win:time_batch(1 min)
+
+      - id: 2
+        name: Alerts per minute
+        description: Calculates the number of alerts per minute
+        statement: |
+           SELECT
+               COUNT(*) AS count
+           FROM
+               Alert.win:time_batch(1 min)
                

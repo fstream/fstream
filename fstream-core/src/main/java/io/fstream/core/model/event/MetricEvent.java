@@ -21,6 +21,7 @@ import org.joda.time.DateTime;
 @AllArgsConstructor
 public class MetricEvent implements Event {
 
+  int id;
   DateTime dateTime;
   final EventType type = METRIC;
 

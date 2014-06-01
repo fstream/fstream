@@ -40,15 +40,15 @@ public class AlertBolt extends EsperBolt {
     val alerts = getAlerts(conf);
     for (val alert : alerts) {
       log.info("Registering alert: {}", alert);
-      val statement = admin.createEPL(alert.getStatement());
+      val statement = admin.createEPL(alert.getStatement(), alert);
 
       statement.addListener(this);
     }
   }
 
   @Override
-  protected Event createEvent(Object data) {
-    return new AlertEvent(new DateTime(), data);
+  protected Event createEvent(int id, Object data) {
+    return new AlertEvent(id, new DateTime(), data);
   }
 
   @SneakyThrows

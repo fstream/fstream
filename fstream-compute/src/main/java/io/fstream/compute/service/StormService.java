@@ -20,6 +20,7 @@ import io.fstream.compute.bolt.MetricBolt;
 import io.fstream.compute.config.ComputeProperties;
 import io.fstream.compute.config.KafkaProperties;
 import io.fstream.compute.config.StormProperties;
+import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -83,46 +84,73 @@ public class StormService {
   }
 
   public StormTopology createTopology() {
+
+    /**
+     * Setup
+     */
+    val ratesSpoutId = "rates-spout";
+    val alertsSpoutId = "alerts-spout";
+    val alertsBoltId = "alerts-bolt";
+    val alertsKafkaBoltId = "alerts-kafka-bolt";
+    val metricsBoltId = "metrics-bolt";
+    val metricsKafkaBoltId = "metrics-kafka-bolt";
+    val loggerBoltId = "logger-bolt";
+
+    val parallelismHint = 2;
     val builder = new TopologyBuilder();
 
+    /**
+     * Spouts
+     */
+
     // Rates
-    val ratesId = "fstream-rates";
-    val parallelismHint = 2;
-    builder.setSpout(ratesId, newKafkaSpout(zkConnect), parallelismHint);
+    builder.setSpout(ratesSpoutId, newKafkaSpout(zkConnect, RATES), parallelismHint);
 
     // Alerts
-    val alertsId = "fstream-alerts";
-    builder.setBolt(alertsId, new AlertBolt()).shuffleGrouping(ratesId);
-    builder.setBolt("kafka-alerts", new KafkaBolt<String, String>()).shuffleGrouping(alertsId)
+    builder.setSpout(alertsSpoutId, newKafkaSpout(zkConnect, ALERTS), parallelismHint);
+
+    /**
+     * Bolts
+     */
+
+    // Alerts
+    builder.setBolt(alertsBoltId, new AlertBolt())
+        .shuffleGrouping(ratesSpoutId);
+    builder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
+        .shuffleGrouping(alertsBoltId)
         .addConfiguration(KafkaBolt.TOPIC, ALERTS.getId());
 
     // Metrics
-    val metricsId = "fstream-metrics";
-    builder.setBolt(metricsId, new MetricBolt()).shuffleGrouping(ratesId);
-    builder.setBolt("kafka-metrics", new KafkaBolt<String, String>()).shuffleGrouping(metricsId)
+    builder.setBolt(metricsBoltId, new MetricBolt())
+        .shuffleGrouping(ratesSpoutId)
+        .shuffleGrouping(alertsSpoutId);
+    builder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
+        .shuffleGrouping(metricsBoltId)
         .addConfiguration(KafkaBolt.TOPIC, METRICS.getId());
 
     // Logging
-    val loggerId = "fstream-logger";
-    builder.setBolt(loggerId, new LoggingBolt()).shuffleGrouping(ratesId);
+    builder.setBolt(loggerBoltId, new LoggingBolt())
+        .shuffleGrouping(ratesSpoutId);
+
+    /**
+     * Create
+     */
 
     return builder.createTopology();
   }
 
-  private IRichSpout newKafkaSpout(String zkConnect) {
+  private IRichSpout newKafkaSpout(String zkConnect, Topic topic) {
     // List of Kafka brokers
     val hosts = newZkHosts(zkConnect);
 
-    // Topic to read from
-    val topic = RATES.getId();
-
     // The root path in ZooKeeper for the spout to store the consumer offsets
-    val zkRoot = "/fstream/storm/kafka";
+    val zkRoot = "/fstream/storm/kafka-" + topic.getId();
 
+    // TODO: determine if this needs to be unique
     // An id for this consumer for storing the consumer offsets in ZooKeeper
-    val consumerId = "fstream-storm-kafka-spout";
+    val consumerId = "storm-kafka-spout-" + topic.getId();
 
-    val kafkaConf = new SpoutConfig(hosts, topic, zkRoot, consumerId);
+    val kafkaConf = new SpoutConfig(hosts, topic.getId(), zkRoot, consumerId);
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
 
     return new KafkaSpout(kafkaConf);

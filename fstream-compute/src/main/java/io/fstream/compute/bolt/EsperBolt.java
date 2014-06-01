@@ -9,6 +9,8 @@
 
 package io.fstream.compute.bolt;
 
+import io.fstream.core.model.definition.Definition;
+import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.TickEvent;
 import io.fstream.core.util.Codec;
@@ -33,12 +35,14 @@ import com.espertech.esper.client.EPAdministrator;
 import com.espertech.esper.client.EPRuntime;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
+import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.UpdateListener;
+import com.espertech.esper.client.StatementAwareUpdateListener;
+import com.espertech.esper.client.metric.MetricEvent;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
-public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
+public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUpdateListener {
 
   /**
    * Constants.
@@ -72,6 +76,8 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
     log.info("Preparing...");
     val configuration = new Configuration();
     configuration.addEventType("Rate", TickEvent.class.getName());
+    configuration.addEventType("Alert", AlertEvent.class.getName());
+    configuration.addEventType("Metric", MetricEvent.class.getName());
 
     this.collector = collector;
     this.provider = EPServiceProviderManager.getProvider(this.toString(), configuration);
@@ -95,20 +101,20 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
   }
 
   /**
-   * Template methods.
+   * Template method to create a statement.
    */
   protected abstract void createStatements(Map<?, ?> conf, EPAdministrator admin);
 
   /**
-   * Template methods.
+   * Template method to create an event.
    */
-  protected abstract Event createEvent(Object data);
+  protected abstract Event createEvent(int id, Object data);
 
   @Override
   @SneakyThrows
   public void execute(Tuple tuple) {
     val value = (String) tuple.getValue(0);
-    val event = Codec.decodeText(value, TickEvent.class);
+    val event = Codec.decodeText(value, Event.class);
 
     runtime.sendEvent(event);
 
@@ -116,12 +122,13 @@ public abstract class EsperBolt extends BaseRichBolt implements UpdateListener {
   }
 
   @Override
-  @SneakyThrows
-  public void update(EventBean[] newEvents, EventBean[] oldEvents) {
+  public void update(EventBean[] newEvents, EventBean[] oldEvents, EPStatement statement,
+      EPServiceProvider epServiceProvider) {
     if (newEvents != null) {
+      val definition = (Definition) statement.getUserObject();
       for (val newEvent : newEvents) {
         val data = newEvent.getUnderlying();
-        val event = createEvent(data);
+        val event = createEvent(definition.getId(), data);
         val value = Codec.encodeText(event);
 
         collector.emit(new Values(KAFKA_TOPIC_KEY, value));

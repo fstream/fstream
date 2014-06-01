@@ -70,6 +70,10 @@ angular.module('FStreamApp.directives').directive('metricChart', function() {
 			});
 			
 		    $scope.$on('metric', function(e, metric) {
+		    	if (metric.id !== $scope.options.id) {
+		    		return;
+		    	}
+		    	
 	    		var shift = chart.series[0].data.length >= size,
     		    	animate = false;
 	    		

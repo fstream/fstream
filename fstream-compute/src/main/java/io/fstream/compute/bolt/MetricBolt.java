@@ -40,15 +40,15 @@ public class MetricBolt extends EsperBolt {
     val metrics = getMetrics(conf);
     for (val metric : metrics) {
       log.info("Registering metric: {}", metric);
-      val statement = admin.createEPL(metric.getStatement());
+      val statement = admin.createEPL(metric.getStatement(), metric);
 
       statement.addListener(this);
     }
   }
 
   @Override
-  protected Event createEvent(Object data) {
-    return new MetricEvent(new DateTime(), data);
+  protected Event createEvent(int id, Object data) {
+    return new MetricEvent(id, new DateTime(), data);
   }
 
   @SneakyThrows
