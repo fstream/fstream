@@ -9,14 +9,16 @@
 
 package io.fstream.core.model.event;
 
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
+
 import java.io.Serializable;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 /**
@@ -24,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 @JsonTypeInfo(
     use = Id.NAME,
-    include = As.PROPERTY,
+    include = PROPERTY,
     property = "type")
 @JsonSubTypes({
     @Type(value = TickEvent.class, name = "TICK"),
@@ -35,6 +37,7 @@ public interface Event extends Serializable {
 
   DateTime getDateTime();
 
+  @JsonProperty("type")
   EventType getType();
 
 }

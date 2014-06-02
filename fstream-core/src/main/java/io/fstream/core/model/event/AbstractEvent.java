@@ -9,21 +9,18 @@
 
 package io.fstream.core.model.event;
 
-import static io.fstream.core.model.event.EventType.METRIC;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class MetricEvent extends AbstractDerivedEvent {
+@AllArgsConstructor
+public abstract class AbstractEvent implements Event {
 
-  public MetricEvent(@NonNull DateTime dateTime, int id, @NonNull Object data) {
-    super(METRIC, dateTime, id, data);
-  }
+  protected EventType type;
+  protected DateTime dateTime;
 
 }
