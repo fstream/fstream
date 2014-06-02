@@ -29,11 +29,6 @@ public class EmbeddedKafka {
   private final File logDir;
 
   /**
-   * Dependencies.
-   */
-  private final EmbeddedTopics topics;
-
-  /**
    * State.
    */
   private KafkaServerStartable server;
@@ -45,8 +40,6 @@ public class EmbeddedKafka {
     log.info("Starting up server...");
     server.startup();
     log.info("Finished startup");
-
-    topics.create();
   }
 
   public void shutDown() throws Exception {

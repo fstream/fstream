@@ -74,13 +74,13 @@ public class AppConfig {
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
-    return new EmbeddedKafka(zkConnect, workDir(), embeddedTopics());
+    return new EmbeddedKafka(zkConnect, workDir());
   }
 
   @Bean
   @SneakyThrows
   public EmbeddedTopics embeddedTopics() {
-    return new EmbeddedTopics(zkConnect);
+    return new EmbeddedTopics();
   }
 
   @PostConstruct
@@ -99,6 +99,10 @@ public class AppConfig {
     log.info("> Starting embedded Kafka...");
     embeddedKafka().startUp();
     log.info("< Started embedded Kafka");
+
+    log.info("> Creating embedded topics...");
+    embeddedTopics().create();
+    log.info("< Created embedded topics");
   }
 
   @PreDestroy
