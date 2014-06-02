@@ -18,6 +18,7 @@
 				<table ng-table="tableParams" show-filter="true" class="table">
 					<tr ng-repeat="alert in data">
 						<td data-title="'Time'">{{ alert.dateTime | date:'yyyy-MM-dd HH:mm:ss Z' }}</td>
+						<td data-title="'ID'">{{ alert.id }}</td>
 						<td data-title="'Data'" filter="{ 'data': 'text' }"><pre>{{ alert.data | json }}</pre></td>
 					</tr>
 				</table>       

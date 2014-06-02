@@ -48,7 +48,7 @@ public class AlertBolt extends EsperBolt {
 
   @Override
   protected Event createEvent(int id, Object data) {
-    return new AlertEvent(id, new DateTime(), data);
+    return new AlertEvent(new DateTime(), id, data);
   }
 
   @SneakyThrows

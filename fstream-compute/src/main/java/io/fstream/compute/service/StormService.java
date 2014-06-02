@@ -151,6 +151,7 @@ public class StormService {
     val consumerId = "storm-kafka-spout-" + topic.getId();
 
     val kafkaConf = new SpoutConfig(hosts, topic.getId(), zkRoot, consumerId);
+    kafkaConf.forceFromStart = true;
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
 
     return new KafkaSpout(kafkaConf);

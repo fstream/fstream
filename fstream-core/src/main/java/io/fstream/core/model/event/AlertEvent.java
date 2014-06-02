@@ -10,21 +10,20 @@
 package io.fstream.core.model.event;
 
 import static io.fstream.core.model.event.EventType.ALERT;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class AlertEvent implements Event {
+@EqualsAndHashCode(callSuper = true)
+public class AlertEvent extends AbstractDerivedEvent {
 
-  int id;
-  DateTime dateTime;
-  final EventType type = ALERT;
-
-  Object data;
+  public AlertEvent(@NonNull DateTime dateTime, int id, @NonNull Object data) {
+    super(ALERT, dateTime, id, data);
+  }
 
 }

@@ -20,4 +20,3 @@ FROM PATTERN  [EVERY
                rate3 =  Rate(symbol in ['AUD/USD','NZD/USD','AUD/NZD'] and symbol != rate1.symbol and symbol != rate2.symbol and dateTime = rate2.dateTime)
                )
             ]
-            

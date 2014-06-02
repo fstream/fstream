@@ -60,6 +60,8 @@ public class TickEventTypeConverter extends TypeConverterSupport {
       }
     }
 
+    event.setMid((event.getAsk() + event.getBid()) / 2.0f);
+
     return event;
   }
 

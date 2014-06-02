@@ -105,6 +105,5 @@ subprojects {
 			attributes 'Provider': 'gradle', 'Implementation-Title': project.name, 'Implementation-Version': project.version
 		}
 	}
-	
 }
 

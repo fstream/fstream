@@ -18,11 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.curator.test.TestingServer;
 
-import com.google.common.util.concurrent.AbstractIdleService;
-
 @Slf4j
 @RequiredArgsConstructor
-public class EmbeddedZooKeeper extends AbstractIdleService {
+public class EmbeddedZooKeeper {
 
   /**
    * Configuration.
@@ -37,8 +35,7 @@ public class EmbeddedZooKeeper extends AbstractIdleService {
    */
   private TestingServer server;
 
-  @Override
-  protected void startUp() throws Exception {
+  public void startUp() throws Exception {
     val clientPort = getZkClientPort();
 
     log.info("Starting testing server...");
@@ -46,8 +43,7 @@ public class EmbeddedZooKeeper extends AbstractIdleService {
     log.info("Finished starting testing server");
   }
 
-  @Override
-  protected void shutDown() throws Exception {
+  public void shutDown() throws Exception {
     log.info("Stopping testing server...");
     server.stop();
     log.info("Finished topting testing server");

@@ -48,7 +48,7 @@ public class MetricBolt extends EsperBolt {
 
   @Override
   protected Event createEvent(int id, Object data) {
-    return new MetricEvent(id, new DateTime(), data);
+    return new MetricEvent(new DateTime(), id, data);
   }
 
   @SneakyThrows

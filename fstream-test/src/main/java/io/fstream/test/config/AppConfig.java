@@ -9,12 +9,17 @@
 
 package io.fstream.test.config;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Strings.repeat;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import io.fstream.core.model.topic.Topic;
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
+import io.fstream.test.kafka.KafkaUtils;
+import io.fstream.test.kafka.ZkStringSerializer;
 import io.fstream.test.zk.EmbeddedZooKeeper;
 
 import java.io.File;
-import java.nio.file.Files;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -23,12 +28,14 @@ import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 @Slf4j
 @Configuration
@@ -41,11 +48,16 @@ public class AppConfig {
 
   @Bean
   @SneakyThrows
-  public File tmp() {
-    val tmp = Files.createTempDirectory("fstream-test").toFile();
-    log.info("Testing storage: {}", tmp);
+  public File workDir() {
+    val workDir = new File("/tmp/fstream-test");
+    if (workDir.exists()) {
+      deleteDirectory(workDir);
+    }
 
-    return tmp;
+    checkState(workDir.mkdir(), "Could not create %s", workDir);
+    log.info("**** Testing storage: {}", workDir);
+
+    return workDir;
   }
 
   @Bean
@@ -61,47 +73,74 @@ public class AppConfig {
 
   @Bean
   public EmbeddedZooKeeper embeddedZookeeper() {
-    return new EmbeddedZooKeeper(zkConnect, tmp());
+    return new EmbeddedZooKeeper(zkConnect, workDir());
   }
 
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
-    return new EmbeddedKafka(zkConnect);
+    return new EmbeddedKafka(zkConnect, workDir());
+  }
+
+  @Bean
+  @Lazy
+  @SneakyThrows
+  public ZkClient zkClient() {
+    val zkClient = new ZkClient(zkConnect);
+    zkClient.setZkSerializer(new ZkStringSerializer());
+
+    return zkClient;
   }
 
   @PostConstruct
+  @SneakyThrows
   public void init() {
     if (hbase()) {
       log.info("> Starting embedded HBase...");
-      embeddedHbase().startAndWait();
+      embeddedHbase().startUp();
       log.info("< Started embedded HBase");
     } else {
       log.info("> Starting embedded ZooKeeper...");
-      embeddedZookeeper().startAndWait();
+      embeddedZookeeper().startUp();
       log.info("< Started embedded ZooKeeper");
     }
 
     log.info("> Starting embedded Kafka...");
-    embeddedKafka().startAndWait();
+    embeddedKafka().startUp();
     log.info("< Started embedded Kafka");
+
+    log.info("> Creating topics...");
+    for (val topic : Topic.values()) {
+      val topicName = topic.getId();
+      log.info(repeat("-", 80));
+      log.info("Creating topic '{}'...", topicName);
+      log.info(repeat("-", 80));
+
+      KafkaUtils.createTopic(zkClient(), topicName);
+    }
+    log.info("< Created topics");
   }
 
   @PreDestroy
+  @SneakyThrows
   public void destroy() {
     log.info("> Stopping embedded Kafka...");
-    embeddedKafka().stopAndWait();
+    embeddedKafka().shutDown();
     log.info("< Stopped embedded Kafka");
 
     if (hbase()) {
       log.info("> Stopping embedded HBase...");
-      embeddedHbase().stopAndWait();
+      embeddedHbase().shutDown();
       log.info("< Stopped embedded HBase");
     } else {
       log.info("> Stopping embedded ZooKeeper...");
-      embeddedZookeeper().stopAndWait();
+      embeddedZookeeper().shutDown();
       log.info("< Stopped embedded ZooKeeper");
     }
+
+    log.info("> Stopping ZkClient...");
+    zkClient().close();
+    log.info("< Stopped ZkClient");
   }
 
 }

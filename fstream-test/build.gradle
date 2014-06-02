@@ -13,6 +13,9 @@ apply plugin:'application'
 mainClassName = "io.fstream.test.Main"
 
 dependencies {
+  // fStream
+  compile project(':fstream-core')
+  
   // Spring
   compile libraries.springBootActuator
   
@@ -31,7 +34,6 @@ dependencies {
   
   // Zookeeper
   compile libraries.curatorTest
-  
-  // Utilities
-  compile 'com.google.guava:guava:12.0' // Override due to conflicts
 }
+
+task bootRun(dependsOn: run)

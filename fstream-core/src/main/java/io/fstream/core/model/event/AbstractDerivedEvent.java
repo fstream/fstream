@@ -9,30 +9,24 @@
 
 package io.fstream.core.model.event;
 
-import static io.fstream.core.model.event.EventType.TICK;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TickEvent extends AbstractEvent {
+public abstract class AbstractDerivedEvent extends AbstractEvent {
 
-  private String symbol;
-  private float ask;
-  private float bid;
-  private float mid;
+  private int id;
+  private Object data;
 
-  public TickEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid) {
-    super(TICK, dateTime);
-    this.symbol = symbol;
-    this.ask = ask;
-    this.bid = bid;
-    this.mid = (ask + bid) / 2.0f;
+  public AbstractDerivedEvent(EventType type, DateTime dateTime, int id, Object data) {
+    super(type, dateTime);
+    this.id = id;
+    this.data = data;
   }
 
 }

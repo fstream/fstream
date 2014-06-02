@@ -17,6 +17,8 @@ zk:
 
 # Kafka
 kafka:
+   host: localhost
+   port: 6667
    consumerProperties:
       zookeeper.connect: ${zk.connect}
       zookeeper.connection.timeout.ms: 1000000
