@@ -35,3 +35,5 @@ dependencies {
   // Zookeeper
   compile libraries.curatorTest
 }
+
+task bootRun(dependsOn: run)

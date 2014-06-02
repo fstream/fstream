@@ -7,8 +7,15 @@ SELECT
    c.symbol,
    c.dateTime
 FROM 
-   pattern [
+   PATTERN [
          Rate(symbol='AUD/USD') OR
          Rate(symbol='AUD/NZD') OR 
          Rate(symbol='NZD/USD')
-     ->  a = Rate(symbol='AUD/USD') AND b = Rate(symbol='AUD/NZD') AND c = Rate(symbol='NZD/USD')].timer:within(6 sec)
+      ->
+         a = Rate(symbol='AUD/USD') AND 
+         b = Rate(symbol='AUD/NZD') AND 
+         c = Rate(symbol='NZD/USD')
+     
+      WHERE
+         timer:within(6 sec)
+   ] 
