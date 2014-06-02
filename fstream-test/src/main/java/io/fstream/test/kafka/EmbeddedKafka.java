@@ -54,7 +54,6 @@ public class EmbeddedKafka {
     log.info("Creating properties with zkConnect = '{}'", zkConnect);
     val properties = new Properties();
     properties.put("zookeeper.connect", zkConnect);
-    properties.put("auto.create.topics.enable", "true");
     properties.put("broker.id", "0");
     properties.put("log.dirs", logDir.getAbsolutePath());
 
