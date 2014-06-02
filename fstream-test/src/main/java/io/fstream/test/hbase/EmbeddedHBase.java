@@ -18,11 +18,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 
-import com.google.common.util.concurrent.AbstractIdleService;
-
 @Slf4j
 @RequiredArgsConstructor
-public class EmbeddedHBase extends AbstractIdleService {
+public class EmbeddedHBase {
 
   /**
    * Configuration.
@@ -34,8 +32,7 @@ public class EmbeddedHBase extends AbstractIdleService {
    */
   private HBaseTestingUtility utility;
 
-  @Override
-  protected void startUp() throws Exception {
+  public void startUp() throws Exception {
     val config = createConfiguration();
     utility = new HBaseTestingUtility(config);
 
@@ -44,8 +41,7 @@ public class EmbeddedHBase extends AbstractIdleService {
     log.info("Finished starting mini-cluster");
   }
 
-  @Override
-  protected void shutDown() throws Exception {
+  public void shutDown() throws Exception {
     log.info("Shutting down mini-cluster...");
     utility.shutdownMiniCluster();
     log.info("Finished shutting down mini-cluster");

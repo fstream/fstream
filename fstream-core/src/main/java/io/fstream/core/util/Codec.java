@@ -38,7 +38,11 @@ public final class Codec {
 
   @SneakyThrows
   public static <T> T decodeText(String text, Class<T> type) {
-    return MAPPER.readValue(text, type);
+    try {
+      return MAPPER.readValue(text, type);
+    } catch (Throwable t) {
+      throw new RuntimeException("Error converting '" + text + "' to " + type, t);
+    }
   }
 
   @SneakyThrows

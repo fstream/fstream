@@ -9,12 +9,14 @@
 
 package io.fstream.test.config;
 
+import static com.google.common.base.Preconditions.checkState;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
+import io.fstream.test.kafka.EmbeddedTopics;
 import io.fstream.test.zk.EmbeddedZooKeeper;
 
 import java.io.File;
-import java.nio.file.Files;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -41,11 +43,16 @@ public class AppConfig {
 
   @Bean
   @SneakyThrows
-  public File tmp() {
-    val tmp = Files.createTempDirectory("fstream-test").toFile();
-    log.info("Testing storage: {}", tmp);
+  public File workDir() {
+    val workDir = new File("/tmp/fstream-test");
+    if (workDir.exists()) {
+      deleteDirectory(workDir);
+    }
 
-    return tmp;
+    checkState(workDir.mkdir(), "Could not create %s", workDir);
+    log.info("**** Testing storage: {}", workDir);
+
+    return workDir;
   }
 
   @Bean
@@ -61,45 +68,53 @@ public class AppConfig {
 
   @Bean
   public EmbeddedZooKeeper embeddedZookeeper() {
-    return new EmbeddedZooKeeper(zkConnect, tmp());
+    return new EmbeddedZooKeeper(zkConnect, workDir());
   }
 
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
-    return new EmbeddedKafka(zkConnect);
+    return new EmbeddedKafka(zkConnect, workDir(), embeddedTopics());
+  }
+
+  @Bean
+  @SneakyThrows
+  public EmbeddedTopics embeddedTopics() {
+    return new EmbeddedTopics(zkConnect);
   }
 
   @PostConstruct
+  @SneakyThrows
   public void init() {
     if (hbase()) {
       log.info("> Starting embedded HBase...");
-      embeddedHbase().startAndWait();
+      embeddedHbase().startUp();
       log.info("< Started embedded HBase");
     } else {
       log.info("> Starting embedded ZooKeeper...");
-      embeddedZookeeper().startAndWait();
+      embeddedZookeeper().startUp();
       log.info("< Started embedded ZooKeeper");
     }
 
     log.info("> Starting embedded Kafka...");
-    embeddedKafka().startAndWait();
+    embeddedKafka().startUp();
     log.info("< Started embedded Kafka");
   }
 
   @PreDestroy
+  @SneakyThrows
   public void destroy() {
     log.info("> Stopping embedded Kafka...");
-    embeddedKafka().stopAndWait();
+    embeddedKafka().shutDown();
     log.info("< Stopped embedded Kafka");
 
     if (hbase()) {
       log.info("> Stopping embedded HBase...");
-      embeddedHbase().stopAndWait();
+      embeddedHbase().shutDown();
       log.info("< Stopped embedded HBase");
     } else {
       log.info("> Stopping embedded ZooKeeper...");
-      embeddedZookeeper().stopAndWait();
+      embeddedZookeeper().shutDown();
       log.info("< Stopped embedded ZooKeeper");
     }
   }
