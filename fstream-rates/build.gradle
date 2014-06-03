@@ -8,6 +8,7 @@
  */
 
 apply plugin: 'spring-boot'
+applicationDefaultJvmArgs = [ "-XX:MaxPermSize=128M" ]
 
 dependencies {
   // fStream
@@ -34,3 +35,4 @@ dependencies {
   // Utilities
   compile libraries.guava
 }
+

@@ -8,10 +8,11 @@
  */
 
 // Can't use Boot's nested jar packagin due to the way Hadoop's Server loads web.xml
-apply plugin:'application'
-
-mainClassName = "io.fstream.test.Main"
-
+// apply plugin:'application'
+// mainClassName = "io.fstream.test.Main"
+// task bootRun(dependsOn: run)
+apply plugin: 'spring-boot'
+ 
 dependencies {
   // fStream
   compile project(':fstream-core')
@@ -35,5 +36,3 @@ dependencies {
   // Zookeeper
   compile libraries.curatorTest
 }
-
-task bootRun(dependsOn: run)

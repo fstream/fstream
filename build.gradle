@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit;
+
 /*
  * Copyright (c) 2014 fStream. All Rights Reserved.
  *
@@ -107,3 +109,36 @@ subprojects {
 	}
 }
 
+task up() {
+	gradle.taskGraph.whenReady {
+		def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
+		
+		addShutdownHook {
+			println "**** Shutting down..."
+			println "Waiting 10s ..."
+			TimeUnit.SECONDS.sleep(10)
+		}
+		
+		['fstream-test'].each { projectName ->
+			Thread.start {
+				println "Running $projectName..."
+				tasks[projectName].execute()
+			}
+		}
+		
+		println "Waiting 10s ..."
+		TimeUnit.SECONDS.sleep(10)
+		
+		['fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
+			Thread.start {
+				println "Running $projectName..."
+				tasks[projectName].execute()
+			}
+			
+			println "Waiting 5s ..."
+			TimeUnit.SECONDS.sleep(5)
+		}
+	
+		TimeUnit.DAYS.sleep(1)
+	}
+}
