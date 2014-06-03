@@ -9,6 +9,8 @@
 
 package io.fstream.persist.config;
 
+import io.fstream.core.config.CoreConfig;
+
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableAutoConfiguration
 @EnableConfigurationProperties
-public class AppConfig {
+public class PersistConfig extends CoreConfig {
 
 }

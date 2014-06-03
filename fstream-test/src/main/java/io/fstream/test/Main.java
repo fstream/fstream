@@ -14,6 +14,7 @@ import static com.google.common.base.Strings.repeat;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.readLines;
 import static java.lang.System.out;
+import io.fstream.test.config.TestConfig;
 
 import java.io.IOException;
 
@@ -21,15 +22,11 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Application entry point.
  */
 @Slf4j
-@Configuration
-@ComponentScan
 public class Main {
 
   public static void main(String... args) throws Exception {
@@ -37,7 +34,7 @@ public class Main {
 
     new SpringApplicationBuilder()
         .showBanner(false)
-        .sources(Main.class)
+        .sources(TestConfig.class)
         .run(args);
 
     out.println("\n\n*** Running test. Press CTLR+C to shutdown\n\n");

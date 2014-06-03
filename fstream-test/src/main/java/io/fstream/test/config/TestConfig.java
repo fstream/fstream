@@ -12,6 +12,7 @@ package io.fstream.test.config;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.repeat;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
+import io.fstream.core.config.CoreConfig;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
@@ -41,10 +42,13 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 @EnableAutoConfiguration
 @EnableConfigurationProperties
-public class AppConfig {
+public class TestConfig extends CoreConfig {
 
   @Value("${zk.connect}")
   private String zkConnect;
+
+  @Value("${state.statements[0]}")
+  private String statement;
 
   @Bean
   @SneakyThrows
@@ -119,6 +123,11 @@ public class AppConfig {
       KafkaUtils.createTopic(zkClient(), topicName);
     }
     log.info("< Created topics");
+
+    // log.info("> Initializing state...");
+    // stateService.initialize();
+    // stateService.write(state);
+    // log.info("< Initialized state");
   }
 
   @PreDestroy

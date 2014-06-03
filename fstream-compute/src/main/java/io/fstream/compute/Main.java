@@ -14,6 +14,7 @@ import static com.google.common.base.Strings.repeat;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.readLines;
 import static java.lang.System.out;
+import io.fstream.compute.config.ComputeConfig;
 
 import java.io.IOException;
 
@@ -21,25 +22,25 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Application entry point.
  */
 @Slf4j
-@Configuration
-@ComponentScan
 public class Main {
 
   public static void main(String... args) throws Exception {
     logBanner();
 
-    new SpringApplicationBuilder()
-        .showBanner(false)
-        .sources(Main.class)
-        .run(args);
-
+    try {
+      new SpringApplicationBuilder()
+          .showBanner(false)
+          .sources(ComputeConfig.class)
+          .run(args);
+    } catch (Throwable t) {
+      log.error("", t);
+      throw t;
+    }
     out.println("\n\n*** Running compute. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);
   }

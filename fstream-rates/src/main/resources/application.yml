@@ -42,13 +42,6 @@ fix:
 rates:
    password: ${PASSWORD:xxxxxxxxxxx missing xxxxxxxxxxxxx}
    uri: quickfix:${fix.configFile}?sessionID=${fix.sessionID}
-   symbols:
-     - EUR/USD
-     - USD/JPY
-     - GBP/USD
-     - AUD/USD
-     - USD/CHF
-     - USD/CAD
 
 # OANDA
 oanda:

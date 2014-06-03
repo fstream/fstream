@@ -10,9 +10,8 @@
 package io.fstream.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import io.fstream.core.model.state.State;
 import io.fstream.web.service.ConfigService;
-
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,11 +23,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ConfigController {
 
   @Autowired
+  State state;
+  @Autowired
   ConfigService configService;
 
   @RequestMapping(method = GET)
-  public @ResponseBody List<String> config() throws Exception {
-    return configService.read();
+  public @ResponseBody State config() throws Exception {
+    return state;
   }
 
 }

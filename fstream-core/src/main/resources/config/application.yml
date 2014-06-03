@@ -1,0 +1,98 @@
+---
+
+#
+# Copyright (c) 2014 fStream. All Rights Reserved.
+# 
+# Project and contact information: https://bitbucket.org/fstream/fstream
+# 
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# Proprietary and confidential.
+#
+
+# State     
+state:
+
+   # Registered instruments
+   symbols:
+     - EUR/USD
+     - USD/JPY
+     - GBP/USD
+     - AUD/USD
+     - USD/CHF
+     - USD/CAD
+
+   # Common statements
+   statements:
+
+      - |
+        CREATE CONTEXT 
+           SegmentedBySymbol
+        PARTITION BY 
+           symbol 
+        FROM
+           Rate
+      
+   alerts:
+         
+      - id: 1
+        name: Relative tick threshold
+        description: Tick-to-tick percentage is greater than 1%
+        statement: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+              ask / prior(1, ask) AS askPercentChange
+           FROM
+              Rate
+           WHERE
+              ask / prior(1, ask) > 1.01
+
+      - id: 2
+        name: Flat pricing
+        description: Coded to fire many times. Final implementation would count < 1 every 60 secs.
+        statement: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+               symbol, 
+               COUNT(*) AS eventCnt 
+           FROM
+               Rate.win:time(10 sec)
+           GROUP BY 
+               symbol
+           HAVING
+               COUNT(*) < 5
+
+      - id: 3
+        name: Bursty pricing
+        description: A high amount of quote activity per second.
+        statement: |
+           CONTEXT SegmentedBySymbol
+           SELECT
+               symbol, 
+               COUNT(*) AS eventCnt 
+           FROM
+               Rate.win:time(1 sec)
+           GROUP BY 
+               symbol
+           HAVING
+               COUNT(*) > 20
+
+   metrics:
+
+      - id: 1
+        name: Events per minute
+        description: Calculates the number of events per minute across all instruments
+        statement: |
+           SELECT
+               COUNT(*) AS count
+           FROM
+               Rate.win:time_batch(1 min)
+
+      - id: 2
+        name: Alerts per minute
+        description: Calculates the number of alerts per minute
+        statement: |
+           SELECT
+               COUNT(*) AS count
+           FROM
+               Alert.win:time_batch(1 min)
+               

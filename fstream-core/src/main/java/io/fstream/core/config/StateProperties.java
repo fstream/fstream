@@ -7,16 +7,15 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.config;
+package io.fstream.core.config;
 
-import lombok.Data;
+import io.fstream.core.model.state.State;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Data
 @Component
-@ConfigurationProperties("rates")
-public class RatesProperties {
+@ConfigurationProperties("state")
+public class StateProperties extends State {
 
 }

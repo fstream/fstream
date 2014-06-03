@@ -2,7 +2,7 @@ angular.module('FStreamApp.services').factory('configService', ['$http', functio
 	return {
 		getConfig: function() {
 			return $http.get('/config').then(function(response) {
-				return response.data;
+				return response.data.symbols;
 			});              
 		}
 	} 

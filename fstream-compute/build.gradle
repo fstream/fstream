@@ -11,7 +11,10 @@ apply plugin: 'spring-boot'
  
 dependencies {
   // fStream
-  compile project(':fstream-core')
+  compile(project(':fstream-core')) {
+    exclude group: 'org.apache.curator'
+    exclude group: 'org.apache.zookeeper'
+  }
 
   // Spring
   compile libraries.springBootActuator

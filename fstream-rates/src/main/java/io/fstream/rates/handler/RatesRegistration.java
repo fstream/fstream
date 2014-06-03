@@ -13,7 +13,7 @@ import static quickfix.field.MDEntryType.BID;
 import static quickfix.field.MDEntryType.OFFER;
 import static quickfix.field.MDUpdateType.FULL_REFRESH;
 import static quickfix.field.SubscriptionRequestType.SNAPSHOT_PLUS_UPDATES;
-import io.fstream.rates.config.RatesProperties;
+import io.fstream.core.model.state.State;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +40,11 @@ import quickfix.fix44.Message;
 public class RatesRegistration {
 
   @Autowired
-  private RatesProperties properties;
+  private State state;
 
   @Handler
   public Message register() {
-    log.info("Registering {}...", properties.getSymbols());
+    log.info("Registering {}...", state.getSymbols());
 
     // All these fields are required
     val message = new MarketDataRequest(
@@ -63,7 +63,7 @@ public class RatesRegistration {
     message.addGroup(entryTypes);
 
     // Symbols
-    for (val symbol : properties.getSymbols()) {
+    for (val symbol : state.getSymbols()) {
       val relatedSymbols = new MarketDataRequest.NoRelatedSym();
       relatedSymbols.set(new Symbol(symbol));
       message.addGroup(relatedSymbols);

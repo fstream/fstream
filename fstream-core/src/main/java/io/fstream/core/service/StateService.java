@@ -7,13 +7,13 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.service;
+package io.fstream.core.service;
 
 import static com.google.common.io.Closeables.close;
+import io.fstream.core.model.state.State;
+import io.fstream.core.model.state.StateListener;
 import io.fstream.core.util.Codec;
-import io.fstream.rates.config.RatesProperties;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.SneakyThrows;
@@ -23,27 +23,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service
-public class ConfigService {
+// @Service
+public class StateService {
 
   /**
    * Constants.
    */
-  private static final String PATH = "/fstream/config";
+  private static final String PATH = "/fstream/state";
 
   /**
-   * Configuration.
+   * state.
    */
   @Value("${zk.connect}")
   private String zkConnect;
-  @Autowired
-  private RatesProperties properties;
 
   /**
    * State.
@@ -52,7 +50,6 @@ public class ConfigService {
   private PathChildrenCache cache;
 
   @SneakyThrows
-  @PostConstruct
   public void initialize() {
     this.client = CuratorFrameworkFactory.newClient(zkConnect, new ExponentialBackoffRetry(1000, 3));
     this.cache = new PathChildrenCache(client, PATH, true);
@@ -64,9 +61,6 @@ public class ConfigService {
     log.info("Starting cache...");
     cache.start();
     log.info("Started cache.");
-
-    // Perform update
-    write();
   }
 
   @SneakyThrows
@@ -82,24 +76,51 @@ public class ConfigService {
   }
 
   @SneakyThrows
-  public void write() {
-    byte[] bytes = serialize();
+  public State read() {
+    log.info("Getting state at path '{}'...", PATH);
+    byte[] bytes = client.getData().forPath(PATH);
+    log.info("Got state at path '{}'.", PATH);
 
-    val exists = client.checkExists().forPath(PATH) != null;
-    if (exists) {
-      log.info("Updating existing configuration at path '{}'...", PATH);
-      client.setData().forPath(PATH, bytes);
-      log.info("Updated configuration at path '{}'.", PATH);
-    } else {
-      log.info("Creating configuration at path '{}'...", PATH);
-      client.create().creatingParentsIfNeeded().forPath(PATH, bytes);
-      log.info("Created configuration at path '{}'.", PATH);
-    }
+    return deserialize(bytes);
   }
 
   @SneakyThrows
-  public byte[] serialize() {
-    return Codec.encodeBytes(properties.getSymbols());
+  public void write(State state) {
+    byte[] bytes = serialize(state);
+
+    val exists = client.checkExists().forPath(PATH) != null;
+    if (exists) {
+      log.info("Updating existing state at path '{}'...", PATH);
+      client.setData().forPath(PATH, bytes);
+      log.info("Updated state at path '{}'.", PATH);
+    } else {
+      log.info("Creating state at path '{}'...", PATH);
+      client.create().creatingParentsIfNeeded().forPath(PATH, bytes);
+      log.info("Created state at path '{}'.", PATH);
+    }
+  }
+
+  public void register(final StateListener listener) {
+    cache.getListenable().addListener(new PathChildrenCacheListener() {
+
+      @Override
+      public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+        val state = deserialize(event.getData().getData());
+
+        listener.onUpdate(state);
+      }
+
+    });
+  }
+
+  @SneakyThrows
+  private byte[] serialize(State state) {
+    return Codec.encodeBytes(state);
+  }
+
+  @SneakyThrows
+  private State deserialize(byte[] bytes) {
+    return Codec.decodeBytes(bytes, State.class);
   }
 
 }

@@ -20,6 +20,7 @@ import io.fstream.compute.bolt.MetricBolt;
 import io.fstream.compute.config.ComputeProperties;
 import io.fstream.compute.config.KafkaProperties;
 import io.fstream.compute.config.StormProperties;
+import io.fstream.core.model.state.State;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 import lombok.SneakyThrows;
@@ -58,6 +59,8 @@ public class StormService {
   @Value("${zk.connect}")
   private String zkConnect;
   @Autowired
+  private State state;
+  @Autowired
   private StormProperties stormProperties;
   @Autowired
   private KafkaProperties kafkaProperties;
@@ -70,9 +73,9 @@ public class StormService {
     config.setDebug(true);
 
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
-    config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(computeProperties.getStatements()));
-    config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(computeProperties.getAlerts()));
-    config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(computeProperties.getMetrics()));
+    config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(state.getStatements()));
+    config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));
+    config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(state.getMetrics()));
 
     if (stormProperties.isLocal()) {
       config.setMaxTaskParallelism(PARALLELISM);

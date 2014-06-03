@@ -12,6 +12,7 @@ package io.fstream.web.config;
 import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import static io.fstream.core.model.topic.Topic.RATES;
+import io.fstream.core.config.CoreConfig;
 import io.fstream.web.service.TopicMessageService;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableAutoConfiguration
 @EnableConfigurationProperties
-public class AppConfig {
+public class WebConfig extends CoreConfig {
 
   @Bean
   public TopicMessageService ratesMessageService() {
