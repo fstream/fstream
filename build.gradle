@@ -113,32 +113,23 @@ task up() {
 	gradle.taskGraph.whenReady {
 		def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
 		
+		def seconds = 10
 		addShutdownHook {
 			println "**** Shutting down..."
-			println "Waiting 10s ..."
-			TimeUnit.SECONDS.sleep(10)
+			println "Waiting ${seconds}s ..."
+			TimeUnit.SECONDS.sleep(seconds)
 		}
 		
-		['fstream-test'].each { projectName ->
+		['fstream-test', 'fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
 			Thread.start {
 				println "Running $projectName..."
 				tasks[projectName].execute()
 			}
+
+			println "Waiting ${seconds}s ..."
+			TimeUnit.SECONDS.sleep(seconds)
 		}
-		
-		println "Waiting 10s ..."
-		TimeUnit.SECONDS.sleep(10)
-		
-		['fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
-			Thread.start {
-				println "Running $projectName..."
-				tasks[projectName].execute()
-			}
-			
-			println "Waiting 5s ..."
-			TimeUnit.SECONDS.sleep(5)
-		}
-	
+
 		TimeUnit.DAYS.sleep(1)
 	}
 }
