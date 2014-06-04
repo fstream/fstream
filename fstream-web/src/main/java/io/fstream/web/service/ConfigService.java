@@ -13,6 +13,9 @@ import io.fstream.core.model.state.State;
 import io.fstream.core.model.state.StateListener;
 import io.fstream.core.service.StateService;
 import io.fstream.core.util.Codec;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +34,13 @@ public class ConfigService {
    * Dependencies.
    */
   @Setter
-  // @Autowired
+  @Autowired
   protected StateService stateService;
   @Setter
   @Autowired
   protected SimpMessagingTemplate template;
 
-  // @PostConstruct
+  @PostConstruct
   @SneakyThrows
   public void initialize() {
     stateService.register(new StateListener() {

@@ -23,7 +23,7 @@ public class CoreConfig {
   @Autowired
   protected State state;
 
-  // @Autowired
+  @Autowired
   protected StateService stateService;
 
 }
