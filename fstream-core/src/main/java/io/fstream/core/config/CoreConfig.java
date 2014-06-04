@@ -10,7 +10,6 @@
 package io.fstream.core.config;
 
 import io.fstream.core.model.state.State;
-import io.fstream.core.service.StateService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -22,8 +21,5 @@ public class CoreConfig {
 
   @Autowired
   protected State state;
-
-  // @Autowired
-  protected StateService stateService;
 
 }

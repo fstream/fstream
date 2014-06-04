@@ -11,9 +11,6 @@ dependencies {
   // Spring
   compile libraries.springBoot
   
-  // Zookeeper
-//  compile libraries.curator
-  
   // Utilities
   compile libraries.guava
   compile libraries.jacksonDatabind
