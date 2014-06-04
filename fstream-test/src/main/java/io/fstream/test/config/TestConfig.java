@@ -124,10 +124,10 @@ public class TestConfig extends CoreConfig {
     }
     log.info("< Created topics");
 
-    // log.info("> Initializing state...");
-    // stateService.initialize();
-    // stateService.write(state);
-    // log.info("< Initialized state");
+    log.info("> Initializing state...");
+    stateService.initialize();
+    stateService.write(state);
+    log.info("< Initialized state");
   }
 
   @PreDestroy
