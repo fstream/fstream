@@ -20,13 +20,13 @@ dependencies {
   compile libraries.springBootActuator
       
   // Storm
-  compile "storm:storm:${stormVersion}"
+  compile libraries.storm
   
   // Storm-Kafka 
-  compile 'net.wurstmeister.storm:storm-kafka-0.8-plus:0.4.0'
+  compile libraries.stormKafka
   
   // Esper
-  compile "com.espertech:esper:${esperVersion}"
+  compile libraries.esper
   
   // Utilities
   compile libraries.guava
