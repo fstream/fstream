@@ -79,8 +79,9 @@ state:
    metrics:
 
       - id: 1
-        name: Events per minute
+        name: Events per Minute
         description: Calculates the number of events per minute across all instruments
+        units: Events / min
         statement: |
            SELECT
                COUNT(*) AS count
@@ -88,8 +89,9 @@ state:
                Rate.win:time_batch(1 min)
 
       - id: 2
-        name: Alerts per minute
+        name: Alerts per Minute
         description: Calculates the number of alerts per minute
+        units: Alert / min
         statement: |
            SELECT
                COUNT(*) AS count

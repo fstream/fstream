@@ -1,4 +1,4 @@
-angular.module('FStreamApp.controllers').controller('mainController', function($scope, _, configService, eventService) {
+angular.module('FStreamApp.controllers').controller('mainController', function($scope, _, stateService, eventService) {
 	function registerEvents() {
 		// Events
 		$scope.$on('connected', function(e) {
@@ -24,7 +24,7 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	};
 	
 	function connect() {
-		configService.getConfig().then(updateInstruments);
+		stateService.getState().then(updateState);
 		initScope();
 		resetModel();
 		
@@ -37,7 +37,7 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	
 	function initScope() {
 		$scope.connected = false;
-		$scope.instruments = [];
+		$scope.state = {};
 		$scope.views = [];
 		$scope.connect = connect;
 		$scope.disconnect = disconnect;
@@ -55,28 +55,20 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		eventService.register($scope.instrument);
 	}
 		
-	function updateInstruments(instruments) {
-		$scope.instruments = instruments;
+	function updateState(state) {
+		$scope.state = state.symbols;
 		
-		var metrics = [{
-			type: 'metric',
-			id: 1,
-			title: 'Events per Minute',
-			name: "Events",
-			units: "Count"
-		}, {
-			type: 'metric',
-			id: 2,
-			title: 'Alerts per Minute',
-			name: "Alerts",
-			units: "Count"
-		}]
-		
-		_.each(metrics, function(metric, i) {
-			$scope.views.push(metric);
+		_.each(state.metrics, function(metric, i) {
+			$scope.views.push({
+				type: 'metric',
+				id: metric.id,
+				title: metric.name,
+				name: metric.units,
+				units: metric.units
+			});
 		});
 	
-		_.each(instruments, function(symbol, i) {
+		_.each(state.symbols, function(symbol, i) {
 			$scope.views.push({
 				type: 'tick',
 				index: i,

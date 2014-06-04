@@ -114,27 +114,25 @@ subprojects {
 	}
 }
 
-//task up() {
-//	gradle.taskGraph.whenReady {
-//		def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
-//		
-//		def seconds = 10
-//		addShutdownHook {
-//			println "**** Shutting down..."
-//			println "Waiting ${seconds}s ..."
-//			TimeUnit.SECONDS.sleep(seconds)
-//		}
-//		
-//		['fstream-test', 'fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
-//			Thread.start {
-//				println "Running $projectName..."
-//				tasks[projectName].execute()
-//			}
-//
-//			println "Waiting ${seconds}s ..."
-//			TimeUnit.SECONDS.sleep(seconds)
-//		}
-//
-//		TimeUnit.DAYS.sleep(1)
-//	}
-//}
+task up << {
+	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
+	
+	def seconds = 10
+	addShutdownHook {
+		println "**** Shutting down..."
+		println "Waiting ${seconds}s ..."
+		TimeUnit.SECONDS.sleep(seconds)
+	}
+	
+	['fstream-test', 'fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
+		Thread.start {
+			println "Running $projectName..."
+			tasks[projectName].execute()
+		}
+
+		println "Waiting ${seconds}s ..."
+		TimeUnit.SECONDS.sleep(seconds)
+	}
+
+	TimeUnit.DAYS.sleep(1)
+}

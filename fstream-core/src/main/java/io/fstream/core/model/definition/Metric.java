@@ -17,5 +17,6 @@ import lombok.EqualsAndHashCode;
 public class Metric extends Definition {
 
   private String statement;
+  private String units;
 
 }

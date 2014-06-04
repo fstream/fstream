@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class ConfigService {
+public class StateListenerService implements StateListener {
 
   /**
    * Dependencies.
@@ -43,16 +43,13 @@ public class ConfigService {
   @PostConstruct
   @SneakyThrows
   public void initialize() {
-    stateService.register(new StateListener() {
+    stateService.register(this);
+  }
 
-      @Override
-      public void onUpdate(State state) {
-        log.info("Configuration updated: {}", state);
-        template.send("/topic/commands", createMessage(state));
-
-      }
-
-    });
+  @Override
+  public void onUpdate(State state) {
+    log.info("Configuration updated: {}", state);
+    template.send("/topic/commands", createMessage(state));
   }
 
   private static Message<byte[]> createMessage(State state) {

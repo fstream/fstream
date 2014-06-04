@@ -11,7 +11,7 @@ package io.fstream.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import io.fstream.core.model.state.State;
-import io.fstream.web.service.ConfigService;
+import io.fstream.web.service.StateListenerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/config")
-public class ConfigController {
+@RequestMapping("/state")
+public class StateController {
 
   @Autowired
   State state;
   @Autowired
-  ConfigService configService;
+  StateListenerService configService;
 
   @RequestMapping(method = GET)
   public @ResponseBody State config() throws Exception {
