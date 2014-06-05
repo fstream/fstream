@@ -3,8 +3,9 @@
 	<tabset>
        <tab heading="Charts" select="enableChart()" deselect="disableChart()" ng-controller="chartController">
          <div ng-repeat="view in views" ng-switch="view.type" class="view">
-       	  <metric-chart ng-switch-when="metric" options="view"></metric-chart>
-       	  <tick-chart ng-switch-when="tick" options="view"></tick-chart>
+       	  <metric-chart ng-switch-when="metric-chart" options="view"></metric-chart>
+       	  <tick-chart ng-switch-when="tick-chart" options="view"></tick-chart>
+       	  <alert-log ng-switch-when="alert-log"></alert-log>
          </div>
        </tab>
        <tab heading="Commands">

@@ -58,19 +58,24 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	function updateState(state) {
 		$scope.state = state;
 		
+		
 		_.each(state.metrics, function(metric, i) {
 			$scope.views.push({
-				type: 'metric',
+				type: 'metric-chart',
 				id: metric.id,
 				title: metric.name,
 				name: metric.units,
 				units: metric.units
 			});
 		});
+		
+		$scope.views.push({
+			type: 'alert-log',
+		});
 	
 		_.each(state.symbols, function(symbol, i) {
 			$scope.views.push({
-				type: 'tick',
+				type: 'tick-chart',
 				index: i,
 				symbol: symbol
 		    });

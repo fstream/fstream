@@ -42,3 +42,6 @@
 .view {
    display: inline-block;	
 }	
+.alert-log {
+	width: 550px;
+}
