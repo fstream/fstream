@@ -2,4 +2,6 @@
   <defaults>
     <expression math-context="precision=5 roundingMode=UNNECESSARY"/>
   </defaults>
+  <plugin-singlerow-function name="test" function-class="io.fstream.compute.esper.SingleRowFunctions" function-method="test"/>
+  <auto-import import-name="io.fstream.core.model.event.*"/>
 </engine-settings>
