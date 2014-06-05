@@ -56,7 +56,7 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	}
 		
 	function updateState(state) {
-		$scope.state = state.symbols;
+		$scope.state = state;
 		
 		_.each(state.metrics, function(metric, i) {
 			$scope.views.push({

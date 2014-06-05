@@ -115,14 +115,14 @@ subprojects {
 }
 
 task up << {
-	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
-	
-	def seconds = 10
 	addShutdownHook {
 		println "**** Shutting down..."
 		println "Waiting ${seconds}s ..."
 		TimeUnit.SECONDS.sleep(seconds)
 	}
+	
+	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
+	def seconds = 10
 	
 	['fstream-test', 'fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
 		Thread.start {
