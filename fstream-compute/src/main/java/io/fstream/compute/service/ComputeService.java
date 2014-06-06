@@ -10,6 +10,7 @@
 package io.fstream.compute.service;
 
 import io.fstream.compute.config.StormProperties;
+import io.fstream.core.model.state.State;
 
 import javax.annotation.PostConstruct;
 
@@ -58,11 +59,17 @@ public class ComputeService {
   @Autowired
   private StormService stormService;
 
+  /**
+   * State.
+   */
+  @Autowired
+  private State state;
+
   @PostConstruct
   public void execute() throws Exception {
     // Setup
+    val config = stormService.createConfig(state);
     val topology = stormService.createTopology();
-    val config = stormService.createConfig();
 
     if (stormProperties.isLocal()) {
       executeLocal(topology, config);

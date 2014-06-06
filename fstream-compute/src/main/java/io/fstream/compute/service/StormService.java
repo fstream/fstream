@@ -17,7 +17,6 @@ import io.fstream.compute.bolt.EsperBolt;
 import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.compute.bolt.MetricBolt;
-import io.fstream.compute.config.ComputeProperties;
 import io.fstream.compute.config.KafkaProperties;
 import io.fstream.compute.config.StormProperties;
 import io.fstream.core.model.state.State;
@@ -51,7 +50,7 @@ public class StormService {
   /**
    * Constants.
    */
-  private static final int PARALLELISM = 3;
+  private static final int PARALLELISM = 1;
 
   /**
    * Configuration.
@@ -59,19 +58,16 @@ public class StormService {
   @Value("${zk.connect}")
   private String zkConnect;
   @Autowired
-  private State state;
-  @Autowired
   private StormProperties stormProperties;
   @Autowired
   private KafkaProperties kafkaProperties;
-  @Autowired
-  private ComputeProperties computeProperties;
 
   @SneakyThrows
-  public Config createConfig() {
+  public Config createConfig(State state) {
     val config = new Config();
     config.setDebug(true);
 
+    // Serialize state
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(state.getStatements()));
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));
@@ -91,6 +87,7 @@ public class StormService {
     /**
      * Setup
      */
+    // IDs
     val ratesSpoutId = "rates-spout";
     val alertsSpoutId = "alerts-spout";
     val alertsBoltId = "alerts-bolt";
@@ -99,7 +96,7 @@ public class StormService {
     val metricsKafkaBoltId = "metrics-kafka-bolt";
     val loggerBoltId = "logger-bolt";
 
-    val parallelismHint = 2;
+    val parallelismHint = PARALLELISM;
     val builder = new TopologyBuilder();
 
     /**
@@ -133,7 +130,8 @@ public class StormService {
 
     // Logging
     builder.setBolt(loggerBoltId, new LoggingBolt())
-        .shuffleGrouping(ratesSpoutId);
+        .shuffleGrouping(alertsBoltId)
+        .shuffleGrouping(metricsBoltId);
 
     /**
      * Create
