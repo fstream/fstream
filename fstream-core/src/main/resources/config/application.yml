@@ -20,6 +20,8 @@ state:
      - AUD/USD
      - USD/CHF
      - USD/CAD
+     - AUD/NZD
+     - NZD/USD
 
    # Common statements
    statements:
@@ -55,11 +57,11 @@ state:
                symbol, 
                COUNT(*) AS eventCnt 
            FROM
-               Rate.win:time(10 sec)
+               Rate.win:time(60 sec)
            GROUP BY 
                symbol
            HAVING
-               COUNT(*) < 5
+               COUNT(*) < 1
 
       - id: 3
         name: Bursty pricing
@@ -75,6 +77,25 @@ state:
                symbol
            HAVING
                COUNT(*) > 20
+
+      - id: 4
+        name: AUDNZD cross mispricing
+        description: AUDNZD cross mispricing
+        statement: |
+           SELECT adt,bdt,cdt,amid,bmid, cmid, amid - (bmid*cmid) as diff FROM Rate(symbol in ['AUD/USD','AUD/NZD','NZD/USD']).win:time(1 millisecond)
+           MATCH_RECOGNIZE (
+           MEASURES last(A.mid) as amid, last(B.mid) as bmid, 
+               last(C.mid) as cmid, last(A.dateTime) as adt, 
+               last(B.dateTime) as bdt,last(C.dateTime) as cdt
+               PATTERN ((A+ B+ C+) | (A+ C+ B+) | (B+ A+ C+) | (B+ C+ A+) | (C+ A+ B+) | (C+ B+ A+)) 
+               DEFINE
+               A as Rate.symbol = 'AUD/USD',
+               B as Rate.symbol = 'AUD/NZD',
+               C as Rate.symbol = 'NZD/USD'
+           )
+            WHERE amid - (bmid*cmid) > 0.00001
+
+
 
    metrics:
 
