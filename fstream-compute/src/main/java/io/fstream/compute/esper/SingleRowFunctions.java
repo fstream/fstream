@@ -12,6 +12,8 @@ package io.fstream.compute.esper;
 import static lombok.AccessLevel.PRIVATE;
 import lombok.NoArgsConstructor;
 
+import com.google.common.math.DoubleMath;
+
 /**
  * Esper singlerow-functions.
  * 
@@ -20,8 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PRIVATE)
 public class SingleRowFunctions {
 
-  public static String test() {
-    return "Passed!";
+  public static boolean fuzzyEquals(double a, double b, double tolerance) {
+    return DoubleMath.fuzzyEquals(a, b, tolerance);
   }
-
 }
