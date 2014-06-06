@@ -42,7 +42,7 @@ state:
         statement: |
            CONTEXT SegmentedBySymbol
            SELECT
-              ask / prior(1, ask) AS askPercentChange
+              ask / prior(1, ask) AS askPercentChange, symbol,dateTime
            FROM
               Rate
            WHERE
@@ -54,7 +54,7 @@ state:
         statement: |
            CONTEXT SegmentedBySymbol
            SELECT
-               symbol, 
+               symbol, dateTime,
                COUNT(*) AS eventCnt 
            FROM
                Rate.win:time(60 sec)
