@@ -39,6 +39,11 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
 public class KafkaService extends AbstractExecutionThreadService {
 
   /**
+   * Configuration.
+   */
+  private final String topicName = "rates";
+
+  /**
    * Dependencies.
    */
   @Setter
@@ -47,11 +52,6 @@ public class KafkaService extends AbstractExecutionThreadService {
   @Setter
   @Autowired
   private PersistenceService persistenceService;
-
-  /**
-   * Configuration.
-   */
-  private final String topicName = "rates";
 
   /**
    * State.

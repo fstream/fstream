@@ -18,14 +18,20 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class AdapterBolt extends BaseBasicBolt {
+public class KafkaAdapterBolt extends BaseBasicBolt {
+
+  /**
+   * Constants.
+   */
+  private static final String KAFKA_PARTITION_KEY_VALUE = "1";
 
   @Override
   @SneakyThrows
   public void execute(Tuple tuple, BasicOutputCollector collector) {
+    val key = KAFKA_PARTITION_KEY_VALUE;
     val value = (String) tuple.getValue(0);
 
-    collector.emit(new Values("1", value));
+    collector.emit(new Values(key, value));
   }
 
   @Override

@@ -11,7 +11,6 @@ package io.fstream.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import io.fstream.core.model.state.State;
-import io.fstream.web.service.StateListenerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,11 +23,9 @@ public class StateController {
 
   @Autowired
   State state;
-  @Autowired
-  StateListenerService configService;
 
   @RequestMapping(method = GET)
-  public @ResponseBody State config() throws Exception {
+  public @ResponseBody State getState() {
     return state;
   }
 

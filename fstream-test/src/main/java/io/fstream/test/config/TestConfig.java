@@ -44,9 +44,11 @@ import org.springframework.context.annotation.Lazy;
 @EnableConfigurationProperties
 public class TestConfig extends CoreConfig {
 
+  /**
+   * Configuration.
+   */
   @Value("${zk.connect}")
   private String zkConnect;
-
   @Value("${state.statements[0]}")
   private String statement;
 

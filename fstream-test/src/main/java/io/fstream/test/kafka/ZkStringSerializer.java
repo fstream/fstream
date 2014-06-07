@@ -25,4 +25,5 @@ public class ZkStringSerializer implements ZkSerializer {
   public Object deserialize(byte[] bytes) throws ZkMarshallingError {
     return ZKStringSerializer.deserialize(bytes);
   }
+
 }

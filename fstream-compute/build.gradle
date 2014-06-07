@@ -10,15 +10,15 @@
 apply plugin: 'spring-boot'
  
 dependencies {
+  
+  // fStream
+  compile(project(':fstream-core'))
+  
+  // ZooKeeper
   compile('org.apache.zookeeper:zookeeper:3.3.2') {
     force = true
   }
   
-  // fStream
-  compile(project(':fstream-core')){
-    exclude group: 'org.apache.zookeeper'
-  }
-
   // Spring
   compile libraries.springBootActuator
       
