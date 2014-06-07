@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
  * Proprietary and confidential.
  */
  
- 
 defaultTasks 'build'
  
 buildscript {
@@ -18,7 +17,7 @@ buildscript {
    // Versions
    //
    ext.springVersion     = '4.0.5.RELEASE'
-   ext.springBootVersion = "1.0.2.RELEASE"
+   ext.springBootVersion = "1.1.0.RC1"
    ext.quickfixjVersion  = '1.5.3'
    ext.camelVersion      = '2.13.1'
    ext.kafkaVersion      = '0.8.1'
@@ -54,8 +53,9 @@ buildscript {
    ]
    
    repositories {
-   	 maven { url "http://repo.spring.io/libs-snapshot" }
-   	 mavenLocal()
+	   mavenLocal()
+       maven { url "http://repo.spring.io/libs-milestone" }
+       maven { url "http://repo.spring.io/libs-snapshot" }
    }
    
    dependencies {
@@ -74,6 +74,8 @@ subprojects {
 	
 	repositories { 
 		mavenCentral() 
+		maven { url "http://repo.spring.io/libs-milestone" }
+		maven { url "http://repo.spring.io/libs-snapshot" }
 	    maven { url 'http://repo.marketcetera.org/maven' }
 	    maven { url 'http://clojars.org/repo' }
 	    maven { url 'http://conjars.org/repo' }
@@ -114,6 +116,10 @@ subprojects {
 	}
 }
 
+
+/**
+ * Run fStream in "vagrant up / fig up" style.
+ */
 task up << {
 	addShutdownHook {
 		println "**** Shutting down..."

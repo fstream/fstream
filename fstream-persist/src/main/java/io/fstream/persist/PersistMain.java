@@ -6,50 +6,25 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
-
 package io.fstream.persist;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.base.Strings.repeat;
-import static com.google.common.io.Resources.getResource;
-import static com.google.common.io.Resources.readLines;
 import static java.lang.System.out;
-
-import java.io.IOException;
-
-import lombok.val;
-import lombok.extern.slf4j.Slf4j;
+import io.fstream.persist.config.PersistConfig;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Application entry point.
  */
-@Slf4j
-@Configuration
-@ComponentScan
 public class PersistMain {
 
   public static void main(String[] args) throws Exception {
-    logBanner();
-
     new SpringApplicationBuilder()
-        .showBanner(false)
-        .sources(PersistMain.class)
+        .sources(PersistConfig.class)
         .run(args);
 
     out.println("\n\n*** Running persist. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);
-  }
-
-  private static void logBanner() throws IOException {
-    log.info("{}", repeat("-", 100));
-    for (val line : readLines(getResource("banner.txt"), UTF_8)) {
-      log.info(line);
-    }
-    log.info("{}", repeat("-", 100));
   }
 
 }
