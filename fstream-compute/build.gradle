@@ -11,7 +11,7 @@ apply plugin: 'spring-boot'
  
 dependencies {
   // fStream
-  compile(project(':fstream-core'))
+  compile project(':fstream-core')
   
   // Spring
   compile libraries.springBootActuator

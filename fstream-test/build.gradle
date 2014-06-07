@@ -29,9 +29,7 @@ dependencies {
   compile "org.apache.hbase:hbase-testing-util:$hbaseVersion"
   
   // Kafka
-  compile(libraries.kafka) {
-    exclude group: 'org.apache.zookeeper'
-  }
+  compile libraries.kafka
   
   // Zookeeper
   compile libraries.curatorTest
