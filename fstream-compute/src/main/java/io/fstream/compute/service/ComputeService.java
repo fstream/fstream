@@ -33,8 +33,6 @@ public class ComputeService implements StateListener {
    * Dependencies.
    */
   @Autowired
-  private State state;
-  @Autowired
   private StateService stateService;
   @Autowired
   private StormExecutorService executorService;
@@ -43,11 +41,11 @@ public class ComputeService implements StateListener {
   @SneakyThrows
   public void init() {
     log.info("Registering for state updates...");
-    // stateService.initialize();
-    // stateService.register(this);
+    stateService.initialize();
+    stateService.register(this);
 
     log.info("Submitting storm topologies...");
-    executorService.execute(state);
+    executorService.execute(stateService.read());
   }
 
   @Override
