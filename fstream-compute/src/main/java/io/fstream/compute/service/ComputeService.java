@@ -9,119 +9,52 @@
 
 package io.fstream.compute.service;
 
-import io.fstream.compute.config.StormProperties;
+import io.fstream.compute.storm.StormExecutorService;
 import io.fstream.core.model.state.State;
+import io.fstream.core.model.state.StateListener;
+import io.fstream.core.service.StateService;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.thrift7.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.generated.KillOptions;
-import backtype.storm.generated.NotAliveException;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.utils.NimbusClient;
-import backtype.storm.utils.Utils;
-
 /**
- * Service responsible for launching topologies.
+ * Compute job submission entry point.
  */
 @Slf4j
 @Service
-@Setter
-public class ComputeService {
-
-  /**
-   * Constants.
-   */
-  private static final String TOPOLOGY_NAME = "compute-topology";
-
-  /**
-   * Configuration.
-   */
-  @Autowired
-  private StormProperties stormProperties;
+public class ComputeService implements StateListener {
 
   /**
    * Dependencies.
    */
   @Autowired
-  private StormService stormService;
-
-  /**
-   * State.
-   */
-  @Autowired
   private State state;
+  @Autowired
+  private StateService stateService;
+  @Autowired
+  private StormExecutorService executorService;
 
   @PostConstruct
-  public void execute() throws Exception {
-    // Setup
-    val config = stormService.createConfig(state);
-    val topology = stormService.createTopology();
+  @SneakyThrows
+  public void init() {
+    log.info("Registering for state updates...");
+    // stateService.initialize();
+    // stateService.register(this);
 
-    if (stormProperties.isLocal()) {
-      executeLocal(topology, config);
-    } else {
-      executeCluster(topology, config);
-    }
+    log.info("Submitting storm topologies...");
+    executorService.execute(state);
   }
 
-  private void executeLocal(StormTopology topology, Config config) {
-    log.info("Submitting local topology '{}'...", TOPOLOGY_NAME);
-    val cluster = new LocalCluster();
-    cluster.submitTopology(TOPOLOGY_NAME, config, topology);
-
-    onShutdown(new Runnable() {
-
-      @Override
-      public void run() {
-        log.info("Shutting down cluster...");
-        cluster.shutdown();
-        log.info("Shut down cluster.");
-      }
-
-    });
-  }
-
-  private void executeCluster(StormTopology topology, Config config)
-      throws AlreadyAliveException, InvalidTopologyException {
-    log.info("Submitting cluster topology '{}'...", TOPOLOGY_NAME);
-    StormSubmitter.submitTopology(TOPOLOGY_NAME, config, topology);
-
-    onShutdown(new Runnable() {
-
-      @Override
-      @SneakyThrows
-      public void run() {
-        killTopology(TOPOLOGY_NAME);
-      }
-
-    });
-  }
-
-  private static void killTopology(String name) throws NotAliveException, TException {
-    val client = NimbusClient.getConfiguredClient(Utils.readStormConfig()).getClient();
-    val killOpts = new KillOptions();
-
-    log.info("Killing topology '{}'", name);
-    client.killTopologyWithOpts(name, killOpts);
-    log.info("Killed topology '{}'.", name);
-  }
-
-  private static void onShutdown(Runnable runnable) {
-    Runtime.getRuntime().addShutdownHook(new Thread(runnable));
+  @Override
+  @SneakyThrows
+  public void onUpdate(State state) {
+    log.info("Submitting storm topology...");
+    executorService.execute(state);
   }
 
 }

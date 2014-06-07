@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.service;
+package io.fstream.compute.storm;
 
 import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
@@ -18,17 +18,13 @@ import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.compute.bolt.MetricBolt;
 import io.fstream.compute.config.KafkaProperties;
-import io.fstream.compute.config.StormProperties;
 import io.fstream.core.model.state.State;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
@@ -44,26 +40,35 @@ import backtype.storm.topology.TopologyBuilder;
  * <p>
  * @see https://github.com/nathanmarz/storm-contrib/tree/master/storm-kafka
  */
-@Service
-public class StormService {
+@RequiredArgsConstructor
+public class StormJob {
 
   /**
    * Constants.
    */
+  private static final String TOPOLOGY_NAME = "compute-topology";
   private static final int PARALLELISM = 1;
 
   /**
    * Configuration.
    */
-  @Value("${zk.connect}")
+  @NonNull
   private String zkConnect;
-  @Autowired
-  private StormProperties stormProperties;
-  @Autowired
+  @NonNull
   private KafkaProperties kafkaProperties;
 
+  /**
+   * State.
+   */
+  @NonNull
+  private State state;
+
+  public String getName() {
+    return TOPOLOGY_NAME;
+  }
+
   @SneakyThrows
-  public Config createConfig(State state) {
+  public Config getConfig() {
     val config = new Config();
     config.setDebug(true);
 
@@ -73,16 +78,14 @@ public class StormService {
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));
     config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(state.getMetrics()));
 
-    if (stormProperties.isLocal()) {
-      config.setMaxTaskParallelism(PARALLELISM);
-    } else {
-      config.setNumWorkers(PARALLELISM);
-    }
+    // Parallelism
+    config.setMaxTaskParallelism(PARALLELISM);
+    config.setNumWorkers(PARALLELISM);
 
     return config;
   }
 
-  public StormTopology createTopology() {
+  public StormTopology getTopology() {
 
     /**
      * Setup

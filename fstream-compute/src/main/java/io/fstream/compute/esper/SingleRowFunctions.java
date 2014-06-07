@@ -25,4 +25,5 @@ public class SingleRowFunctions {
   public static boolean fuzzyEquals(double a, double b, double tolerance) {
     return DoubleMath.fuzzyEquals(a, b, tolerance);
   }
+
 }
