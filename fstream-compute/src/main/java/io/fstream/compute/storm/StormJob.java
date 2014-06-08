@@ -163,7 +163,6 @@ public class StormJob {
 
   private ZkHosts newZkHosts(String zkConnect) {
     val hosts = new ZkHosts(zkConnect);
-    hosts.refreshFreqSecs = 1;
 
     return hosts;
   }

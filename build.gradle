@@ -134,7 +134,11 @@ task up << {
 	['fstream-test', 'fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
 		Thread.start {
 			println "Running $projectName..."
-			tasks[projectName].execute()
+			def task = tasks[projectName]
+			def name = projectName.split("-")[1]
+			task.main = "io.fstream.${name}.${name.capitalize()}Main"
+			
+			task.execute()
 		}
 
 		println "Waiting ${seconds}s ..."

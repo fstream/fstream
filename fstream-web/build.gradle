@@ -28,4 +28,3 @@ dependencies {
   // Utilities
   compile libraries.guava
 }
-
