@@ -18,8 +18,8 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		$scope.$on('metric', function(e, metric) {
 			queueEvent($scope.metrics, metric, 60);
 		});
-		$scope.$on('command', function(e, command) {
-			queueEvent($scope.commands, command, 50);
+		$scope.$on('state', function(e, state) {
+			updateState(state);
 		});
 	};
 	

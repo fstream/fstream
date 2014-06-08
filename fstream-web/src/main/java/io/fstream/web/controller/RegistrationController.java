@@ -10,6 +10,7 @@
 package io.fstream.web.controller;
 
 import io.fstream.core.model.definition.Alert;
+import io.fstream.core.model.state.State;
 import io.fstream.core.service.StateService;
 import lombok.Setter;
 import lombok.val;
@@ -32,15 +33,16 @@ public class RegistrationController {
   protected StateService stateService;
 
   @MessageMapping("/register")
-  @SendTo("/topic/commands")
-  public boolean register(Alert alert) throws Exception {
+  @SendTo("/topic/state")
+  public State register(Alert alert) throws Exception {
     log.info("Registering '{}'", alert);
     val state = stateService.getState();
+
     state.getAlerts().add(alert);
 
     stateService.setState(state);
 
-    return true;
+    return state;
   }
 
 }

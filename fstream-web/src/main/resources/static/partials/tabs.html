@@ -8,9 +8,6 @@
        	  <alert-log ng-switch-when="alert-log"></alert-log>
          </div>
        </tab>
-       <tab heading="Commands">
-          <div id="commands"><pre ng-repeat="command in commands">{{ command | json }}</pre></div>
-       </tab>
        <tab heading="Rates">
           <div id="rates"><pre ng-repeat="rate in rates">{{ rate | json }}</pre></div>
        </tab>
@@ -36,7 +33,17 @@
 	            </tab>
                <tab heading="New">
                   <form>
-                     <textarea rows="15" cols="80" ng-model="newAlert.statement"></textarea>
+                     <label>Name:</label>
+                     <br>
+                     <input type="text" ng-model="newAlert.name">
+                     <br>
+                     <label>Description:</label>
+                     <br>
+                     <textarea rows="3" cols="80" ng-model="newAlert.description"></textarea>
+                     <br>
+                     <label>Statement:</label>
+                     <br>
+                     <textarea rows="10" cols="80" ng-model="newAlert.statement"></textarea>
                      <br>
                      <button type="button" class="btn btn-success" ng-click="registerAlert()">Register</button>
                   </form>

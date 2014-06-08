@@ -27,9 +27,9 @@ angular.module('FStreamApp.services').factory('eventService', ['$rootScope', '$t
 		        stompClient.subscribe('/topic/metrics', function(frame){
 		        	publishEvent("metric", frame);
 		        });
-		        
-		        stompClient.subscribe('/topic/commands', function(frame){
-		        	publishEvent("command", frame);
+		                     
+		        stompClient.subscribe('/topic/state', function(frame){
+		        	publishEvent("state", frame);
 		        });                
 		    });
 			
