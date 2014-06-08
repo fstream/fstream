@@ -62,6 +62,8 @@ public class StormExecutorService {
 
   private void executeLocal(StormJob job) {
     log.info("Submitting local topology '{}'...", job.getName());
+
+    // https://issues.apache.org/jira/browse/STORM-213
     val cluster = new LocalCluster();
     cluster.submitTopology(job.getName(), job.getConfig(), job.getTopology());
 
