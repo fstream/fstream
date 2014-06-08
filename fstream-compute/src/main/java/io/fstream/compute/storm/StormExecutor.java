@@ -7,16 +7,12 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.core.model.definition;
+package io.fstream.compute.storm;
 
-import lombok.Data;
+import io.fstream.core.model.state.State;
 
-@Data
-public class Definition {
+public interface StormExecutor {
 
-  private int id;
-  private int version;
-  private String name;
-  private String description;
+  void execute(State state);
 
 }

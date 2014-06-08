@@ -9,7 +9,7 @@
 
 package io.fstream.compute.service;
 
-import io.fstream.compute.storm.StormExecutorService;
+import io.fstream.compute.storm.StormExecutor;
 import io.fstream.core.model.state.State;
 import io.fstream.core.model.state.StateListener;
 import io.fstream.core.service.StateService;
@@ -36,7 +36,7 @@ public class ComputeService implements StateListener {
   @Autowired
   private StateService stateService;
   @Autowired
-  private StormExecutorService executorService;
+  private StormExecutor stormExecutor;
 
   @PostConstruct
   @SneakyThrows
@@ -47,14 +47,18 @@ public class ComputeService implements StateListener {
 
     log.info("Submitting storm topologies...");
     val state = stateService.read();
-    executorService.execute(state);
+    submit(state);
   }
 
   @Override
   @SneakyThrows
   public void onUpdate(State state) {
     log.info("Submitting storm topology...");
-    executorService.execute(state);
+    submit(state);
+  }
+
+  private void submit(State state) throws Exception {
+    stormExecutor.execute(state);
   }
 
 }
