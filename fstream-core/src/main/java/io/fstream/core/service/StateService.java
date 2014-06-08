@@ -36,7 +36,8 @@ public class StateService {
   /**
    * Constants.
    */
-  private static final String PATH = "/fstream/state";
+  private static final String PARENT_PATH = "/fstream";
+  private static final String STATE_PATH = PARENT_PATH + "/state";
 
   /**
    * state.
@@ -52,14 +53,13 @@ public class StateService {
 
   @SneakyThrows
   public void initialize() {
-    this.client = CuratorFrameworkFactory.newClient(zkConnect, new ExponentialBackoffRetry(1000, 3));
-    this.cache = new PathChildrenCache(client, PATH, true);
-
     log.info("Starting client...");
+    this.client = createClient();
     client.start();
     log.info("Started client.");
 
     log.info("Starting cache...");
+    this.cache = createCache();
     cache.start();
     log.info("Started cache.");
   }
@@ -77,41 +77,52 @@ public class StateService {
   }
 
   @SneakyThrows
-  public State read() {
-    log.info("Getting state at path '{}'...", PATH);
-    byte[] bytes = client.getData().forPath(PATH);
-    log.info("Got state at path '{}'.", PATH);
+  public State getState() {
+    log.info("Getting state at path '{}'...", STATE_PATH);
+    byte[] bytes = client.getData().forPath(STATE_PATH);
+    log.info("Got state at path '{}'.", STATE_PATH);
 
     return deserialize(bytes);
   }
 
   @SneakyThrows
-  public void write(State state) {
+  public void setState(State state) {
     byte[] bytes = serialize(state);
 
-    val exists = client.checkExists().forPath(PATH) != null;
+    val exists = client.checkExists().forPath(STATE_PATH) != null;
     if (exists) {
-      log.info("Updating existing state at path '{}'...", PATH);
-      client.setData().forPath(PATH, bytes);
-      log.info("Updated state at path '{}'.", PATH);
+      log.info("Updating existing state at path '{}'...", STATE_PATH);
+      client.setData().forPath(STATE_PATH, bytes);
+      log.info("Updated state at path '{}'.", STATE_PATH);
     } else {
-      log.info("Creating state at path '{}'...", PATH);
-      client.create().creatingParentsIfNeeded().forPath(PATH, bytes);
-      log.info("Created state at path '{}'.", PATH);
+      log.info("Creating state at path '{}'...", STATE_PATH);
+      client.create().creatingParentsIfNeeded().forPath(STATE_PATH, bytes);
+      log.info("Created state at path '{}'.", STATE_PATH);
     }
   }
 
-  public void register(final StateListener listener) {
+  public void addListener(final StateListener listener) {
     cache.getListenable().addListener(new PathChildrenCacheListener() {
 
       @Override
       public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+        log.info("Cache updated: {}", event);
         val state = deserialize(event.getData().getData());
 
         listener.onUpdate(state);
       }
 
     });
+  }
+
+  private CuratorFramework createClient() {
+    val retryPolicy = new ExponentialBackoffRetry(1000, 3);
+
+    return CuratorFrameworkFactory.newClient(zkConnect, retryPolicy);
+  }
+
+  private PathChildrenCache createCache() {
+    return new PathChildrenCache(client, PARENT_PATH, true);
   }
 
   @SneakyThrows

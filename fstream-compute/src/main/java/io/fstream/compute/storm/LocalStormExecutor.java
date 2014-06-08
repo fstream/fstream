@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import backtype.storm.LocalCluster;
 
 /**
- * Service responsible for launching topologies.
+ * Service responsible for launching local topologies.
  */
 @Slf4j
 @Setter

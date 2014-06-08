@@ -88,7 +88,7 @@ public class TopicMessageService extends AbstractExecutionThreadService {
       val message = messageAndMetadata.message();
       val text = new String(message);
 
-      log.info("Received: {}", text);
+      log.debug("Received: {}", text);
       template.send(getMessageDestination(), convert(message));
     }
   }

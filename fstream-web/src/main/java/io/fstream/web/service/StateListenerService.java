@@ -43,12 +43,13 @@ public class StateListenerService implements StateListener {
   @PostConstruct
   @SneakyThrows
   public void initialize() {
-    stateService.register(this);
+    stateService.initialize();
+    stateService.addListener(this);
   }
 
   @Override
   public void onUpdate(State state) {
-    log.info("Configuration updated: {}", state);
+    log.info("State updated: {}", state);
     template.send("/topic/commands", createMessage(state));
   }
 

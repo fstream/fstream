@@ -128,7 +128,7 @@ public class TestConfig extends CoreConfig {
 
     log.info("> Initializing state...");
     stateService.initialize();
-    stateService.write(state);
+    stateService.setState(state);
     log.info("< Initialized state");
   }
 

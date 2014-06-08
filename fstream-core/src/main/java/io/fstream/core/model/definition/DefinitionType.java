@@ -7,15 +7,11 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.storm;
+package io.fstream.core.model.definition;
 
-import io.fstream.core.model.state.State;
+public enum DefinitionType {
 
-/**
- * Abstraction responsible for executing definitions.
- */
-public interface StormExecutor {
-
-  void execute(State state);
+  ALERT,
+  METRIC;
 
 }

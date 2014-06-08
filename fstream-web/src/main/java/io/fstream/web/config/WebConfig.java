@@ -54,7 +54,7 @@ public class WebConfig extends CoreConfig {
   public void init() {
     log.info("> Initializing state...");
     stateService.initialize();
-    stateService.write(state);
+    stateService.setState(state);
     log.info("< Initialized state");
   }
 

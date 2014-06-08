@@ -23,7 +23,7 @@ import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 
 /**
- * Service responsible for launching topologies.
+ * Service responsible for launching distributed topologies.
  */
 @Slf4j
 @Setter

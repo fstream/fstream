@@ -39,9 +39,10 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		$scope.connected = false;
 		$scope.state = {};
 		$scope.views = [];
+		$scope.newAlert = {};
 		$scope.connect = connect;
 		$scope.disconnect = disconnect;
-		$scope.register = registerInstrument;
+		$scope.registerAlert = registerAlert;
 	}
 		
 	function resetModel() {
@@ -51,8 +52,8 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 		$scope.metrics = [];
 	}
 	
-	function registerInstrument() {
-		eventService.register($scope.instrument);
+	function registerAlert() {
+		eventService.register($scope.newAlert);
 	}
 		
 	function updateState(state) {

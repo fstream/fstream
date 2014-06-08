@@ -9,6 +9,7 @@
 
 package io.fstream.web.model;
 
+import io.fstream.core.model.definition.Alert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterMessage {
 
-  private String instrument;
+  private Alert alert;
 
 }

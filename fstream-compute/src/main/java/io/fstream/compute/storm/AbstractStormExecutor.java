@@ -10,7 +10,6 @@
 package io.fstream.compute.storm;
 
 import io.fstream.compute.config.KafkaProperties;
-import io.fstream.compute.config.StormProperties;
 import io.fstream.core.model.state.State;
 
 import java.util.UUID;
@@ -29,8 +28,6 @@ public abstract class AbstractStormExecutor implements StormExecutor {
    */
   @Value("${zk.connect}")
   private String zkConnect;
-  @Autowired
-  private StormProperties stormProperties;
   @Autowired
   private KafkaProperties kafkaProperties;
 

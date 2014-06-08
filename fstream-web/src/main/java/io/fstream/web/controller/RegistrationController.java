@@ -9,10 +9,13 @@
 
 package io.fstream.web.controller;
 
-import io.fstream.web.model.RegisterMessage;
-import io.fstream.web.model.Registration;
+import io.fstream.core.model.definition.Alert;
+import io.fstream.core.service.StateService;
+import lombok.Setter;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -21,11 +24,23 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class RegistrationController {
 
+  /**
+   * Dependencies.
+   */
+  @Setter
+  @Autowired
+  protected StateService stateService;
+
   @MessageMapping("/register")
   @SendTo("/topic/commands")
-  public Registration register(RegisterMessage message) throws Exception {
-    log.info("Registering '{}'", message);
-    return new Registration(message.getInstrument());
+  public boolean register(Alert alert) throws Exception {
+    log.info("Registering '{}'", alert);
+    val state = stateService.getState();
+    state.getAlerts().add(alert);
+
+    stateService.setState(state);
+
+    return true;
   }
 
 }

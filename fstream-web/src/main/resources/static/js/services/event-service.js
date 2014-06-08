@@ -41,8 +41,8 @@ angular.module('FStreamApp.services').factory('eventService', ['$rootScope', '$t
 	        publishEvent("disconnected");
 	    },
 	    
-	    register: function(instrument){
-		    stompClient.send("/web/register", {}, angular.toJson({ 'instrument': instrument }));
+	    register: function(alert){
+		    stompClient.send("/web/register", {}, angular.toJson(alert));
 	    }
 	    
 	} 
