@@ -32,8 +32,8 @@ public class DistributedStormExecutor extends AbstractStormExecutor {
   @Override
   @SneakyThrows
   protected void executeJob(final StormJob job) {
-    log.info("Submitting cluster topology '{}'...", job.getName());
-    StormSubmitter.submitTopology(job.getName(), job.getConfig(), job.getTopology());
+    log.info("Submitting cluster topology '{}'...", job.getId());
+    StormSubmitter.submitTopology(job.getId(), job.getConfig(), job.getTopology());
 
     onShutdown(new Runnable() {
 
@@ -41,7 +41,7 @@ public class DistributedStormExecutor extends AbstractStormExecutor {
       @SneakyThrows
       public void run() {
         log.info("Killing topology...");
-        killTopology(job.getName());
+        killTopology(job.getId());
         log.info("Killed topology");
       }
 

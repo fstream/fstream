@@ -12,6 +12,9 @@ package io.fstream.compute.storm;
 import io.fstream.compute.config.KafkaProperties;
 import io.fstream.compute.config.StormProperties;
 import io.fstream.core.model.state.State;
+
+import java.util.UUID;
+
 import lombok.Setter;
 import lombok.val;
 
@@ -44,7 +47,9 @@ public abstract class AbstractStormExecutor implements StormExecutor {
   protected abstract void executeJob(StormJob job);
 
   protected StormJob createJob(State state) {
-    return new StormJob(zkConnect, kafkaProperties, state);
+    val id = UUID.randomUUID().toString();
+
+    return new StormJob(zkConnect, kafkaProperties, id, state);
   }
 
   protected static void onShutdown(Runnable runnable) {

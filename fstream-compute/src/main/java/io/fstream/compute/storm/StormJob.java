@@ -21,6 +21,7 @@ import io.fstream.compute.config.KafkaProperties;
 import io.fstream.core.model.state.State;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -46,29 +47,31 @@ public class StormJob {
   /**
    * Constants.
    */
-  private static final String TOPOLOGY_NAME = "compute-topology";
   private static final int PARALLELISM = 1;
 
   /**
    * Configuration.
    */
   @NonNull
-  private String zkConnect;
+  private final String zkConnect;
   @NonNull
-  private KafkaProperties kafkaProperties;
+  private final KafkaProperties kafkaProperties;
 
   /**
    * State.
    */
+  @Getter
   @NonNull
-  private State state;
-
-  public String getName() {
-    return TOPOLOGY_NAME;
-  }
+  private final String id;
+  @NonNull
+  private final State state;
+  @Getter(lazy = true)
+  private final Config config = createConfig();
+  @Getter(lazy = true)
+  private final StormTopology topology = createTopology();
 
   @SneakyThrows
-  public Config getConfig() {
+  private Config createConfig() {
     val config = new Config();
     config.setDebug(true);
 
@@ -85,7 +88,7 @@ public class StormJob {
     return config;
   }
 
-  public StormTopology getTopology() {
+  private StormTopology createTopology() {
 
     /**
      * Setup
@@ -107,10 +110,10 @@ public class StormJob {
      */
 
     // Rates
-    builder.setSpout(ratesSpoutId, newKafkaSpout(zkConnect, RATES), parallelismHint);
+    builder.setSpout(ratesSpoutId, createKafkaSpout(zkConnect, RATES), parallelismHint);
 
     // Alerts
-    builder.setSpout(alertsSpoutId, newKafkaSpout(zkConnect, ALERTS), parallelismHint);
+    builder.setSpout(alertsSpoutId, createKafkaSpout(zkConnect, ALERTS), parallelismHint);
 
     /**
      * Bolts
@@ -143,7 +146,7 @@ public class StormJob {
     return builder.createTopology();
   }
 
-  private IRichSpout newKafkaSpout(String zkConnect, Topic topic) {
+  private IRichSpout createKafkaSpout(String zkConnect, Topic topic) {
     // List of Kafka brokers
     val hosts = newZkHosts(zkConnect);
 

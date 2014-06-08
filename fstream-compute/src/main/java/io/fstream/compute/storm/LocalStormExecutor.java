@@ -31,8 +31,8 @@ public class LocalStormExecutor extends AbstractStormExecutor {
 
   @Override
   protected void executeJob(StormJob job) {
-    log.info("Submitting local topology '{}'...", job.getName());
-    cluster.submitTopology(job.getName(), job.getConfig(), job.getTopology());
+    log.info("Submitting local topology '{}'...", job.getId());
+    cluster.submitTopology(job.getId(), job.getConfig(), job.getTopology());
   }
 
   @PreDestroy
