@@ -17,6 +17,7 @@ import io.fstream.core.service.StateService;
 import javax.annotation.PostConstruct;
 
 import lombok.SneakyThrows;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,8 @@ public class ComputeService implements StateListener {
     stateService.register(this);
 
     log.info("Submitting storm topologies...");
-    executorService.execute(stateService.read());
+    val state = stateService.read();
+    executorService.execute(state);
   }
 
   @Override

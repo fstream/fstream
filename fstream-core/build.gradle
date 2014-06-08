@@ -17,5 +17,6 @@ dependencies {
   // Utilities
   compile libraries.guava
   compile libraries.jacksonDatabind
+  compile libraries.jacksonAnnotations
   compile libraries.jacksonJoda
 }

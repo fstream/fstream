@@ -23,7 +23,12 @@ import org.joda.time.DateTime;
 public class AlertEvent extends AbstractDerivedEvent {
 
   public AlertEvent(@NonNull DateTime dateTime, int id, @NonNull Object data) {
-    super(ALERT, dateTime, id, data);
+    super(dateTime, id, data);
+  }
+
+  @Override
+  public EventType getType() {
+    return ALERT;
   }
 
 }

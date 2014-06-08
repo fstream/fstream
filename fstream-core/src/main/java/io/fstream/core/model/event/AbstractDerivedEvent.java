@@ -23,8 +23,8 @@ public abstract class AbstractDerivedEvent extends AbstractEvent {
   private int id;
   private Object data;
 
-  public AbstractDerivedEvent(EventType type, DateTime dateTime, int id, Object data) {
-    super(type, dateTime);
+  public AbstractDerivedEvent(DateTime dateTime, int id, Object data) {
+    super(dateTime);
     this.id = id;
     this.data = data;
   }

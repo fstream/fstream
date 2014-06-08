@@ -23,7 +23,12 @@ import org.joda.time.DateTime;
 public class MetricEvent extends AbstractDerivedEvent {
 
   public MetricEvent(@NonNull DateTime dateTime, int id, @NonNull Object data) {
-    super(METRIC, dateTime, id, data);
+    super(dateTime, id, data);
+  }
+
+  @Override
+  public EventType getType() {
+    return METRIC;
   }
 
 }

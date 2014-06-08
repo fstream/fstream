@@ -40,6 +40,7 @@ buildscript {
 	   springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
 	   springBootWeb:      "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
 	   jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+	   jacksonAnnotations: "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
 	   jacksonJoda:        "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
 	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion",
 	   storm:              "org.apache.storm:storm-core:${stormVersion}",

@@ -20,7 +20,6 @@ import org.joda.time.DateTime;
 @AllArgsConstructor
 public abstract class AbstractEvent implements Event {
 
-  protected EventType type;
   protected DateTime dateTime;
 
 }

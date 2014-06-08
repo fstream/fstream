@@ -28,11 +28,16 @@ public class TickEvent extends AbstractEvent {
   private float mid;
 
   public TickEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid) {
-    super(TICK, dateTime);
+    super(dateTime);
     this.symbol = symbol;
     this.ask = ask;
     this.bid = bid;
     this.mid = (ask + bid) / 2.0f;
+  }
+
+  @Override
+  public EventType getType() {
+    return TICK;
   }
 
 }

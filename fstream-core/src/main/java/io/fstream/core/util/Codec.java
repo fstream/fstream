@@ -13,6 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.TimeZone;
 
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,7 +25,9 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 @NoArgsConstructor(access = PRIVATE)
 public final class Codec {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JodaModule());
+  private static final ObjectMapper MAPPER = new ObjectMapper()
+      .setTimeZone(TimeZone.getTimeZone("America/Toronto"))
+      .registerModule(new JodaModule());
 
   @SneakyThrows
   public static <T> String encodeText(T value) {
