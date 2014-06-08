@@ -38,11 +38,26 @@ public class RegistrationController {
     log.info("Registering '{}'", alert);
     val state = stateService.getState();
 
+    val id = getNextId(state);
+    alert.setId(id);
+
     state.getAlerts().add(alert);
 
     stateService.setState(state);
 
     return state;
+  }
+
+  private int getNextId(State state) {
+    // TODO: This is temporary. Ids should be generated randomly
+    int max = 0;
+    for (val alert : state.getAlerts()) {
+      if (alert.getId() > max) {
+        max = alert.getId();
+      }
+    }
+
+    return max + 1;
   }
 
 }
