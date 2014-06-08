@@ -148,3 +148,18 @@ task up << {
 
 	TimeUnit.DAYS.sleep(1)
 }
+
+/**
+ * Kills all fStream processes.
+ */
+task kill << {
+	def process = "jps -l".execute()
+	process.waitFor()
+	def lines = process.in.text.eachLine { 
+		if (it.contains("io.fstream")) {
+			println "Killing: $it"
+			def pid = it.split()[0]
+			"kill -9 $pid".execute().waitFor()
+		} 
+	}
+}
