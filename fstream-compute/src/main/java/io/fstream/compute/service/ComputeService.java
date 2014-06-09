@@ -9,7 +9,7 @@
 
 package io.fstream.compute.service;
 
-import static org.assertj.core.util.Maps.newConcurrentHashMap;
+import static com.google.common.collect.Maps.newConcurrentMap;
 import io.fstream.compute.storm.StormExecutor;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Metric;
@@ -45,8 +45,8 @@ public class ComputeService implements StateListener {
   @Autowired
   private StormExecutor stormExecutor;
 
-  private final Map<Integer, Alert> alerts = newConcurrentHashMap();
-  private final Map<Integer, Metric> metrics = newConcurrentHashMap();
+  private final Map<Integer, Alert> alerts = newConcurrentMap();
+  private final Map<Integer, Metric> metrics = newConcurrentMap();
 
   @PostConstruct
   @SneakyThrows
