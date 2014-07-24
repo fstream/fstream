@@ -52,10 +52,12 @@ public class TestConfig extends CoreConfig {
   @Value("${state.statements[0]}")
   private String statement;
 
+  private static File WORK_DIR = new File("/tmp/fstream-test");
+
   @Bean
   @SneakyThrows
   public File workDir() {
-    val workDir = new File("/tmp/fstream-test");
+    val workDir = WORK_DIR;
     if (workDir.exists()) {
       deleteDirectory(workDir);
     }

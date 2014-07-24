@@ -12,6 +12,7 @@ package io.fstream.compute.storm;
 import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import static io.fstream.core.model.topic.Topic.RATES;
+import static java.util.UUID.randomUUID;
 import io.fstream.compute.bolt.AlertBolt;
 import io.fstream.compute.bolt.EsperBolt;
 import io.fstream.compute.bolt.KafkaBolt;
@@ -153,12 +154,10 @@ public class StormJob {
     // The root path in ZooKeeper for the spout to store the consumer offsets
     val zkRoot = "/fstream/storm/kafka-" + topic.getId();
 
-    // TODO: determine if this needs to be unique
-    // An id for this consumer for storing the consumer offsets in ZooKeeper
-    val consumerId = "storm-kafka-spout-" + topic.getId();
+    // The unique id for this consumer for storing the consumer offsets in ZooKeeper
+    val consumerId = "storm-kafka-spout-" + topic.getId() + "-" + randomUUID();
 
     val kafkaConf = new SpoutConfig(hosts, topic.getId(), zkRoot, consumerId);
-    kafkaConf.forceFromStart = true;
     kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
 
     return new KafkaSpout(kafkaConf);
