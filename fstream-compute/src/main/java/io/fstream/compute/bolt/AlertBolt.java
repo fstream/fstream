@@ -39,7 +39,7 @@ public class AlertBolt extends EsperBolt {
   protected void createStatements(Map<?, ?> conf, EPAdministrator admin) {
     val alerts = getAlerts(conf);
     for (val alert : alerts) {
-      log.info("Registering alert: {}", alert);
+      log.info("Registering alert: {}", alert.getName());
       val statement = admin.createEPL(alert.getStatement(), alert);
 
       statement.addListener(this);

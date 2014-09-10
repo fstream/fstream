@@ -17,6 +17,7 @@ import io.fstream.core.model.state.State;
 import io.fstream.core.model.state.StateListener;
 import io.fstream.core.service.StateService;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -57,6 +58,7 @@ public class ComputeService implements StateListener {
 
     // Bootstrap initial job
     val state = stateService.getState();
+
     onUpdate(state);
   }
 
@@ -65,39 +67,70 @@ public class ComputeService implements StateListener {
   public void onUpdate(State nextState) {
     // TODO: Support removal of definitions
     log.info("Updating state...");
-    for (val alert : nextState.getAlerts()) {
-      if (alerts.containsKey(alert.getId())) {
+    val symbols = nextState.getSymbols();
+    val common = nextState.getStatements();
+
+    log.info("Submitting alerts...");
+    submitAlerts(nextState.getAlerts(), symbols, common);
+
+    log.info("Submitting metrics...");
+    submitMetrics(nextState.getMetrics(), symbols, common);
+  }
+
+  private void submitAlerts(List<Alert> alerts, List<String> symbols, List<String> common) {
+    for (val alert : alerts) {
+      if (alertExists(alert)) {
         // Skip
         continue;
       }
 
-      val command = new State();
-      command.setSymbols(nextState.getSymbols());
-      command.setStatements(nextState.getStatements());
-      command.setAlerts(ImmutableList.of(alert));
-
-      log.info("Submitting storm topology: {}...", command);
-      stormExecutor.execute(command);
-
-      alerts.put(alert.getId(), alert);
+      submitAlert(alert, symbols, common);
     }
+  }
 
-    for (val metric : nextState.getMetrics()) {
-      if (metrics.containsKey(metric.getId())) {
+  private void submitAlert(Alert alert, List<String> symbols, List<String> common) {
+    // Singleton alert
+    val state = new State();
+    state.setAlerts(ImmutableList.of(alert));
+    state.setSymbols(symbols);
+    state.setStatements(common);
+
+    log.info("Submitting storm alert topology: '{}'...", alert.getName());
+    stormExecutor.execute(state);
+
+    alerts.put(alert.getId(), alert);
+  }
+
+  private boolean alertExists(Alert alert) {
+    return alerts.containsKey(alert.getId());
+  }
+
+  private void submitMetrics(List<Metric> metrics, List<String> symbols, List<String> common) {
+    for (val metric : metrics) {
+      if (metricExists(metric)) {
         // Skip
         continue;
       }
 
-      val command = new State();
-      command.setSymbols(nextState.getSymbols());
-      command.setStatements(nextState.getStatements());
-      command.setMetrics(ImmutableList.of(metric));
-
-      log.info("Submitting storm topology: {}...", command);
-      stormExecutor.execute(command);
-
-      metrics.put(metric.getId(), metric);
+      submitMetric(metric, symbols, common);
     }
+  }
+
+  private void submitMetric(Metric metric, List<String> symbols, List<String> statement) {
+    // Singleton metric
+    val state = new State();
+    state.setMetrics(ImmutableList.of(metric));
+    state.setSymbols(symbols);
+    state.setStatements(statement);
+
+    log.info("Submitting storm metric topology: '{}'...", metric.getName());
+    stormExecutor.execute(state);
+
+    metrics.put(metric.getId(), metric);
+  }
+
+  private boolean metricExists(Metric metric) {
+    return metrics.containsKey(metric.getId());
   }
 
 }

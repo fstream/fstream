@@ -87,7 +87,7 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
 
     log.info("Creating common statements...");
     for (val statement : getStatements(conf)) {
-      log.info("Registering statement: {}", statement);
+      log.info("Registering common statement: '{};", statement.replace('\n', ' '));
       val epl = admin.createEPL(statement);
 
       epl.addListener(this);

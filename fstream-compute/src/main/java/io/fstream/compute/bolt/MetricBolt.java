@@ -39,7 +39,7 @@ public class MetricBolt extends EsperBolt {
   protected void createStatements(Map<?, ?> conf, EPAdministrator admin) {
     val metrics = getMetrics(conf);
     for (val metric : metrics) {
-      log.info("Registering metric: {}", metric);
+      log.info("Registering metric: {}", metric.getName());
       val statement = admin.createEPL(metric.getStatement(), metric);
 
       statement.addListener(this);
