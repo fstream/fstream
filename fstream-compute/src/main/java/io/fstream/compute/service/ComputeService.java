@@ -59,12 +59,22 @@ public class ComputeService implements StateListener {
     // Bootstrap initial job
     val state = stateService.getState();
 
-    onUpdate(state);
+    // TODO: Submitting more than one topology per topic seems to stop the flow of events. Not sure why this works in
+    // simulation mode...
+    // onUpdate(state);
+    stormExecutor.execute(state);
   }
 
   @Override
   @SneakyThrows
   public void onUpdate(State nextState) {
+    // TODO: Remove, see above
+    val todo = true;
+    if (todo) {
+      log.warn("**** IGNORING UPDATE !!!");
+      return;
+    }
+
     // TODO: Support removal of definitions
     log.info("Updating state...");
     val symbols = nextState.getSymbols();
