@@ -15,8 +15,8 @@ import io.fstream.compute.storm.StormJobExecutor;
 import io.fstream.core.config.CoreConfig;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,17 +31,14 @@ import org.springframework.context.annotation.Configuration;
 public class ComputeConfig extends CoreConfig {
 
   @Bean
-  @ConditionalOnExpression("${storm.local}")
-  public StormJobExecutor localStormExecutor() {
-    log.info("Creating local storm executor...");
-    return new LocalStormJobExecutor();
-  }
-
-  @Bean
-  @ConditionalOnExpression("!${storm.local}")
-  public StormJobExecutor distributedStormExecutor() {
-    log.info("Creating distributed storm executor...");
-    return new DistributedStormJobExecutor();
+  public StormJobExecutor stormJobExecutor(@Value("${storm.local}") boolean local) {
+    if (local) {
+      log.info("Creating local storm executor...");
+      return new LocalStormJobExecutor();
+    } else {
+      log.info("Creating distributed storm executor...");
+      return new DistributedStormJobExecutor();
+    }
   }
 
 }

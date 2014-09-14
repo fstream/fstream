@@ -129,39 +129,39 @@ public class StormJobFactory {
     val loggerBoltId = "logger-bolt";
 
     val parallelismHint = PARALLELISM;
-    val builder = new TopologyBuilder();
+    val topologyBuilder = new TopologyBuilder();
 
     /**
      * Spouts
      */
 
     // Rates
-    builder.setSpout(ratesSpoutId, createKafkaSpout(zkConnect, RATES), parallelismHint);
+    topologyBuilder.setSpout(ratesSpoutId, createKafkaSpout(zkConnect, RATES), parallelismHint);
 
     // Alerts
-    builder.setSpout(alertsSpoutId, createKafkaSpout(zkConnect, ALERTS), parallelismHint);
+    topologyBuilder.setSpout(alertsSpoutId, createKafkaSpout(zkConnect, ALERTS), parallelismHint);
 
     /**
      * Bolts
      */
 
     // Alerts
-    builder.setBolt(alertsBoltId, new AlertBolt())
+    topologyBuilder.setBolt(alertsBoltId, new AlertBolt())
         .shuffleGrouping(ratesSpoutId);
-    builder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
+    topologyBuilder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
         .shuffleGrouping(alertsBoltId)
         .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, ALERTS.getId());
 
     // Metrics
-    builder.setBolt(metricsBoltId, new MetricBolt())
+    topologyBuilder.setBolt(metricsBoltId, new MetricBolt())
         .shuffleGrouping(ratesSpoutId)
         .shuffleGrouping(alertsSpoutId);
-    builder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
+    topologyBuilder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
         .shuffleGrouping(metricsBoltId)
         .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, METRICS.getId());
 
     // Logging
-    builder.setBolt(loggerBoltId, new LoggingBolt())
+    topologyBuilder.setBolt(loggerBoltId, new LoggingBolt())
         .shuffleGrouping(alertsBoltId)
         .shuffleGrouping(metricsBoltId);
 
@@ -169,7 +169,7 @@ public class StormJobFactory {
      * Create
      */
 
-    return builder.createTopology();
+    return topologyBuilder.createTopology();
   }
 
   private static IRichSpout createKafkaSpout(String zkConnect, Topic topic) {

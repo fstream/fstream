@@ -110,6 +110,7 @@ public class ComputeService implements StateListener {
     log.info("Submitting storm alert topology: '{}'...", alert.getName());
     jobExecutor.execute(alertJob);
 
+    // TODO: Need to store job as well. Use Table
     alerts.put(alert.getId(), alert);
   }
 
@@ -130,6 +131,7 @@ public class ComputeService implements StateListener {
     log.info("Submitting storm metric topology: '{}'...", metric.getName());
     jobExecutor.execute(metricJob);
 
+    // TODO: Need to store job as well. Use Table
     metrics.put(metric.getId(), metric);
   }
 
