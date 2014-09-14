@@ -25,7 +25,7 @@ buildscript {
    ext.hbaseVersion      = '0.98.5-hadoop1'
    ext.hadoopVersion     = '1.2.1'
    ext.esperVersion      = '4.11.0'
-   ext.curatorVersion    = '2.4.2'
+   ext.curatorVersion    = '2.6.0'
    ext.guavaVersion      = '18.0'
    ext.jacksonVersion    = '2.3.3'
    ext.lombokVersion     = '1.14.6'
