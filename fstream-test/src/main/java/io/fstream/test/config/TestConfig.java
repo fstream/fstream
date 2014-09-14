@@ -49,8 +49,6 @@ public class TestConfig extends CoreConfig {
    */
   @Value("${zk.connect}")
   private String zkConnect;
-  @Value("${state.statements[0]}")
-  private String statement;
 
   private static File WORK_DIR = new File("/tmp/fstream-test");
 

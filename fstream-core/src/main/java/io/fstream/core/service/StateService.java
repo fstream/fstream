@@ -122,7 +122,9 @@ public class StateService {
   }
 
   private PathChildrenCache createCache() {
-    return new PathChildrenCache(client, PARENT_PATH, true);
+    // TODO: Use version number when performing updates
+    val cacheData = true;
+    return new PathChildrenCache(client, PARENT_PATH, cacheData);
   }
 
   @SneakyThrows

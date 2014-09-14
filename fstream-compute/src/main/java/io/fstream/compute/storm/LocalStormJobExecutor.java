@@ -9,11 +9,15 @@
 
 package io.fstream.compute.storm;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import backtype.storm.LocalCluster;
 
 /**
@@ -24,23 +28,37 @@ import backtype.storm.LocalCluster;
 public class LocalStormJobExecutor extends AbstractStormJobExecutor {
 
   /**
-   * State.
-   * 
-   * @see https://issues.apache.org/jira/browse/STORM-213
+   * Configuration.
    */
-  private final LocalCluster cluster = new LocalCluster();
+  @Value("${zk.host}")
+  private String zkHost;
+  @Value("${zk.port}")
+  private long zkPort;
+
+  /**
+   * State.
+   */
+  private LocalCluster cluster;
+
+  @PostConstruct
+  public void initialize() {
+    log.info("Creating local cluster using external zookeeper: {}:{}...", zkHost, zkPort);
+    this.cluster = new LocalCluster(zkHost, zkPort);
+    log.info("Finished creating local cluster");
+  }
 
   @Override
   public void execute(@NonNull StormJob job) {
-    log.info("Submitting local topology '{}'...", job.getId());
+    log.info("Submitting local storm job '{}'...", job.getId());
     cluster.submitTopology(job.getId(), job.getConfig(), job.getTopology());
+    log.info("Finished submitting local storm job '{}'", job.getId());
   }
 
   @PreDestroy
   public void shutdown() {
     log.info("Shutting down cluster...");
     cluster.shutdown();
-    log.info("Shut down cluster.");
+    log.info("Finished shutting down cluster");
   }
 
 }

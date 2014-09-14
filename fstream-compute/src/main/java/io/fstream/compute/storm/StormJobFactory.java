@@ -58,7 +58,7 @@ public class StormJobFactory {
    * Constants.
    */
   private static final int PARALLELISM = 1;
-  private static final String FSTREAM_ZK_ROOT = "/fstream/storm";
+  private static final String FSTREAM_ZK_ROOT = "/storm";
   private static final String TOPIC_CONSUMER_ID_PREFIX = "storm-kafka-spout";
 
   /**

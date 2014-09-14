@@ -22,7 +22,7 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import storm.kafka.bolt.KafkaBolt;
+import storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -69,7 +69,9 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(KafkaBolt.BOLT_KEY, KafkaBolt.BOLT_MESSAGE));
+    declarer.declare(new Fields(
+        FieldNameBasedTupleToKafkaMapper.BOLT_KEY,
+        FieldNameBasedTupleToKafkaMapper.BOLT_MESSAGE));
   }
 
   @Override
