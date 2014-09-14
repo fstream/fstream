@@ -33,6 +33,8 @@ public class StormProperties {
 
   /**
    * Properties that are passed to a Storm {@code Topology}'s {@code Config} object.
+   * 
+   * @see https://storm.incubator.apache.org/documentation/Configuration.html
    */
   private Map<String, String> properties = newHashMap();
 

@@ -15,7 +15,7 @@ import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
 
 /**
- * A logic job to run on Storm in the form of a {@link Topology} and {@link Config} pair.
+ * A logical job to run on Storm in the form of a {@link Topology} and {@link Config} pair.
  */
 @Value
 public class StormJob {

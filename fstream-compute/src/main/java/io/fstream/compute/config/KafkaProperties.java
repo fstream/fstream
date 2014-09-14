@@ -28,6 +28,8 @@ public class KafkaProperties {
 
   /**
    * Kafka properties that effect producer behavior.
+   * 
+   * @see http://kafka.apache.org/07/configuration.html
    */
   private Map<String, String> producerProperties = newHashMap();
 

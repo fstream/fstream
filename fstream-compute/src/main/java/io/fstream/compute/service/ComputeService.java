@@ -95,8 +95,8 @@ public class ComputeService implements StateListener {
 
   private void submitAlerts(List<Alert> alerts, List<String> symbols, List<String> common) {
     for (val alert : alerts) {
-      if (alertExists(alert)) {
-        // Skip
+      if (isAlertExecuting(alert)) {
+        // TODO: kill and resubmit
         continue;
       }
 
@@ -115,8 +115,8 @@ public class ComputeService implements StateListener {
 
   private void submitMetrics(List<Metric> metrics, List<String> symbols, List<String> common) {
     for (val metric : metrics) {
-      if (metricExists(metric)) {
-        // Skip
+      if (isMetricExecuting(metric)) {
+        // TODO: kill and resubmit
         continue;
       }
 
@@ -133,11 +133,11 @@ public class ComputeService implements StateListener {
     metrics.put(metric.getId(), metric);
   }
 
-  private boolean alertExists(Alert alert) {
+  private boolean isAlertExecuting(Alert alert) {
     return alerts.containsKey(alert.getId());
   }
 
-  private boolean metricExists(Metric metric) {
+  private boolean isMetricExecuting(Metric metric) {
     return metrics.containsKey(metric.getId());
   }
 
