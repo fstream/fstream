@@ -35,44 +35,42 @@ import backtype.storm.tuple.Tuple;
 @Slf4j
 public class KafkaBolt<K, V> extends BaseRichBolt {
 
-  public static final String TOPIC = "topic";
-  public static final String KAFKA_BROKER_PROPERTIES = "kafka.broker.properties";
+  /**
+   * Kafka config name constants.
+   */
+  public static final String KAFKA_TOPIC_CONFIG_NAME = "topic";
+  public static final String KAFKA_BROKER_PROPERTIES_CONFIG_NAME = "kafka.broker.properties";
 
-  public static final String BOLT_KEY = "key";
-  public static final String BOLT_MESSAGE = "message";
+  /**
+   * Bolt field name constants.
+   */
+  public static final String BOLT_KEY_FIELD_NAME = "key";
+  public static final String BOLT_MESSAGE_FILED_NAME = "message";
 
-  private Object producer;
+  /**
+   * State.
+   */
+  private Producer<K, V> producer;
   private OutputCollector collector;
   private String topic;
 
   @Override
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings("rawtypes")
   public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-    val configMap = (Map) stormConf.get(KAFKA_BROKER_PROPERTIES);
-    val properties = new Properties();
-    properties.putAll(configMap);
-
-    val config = new ProducerConfig(properties);
-    producer = new Producer<K, V>(config);
-
-    this.topic = (String) stormConf.get(TOPIC);
+    this.producer = new Producer<K, V>(createProducerConfig(stormConf));
+    this.topic = (String) stormConf.get(KAFKA_TOPIC_CONFIG_NAME);
     this.collector = collector;
 
     log.info("Registered topic '{}'", topic);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void execute(Tuple input) {
-    K key = null;
-    if (input.contains(BOLT_KEY)) {
-      key = (K) input.getValueByField(BOLT_KEY);
-    }
-
-    val message = (V) input.getValueByField(BOLT_MESSAGE);
+    val key = getKey(input);
+    val message = getMessage(input);
 
     try {
-      getProducer().send(new KeyedMessage<K, V>(topic, key, message));
+      send(key, message);
     } catch (Exception ex) {
       log.error("Could not send message with key '" + key + "' and value '" + message + "'", ex);
     } finally {
@@ -85,9 +83,26 @@ public class KafkaBolt<K, V> extends BaseRichBolt {
     // No-op
   }
 
+  private ProducerConfig createProducerConfig(Map<?, ?> stormConf) {
+    val configMap = (Map<?, ?>) stormConf.get(KAFKA_BROKER_PROPERTIES_CONFIG_NAME);
+    val properties = new Properties();
+    properties.putAll(configMap);
+
+    return new ProducerConfig(properties);
+  }
+
+  private void send(K key, V message) {
+    producer.send(new KeyedMessage<K, V>(topic, key, message));
+  }
+
   @SuppressWarnings("unchecked")
-  private Producer<K, V> getProducer() {
-    return (Producer<K, V>) producer;
+  private K getKey(Tuple input) {
+    return input.contains(BOLT_KEY_FIELD_NAME) ? (K) input.getValueByField(BOLT_KEY_FIELD_NAME) : null;
+  }
+
+  @SuppressWarnings("unchecked")
+  private V getMessage(Tuple input) {
+    return (V) input.getValueByField(BOLT_MESSAGE_FILED_NAME);
   }
 
 }

@@ -9,15 +9,16 @@
 
 package io.fstream.compute.storm;
 
+import lombok.NonNull;
 import lombok.Setter;
 
+/**
+ * Convenience template for {@code StormJobExecutor} implementations.
+ */
 @Setter
-public abstract class AbstractStormExecutor implements StormExecutor {
+public abstract class AbstractStormJobExecutor implements StormJobExecutor {
 
-  @Override
-  public abstract void execute(StormJob job);
-
-  protected static void onShutdown(Runnable runnable) {
+  protected static void onShutdown(@NonNull Runnable runnable) {
     Runtime.getRuntime().addShutdownHook(new Thread(runnable));
   }
 

@@ -17,11 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import backtype.storm.LocalCluster;
 
 /**
- * Service responsible for launching local topologies.
+ * {@code StormJobExecutor} implementation responsible for executing local topologies.
  */
 @Slf4j
 @Setter
-public class LocalStormExecutor extends AbstractStormExecutor {
+public class LocalStormJobExecutor extends AbstractStormJobExecutor {
 
   /**
    * State.

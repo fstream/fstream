@@ -9,9 +9,9 @@
 
 package io.fstream.compute.config;
 
-import io.fstream.compute.storm.DistributedStormExecutor;
-import io.fstream.compute.storm.LocalStormExecutor;
-import io.fstream.compute.storm.StormExecutor;
+import io.fstream.compute.storm.DistributedStormJobExecutor;
+import io.fstream.compute.storm.LocalStormJobExecutor;
+import io.fstream.compute.storm.StormJobExecutor;
 import io.fstream.core.config.CoreConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,16 +32,16 @@ public class ComputeConfig extends CoreConfig {
 
   @Bean
   @ConditionalOnExpression("${storm.local}")
-  public StormExecutor localStormExecutor() {
+  public StormJobExecutor localStormExecutor() {
     log.info("Creating local storm executor...");
-    return new LocalStormExecutor();
+    return new LocalStormJobExecutor();
   }
 
   @Bean
   @ConditionalOnExpression("!${storm.local}")
-  public StormExecutor distributedStormExecutor() {
+  public StormJobExecutor distributedStormExecutor() {
     log.info("Creating distributed storm executor...");
-    return new DistributedStormExecutor();
+    return new DistributedStormJobExecutor();
   }
 
 }

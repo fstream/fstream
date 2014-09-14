@@ -68,7 +68,7 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(KafkaBolt.BOLT_KEY, KafkaBolt.BOLT_MESSAGE));
+    declarer.declare(new Fields(KafkaBolt.BOLT_KEY_FIELD_NAME, KafkaBolt.BOLT_MESSAGE_FILED_NAME));
   }
 
   @Override

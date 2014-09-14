@@ -12,7 +12,7 @@ package io.fstream.compute.storm;
 /**
  * Abstraction responsible for executing alert and metric definitions in the form of {@link StormJob}s.
  */
-public interface StormExecutor {
+public interface StormJobExecutor {
 
   /**
    * Execute a Storm {@code job} indefinitely.

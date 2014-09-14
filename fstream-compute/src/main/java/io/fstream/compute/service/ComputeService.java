@@ -10,7 +10,7 @@
 package io.fstream.compute.service;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
-import io.fstream.compute.storm.StormExecutor;
+import io.fstream.compute.storm.StormJobExecutor;
 import io.fstream.compute.storm.StormJobFactory;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Metric;
@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class ComputeService implements StateListener {
   @Autowired
   private StormJobFactory jobFactory;
   @Autowired
-  private StormExecutor stormExecutor;
+  private StormJobExecutor jobExecutor;
 
   /**
    * State.
@@ -67,12 +68,12 @@ public class ComputeService implements StateListener {
     // TODO: Submitting more than one topology per topic seems to stop the flow of events. Not sure why this works in
     // simulation mode...
     // onUpdate(state);
-    stormExecutor.execute(job);
+    jobExecutor.execute(job);
   }
 
   @Override
   @SneakyThrows
-  public void onUpdate(State nextState) {
+  public void onUpdate(@NonNull State nextState) {
     // TODO: Remove, see above
     val todo = true;
     if (todo) {
@@ -107,7 +108,7 @@ public class ComputeService implements StateListener {
     val alertJob = jobFactory.createAlertJob(alert, symbols, common);
 
     log.info("Submitting storm alert topology: '{}'...", alert.getName());
-    stormExecutor.execute(alertJob);
+    jobExecutor.execute(alertJob);
 
     alerts.put(alert.getId(), alert);
   }
@@ -127,7 +128,7 @@ public class ComputeService implements StateListener {
     val metricJob = jobFactory.createMetricJob(metric, symbols, common);
 
     log.info("Submitting storm metric topology: '{}'...", metric.getName());
-    stormExecutor.execute(metricJob);
+    jobExecutor.execute(metricJob);
 
     metrics.put(metric.getId(), metric);
   }

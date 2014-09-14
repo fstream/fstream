@@ -99,7 +99,7 @@ public class StormJobFactory {
     config.setDebug(true);
 
     // Serialize state
-    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
+    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES_CONFIG_NAME, kafkaProperties.getProducerProperties());
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(state.getStatements()));
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));
     config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(state.getMetrics()));
@@ -147,7 +147,7 @@ public class StormJobFactory {
         .shuffleGrouping(ratesSpoutId);
     builder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
         .shuffleGrouping(alertsBoltId)
-        .addConfiguration(KafkaBolt.TOPIC, ALERTS.getId());
+        .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, ALERTS.getId());
 
     // Metrics
     builder.setBolt(metricsBoltId, new MetricBolt())
@@ -155,7 +155,7 @@ public class StormJobFactory {
         .shuffleGrouping(alertsSpoutId);
     builder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
         .shuffleGrouping(metricsBoltId)
-        .addConfiguration(KafkaBolt.TOPIC, METRICS.getId());
+        .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, METRICS.getId());
 
     // Logging
     builder.setBolt(loggerBoltId, new LoggingBolt())

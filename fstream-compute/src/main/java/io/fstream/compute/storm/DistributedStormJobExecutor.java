@@ -24,11 +24,11 @@ import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 
 /**
- * Service responsible for launching distributed topologies via {@link StormJob}s.
+ * {@code StormJobExecutor} implementation responsible for executing distributed topologies via {@link StormJob}s.
  */
 @Slf4j
 @Setter
-public class DistributedStormExecutor extends AbstractStormExecutor {
+public class DistributedStormJobExecutor extends AbstractStormJobExecutor {
 
   @Override
   @SneakyThrows
