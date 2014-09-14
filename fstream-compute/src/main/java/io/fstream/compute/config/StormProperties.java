@@ -18,6 +18,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Storm specific configuration properties.
+ */
 @Data
 @Configuration
 @ConfigurationProperties("storm")

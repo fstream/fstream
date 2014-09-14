@@ -9,13 +9,16 @@
 
 package io.fstream.compute.storm;
 
-import io.fstream.core.model.state.State;
-
 /**
- * Abstraction responsible for executing definitions.
+ * Abstraction responsible for executing alert and metric definitions in the form of {@link StormJob}s.
  */
 public interface StormExecutor {
 
-  void execute(State state);
+  /**
+   * Execute a Storm {@code job} indefinitely.
+   * 
+   * @param job the job to execute
+   */
+  void execute(StormJob job);
 
 }

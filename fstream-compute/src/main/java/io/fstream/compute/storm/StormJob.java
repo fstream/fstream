@@ -38,9 +38,7 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
 /**
- * Factory for storm component creation.
- * <p>
- * @see https://github.com/nathanmarz/storm-contrib/tree/master/storm-kafka
+ * A logic job to run on Storm in the form of a {@link Topology} and {@link Config} pair.
  */
 @RequiredArgsConstructor
 public class StormJob {

@@ -11,6 +11,7 @@ package io.fstream.compute.service;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
 import io.fstream.compute.storm.StormExecutor;
+import io.fstream.compute.storm.StormJobFactory;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Metric;
 import io.fstream.core.model.state.State;
@@ -29,8 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * Compute job submission entry point.
  */
@@ -44,8 +43,13 @@ public class ComputeService implements StateListener {
   @Autowired
   private StateService stateService;
   @Autowired
+  private StormJobFactory jobFactory;
+  @Autowired
   private StormExecutor stormExecutor;
 
+  /**
+   * State.
+   */
   private final Map<Integer, Alert> alerts = newConcurrentMap();
   private final Map<Integer, Metric> metrics = newConcurrentMap();
 
@@ -58,11 +62,12 @@ public class ComputeService implements StateListener {
 
     // Bootstrap initial job
     val state = stateService.getState();
+    val job = jobFactory.createJob(state);
 
     // TODO: Submitting more than one topology per topic seems to stop the flow of events. Not sure why this works in
     // simulation mode...
     // onUpdate(state);
-    stormExecutor.execute(state);
+    stormExecutor.execute(job);
   }
 
   @Override
@@ -99,20 +104,12 @@ public class ComputeService implements StateListener {
   }
 
   private void submitAlert(Alert alert, List<String> symbols, List<String> common) {
-    // Singleton alert
-    val state = new State();
-    state.setAlerts(ImmutableList.of(alert));
-    state.setSymbols(symbols);
-    state.setStatements(common);
+    val alertJob = jobFactory.createAlertJob(alert, symbols, common);
 
     log.info("Submitting storm alert topology: '{}'...", alert.getName());
-    stormExecutor.execute(state);
+    stormExecutor.execute(alertJob);
 
     alerts.put(alert.getId(), alert);
-  }
-
-  private boolean alertExists(Alert alert) {
-    return alerts.containsKey(alert.getId());
   }
 
   private void submitMetrics(List<Metric> metrics, List<String> symbols, List<String> common) {
@@ -126,17 +123,17 @@ public class ComputeService implements StateListener {
     }
   }
 
-  private void submitMetric(Metric metric, List<String> symbols, List<String> statement) {
-    // Singleton metric
-    val state = new State();
-    state.setMetrics(ImmutableList.of(metric));
-    state.setSymbols(symbols);
-    state.setStatements(statement);
+  private void submitMetric(Metric metric, List<String> symbols, List<String> common) {
+    val metricJob = jobFactory.createMetricJob(metric, symbols, common);
 
     log.info("Submitting storm metric topology: '{}'...", metric.getName());
-    stormExecutor.execute(state);
+    stormExecutor.execute(metricJob);
 
     metrics.put(metric.getId(), metric);
+  }
+
+  private boolean alertExists(Alert alert) {
+    return alerts.containsKey(alert.getId());
   }
 
   private boolean metricExists(Metric metric) {

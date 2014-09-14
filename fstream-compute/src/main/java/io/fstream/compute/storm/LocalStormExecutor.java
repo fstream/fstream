@@ -11,6 +11,7 @@ package io.fstream.compute.storm;
 
 import javax.annotation.PreDestroy;
 
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import backtype.storm.LocalCluster;
@@ -30,7 +31,7 @@ public class LocalStormExecutor extends AbstractStormExecutor {
   private final LocalCluster cluster = new LocalCluster();
 
   @Override
-  protected void executeJob(StormJob job) {
+  public void execute(@NonNull StormJob job) {
     log.info("Submitting local topology '{}'...", job.getId());
     cluster.submitTopology(job.getId(), job.getConfig(), job.getTopology());
   }

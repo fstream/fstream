@@ -9,6 +9,7 @@
 
 package io.fstream.compute.storm;
 
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -31,7 +32,7 @@ public class DistributedStormExecutor extends AbstractStormExecutor {
 
   @Override
   @SneakyThrows
-  protected void executeJob(final StormJob job) {
+  public void execute(@NonNull final StormJob job) {
     log.info("Submitting cluster topology '{}'...", job.getId());
     StormSubmitter.submitTopology(job.getId(), job.getConfig(), job.getTopology());
 
