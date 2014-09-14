@@ -32,6 +32,11 @@ public class StormProperties {
   private boolean local;
 
   /**
+   * Enable debugging?
+   */
+  private boolean debug;
+
+  /**
    * Properties that are passed to a Storm {@code Topology}'s {@code Config} object.
    * 
    * @see https://storm.incubator.apache.org/documentation/Configuration.html

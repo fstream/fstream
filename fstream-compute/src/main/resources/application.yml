@@ -27,4 +27,5 @@ kafka:
 # Storm
 storm:
    local: true
+   debug: true
    properties:

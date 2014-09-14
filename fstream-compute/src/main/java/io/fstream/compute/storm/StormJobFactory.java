@@ -19,6 +19,7 @@ import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.compute.bolt.MetricBolt;
 import io.fstream.compute.config.KafkaProperties;
+import io.fstream.compute.config.StormProperties;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Metric;
 import io.fstream.core.model.state.State;
@@ -68,6 +69,8 @@ public class StormJobFactory {
   private String zkConnect;
   @Autowired
   private KafkaProperties kafkaProperties;
+  @Autowired
+  private StormProperties stormProperties;
 
   public StormJob createJob(@NonNull State state) {
     return new StormJob(calculateJobId(), createConfig(state), createTopology());
@@ -96,7 +99,7 @@ public class StormJobFactory {
   @SneakyThrows
   private Config createConfig(State state) {
     val config = new Config();
-    config.setDebug(true);
+    config.setDebug(stormProperties.isDebug());
 
     // Serialize state
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES_CONFIG_NAME, kafkaProperties.getProducerProperties());
