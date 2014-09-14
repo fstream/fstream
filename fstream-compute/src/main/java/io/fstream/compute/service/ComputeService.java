@@ -9,8 +9,8 @@
 
 package io.fstream.compute.service;
 
+import static com.google.common.base.Strings.repeat;
 import static com.google.common.collect.Maps.newConcurrentMap;
-import static joptsimple.internal.Strings.repeat;
 import io.fstream.compute.storm.StormJobExecutor;
 import io.fstream.compute.storm.StormJobFactory;
 import io.fstream.core.model.definition.Alert;
@@ -67,9 +67,9 @@ public class ComputeService implements StateListener {
   @SneakyThrows
   public void onUpdate(@NonNull State nextState) {
     // TODO: Support removal of definitions
-    log.info("{}", repeat('-', 100));
+    log.info("{}", repeat("-", 100));
     log.info("Updating state...");
-    log.info("{}", repeat('-', 100));
+    log.info("{}", repeat("-", 100));
     val symbols = nextState.getSymbols();
     val common = nextState.getStatements();
 

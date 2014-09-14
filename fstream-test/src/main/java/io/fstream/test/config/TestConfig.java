@@ -104,16 +104,16 @@ public class TestConfig extends CoreConfig {
   @SneakyThrows
   public void init() {
     if (hbase()) {
-      log.info("> Starting embedded HBase...");
+      log.info("> Starting embedded HBase...\n");
       embeddedHbase().startUp();
       log.info("< Started embedded HBase");
     } else {
-      log.info("> Starting embedded ZooKeeper...");
+      log.info("> Starting embedded ZooKeeper...\n");
       embeddedZookeeper().startUp();
       log.info("< Started embedded ZooKeeper");
     }
 
-    log.info("> Starting embedded Kafka...");
+    log.info("> Starting embedded Kafka...\n");
     embeddedKafka().startUp();
     log.info("< Started embedded Kafka");
 

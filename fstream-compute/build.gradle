@@ -22,6 +22,9 @@ dependencies {
   // Storm-Kafka 
   compile libraries.stormKafka
   
+  // Kafka 
+  compile libraries.kafka
+  
   // Esper
   compile libraries.esper
   

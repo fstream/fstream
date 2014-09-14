@@ -15,7 +15,6 @@ import static io.fstream.core.model.topic.Topic.RATES;
 import static java.util.UUID.randomUUID;
 import io.fstream.compute.bolt.AlertBolt;
 import io.fstream.compute.bolt.EsperBolt;
-import io.fstream.compute.bolt.KafkaBolt;
 import io.fstream.compute.bolt.LoggingBolt;
 import io.fstream.compute.bolt.MetricBolt;
 import io.fstream.compute.config.KafkaProperties;
@@ -40,6 +39,7 @@ import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
 import storm.kafka.ZkHosts;
+import storm.kafka.bolt.KafkaBolt;
 import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
@@ -103,7 +103,7 @@ public class StormJobFactory {
     config.setDebug(stormProperties.isDebug());
 
     // Serialize state
-    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES_CONFIG_NAME, kafkaProperties.getProducerProperties());
+    config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(state.getStatements()));
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));
     config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(state.getMetrics()));
@@ -163,7 +163,7 @@ public class StormJobFactory {
       // Alerts Kafka output
       topologyBuilder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
           .shuffleGrouping(alertsBoltId)
-          .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, ALERTS.getId());
+          .addConfiguration(KafkaBolt.TOPIC, ALERTS.getId());
     }
 
     if (metricsExist) {
@@ -175,7 +175,7 @@ public class StormJobFactory {
       // Metrics Kafka output
       topologyBuilder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
           .shuffleGrouping(metricsBoltId)
-          .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, METRICS.getId());
+          .addConfiguration(KafkaBolt.TOPIC, METRICS.getId());
     }
 
     // Logging
