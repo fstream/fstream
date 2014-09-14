@@ -33,10 +33,10 @@ public class ComputeConfig extends CoreConfig {
   @Bean
   public StormJobExecutor stormJobExecutor(@Value("${storm.local}") boolean local) {
     if (local) {
-      log.info("Creating local storm executor...");
+      log.info("Creating local storm job executor...");
       return new LocalStormJobExecutor();
     } else {
-      log.info("Creating distributed storm executor...");
+      log.info("Creating distributed job storm executor...");
       return new DistributedStormJobExecutor();
     }
   }

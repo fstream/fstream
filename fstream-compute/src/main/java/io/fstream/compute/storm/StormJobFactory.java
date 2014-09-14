@@ -27,7 +27,6 @@ import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 
 import java.util.List;
-import java.util.UUID;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -73,7 +72,9 @@ public class StormJobFactory {
   private StormProperties stormProperties;
 
   public StormJob createJob(@NonNull State state) {
-    return new StormJob(calculateJobId(), createConfig(state), createTopology());
+    val jobId = createJobId();
+
+    return new StormJob(jobId, createConfig(state), createTopology(jobId, state));
   }
 
   public StormJob createAlertJob(@NonNull Alert alert, List<String> symbols, List<String> common) {
@@ -114,7 +115,7 @@ public class StormJobFactory {
     return config;
   }
 
-  private StormTopology createTopology() {
+  private StormTopology createTopology(String jobId, State state) {
 
     /**
      * Setup
@@ -128,42 +129,63 @@ public class StormJobFactory {
     val metricsKafkaBoltId = "metrics-kafka-bolt";
     val loggerBoltId = "logger-bolt";
 
+    // Shorthands
+    val alertsExist = !state.getAlerts().isEmpty();
+    val metricsExist = !state.getMetrics().isEmpty();
     val parallelismHint = PARALLELISM;
+
+    // State
     val topologyBuilder = new TopologyBuilder();
 
     /**
      * Spouts
      */
 
-    // Rates
-    topologyBuilder.setSpout(ratesSpoutId, createKafkaSpout(zkConnect, RATES), parallelismHint);
+    if (alertsExist || metricsExist) {
+      // Alerts and metrics Kafka rates input
+      topologyBuilder.setSpout(ratesSpoutId, createKafkaSpout(zkConnect, RATES), parallelismHint);
+    }
 
-    // Alerts
-    topologyBuilder.setSpout(alertsSpoutId, createKafkaSpout(zkConnect, ALERTS), parallelismHint);
+    if (metricsExist) {
+      // Metrics Kafka alerts input
+      topologyBuilder.setSpout(alertsSpoutId, createKafkaSpout(zkConnect, ALERTS), parallelismHint);
+    }
 
     /**
      * Bolts
      */
 
-    // Alerts
-    topologyBuilder.setBolt(alertsBoltId, new AlertBolt())
-        .shuffleGrouping(ratesSpoutId);
-    topologyBuilder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
-        .shuffleGrouping(alertsBoltId)
-        .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, ALERTS.getId());
+    if (alertsExist) {
+      // Alerts Esper computation
+      topologyBuilder.setBolt(alertsBoltId, new AlertBolt())
+          .shuffleGrouping(ratesSpoutId);
 
-    // Metrics
-    topologyBuilder.setBolt(metricsBoltId, new MetricBolt())
-        .shuffleGrouping(ratesSpoutId)
-        .shuffleGrouping(alertsSpoutId);
-    topologyBuilder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
-        .shuffleGrouping(metricsBoltId)
-        .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, METRICS.getId());
+      // Alerts Kafka output
+      topologyBuilder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
+          .shuffleGrouping(alertsBoltId)
+          .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, ALERTS.getId());
+    }
+
+    if (metricsExist) {
+      // Metric Esper computation
+      topologyBuilder.setBolt(metricsBoltId, new MetricBolt())
+          .shuffleGrouping(ratesSpoutId)
+          .shuffleGrouping(alertsSpoutId);
+
+      // Metrics Kafka output
+      topologyBuilder.setBolt(metricsKafkaBoltId, new KafkaBolt<String, String>())
+          .shuffleGrouping(metricsBoltId)
+          .addConfiguration(KafkaBolt.KAFKA_TOPIC_CONFIG_NAME, METRICS.getId());
+    }
 
     // Logging
-    topologyBuilder.setBolt(loggerBoltId, new LoggingBolt())
-        .shuffleGrouping(alertsBoltId)
-        .shuffleGrouping(metricsBoltId);
+    val loggingBolt = topologyBuilder.setBolt(loggerBoltId, new LoggingBolt());
+    if (alertsExist) {
+      loggingBolt.shuffleGrouping(alertsBoltId);
+    }
+    if (metricsExist) {
+      loggingBolt.shuffleGrouping(metricsBoltId);
+    }
 
     /**
      * Create
@@ -174,8 +196,8 @@ public class StormJobFactory {
 
   private static IRichSpout createKafkaSpout(String zkConnect, Topic topic) {
     val hosts = new ZkHosts(zkConnect);
-    val zkRoot = calculateTopicZkRoot(topic);
-    val consumerId = calculateTopicConsumerId(topic);
+    val zkRoot = getTopicZkRoot(topic);
+    val consumerId = createTopicConsumerId(topic);
 
     // Collect configuration
     val kafkaConf = new SpoutConfig(hosts, topic.getId(), zkRoot, consumerId);
@@ -184,22 +206,21 @@ public class StormJobFactory {
     return new KafkaSpout(kafkaConf);
   }
 
-  private static String calculateJobId() {
-    return UUID.randomUUID().toString();
+  private static String createJobId() {
+    return randomUUID().toString();
   }
 
-  private static String calculateTopicZkRoot(Topic topic) {
+  private static String getTopicZkRoot(Topic topic) {
     // The root path in ZooKeeper for the spout to store the consumer offsets
     val zkRoot = FSTREAM_ZK_ROOT + "/kafka-" + topic.getId();
 
     return zkRoot;
   }
 
-  private static String calculateTopicConsumerId(Topic topic) {
+  private static String createTopicConsumerId(Topic topic) {
     // The unique id for this consumer for storing the consumer offsets in ZooKeeper
-    val consumerId = TOPIC_CONSUMER_ID_PREFIX + "-" + topic.getId() + "-" + randomUUID();
+    val consumerId = TOPIC_CONSUMER_ID_PREFIX + "-" + topic.getId() + "-" + randomUUID().toString();
 
     return consumerId;
   }
-
 }

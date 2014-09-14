@@ -21,6 +21,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.joda.time.DateTime;
 
+/**
+ * {@link TickEvent} generator used to create a simulated rate feed when running in simulation mode.
+ */
 @RequiredArgsConstructor
 public class RandomTickEventGenerator implements Processor {
 

@@ -37,7 +37,7 @@ public class EmbeddedKafka {
     val properties = createProperties();
     server = new KafkaServerStartable(new KafkaConfig(properties));
 
-    log.info("Starting up server...");
+    log.info("Starting up server using logDir '{}'...", logDir.getAbsolutePath());
     server.startup();
     log.info("Finished startup");
   }

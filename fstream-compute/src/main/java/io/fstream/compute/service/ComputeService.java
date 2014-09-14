@@ -10,6 +10,7 @@
 package io.fstream.compute.service;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
+import static joptsimple.internal.Strings.repeat;
 import io.fstream.compute.storm.StormJobExecutor;
 import io.fstream.compute.storm.StormJobFactory;
 import io.fstream.core.model.definition.Alert;
@@ -60,29 +61,15 @@ public class ComputeService implements StateListener {
     log.info("Registering for state updates...");
     stateService.initialize();
     stateService.addListener(this);
-
-    // Bootstrap initial job
-    val state = stateService.getState();
-    val job = jobFactory.createJob(state);
-
-    // TODO: Submitting more than one topology per topic seems to stop the flow of events. Not sure why this works in
-    // simulation mode...
-    // onUpdate(state);
-    jobExecutor.execute(job);
   }
 
   @Override
   @SneakyThrows
   public void onUpdate(@NonNull State nextState) {
-    // TODO: Remove, see above
-    val todo = true;
-    if (todo) {
-      log.warn("**** IGNORING UPDATE !!!");
-      return;
-    }
-
     // TODO: Support removal of definitions
+    log.info("{}", repeat('-', 100));
     log.info("Updating state...");
+    log.info("{}", repeat('-', 100));
     val symbols = nextState.getSymbols();
     val common = nextState.getStatements();
 

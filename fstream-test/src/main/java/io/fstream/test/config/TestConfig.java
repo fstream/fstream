@@ -81,13 +81,13 @@ public class TestConfig extends CoreConfig {
 
   @Bean
   public EmbeddedZooKeeper embeddedZookeeper() {
-    return new EmbeddedZooKeeper(zkConnect, workDir());
+    return new EmbeddedZooKeeper(zkConnect, new File(workDir(), "zookeeper"));
   }
 
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
-    return new EmbeddedKafka(zkConnect, workDir());
+    return new EmbeddedKafka(zkConnect, new File(workDir(), "kafka"));
   }
 
   @Bean

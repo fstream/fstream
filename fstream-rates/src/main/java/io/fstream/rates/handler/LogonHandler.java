@@ -20,11 +20,17 @@ import quickfix.field.Password;
 import quickfix.field.ResetSeqNumFlag;
 import quickfix.fix44.Logon;
 
+/**
+ * Handler that manages the setting of FIX login credentials.
+ */
 @Slf4j
 @Setter
 @Component
 public class LogonHandler {
 
+  /**
+   * FIX account password.
+   */
   @Value("${rates.password}")
   private String password;
 

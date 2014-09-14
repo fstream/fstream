@@ -38,7 +38,7 @@ public class EmbeddedZooKeeper {
   public void startUp() throws Exception {
     val clientPort = getZkClientPort();
 
-    log.info("Starting testing server...");
+    log.info("Starting testing server using tempDir '{}'...", tempDir.getAbsolutePath());
     server = new TestingServer(clientPort, tempDir);
     log.info("Finished starting testing server");
   }
