@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("kafka")
 public class KafkaProperties {
 
+  /**
+   * Kafka properties that effect producer behavior.
+   */
   private Map<String, String> producerProperties = newHashMap();
 
 }

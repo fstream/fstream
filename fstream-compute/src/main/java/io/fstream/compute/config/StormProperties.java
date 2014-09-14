@@ -26,8 +26,14 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("storm")
 public class StormProperties {
 
+  /**
+   * Local mode?
+   */
   private boolean local;
 
+  /**
+   * Properties that are passed to a Storm {@code Topology}'s {@code Config} object.
+   */
   private Map<String, String> properties = newHashMap();
 
 }
