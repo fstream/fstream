@@ -123,6 +123,7 @@ public class StateService {
 
   private PathChildrenCache createCache() {
     // TODO: Use version number when performing updates
+    // TODO: This should really be watching STATE_PATH but it doesn't seem to trigger
     val cacheData = true;
     return new PathChildrenCache(client, PARENT_PATH, cacheData);
   }

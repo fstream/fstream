@@ -59,6 +59,8 @@ angular.module('FStreamApp.controllers').controller('mainController', function($
 	function updateState(state) {
 		$scope.state = state;
 		
+		// This could be smarter to allow not updating things that haven't changed
+		$scope.views = [];
 		
 		_.each(state.metrics, function(metric, i) {
 			$scope.views.push({
