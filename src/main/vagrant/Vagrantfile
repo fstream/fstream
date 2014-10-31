@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - VirtualBox VM Vagrant file
+#
+# Description: 
+#   The is the Vagrant file for provisioning the fStream stack using the 
+#   VirtualBox provider and Ansible as the provisioner.
+#
+# See:
+#   - http://docs.icgc.org
+#   - http://www.ansibleworks.com/docs/
+#   - http://www.ansibleworks.com/docs/guide_vagrant.html
+#   - http://jinja.pocoo.org/docs/templates/
+#   - http://docs.vagrantup.com/v2/provisioning/ansible.html
+#   - http://docs.vagrantup.com/v2/virtualbox/configuration.html
+
+Vagrant.configure("2") do |config|
+  # Base box
+  config.vm.box = "precise64" 
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+
+  # Hostname of the box 
+  config.vm.hostname="fstream-vm"
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine.
+  config.vm.network :forwarded_port, guest: 8080, host: 8080 
+  
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP. This IP is used in the Ansible inventory file.
+  config.vm.network :private_network, ip: "10.211.55.100"
+  
+  # Execute VirtualBox provider
+  config.vm.provider :virtualbox do |v|
+  	# Appliance name
+    v.name = "fstream-vm"
+    
+    # This should be a suitably large
+    v.customize ["modifyvm", :id, "--memory", "4096"]
+    v.customize ["modifyvm", :id, "--cpus", "8"]
+  end
+  
+  # Execute Ansible provisioner
+  config.vm.provision :ansible do |ansible|
+    ansible.playbook = "provisioning/vm.yml"
+    ansible.inventory_path = "provisioning/inventory/hosts"
+    ansible.limit = 'all'
+    ansible.verbose = 'vvvv'
+    
+    # Avoids ssh: connect to host 10.211.55.100 port 22: Host is down
+    ansible.raw_arguments = "--timeout=60"
+  end
+end
