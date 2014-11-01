@@ -18,4 +18,5 @@
   roles: 
     - java
     - kafka
+    - storm
 

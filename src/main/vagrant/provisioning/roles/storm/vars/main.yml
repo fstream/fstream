@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+# Private variables for resolving the Storm distribution
+storm_url: "http://people.apache.org/~ptgoetz"
+storm_artifact: "apache-storm-{{ storm_version }}"
+storm_archive: "{{ storm_artifact }}.tar.gz"
+storm_archive_url: "{{ storm_url }}/{{ storm_artifact }}/{{ storm_archive }}"
+storm_dir: "{{ storm_artifact }}"
