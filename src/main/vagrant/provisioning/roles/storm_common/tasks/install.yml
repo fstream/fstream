@@ -1,0 +1,22 @@
+# file: roles/storm_common/tasks/install.yml
+
+
+- name: Download Storm distribution
+  get_url: "url={{ storm_archive_url }} dest=/tmp/{{ storm_archive }} mode=0444 force=no"
+  
+# Ensure target dir exists
+- name: Creating target dir
+  file: "dest=/usr/local/etc/storm-{{ storm_version }} state=directory"
+
+# Install the Storm files to the specified location
+- name: Extract Storm
+  command: "tar xzf /tmp/{{ storm_archive }} -C /usr/local/etc creates=/usr/local/etc/apache-storm-{{ storm_version }}" 
+  
+- name: Storm | Update the storm install permissions
+  file: path=/usr/local/etc/apache-storm-{{ storm_version }} owner={{ storm_user }} group={{ storm_group }} state=directory recurse=yes
+
+- name: Storm | Update the symbolic link to the storm install
+  file: path=/usr/local/etc/storm src=/usr/local/etc/apache-storm-{{ storm_version }} state=link force=yes
+
+- name: Storm | Make sure the local working directory for storm is present
+  file: path={{ storm_local_dir }} owner={{ storm_user }} group={{ storm_group }} mode=0750 state=directory

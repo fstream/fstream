@@ -1,14 +1,10 @@
----
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# file: roles/kafka/tasks/main.yml
 
-- name: Download Kafka distribution
-  get_url: "url={{ kafka_archive_url }} dest={{ staging_dir }}/{{ kafka_archive }} mode=0444"
-  
-# Ensure target dir exists
-- name: Creating target dir
-  file: "dest={{ target_dir }} state=directory"
+- name: Kafka | Make sure kafka is not running under supervisord
+  supervisorctl: name=kafka state=stopped
 
-# Install the Kakfa files to the specified location
-- name: Extract Kafka
-  command: "tar xzf {{ staging_dir }}/{{  kafka_archive }} -C {{ target_dir }} creates={{ target_dir }}/{{ kafka_dir }}" 
-  
+- include: dependencies.yml
+- include: user.yml
+- include: install.yml
+- include: configure.yml
+- include: supervise_broker.yml

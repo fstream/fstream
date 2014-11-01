@@ -16,8 +16,8 @@
   
   # Apply theses roles
   roles: 
-    - java
-    - kafka
-    - storm
+    - storm_nimbus
     - zookeeper
+    - kafka
+    - storm_supervisor
 

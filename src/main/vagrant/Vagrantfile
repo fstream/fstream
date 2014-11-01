@@ -9,12 +9,12 @@
 #   VirtualBox provider and Ansible as the provisioner.
 #
 # See:
-#   - http://docs.icgc.org
 #   - http://www.ansibleworks.com/docs/
 #   - http://www.ansibleworks.com/docs/guide_vagrant.html
 #   - http://jinja.pocoo.org/docs/templates/
 #   - http://docs.vagrantup.com/v2/provisioning/ansible.html
 #   - http://docs.vagrantup.com/v2/virtualbox/configuration.html
+#   - https://github.com/pjan/the-ansibles
 
 Vagrant.configure("2") do |config|
   # Base box

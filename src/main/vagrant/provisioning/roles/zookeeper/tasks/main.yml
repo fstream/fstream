@@ -1,14 +1,10 @@
----
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# file: roles/zookeeper/tasks/main.yml
 
-- name: Download ZooKeeper distribution
-  get_url: "url={{ zk_archive_url }} dest={{ staging_dir }}/{{ zk_archive }} mode=0444"
-  
-# Ensure target dir exists
-- name: Creating target dir
-  file: "dest={{ target_dir }} state=directory"
+- name: Zookeeper | Make sure zookeeper is not running under supervisord
+  supervisorctl: name=zookeeper state=stopped
 
-# Install the ZooKeeper files to the specified location
-- name: Extract ZooKeeper
-  command: "tar xzf {{ staging_dir }}/{{  zk_archive }} -C {{ target_dir }} creates={{ target_dir }}/{{ zk_dir }}" 
-  
+- include: dependencies.yml
+- include: user.yml
+- include: install.yml
+- include: configure.yml
+- include: supervise_zookeeper.yml

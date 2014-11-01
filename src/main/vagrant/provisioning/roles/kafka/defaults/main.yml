@@ -1,4 +1,4 @@
----
+# file: roles/kafka/defaults/main.yml
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 # The version of Kafka to install
@@ -7,5 +7,43 @@ kafka_version: "0.8.1.1"
 # The version of Scala for Kafka to install with
 kafka_scala_version: "2.10"
 
+kafka_mirror_url: "http://apache.mirror.iweb.ca"
+kafka_artifact: "kafka_{{ kafka_scala_version }}-{{ kafka_version }}"
+kafka_archive: "{{ kafka_artifact }}.tgz"
+kafka_archive_url: "{{ kafka_mirror_url }}/kafka/{{ kafka_version }}/{{ kafka_archive }}"
+kafka_dir: "kafka-{{ kafka_version }}"
+
 # Where to install
 target_dir: /tmp
+
+kafka_repo_url: https://github.com/apache/kafka.git
+kafka_user: kafka
+kafka_group: kafka
+kafka_uid: 3070
+kafka_gid: 3070
+kafka_local_dir: /app/kafka
+
+# server.properties required settings
+kafka_server_JMX_PORT: 13005
+kafka_server_broker_id: 1
+kafka_server_port: 9092
+kafka_host_name: localhost
+kafka_server_zookeeper_connect:
+  - localhost:2181
+kafka_server_num_partitions: 1
+
+# server.properties advanced settings
+kafka_server_num_network_threads: 2
+kafka_server_num_io_threads: 2
+kafka_server_socket_send_buffer_bytes: 1048576
+kafka_server_socket_receive_buffer_bytes: 1048576
+kafka_server_socket_request_max_bytes: 1048576
+kafka_server_log_flush_interval_messages: 10000
+kafka_server_log_flush_interval_ms: 10000
+kafka_server_log_retention_hours: 168
+kafka_server_log_segment_bytes: 536870912
+kafka_server_log_cleanup_interval_mins: 1
+kafka_server_zookeeper_connection_timeout_ms: 1000000
+kafka_server_kafka_metrics_polling_interval_secs: 5
+kafka_server_kafka_metrics_reporters: kafka.metrics.KafkaCSVMetricsReporter
+kafka_server_kafka_csv_metrics_reporter_enabled: "false"

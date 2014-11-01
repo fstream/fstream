@@ -23,7 +23,8 @@ e2e.xml
 
 # Java Temporary files
 reports/
-build/
+fstream-*/build/
+/build/
 .gradle
 .pmd
 dist_*/

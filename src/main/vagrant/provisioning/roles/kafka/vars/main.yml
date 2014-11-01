@@ -1,9 +1,0 @@
----
-# Copyright (c) 2014 fStream. All Rights Reserved.
-
-# Private variables for resolving the Kafka distribution
-kafka_mirror_url: "http://apache.mirror.iweb.ca"
-kafka_artifact: "kafka_{{ kafka_scala_version }}-{{ kafka_version }}"
-kafka_archive: "{{ kafka_artifact }}.tgz"
-kafka_archive_url: "{{ kafka_mirror_url }}/kafka/{{ kafka_archive }}"
-kafka_dir: "{{ kafka_artifact}}"

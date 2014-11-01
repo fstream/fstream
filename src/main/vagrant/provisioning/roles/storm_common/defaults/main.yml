@@ -1,0 +1,31 @@
+# file: roles/storm_common/defaults/main.yml
+
+# The version of Storm to install
+storm_version: "0.9.3-rc1"
+storm_url: "http://people.apache.org/~ptgoetz"
+storm_artifact: "apache-storm-{{ storm_version }}"
+storm_archive: "{{ storm_artifact }}.tar.gz"
+storm_archive_url: "{{ storm_url }}/{{ storm_artifact }}/{{ storm_archive }}"
+storm_dir: "{{ storm_artifact }}"
+
+storm_user: storm
+storm_group: storm
+storm_uid: 3060
+storm_gid: 3060
+
+storm_zookeeper_servers:
+  - "localhost"
+storm_zookeeper_port: 2181
+storm_nimbus_host: "localhost"
+storm_nimbus_childopts: "-Xmx1024m -Djava.net.preferIPv4Stack=true"
+storm_ui_childopts: "-Xmx768m -Djava.net.preferIPv4Stack=true"
+storm_supervisor_childopts: "-Djava.net.preferIPv4Stack=true"
+storm_worker_childopts: "-Xmx768m -Djava.net.preferIPv4Stack=true"
+storm_supervisor_slots_ports:
+  - "6700"
+  - "6701"
+  - "6702"
+  - "6703"
+storm_local_dir: /app/storm
+storm_drpc_servers:
+  - "localhost"

@@ -1,8 +1,0 @@
----
-# Copyright (c) 2014 fStream. All Rights Reserved.
-
-# The version of Storm to install
-storm_version: "0.9.3-rc1"
-
-# Where to install
-target_dir: /tmp
