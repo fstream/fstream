@@ -17,4 +17,5 @@
   # Apply theses roles
   roles: 
     - java
+    - kafka
 

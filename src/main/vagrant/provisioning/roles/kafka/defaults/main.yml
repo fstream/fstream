@@ -1,0 +1,11 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+# The version of Kafka to install
+kafka_version: "0.8.1.1"
+
+# The version of Kafka-Scala to install with
+kafka_scala_version: "2.10"
+
+# Where to install the reference genome
+target_dir: /tmp
