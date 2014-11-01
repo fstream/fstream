@@ -1,0 +1,14 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Download ZooKeeper distribution
+  get_url: "url={{ zk_archive_url }} dest={{ staging_dir }}/{{ zk_archive }} mode=0444"
+  
+# Ensure target dir exists
+- name: Creating target dir
+  file: "dest={{ target_dir }} state=directory"
+
+# Install the ZooKeeper files to the specified location
+- name: Extract ZooKeeper
+  command: "tar xzf {{ staging_dir }}/{{  zk_archive }} -C {{ target_dir }} creates={{ target_dir }}/{{ zk_dir }}" 
+  

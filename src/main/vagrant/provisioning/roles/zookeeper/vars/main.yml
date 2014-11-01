@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+# Private variables for resolving the ZooKeeper distribution
+zk_mirror_url: "http://apache.mirror.iweb.ca"
+zk_artifact: "zookeeper-{{ zk_version }}"
+zk_archive: "{{ zk_artifact }}.tar.gz"
+zk_archive_url: "{{ zk_mirror_url }}/zookeeper/{{ zk_artifact }}/{{ zk_archive }}"
+zk_dir: "{{ zk_artifact}}"
