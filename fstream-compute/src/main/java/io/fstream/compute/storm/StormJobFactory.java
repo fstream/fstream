@@ -103,6 +103,8 @@ public class StormJobFactory {
     config.setDebug(stormProperties.isDebug());
 
     // Serialize state
+    config.put(Config.TOPOLOGY_WORKER_CHILDOPTS,
+        "-Xmx1024m -Djava.system.class.loader=org.springframework.boot.loader.LaunchedURLClassLoader");
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(state.getStatements()));
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));

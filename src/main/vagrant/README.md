@@ -11,9 +11,16 @@ Setup
 ---
 The minimum requirements for creating the VM is VirtualBox (4.3+), Vagrant (1.3.5+) and Ansible (1.4+). You can find instructions on how to install each of these by following the links below.
 
+## General:
+
 - Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - Install [Vagrant](http://downloads.vagrantup.com)
 - Install [Ansible](http://www.ansibleworks.com/docs/intro_installation.html)
+
+## MacOS:
+
+- Install Vagrant and VirtualBox http://www.sourabhbajaj.com/mac-setup/Vagrant/README.html
+- Install Ansible https://devopsu.com/guides/ansible-mac-osx.html
 
 *Note*: It is important that you _not_ install the external [`vagrant-anisble`](https://github.com/dsander/vagrant-ansible) plugin as this is deprecated and is already bundled with recent versions of Vagrant. Doing so may result in `python` Ansible class loading issues.
 

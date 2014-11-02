@@ -1,0 +1,4 @@
+# file: roles/zookeeper/meta/main.yml
+
+dependencies:
+  - { role: fstream_common, fstream_module: 'fstream-compute', http_port: '8083', priority: '11' }

@@ -7,27 +7,55 @@
  * Proprietary and confidential.
  */
 
-apply plugin: 'spring-boot'
- 
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = "io.fstream.compute.ComputeMain"
+
+shadowJar {
+  exclude 'META-INF/*.SF'
+  exclude 'META-INF/*.DSA'
+  exclude 'META-INF/*.RSA'
+  classifier = ''
+
+  mergeServiceFiles()
+  transform(AppendingTransformer) {
+    resource = 'META-INF/spring.handlers' 
+  }
+  transform(AppendingTransformer) {
+    resource = 'META-INF/spring.schemas' 
+  }
+  transform(AppendingTransformer) {
+    resource = 'META-INF/spring.tooling' 
+  }
+  transform(AppendingTransformer) {
+    resource = 'META-INF/spring.factories' 
+  }
+}
+
+build.dependsOn shadowJar
+
 dependencies {
   // fStream
   compile project(':fstream-core')
-  
+
   // Spring
   compile libraries.springBootActuator
-      
+
   // Storm
   compile libraries.storm
-  
-  // Storm-Kafka 
+
+  // Storm-Kafka
   compile libraries.stormKafka
-  
-  // Kafka 
+
+  // Kafka
   compile libraries.kafka
-  
+
   // Esper
   compile libraries.esper
-  
+
   // Utilities
   compile libraries.guava
 }

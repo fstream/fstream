@@ -1,0 +1,4 @@
+# file: roles/zookeeper/handlers/main.yml
+
+- name: Restart supervisor
+  supervisorctl: name={{ fstream_module }} state=restarted

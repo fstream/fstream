@@ -1,0 +1,6 @@
+# file: roles/zookeeper/meta/main.yml
+
+dependencies:
+  - { role: hostname }
+  - { role: jdk }
+  - { role: supervisor }

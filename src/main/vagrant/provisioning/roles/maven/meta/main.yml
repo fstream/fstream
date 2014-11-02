@@ -1,4 +1,0 @@
-# file: roles/maven/meta/main.yml
-
-dependencies:
-  - { role: jdk }

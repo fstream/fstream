@@ -1,9 +1,0 @@
----
-# Copyright (c) 2014 fStream. All Rights Reserved.
-#
-# Description:
-#   Global variables for all hosts in all playbooks
-
-# Directories
-staging_dir: "/tmp"
-target_dir: "/srv"

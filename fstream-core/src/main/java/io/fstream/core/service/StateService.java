@@ -106,9 +106,9 @@ public class StateService {
 
       @Override
       public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-        log.info("Cache updated: {}", event);
         val state = deserialize(event.getData().getData());
 
+        log.info("Cache updated: {}", state);
         listener.onUpdate(state);
       }
 

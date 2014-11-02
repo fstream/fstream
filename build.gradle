@@ -8,82 +8,94 @@
  */
 
 import java.util.concurrent.TimeUnit;
- 
+
 defaultTasks 'build'
- 
+
 buildscript {
-	
-   //
-   // Versions
-   //
-   ext.springVersion     = '4.1.0.RELEASE'
-   ext.springBootVersion = "1.2.0.M1"
-   ext.quickfixjVersion  = '1.5.3'
-   ext.camelVersion      = '2.13.2'
-   ext.kafkaVersion      = '0.8.1.1'
-   ext.stormVersion      = '0.9.3-incubating-SNAPSHOT' // Snapshot for https://issues.apache.org/jira/browse/STORM-213
-   ext.hbaseVersion      = '0.98.5-hadoop1'
-   ext.hadoopVersion     = '1.2.1'
-   ext.esperVersion      = '4.11.0'
-   ext.curatorVersion    = '2.6.0'
-   ext.guavaVersion      = '18.0'
-   ext.jacksonVersion    = '2.3.3'
-   ext.lombokVersion     = '1.14.6'
-   
-   //
-   // Libraries
-   //
-   
-   ext.libraries = [
-	   guava:              "com.google.guava:guava:$guavaVersion",
-	   springBoot:         "org.springframework.boot:spring-boot:$springBootVersion",
-	   springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
-	   springBootWeb:      "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
-	   jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-	   jacksonAnnotations: "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
-	   jacksonJoda:        "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
-	   kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion",
-	   storm:              "org.apache.storm:storm-core:${stormVersion}",
-	   stormKafka:         "org.apache.storm:storm-kafka:${stormVersion}",
-	   esper:              "com.espertech:esper:${esperVersion}",
-       hadoop:             "org.apache.hadoop:hadoop-core:$hadoopVersion",
-	   hadoopTest:         "org.apache.hadoop:hadoop-test:$hadoopVersion",
-	   hbaseClient:        "org.apache.hbase:hbase-client:$hbaseVersion",
-	   curator:            "org.apache.curator:curator-recipes:$curatorVersion",
-	   curatorTest:        "org.apache.curator:curator-test:$curatorVersion"
-   ]
-   
-   repositories {
-	   mavenLocal()
-       maven { url "http://repo.spring.io/libs-milestone" }
-       maven { url "http://repo.spring.io/libs-snapshot" }
-   }
-   
-   dependencies {
-	   classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
-	   classpath 'org.ajoberstar:gradle-git:0.8.0'
-   }
+
+	//
+	// Versions
+	//
+	ext.springVersion     = '4.1.1.RELEASE'
+	ext.springBootVersion = "1.2.0.M2"
+	ext.quickfixjVersion  = '1.5.3'
+	ext.camelVersion      = '2.13.2'
+	ext.kafkaVersion      = '0.8.1.1'
+	ext.stormVersion      = '0.9.3-rc1' // Snapshot for https://issues.apache.org/jira/browse/STORM-213
+	ext.hbaseVersion      = '0.98.5-hadoop1'
+	ext.hadoopVersion     = '1.2.1'
+	ext.esperVersion      = '4.11.0'
+	ext.curatorVersion    = '2.6.0'
+	ext.guavaVersion      = '18.0'
+	ext.jacksonVersion    = '2.3.3'
+	ext.lombokVersion     = '1.14.6'
+
+	//
+	// Libraries
+	//
+
+	ext.libraries = [
+		guava:              "com.google.guava:guava:$guavaVersion",
+		springBoot:         "org.springframework.boot:spring-boot:$springBootVersion",
+		springBootActuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
+		springBootWeb:      "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
+		jacksonDatabind:    "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+		jacksonAnnotations: "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
+		jacksonJoda:        "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
+		kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion",
+		storm:              "org.apache.storm:storm-core:${stormVersion}",
+		stormKafka:         "org.apache.storm:storm-kafka:${stormVersion}",
+		esper:              "com.espertech:esper:${esperVersion}",
+		hadoop:             "org.apache.hadoop:hadoop-core:$hadoopVersion",
+		hadoopTest:         "org.apache.hadoop:hadoop-test:$hadoopVersion",
+		hbaseClient:        "org.apache.hbase:hbase-client:$hbaseVersion",
+		curator:            "org.apache.curator:curator-recipes:$curatorVersion",
+		curatorTest:        "org.apache.curator:curator-test:$curatorVersion"
+	]
+
+	repositories {
+		mavenLocal()
+		maven { url "http://repo.spring.io/libs-milestone" }
+		maven { url "http://repo.spring.io/libs-snapshot" }
+		jcenter()
+	}
+
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
+		classpath 'org.ajoberstar:gradle-git:0.8.0'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.1'
+		}
 }
 
 subprojects {
 	version = '0.0.1-SNAPSHOT'
 	group = 'io.fstream'
-	
+
 	apply plugin: 'java'
-	
+
+	// Create new scope
+	configurations {
+		provided
+		compile.extendsFrom provided
+	}
+
+	sourceSets {
+		main { compileClasspath += configurations.provided }
+	}
+
 	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_7
-	
-	repositories { 
-		mavenCentral() 
+
+	repositories {
+		mavenCentral()
 		maven { url "http://seqwaremaven.oicr.on.ca/artifactory/dcc-dependencies" }
 		maven { url "http://repo.spring.io/libs-milestone" }
 		maven { url "http://repo.spring.io/libs-snapshot" }
-	    maven { url 'http://repo.marketcetera.org/maven' }
-	    maven { url 'http://clojars.org/repo' }
-	    maven { url 'http://conjars.org/repo' }
-	    maven { url 'http://twitter4j.org/maven2' }
+		maven { url 'http://repo.marketcetera.org/maven' }
+		maven { url 'http://clojars.org/repo' }
+		maven { url 'http://conjars.org/repo' }
+		maven { url 'http://twitter4j.org/maven2' }
 	}
-	
+
 	configurations {
 		all*.exclude group: 'org.slf4j', module: 'slf4j-simple'
 		all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
@@ -92,25 +104,25 @@ subprojects {
 		all*.exclude group: 'com.sun.jdmk', module: 'jmxtools'
 		all*.exclude group: 'com.sun.jmx', module: 'jmxri'
 	}
-	
+
 	dependencies {
 		// Compile-time transformations
-		compile "org.projectlombok:lombok:$lombokVersion"
-		
+		provided "org.projectlombok:lombok:$lombokVersion"
+
 		// Utilities
 		compile 'joda-time:joda-time:2.3'
-		
+
 		// Logging
 		compile 'ch.qos.logback:logback-classic:1.1.2'
 		compile 'org.slf4j:jcl-over-slf4j:1.7.6'
 		compile 'org.slf4j:log4j-over-slf4j:1.7.6'
-		
+
 		// Test
 		testCompile 'junit:junit:4.11'
 		testCompile 'org.assertj:assertj-core:1.6.0'
 		testCompile 'org.mockito:mockito-all:1.9.5'
 	}
-	
+
 	jar {
 		manifest {
 			attributes 'Provider': 'gradle', 'Implementation-Title': project.name, 'Implementation-Version': project.version
@@ -128,17 +140,22 @@ task up << {
 		println "Waiting ${seconds}s ..."
 		TimeUnit.SECONDS.sleep(seconds)
 	}
-	
+
 	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
 	def seconds = 10
-	
-	['fstream-test', 'fstream-rates', 'fstream-compute', 'fstream-web'].each { projectName ->
+
+	[
+		'fstream-test',
+		'fstream-rates',
+		'fstream-compute',
+		'fstream-web'
+	].each { projectName ->
 		Thread.start {
 			println "Running $projectName..."
 			def task = tasks[projectName]
 			def name = projectName.split("-")[1]
 			task.main = "io.fstream.${name}.${name.capitalize()}Main"
-			
+
 			task.execute()
 		}
 
@@ -155,11 +172,11 @@ task up << {
 task kill << {
 	def process = "jps -l".execute()
 	process.waitFor()
-	def lines = process.in.text.eachLine { 
+	def lines = process.in.text.eachLine {
 		if (it.contains("io.fstream")) {
 			println "Killing: $it"
 			def pid = it.split()[0]
 			"kill -9 $pid".execute().waitFor()
-		} 
+		}
 	}
 }

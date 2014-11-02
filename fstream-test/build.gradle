@@ -11,6 +11,7 @@
 // apply plugin:'application'
 // mainClassName = "io.fstream.test.Main"
 // task bootRun(dependsOn: run)
+
 apply plugin: 'spring-boot'
  
 dependencies {

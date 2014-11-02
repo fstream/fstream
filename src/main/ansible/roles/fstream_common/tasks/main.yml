@@ -1,0 +1,6 @@
+- name: Make sure not running under supervisord
+  supervisorctl: name={{ fstream_module }} state=stopped
+
+- include: user.yml
+- include: install.yml
+- include: supervise.yml

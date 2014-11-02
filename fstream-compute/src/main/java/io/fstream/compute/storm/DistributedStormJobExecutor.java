@@ -30,9 +30,16 @@ import backtype.storm.utils.Utils;
 @Setter
 public class DistributedStormJobExecutor extends AbstractStormJobExecutor {
 
+  /**
+   * Constants.
+   */
+  private static final String STORM_JAR_PROPERTY_NAME = "storm.jar";
+
   @Override
   @SneakyThrows
   public void execute(@NonNull final StormJob job) {
+    setStormJar();
+
     log.info("Submitting cluster topology '{}'...", job.getId());
     StormSubmitter.submitTopology(job.getId(), job.getConfig(), job.getTopology());
 
@@ -47,6 +54,18 @@ public class DistributedStormJobExecutor extends AbstractStormJobExecutor {
       }
 
     });
+  }
+
+  @SneakyThrows
+  private void setStormJar() {
+    // This needs to be changed in to append {@code .getClassLoader().getClass()} if using nested jars (currently not
+    // working).
+    val anchor = DistributedStormJobExecutor.class;
+    val stormJar = anchor.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+    // See http://stackoverflow.com/questions/15781176/how-to-submit-a-topology-in-storm-production-cluster-using-ide
+    log.info("Setting {} to {}...", STORM_JAR_PROPERTY_NAME, stormJar);
+    System.setProperty(STORM_JAR_PROPERTY_NAME, stormJar);
   }
 
   private static void killTopology(String name) throws NotAliveException, TException {

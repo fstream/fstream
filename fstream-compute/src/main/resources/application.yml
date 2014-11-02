@@ -29,3 +29,7 @@ storm:
    local: true
    debug: true
    properties:
+
+# https://groups.google.com/forum/#!topic/storm-user/yOtE3Em50bA
+# https://translate.google.ca/translate?hl=en&sl=zh-CN&tl=en&u=http%3A%2F%2Fm.blog.csdn.net%2Fblog%2Fpan051%2F16805373
+logging.level.backtype.storm.daemon.nimbus: INFO

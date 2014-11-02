@@ -1,0 +1,16 @@
+# file: roles/fstream/tasks/user.yml
+
+- name: Make sure the storm group is present
+  action: group gid={{ fstream_gid }} name={{ fstream_group }} state=present
+
+- name: Make sure the fstream user directory is present
+  action: file path="/app/home/{{ fstream_user }}" state=directory
+
+- name: Make sure the fstream user is present
+  user: uid={{ fstream_uid }} name={{ fstream_user }} group={{ fstream_group }} home="/app/home/{{ fstream_user }}" shell=/bin/bash state=present comment="fstream user"
+
+- name: Set the right fstream user directory permissions
+  action: file path="/app/home/{{ fstream_user }}" owner={{ fstream_user }} group={{ fstream_group }} mode=0700 state=directory
+
+- name: Set the right expiration on the fstream user
+  command: "sudo chage -I -1 -E -1 -m -1 -M -1 -W -1 -E -1 {{ fstream_user }}"

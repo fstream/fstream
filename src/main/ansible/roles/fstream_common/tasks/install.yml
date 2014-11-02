@@ -1,0 +1,1 @@
+- copy: src={{ fstream_dir}}/{{ fstream_module }}/build/libs/{{ fstream_module }}-{{ fstream_version }}.jar dest=/tmp/{{ fstream_module }}-{{ fstream_version }}.jar
