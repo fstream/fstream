@@ -8,30 +8,42 @@
  */
 
 apply plugin: 'spring-boot'
-applicationDefaultJvmArgs = [ "-XX:MaxPermSize=128M" ]
+applicationDefaultJvmArgs = ["-XX:MaxPermSize=128M"]
+
+build.dependsOn bootRepackage
+
+applicationDistribution.with {
+  // Exclude defaults in lieu of fat jar
+  exclude { it.file in configurations.runtime.files }
+  from("src/main/conf") { into "conf" }
+}
+
+distTar {
+  dependsOn bootRepackage
+  compression Compression.GZIP
+  extension "tar.gz"
+}
 
 dependencies {
   // fStream
   compile project(':fstream-core')
-  
+
   // Spring
   compile libraries.springBootActuator
 
-    // Camel
-  compile("org.apache.camel:camel-spring-javaconfig:$camelVersion") {
-    exclude group: 'org.springframework'
-  }
+  // Camel
+  compile("org.apache.camel:camel-spring-javaconfig:$camelVersion") { exclude group: 'org.springframework' }
   compile "org.apache.camel:camel-core:$camelVersion"
   compile "org.apache.camel:camel-quickfix:$camelVersion"
   compile "org.apache.camel:camel-kafka:$camelVersion"
-  
-  // QuickFIX/J 
+
+  // QuickFIX/J
   compile "quickfixj:quickfixj-all:$quickfixjVersion"
   compile 'org.apache.mina:mina-filter-ssl:1.1.7'
-  
+
   // Zookeeper
   compile libraries.curator
-  
+
   // Utilities
   compile libraries.guava
 }

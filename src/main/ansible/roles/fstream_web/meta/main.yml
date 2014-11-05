@@ -1,4 +1,4 @@
 # file: roles/zookeeper/meta/main.yml
 
 dependencies:
-  - { role: fstream_common, fstream_module: 'fstream-web', http_port: '8081', priority: '12' }
+  - { role: fstream_common, fstream_module: 'fstream-web', main_class: 'org.springframework.boot.loader.JarLauncher', http_port: '8081', priority: '12' }

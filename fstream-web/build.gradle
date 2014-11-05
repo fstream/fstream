@@ -9,22 +9,36 @@
 
 apply plugin: 'spring-boot'
 
+build.dependsOn bootRepackage
+
+applicationDistribution.with {
+  // Exclude defaults in lieu of fat jar
+  exclude { it.file in configurations.runtime.files }
+  from("src/main/conf") { into "conf" }
+}
+
+distTar {
+  dependsOn bootRepackage
+  compression Compression.GZIP
+  extension "tar.gz"
+}
+
 dependencies {
   // fStream
   compile project(':fstream-core')
-  
+
   // Spring
   compile libraries.springBootActuator
   compile libraries.springBootWeb
   compile "org.springframework.boot:spring-boot-starter-websocket:$springBootVersion"
   compile "org.springframework:spring-messaging:$springVersion"
-  
+
   // Kafka
   compile libraries.kafka
-  
+
   // ZooKeeper
   compile libraries.curator
-  
+
   // Utilities
   compile libraries.guava
 }

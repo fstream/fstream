@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit
 
 defaultTasks 'build'
 
@@ -64,7 +64,7 @@ buildscript {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
 		classpath 'org.ajoberstar:gradle-git:0.8.0'
 		classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.1'
-		}
+	}
 }
 
 subprojects {

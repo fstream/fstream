@@ -7,22 +7,38 @@
  * Proprietary and confidential.
  */
 
+apply plugin: 'spring-boot'
+
+build.dependsOn bootRepackage
+
+applicationDistribution.with {
+  // Exclude defaults in lieu of fat jar
+  exclude { it.file in configurations.runtime.files }
+  from("src/main/conf") { into "conf" }
+}
+
+distTar {
+  dependsOn bootRepackage
+  compression Compression.GZIP
+  extension "tar.gz"
+}
+
 dependencies {
   // fStream
   compile project(':fstream-core')
-  
+
   // Spring
   compile libraries.springBootActuator
-  
+
   // Hadoop
   compile libraries.hadoop
-  
+
   // HBase
   compile libraries.hbaseClient
-  
+
   // Kafka
   compile libraries.kafka
-  
+
   // Utilities
   compile libraries.guava
 }

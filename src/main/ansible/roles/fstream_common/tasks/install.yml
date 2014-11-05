@@ -1,1 +1,4 @@
-- copy: src={{ fstream_dir}}/{{ fstream_module }}/build/libs/{{ fstream_module }}-{{ fstream_version }}.jar dest=/tmp/{{ fstream_module }}-{{ fstream_version }}.jar
+- name: Copy {{ fstream_module }}
+  copy: src={{ fstream_dir}}/{{ fstream_module }}/build/distributions/{{ fstream_module }}-{{ fstream_version }}.tar.gz dest={{ staging_dir }}/{{ fstream_module }}-{{ fstream_version }}.tar.gz
+- name: Extract {{ fstream_module }}
+  command: "tar zxf /tmp/{{ fstream_module }}-{{ fstream_version }}.tar.gz -C /usr/local/etc"

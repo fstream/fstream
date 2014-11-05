@@ -7,31 +7,65 @@
  * Proprietary and confidential.
  */
 
-// Can't use Boot's nested jar packagin due to the way Hadoop's Server loads web.xml
-// apply plugin:'application'
-// mainClassName = "io.fstream.test.Main"
-// task bootRun(dependsOn: run)
-
-apply plugin: 'spring-boot'
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
  
+// Can't use Boot's nested jar packaging due to the way Hadoop's Server loads web.xml
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = "io.fstream.test.TestMain"
+
+shadowJar {
+  exclude 'META-INF/*.SF'
+  exclude 'META-INF/*.DSA'
+  exclude 'META-INF/*.RSA'
+  
+  // Required for Storm
+  exclude 'defaults.yaml'
+  classifier = ''
+
+  // Requirede for Spring
+  mergeServiceFiles()
+  transform(AppendingTransformer) { resource = 'META-INF/spring.handlers'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.schemas'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.factories'  }
+}
+
+build.dependsOn shadowJar
+
+applicationDistribution.with {
+  // Exclude defaults in lieu of fat jar
+  exclude { it.file in configurations.runtime.files }
+  from("src/main/conf") { 
+    into "conf"
+  }
+}
+
+distTar {
+  dependsOn shadowJar
+  compression Compression.GZIP
+  extension "tar.gz"
+}
+
 dependencies {
   // fStream
   compile project(':fstream-core')
-  
+
   // Spring
   compile libraries.springBootActuator
-  
+
   // Hadoop
   compile libraries.hadoop
   compile libraries.hadoopTest
-  
+
   // HBase
   compile libraries.hbaseClient
   compile "org.apache.hbase:hbase-testing-util:$hbaseVersion"
-  
+
   // Kafka
   compile libraries.kafka
-  
+
   // Zookeeper
   compile libraries.curatorTest
 }

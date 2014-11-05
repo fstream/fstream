@@ -9,10 +9,15 @@
 
 package io.fstream.compute.config;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import io.fstream.compute.storm.DistributedStormJobExecutor;
 import io.fstream.compute.storm.LocalStormJobExecutor;
 import io.fstream.compute.storm.StormJobExecutor;
 import io.fstream.core.config.CoreConfig;
+import io.fstream.core.util.Port;
+
+import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +36,10 @@ import org.springframework.context.annotation.Configuration;
 public class ComputeConfig extends CoreConfig {
 
   @Bean
-  public StormJobExecutor stormJobExecutor(@Value("${storm.local}") boolean local) {
+  public StormJobExecutor stormJobExecutor(@Value("${zk.host}") String host, @Value("${zk.port}") int port,
+      @Value("${storm.local}") boolean local) throws IOException, InterruptedException {
+    new Port(host, port).waitFor(1L, MINUTES);
+
     if (local) {
       log.info("Creating local storm job executor...");
       return new LocalStormJobExecutor();
