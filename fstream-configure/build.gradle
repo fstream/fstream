@@ -1,0 +1,33 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+apply plugin: 'spring-boot'
+
+build.dependsOn bootRepackage
+
+applicationDistribution.with {
+  // Exclude defaults in lieu of fat jar
+  exclude { it.file in configurations.runtime.files }
+  from("src/main/conf") { into "conf" }
+}
+
+distTar {
+  dependsOn bootRepackage
+  compression Compression.GZIP
+  extension "tar.gz"
+}
+
+dependencies {
+  // Spring
+  compile libraries.springBoot
+  compile libraries.springCloudServer
+  
+  // Utilities
+  compile libraries.guava
+}

@@ -1,0 +1,45 @@
+---
+
+#
+# Copyright (c) 2014 fStream. All Rights Reserved.
+# 
+# Project and contact information: https://bitbucket.org/fstream/fstream
+# 
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# Proprietary and confidential.
+#
+
+# Spring
+spring:
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        uri: file:src/main/resources
+        basedir: build/config
+        prefix: config
+        
+  application:
+    name: application
+    
+  jmx:
+    default_domain: io.fstream
+
+# Web
+server:
+  port: 8888
+
+# Administration
+management:
+  contextPath: /admin
+
+# /admin/info
+info:
+  component: fstream-compute
+  
+# Logging
+logging:
+   level:
+      org.springframework.boot.env.PropertySourcesLoader: TRACE
+      org.springframework.web: DEBUG

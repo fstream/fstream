@@ -7,4 +7,4 @@
  * Proprietary and confidential.
  */
 
-include 'fstream-core', 'fstream-test', 'fstream-rates', 'fstream-persist', 'fstream-compute', 'fstream-web'
+include 'fstream-core', 'fstream-test', 'fstream-rates', 'fstream-persist', 'fstream-compute', 'fstream-web', 'fstream-configure'
