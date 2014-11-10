@@ -4,3 +4,4 @@ fstream_user: fstream
 fstream_group: fstream
 fstream_uid: 3080
 fstream_gid: 3080
+rates_password:

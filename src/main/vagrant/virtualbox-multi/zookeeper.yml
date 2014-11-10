@@ -1,0 +1,19 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the master Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+# This single play playbook will provision the VM
+- hosts: zookeeper
+  gather_facts: False
+  sudo: yes
+  
+  # Apply theses roles
+  roles: 
+    - zookeeper

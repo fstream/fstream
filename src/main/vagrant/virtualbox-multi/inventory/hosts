@@ -1,0 +1,19 @@
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+[zookeeper]
+10.211.55.100
+
+[kafka]
+10.211.55.101
+
+[storm]
+10.211.55.102
+
+[fstream-rates]
+10.211.55.103
+
+[fstream-compute]
+10.211.55.104
+
+[fstream-web]
+10.211.55.105

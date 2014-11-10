@@ -18,7 +18,7 @@
 
 # See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
-ENV['ANSIBLE_ROLES_PATH'] = "../ansible/roles"
+ENV['ANSIBLE_ROLES_PATH'] = "../../ansible/roles"
 
 Vagrant.configure("2") do |config|
   # Base box
@@ -26,12 +26,12 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
   # Hostname of the box 
-  config.vm.hostname="fstream-vm"
+  config.vm.hostname="fstream"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine.
-  config.vm.network :forwarded_port, guest: 8080, host: 8080
-  config.vm.network :forwarded_port, guest: 8081, host: 8081
+  config.vm.network :forwarded_port, guest: 8080, host: 8081
+  config.vm.network :forwarded_port, guest: 8081, host: 8080
   
   # Create a private network, which allows host-only access to the machine
   # using a specific IP. This IP is used in the Ansible inventory file.
@@ -40,7 +40,7 @@ Vagrant.configure("2") do |config|
   # Execute VirtualBox provider
   config.vm.provider :virtualbox do |v|
   	# Appliance name
-    v.name = "fstream-vm"
+    v.name = "fstream"
     
     # This should be a suitably large
     v.customize ["modifyvm", :id, "--memory", "4096"]
@@ -49,14 +49,12 @@ Vagrant.configure("2") do |config|
   
   # Execute Ansible provisioner
   config.vm.provision :ansible do |ansible|
-    ansible.playbook = "provisioning/virtualbox/deploy.yml"
-    ansible.inventory_path = "provisioning/virtualbox/inventory/hosts"
+    ansible.playbook = "site.yml"
+    ansible.inventory_path = "inventory/hosts"
     ansible.limit = 'all'
     ansible.verbose = 'v'
     
-    # puts ansible.inspect
-    
-    # Avoids ssh: connect to host 10.211.55.100 port 22: Host is down
+    # Avoids ssh: connect to host <ip-address> port 22: Host is down
     ansible.raw_arguments = "--timeout=60"
   end
 end
