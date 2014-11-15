@@ -16,4 +16,4 @@
   
   # Apply theses roles
   roles: 
-    - fstream_compute
+    - { role: fstream_compute, zk_host: "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}", kafka_host: "{{ hostvars[groups['kafka'][0]]['inventory_hostname'] }}", storm_host: "{{ hostvars[groups['storm'][0]]['inventory_hostname'] }}"}

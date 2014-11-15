@@ -1,10 +1,9 @@
 <configuration debug="false">
-  <property name="log.dir" value="build/logs" />
-  <property name="log.name" value="fstream" />
   <property name="pattern" value="%date{ISO8601} [%thread] %-5level %logger{20} - %msg%n" />
-
-  <!-- org.apache.storm:storm-core:0.9.1-incubating embeds logback.xml. This mutes the warnings -->
-  <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+  
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>  
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -12,22 +11,17 @@
     </encoder>
   </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>${log.dir}/${log.name}.log</File>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>${log.dir}/${log.name}.%d{yyyy-MM-dd}.log</FileNamePattern>
-    </rollingPolicy>
-    <encoder>
-      <pattern>${pattern}</pattern>
-    </encoder>
-  </appender>
-  
+   <!-- Storm -->
   <logger name="storm.kafka" level="WARN"/>
   <logger name="backtype.storm.daemon" level="WARN"/>
+  
+   <!-- ZooKeeper -->
   <logger name="org.apache.zookeeper" level="WARN"/>
   
   <root level="INFO">
     <appender-ref ref="STDOUT" />
-    <appender-ref ref="FILE" />
   </root>
+  
+  <!-- org.apache.storm:storm-core:0.9.1-incubating embeds logback.xml. This mutes the warnings -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 </configuration>

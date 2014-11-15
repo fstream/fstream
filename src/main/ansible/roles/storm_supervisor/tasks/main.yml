@@ -1,6 +1,7 @@
-# file: roles/storm_supervisor/tasks/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Storm | Install the supervisord storm-supervisor script
-  template: src=etc_supervisor.d_storm-supervisor.conf.j2 dest=/etc/supervisor.d/storm-supervisor.conf owner=root group=root mode=0644
+- name: Install the supervisord storm-supervisor script
+  template: src=storm-supervisor.conf.j2 dest=/etc/supervisor.d/storm-supervisor.conf owner=root group=root mode=0644
   notify:
-    - restart supervisor
+    - Restart storm-supervisor supervisor

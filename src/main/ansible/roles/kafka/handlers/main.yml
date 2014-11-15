@@ -1,4 +1,5 @@
-# file: roles/kafka/handlers/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: restart kafka
+- name: Restart kafka supervisor
   supervisorctl: name=kafka-broker state=restarted

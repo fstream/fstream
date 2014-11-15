@@ -1,0 +1,8 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Restart storm-nimbus supervisor
+  supervisorctl: name=storm-nimbus state=restarted
+
+- name: Restart storm-ui supervisor
+  supervisorctl: name=storm-ui state=restarted

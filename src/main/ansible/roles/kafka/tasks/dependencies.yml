@@ -1,6 +1,7 @@
-# file: roles/kafka/tasks/dependencies.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Kafka | Make sure the kafka dependencies are installed
+- name: Make sure the kafka dependencies are installed
   apt: pkg={{ item }}
   with_items:
     - git

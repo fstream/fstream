@@ -1,3 +1,4 @@
-# file: roles/zeromq/defaults/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
 zeromq_version: 2.1.7

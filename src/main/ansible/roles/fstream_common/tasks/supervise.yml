@@ -1,6 +1,7 @@
-# file: roles/zookeeper/tasks/supervise_zookeeper.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Install the supervisord script
-  template: src=fstream.conf.j2 dest=/etc/supervisor.d/{{ fstream_module }}.conf owner=root group=root mode=0644
+- name: Install the {{ fstream_module }} supervisord configuration
+  template: src=fstream_module.conf.j2 dest=/etc/supervisor.d/{{ fstream_module }}.conf owner=root group=root mode=0644
   notify:
-    - restart supervisor
+    - Restart {{ fstream_module }} supervisor

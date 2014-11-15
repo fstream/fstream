@@ -14,11 +14,11 @@
   gather_facts: False
   sudo: yes
   
-  # Apply theses roles
-  roles: 
-    - fstream_rates
-
   vars_prompt:
-    - name: rates_password
+    - name: fstream_rates_password
       prompt: OANDA FIX password
       confirm: yes
+      
+  # Apply theses roles
+  roles: 
+    - { role: fstream_rates, fstream_rates_password: "{{ fstream_rates_password }}", zk_host: "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}", kafka_host: "{{ hostvars[groups['kafka'][0]]['inventory_hostname'] }}" }

@@ -1,4 +1,4 @@
-# file: roles/kafka/defaults/main.yml
+---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 # The version of Kafka to install
@@ -16,12 +16,11 @@ kafka_dir: "kafka-{{ kafka_version }}"
 # Where to install
 target_dir: /tmp
 
-kafka_repo_url: https://github.com/apache/kafka.git
 kafka_user: kafka
 kafka_group: kafka
 kafka_uid: 3070
 kafka_gid: 3070
-kafka_local_dir: /app/kafka
+kafka_local_dir: /home/kafka
 
 # server.properties required settings
 kafka_server_JMX_PORT: 13005

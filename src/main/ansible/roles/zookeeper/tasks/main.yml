@@ -1,10 +1,11 @@
-# file: roles/zookeeper/tasks/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Zookeeper | Make sure zookeeper is not running under supervisord
+- name: Make sure ZooKeeper is not running under supervisord
   supervisorctl: name=zookeeper state=stopped
 
 - include: dependencies.yml
 - include: user.yml
 - include: install.yml
 - include: configure.yml
-- include: supervise_zookeeper.yml
+- include: supervise.yml

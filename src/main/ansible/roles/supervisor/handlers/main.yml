@@ -1,17 +1,18 @@
-# file: roles/supervisor/handlers/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: restart supervisor
+- name: Restart supervisor
   service: name=supervisor state=restarted
   sudo: yes
 
-- name: start supervisor
+- name: Start supervisor
   service: name=supervisor state=started
   sudo: yes
 
-- name: stop supervisor
+- name: Stop supervisor
   service: name=supervisor state=stopped
   sudo: yes
 
-- name: enable supervisor
+- name: Enable supervisor
   service: name=supervisor enabled=yes
   sudo: yes

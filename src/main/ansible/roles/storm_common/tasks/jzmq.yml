@@ -1,21 +1,22 @@
-# file: roles/storm_common/tasks/jzmq.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Storm | (jzmq) Download the jzmq source from the git repo
+- name: Download the jzmq source from the git repo
   git: repo=https://github.com/zeromq/jzmq.git dest=/tmp/jzmq
 
-#- name: Storm | (jzmq) prepare the jzmq source
+#- name: prepare the jzmq source
 #  shell: ./autogen.sh chdir=/tmp/jzmq
 #  shell: ./configure chdir=/tmp/jzmq
 #  shell: sudo make -j $machine_cpu_count chdir=/tmp/jzmq
 
-- name: Storm | (jzmq) Patch jzmq install for ubuntu - pt. 1
+- name: Patch jzmq install for ubuntu - pt. 1
   shell: touch classdist_noinst.stamp chdir=/tmp/jzmq/src
 
-- name: Storm | (jzmq) prepare the jzmq source
+- name: Prepare the jzmq source
   shell: ./autogen.sh chdir=/tmp/jzmq
 
-- name: Storm | (jzmq) configure and make the jzmq source
+- name: Configure and make the jzmq source
   shell: cd /tmp/jzmq && export JAVA_HOME=/usr/local/java/jdk && ./configure && make -k -j $machine_cpu_count
 
-- name: Storm | (jzmq) make install jzmq
+- name: Make install jzmq
   shell: cd /tmp/jzmq && sudo make -k install

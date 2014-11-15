@@ -16,201 +16,97 @@
 #   - http://docs.vagrantup.com/v2/virtualbox/configuration.html
 #   - https://github.com/pjan/the-ansibles
 
+# VBoxManage list runningvms
+# VBoxManage showvminfo virtualbox-multi_fstream-web_1416154748747_32842
+
 # See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
 ENV['ANSIBLE_ROLES_PATH'] = "../../ansible/roles"
+
+# All boxes in the stack
+boxes = [{
+    :name => "zookeeper",
+    :ip => '10.211.55.100',
+    :cpu => "50",
+    :ram => "512",
+    :fowarded_ports => []
+  }, {
+    :name => "kafka",
+    :ip => '10.211.55.101',
+    :cpu => "50",
+    :ram => "512",
+    :fowarded_ports => []
+  }, {
+    :name => "storm",
+    :ip => '10.211.55.102',
+    :cpu => "50",
+    :ram => "1024",
+    :fowarded_ports => [{
+      :guest => 8081, :host=> 8080
+    }]
+  }, {
+    :name => "fstream-rates",
+    :ip => '10.211.55.103',
+    :cpu => "50",
+    :ram => "512",
+    :fowarded_ports => []
+  }, {
+    :name => "fstream-compute",
+    :ip => '10.211.55.104',
+    :cpu => "50",
+    :ram => "512",
+    :fowarded_ports => []
+  }, {
+    :name => "fstream-web",
+    :ip => '10.211.55.105',
+    :cpu => "50",
+    :ram => "512",
+    :fowarded_ports => [{
+      :guest => 8080, :host=> 8081 
+    }]
+}]
 
 Vagrant.configure("2") do |config|
   # Base box
   config.vm.box = "precise64" 
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
-  config.vm.define "zookeeper" do |zookeeper|
-	  # Hostname of the box 
-	  zookeeper.vm.hostname="fstream-zookeeper"
-	
-	  # Create a private network, which allows host-only access to the machine
-	  # using a specific IP. This IP is used in the Ansible inventory file.
-	  zookeeper.vm.network :private_network, ip: "10.211.55.100"  
-	  
-	  # Execute VirtualBox provider
-	  zookeeper.vm.provider :virtualbox do |v|
-	   # Appliance name
-	    v.name = "fstream-zookeeper"
-	    
-	    # This should be a suitably large
-	    v.customize ["modifyvm", :id, "--memory", "512"]
-	    v.customize ["modifyvm", :id, "--cpus", "1"]
-	  end
-	  
-	  # Execute Ansible provisioner
-	  zookeeper.vm.provision :ansible do |ansible|
-	    ansible.playbook = "zookeeper.yml"
-	    ansible.inventory_path = "inventory/hosts"
-	    ansible.limit = 'all'
-	    ansible.verbose = 'v'
-	    
-	    # Avoids ssh: connect to host <ip-address> port 22: Host is down
-	    ansible.raw_arguments = "--timeout=60"
-	  end	  
-  end
-  
-  config.vm.define "kafka" do |kafka|
-     # Hostname of the box 
-     kafka.vm.hostname="fstream-kafka"
-   
-     # Create a private network, which allows host-only access to the machine
-     # using a specific IP. This IP is used in the Ansible inventory file.
-     kafka.vm.network :private_network, ip: "10.211.55.101"  
-     
-     # Execute VirtualBox provider
-     kafka.vm.provider :virtualbox do |v|
-      # Appliance name
-       v.name = "fstream-kafka"
-       
-       # This should be a suitably large
-       v.customize ["modifyvm", :id, "--memory", "512"]
-       v.customize ["modifyvm", :id, "--cpus", "1"]
-     end
-     
-     # Execute Ansible provisioner
-     kafka.vm.provision :ansible do |ansible|
-       ansible.playbook = "kafka.yml"
-       ansible.inventory_path = "inventory/hosts"
-       ansible.limit = 'all'
-       ansible.verbose = 'v'
-       
-       # Avoids ssh: connect to host <ip-address> port 22: Host is down
-       ansible.raw_arguments = "--timeout=60"
-     end   
-  end  
-  
-  config.vm.define "storm" do |storm|
-     # Hostname of the box 
-     storm.vm.hostname="fstream-storm"
-   
-     # Create a forwarded port mapping which allows access to a specific port
-     # within the machine from a port on the host machine.   
-     storm.vm.network :forwarded_port, guest: 8081, host: 8080
+  boxes.each do |box|
+     config.vm.define box[:name] do |vms|
+        # Hostname of the box 
+        vms.vm.hostname = box[:box]
+      
+        # Create a forwarded port mapping which allows access to a specific port
+        # within the machine from a port on the host machine.
+        box[:fowarded_ports].each do |port|
+          # puts "Forwarding port from localhost:#{port[:guest]} to #{box[:name]}:#{port[:host]}"
+          vms.vm.network :forwarded_port, guest: port[:guest], host: port[:host]
+        end
         
-     # Create a private network, which allows host-only access to the machine
-     # using a specific IP. This IP is used in the Ansible inventory file.
-     storm.vm.network :private_network, ip: "10.211.55.102"  
-     
-     # Execute VirtualBox provider
-     storm.vm.provider :virtualbox do |v|
-      # Appliance name
-       v.name = "fstream-storm"
-       
-       # This should be a suitably large
-       v.customize ["modifyvm", :id, "--memory", "512"]
-       v.customize ["modifyvm", :id, "--cpus", "1"]
-     end
-     
-     # Execute Ansible provisioner
-     storm.vm.provision :ansible do |ansible|
-       ansible.playbook = "storm.yml"
-       ansible.inventory_path = "inventory/hosts"
-       ansible.limit = 'all'
-       ansible.verbose = 'v'
-       
-       # Avoids ssh: connect to host <ip-address> port 22: Host is down
-       ansible.raw_arguments = "--timeout=60"
-     end   
-  end 
-  
-  config.vm.define "rates" do |rates|
-     # Hostname of the box 
-     rates.vm.hostname="fstream-rates"
-   
-     # Create a private network, which allows host-only access to the machine
-     # using a specific IP. This IP is used in the Ansible inventory file.
-     rates.vm.network :private_network, ip: "10.211.55.103"  
-     
-     # Execute VirtualBox provider
-     rates.vm.provider :virtualbox do |v|
-      # Appliance name
-       v.name = "fstream-rates"
-       
-       # This should be a suitably large
-       v.customize ["modifyvm", :id, "--memory", "512"]
-       v.customize ["modifyvm", :id, "--cpus", "1"]
-     end
-     
-     # Execute Ansible provisioner
-     rates.vm.provision :ansible do |ansible|
-       ansible.playbook = "fstream-rates.yml"
-       ansible.inventory_path = "inventory/hosts"
-       ansible.limit = 'all'
-       ansible.verbose = 'v'
-       
-       # Avoids ssh: connect to host <ip-address> port 22: Host is down
-       ansible.raw_arguments = "--timeout=60"
-     end   
-  end 
-  
-  config.vm.define "compute" do |compute|
-     # Hostname of the box 
-     compute.vm.hostname="fstream-compute"
-   
-     # Create a private network, which allows host-only access to the machine
-     # using a specific IP. This IP is used in the Ansible inventory file.
-     compute.vm.network :private_network, ip: "10.211.55.104"  
-     
-     # Execute VirtualBox provider
-     compute.vm.provider :virtualbox do |v|
-      # Appliance name
-       v.name = "fstream-compute"
-       
-       # This should be a suitably large
-       v.customize ["modifyvm", :id, "--memory", "512"]
-       v.customize ["modifyvm", :id, "--cpus", "1"]
-     end
-     
-     # Execute Ansible provisioner
-     compute.vm.provision :ansible do |ansible|
-       ansible.playbook = "fstream-compute.yml"
-       ansible.inventory_path = "inventory/hosts"
-       ansible.limit = 'all'
-       ansible.verbose = 'v'
-       
-       # Avoids ssh: connect to host <ip-address> port 22: Host is down
-       ansible.raw_arguments = "--timeout=60"
-     end   
-  end 
-  
-  config.vm.define "web" do |web|
-     # Hostname of the box 
-     web.vm.hostname="fstream-web"
-   
-	  # Create a forwarded port mapping which allows access to a specific port
-	  # within the machine from a port on the host machine.
-	  web.vm.network :forwarded_port, guest: 8080, host: 8081
-     
-     # Create a private network, which allows host-only access to the machine
-     # using a specific IP. This IP is used in the Ansible inventory file.
-     web.vm.network :private_network, ip: "10.211.55.104"  
-     
-     # Execute VirtualBox provider
-     web.vm.provider :virtualbox do |v|
-      # Appliance name
-       v.name = "fstream-web"
-       
-       # This should be a suitably large
-       v.customize ["modifyvm", :id, "--memory", "512"]
-       v.customize ["modifyvm", :id, "--cpus", "1"]
-     end
-     
-     # Execute Ansible provisioner
-     web.vm.provision :ansible do |ansible|
-       ansible.playbook = "fstream-web.yml"
-       ansible.inventory_path = "inventory/hosts"
-       ansible.limit = 'all'
-       ansible.verbose = 'v'
-       
-       # Avoids ssh: connect to host <ip-address> port 22: Host is down
-       ansible.raw_arguments = "--timeout=60"
-     end   
-  end 
- 
+        # Create a private network, which allows host-only access to the machine
+        # using a specific IP. This IP is used in the Ansible inventory file.
+        vms.vm.network :private_network, ip: box[:ip]  
+        
+        # Execute VirtualBox provider
+        vms.vm.provider :virtualbox do |v|
+         # Appliance name
+          v.name = box[:box]
+          
+          # This should be a suitably large
+          v.customize ["modifyvm", :id, "--memory", box[:ram]]
+          v.customize ["modifyvm", :id, "--cpus", "1"]
+        end
+        
+        # Execute Ansible provisioner
+        vms.vm.provision :ansible do |ansible|
+          ansible.playbook = "#{box[:name]}.yml"
+          ansible.inventory_path = "inventory/hosts"
+          ansible.limit = 'all'
+          ansible.verbose = 'vv'
+          
+          # Avoids ssh: connect to host <ip-address> port 22: Host is down
+          ansible.raw_arguments = "--timeout=60"
+        end   
+     end  
+  end
 end

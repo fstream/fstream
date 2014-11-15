@@ -1,6 +1,7 @@
-# file: roles/zookeeper/tasks/dependencies.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Zookeeper | Make sure the zookeeper dependencies are installed
+- name: Make sure the zookeeper dependencies are installed
   apt: pkg={{ item }}
   with_items:
     - pkg-config

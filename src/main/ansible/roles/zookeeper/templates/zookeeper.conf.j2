@@ -1,0 +1,12 @@
+[program:zookeeper]
+command=/usr/local/zookeeper/bin/zkServer.sh start-foreground 
+priority=1
+user={{zookeeper_user}}
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+redirect_stderr=true
+stdout_logfile=/var/log/zookeeper/zookeeper.log
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10

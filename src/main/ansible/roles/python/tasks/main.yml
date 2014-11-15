@@ -1,6 +1,7 @@
-# file: roles/python/tasks/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Python | Make sure python packages are installed
+- name: Make sure python packages are installed
   apt: pkg={{ item }}
   with_items:
     - cython
@@ -10,11 +11,11 @@
     - python-dev
 
 # Ubuntu's python-setuptools, python-pip and python-virtualenv packages are broken
-- name: Python | Get the setuptools install-script
+- name: Get the setuptools install-script
   get_url: dest=/tmp url=https://bootstrap.pypa.io/ez_setup.py mode=0644
 
-- name: Python | Make sure pip is installed (from script)
+- name: Make sure pip is installed (from script)
   shell: python ez_setup.py && /usr/local/bin/easy_install pip chdir=/tmp
 
-- name: Python | Make sure virtualenv is installed
+- name: Make sure virtualenv is installed
   pip: name=virtualenv

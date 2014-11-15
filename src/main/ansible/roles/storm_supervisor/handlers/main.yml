@@ -1,0 +1,6 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Restart storm-supervisor supervisor
+  supervisorctl: name=storm-supervisor state=restarted
+

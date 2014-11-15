@@ -1,0 +1,12 @@
+[program:{{ fstream_module }}]
+command=java -XX:MaxPermSize=128m -cp /usr/local/{{ fstream_module }}-{{ fstream_version }}/conf:/usr/local/{{ fstream_module }}-{{ fstream_version }}/lib/{{ fstream_module }}-{{ fstream_version }}.jar {{ main_class }} --server.port={{ http_port }} --zk.host={{ zk_host }} --zk.port={{ zk_port }} --kafka.host={{ kafka_host }} --kafka.port={{ kafka_port }} --storm.local=false --storm.host={{ storm_host }} --rates.password={{ fstream_rates_password }} start-foreground
+priority={{ priority }}
+user={{fstream_user}}
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+redirect_stderr=true
+stdout_logfile=/var/log/{{ fstream_module }}/{{ fstream_module }}.log
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10

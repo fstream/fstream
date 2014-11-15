@@ -1,16 +1,20 @@
-# file: roles/zookeeper/tasks/install.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Zookeeper | Download the zookeeper source in /tmp if not yet present
+- name: Make sure the zookeeper log dir exists
+  file: path=/var/log/zookeeper state=directory owner={{ zookeeper_user }} group={{ zookeeper_group }} mode=0755 recurse=yes
+
+- name: Download the zookeeper source in /tmp if not yet present
   command: wget http://mirror.csclub.uwaterloo.ca/apache/zookeeper/zookeeper-{{ zookeeper_version }}/zookeeper-{{ zookeeper_version }}.tar.gz chdir=/tmp creates=/tmp/zookeeper-{{ zookeeper_version }}.tar.gz
 
-- name: Zookeeper | Untar the zookeeper source in /usr/local/etc
-  command: tar -xvzf /tmp/zookeeper-{{ zookeeper_version }}.tar.gz chdir=/usr/local/etc creates=/usr/local/etc/zookeeper-{{ zookeeper_version }}
+- name: Untar the zookeeper source in /usr/local
+  command: tar -xvzf /tmp/zookeeper-{{ zookeeper_version }}.tar.gz chdir=/usr/local creates=/usr/local/zookeeper-{{ zookeeper_version }}
 
-- name: Zookeeper | Update the zookeeper install permissions
-  file: path=/usr/local/etc/zookeeper-{{ zookeeper_version }} owner={{ zookeeper_user }} group={{ zookeeper_group }} state=directory recurse=yes
+- name: Update the zookeeper install permissions
+  file: path=/usr/local/zookeeper-{{ zookeeper_version }} owner={{ zookeeper_user }} group={{ zookeeper_group }} state=directory recurse=yes
 
-- name: Zookeeper | Update the symbolic link to the zookeeper install
-  file: path=/usr/local/etc/zookeeper src=/usr/local/etc/zookeeper-{{ zookeeper_version }} state=link force=yes
+- name: Update the symbolic link to the zookeeper install
+  file: path=/usr/local/zookeeper src=/usr/local/zookeeper-{{ zookeeper_version }} state=link force=yes
 
-- name: Zookeeper | Make sure the local working directory for zookeeper is present
+- name: Make sure the local working directory for zookeeper is present
   file: path={{ zookeeper_data_dir }} owner={{ zookeeper_user }} group={{ zookeeper_group }} mode=0750 state=directory

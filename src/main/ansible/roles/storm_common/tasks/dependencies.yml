@@ -1,6 +1,7 @@
-# file: roles/storm_common/tasks/dependencies.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Storm | Make sure the storm dependencies are installed
+- name: Make sure the storm dependencies are installed
   apt: pkg={{ item }}
   with_items:
     - unzip

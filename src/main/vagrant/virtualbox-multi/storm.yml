@@ -14,7 +14,7 @@
   gather_facts: False
   sudo: yes
   
-  # Apply theses roles
-  roles: 
-    - storm_supervisor
-    - storm_nimbus
+  # Apply Storm roles
+  roles:
+    - { role: storm_supervisor, storm_zookeeper_servers: [ "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}" ] }
+    - { role: storm_nimbus,     storm_zookeeper_servers: [ "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}" ] }

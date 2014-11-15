@@ -1,4 +1,11 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Make sure the {{ fstream_module }} log dir exists
+  file: path=/var/log/{{ fstream_module }} state=directory owner={{ fstream_user }} group={{ fstream_group }} mode=0755 recurse=yes
+
 - name: Copy {{ fstream_module }}
   copy: src={{ fstream_dir}}/{{ fstream_module }}/build/distributions/{{ fstream_module }}-{{ fstream_version }}.tar.gz dest={{ staging_dir }}/{{ fstream_module }}-{{ fstream_version }}.tar.gz
+  
 - name: Extract {{ fstream_module }}
-  command: "tar zxf /tmp/{{ fstream_module }}-{{ fstream_version }}.tar.gz -C /usr/local/etc"
+  command: "tar zxf /tmp/{{ fstream_module }}-{{ fstream_version }}.tar.gz -C /usr/local"

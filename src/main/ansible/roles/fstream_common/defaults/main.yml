@@ -1,7 +1,15 @@
-# file: roles/fstream/defaults/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
 fstream_user: fstream
 fstream_group: fstream
 fstream_uid: 3080
 fstream_gid: 3080
-rates_password:
+fstream_rates_password:
+
+zk_host: localhost
+zk_port: 2181
+kafka_host: localhost
+kafka_port: 9092
+storm_host: localhost
+storm_port: 6627

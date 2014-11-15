@@ -1,4 +1,5 @@
-# file: roles/zookeeper/defaults/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
 zookeeper_version: 3.4.6
 zookeeper_user: zookeeper
@@ -8,7 +9,7 @@ zookeeper_gid: 3040
 
 zookeeper_id: 1
 
-zookeeper_data_dir: /app/zookeeper
+zookeeper_data_dir: /home/zookeeper
 zookeeper_client_port: 2181
 zookeeper_tick_time: 2000
 zookeeper_init_limit: 10

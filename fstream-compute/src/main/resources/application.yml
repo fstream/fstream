@@ -1,13 +1,10 @@
 ---
-
-#
 # Copyright (c) 2014 fStream. All Rights Reserved.
 # 
 # Project and contact information: https://bitbucket.org/fstream/fstream
 # 
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
-#
 
 # ZooKeeper
 zk:
@@ -26,9 +23,11 @@ kafka:
       
 # Storm
 storm:
+   host: localhost
    local: true
    debug: true
    properties:
+      nimbus.host: ${storm.host} 
 
 # https://groups.google.com/forum/#!topic/storm-user/yOtE3Em50bA
 # https://translate.google.ca/translate?hl=en&sl=zh-CN&tl=en&u=http%3A%2F%2Fm.blog.csdn.net%2Fblog%2Fpan051%2F16805373

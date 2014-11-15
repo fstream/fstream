@@ -14,6 +14,7 @@
   gather_facts: False
   sudo: yes
   
-  # Apply theses roles
+  # Apply kafka role
+  # TODO: Allow for multiple zookeepers
   roles: 
-    - kafka
+    - { role: kafka, kafka_host_name: "{{ hostvars[groups['kafka'][0]]['inventory_hostname'] }}", kafka_server_zookeeper_connect: [ "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}:2181" ] }

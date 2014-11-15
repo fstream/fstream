@@ -1,6 +1,7 @@
-# file: roles/storm_common/tasks/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Storm | Make sure storm is not running under supervisord
+- name: Make sure storm is not running under supervisord
   supervisorctl: name={{ item }} state=stopped
   with_items:
     - storm-drpc

@@ -16,4 +16,4 @@
   
   # Apply theses roles
   roles: 
-    - fstream_web
+    - { role: fstream_web, zk_host: "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}", kafka_host: "{{ hostvars[groups['kafka'][0]]['inventory_hostname'] }}" }

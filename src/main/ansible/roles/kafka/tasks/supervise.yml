@@ -1,0 +1,7 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Install the supervisord kafka broker script
+  template: src=kafka-broker.conf.j2 dest=/etc/supervisor.d/kafka-broker.conf owner=root group=root mode=0644
+  notify:
+    - Restart kafka supervisor

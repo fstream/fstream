@@ -1,0 +1,12 @@
+[program:storm-supervisor]
+command=/usr/local/storm/bin/storm supervisor
+priority=3
+user={{storm_user}}
+autostart=true
+autorestart=true
+startsecs=20
+startretries=999
+redirect_stderr=true
+stdout_logfile=/var/log/storm/storm-supervisor.log
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10

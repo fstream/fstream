@@ -1,4 +1,5 @@
-# file: roles/zookeeper/meta/main.yml
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
 dependencies:
   - { role: fstream_common, fstream_module: 'fstream-compute', main_class: 'io.fstream.compute.ComputeMain', http_port: '8083', priority: '11' }

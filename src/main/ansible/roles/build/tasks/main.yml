@@ -1,9 +1,8 @@
-# file: roles/build/tasks/main.yml
-
-# Run the equivalent of "apt-get update" as a separate step
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
 - apt: update_cache=yes cache_valid_time=3600
 
-- name: Build | Make sure essential build/dev tools and compilers are installed/up-to-date
+- name: Make sure common build/dev tools and compilers are installed/up-to-date
   apt: pkg={{ item }}
   with_items:
     - ack
