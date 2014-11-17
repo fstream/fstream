@@ -1,6 +1,7 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
+supervisor_version: 3.0b2
 supervisor_inet_port: 8010
 supervisor_inet_username: supervisor
 supervisor_inet_password: supervisor

@@ -11,7 +11,7 @@
 
 # This single play playbook will provision the VM
 - hosts: zookeeper
-  gather_facts: False
+  gather_facts: True
   sudo: yes
   
   # Apply theses roles

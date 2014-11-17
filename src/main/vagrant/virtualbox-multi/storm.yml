@@ -11,10 +11,13 @@
 
 # This single play playbook will provision the VM
 - hosts: storm
-  gather_facts: False
+  gather_facts: True
   sudo: yes
+  vars:
+    zookeeper_node:    "{{ groups['zookeeper'][0] }}"
+    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
   
   # Apply Storm roles
   roles:
-    - { role: storm_supervisor, storm_zookeeper_servers: [ "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}" ] }
-    - { role: storm_nimbus,     storm_zookeeper_servers: [ "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}" ] }
+    - { role: storm_supervisor, storm_zookeeper_servers: [ "{{ zookeeper_address }}" ] }
+    - { role: storm_nimbus,     storm_zookeeper_servers: [ "{{ zookeeper_address }}" ] }

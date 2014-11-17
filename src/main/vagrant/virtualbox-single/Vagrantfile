@@ -67,8 +67,15 @@ Vagrant.configure("2") do |config|
         # Execute Ansible provisioner
         vms.vm.provision :ansible do |ansible|
           ansible.playbook = "#{box[:name]}.yml"
-          ansible.inventory_path = "inventory/hosts"
           ansible.limit = 'all'
+          ansible.groups = {
+			   "zookeeper"       => ["site"],
+			   "kafka"           => ["site"],
+			   "storm"           => ["site"],
+			   "fstream-rates"   => ["site"],
+			   "fstream-compute" => ["site"],
+			   "fstream-web"     => ["site"]
+			 }
           ansible.verbose = 'vv'
           
           # Avoids ssh: connect to host <ip-address> port 22: Host is down

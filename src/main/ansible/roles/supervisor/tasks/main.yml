@@ -1,8 +1,8 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Make sure supervisor is installed
-  apt: pkg=supervisor state=installed
+- name: Supervisor | Make sure supervisor is installed
+  pip: name=supervisor version={{ supervisor_version }}
 
 - name: Make sure the supervisor conf dir exists
   file: path={{ supervisor_dir }} state=directory mode=0755 owner=root group=root
@@ -16,4 +16,5 @@
 - name: Install the supervisor runit script
   template: src=supervisor.j2 dest=/etc/init.d/supervisor owner=root group=root mode=0755
   notify:
+    - Enable supervisor
     - Restart supervisor

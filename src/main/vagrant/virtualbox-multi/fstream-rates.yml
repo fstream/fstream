@@ -13,7 +13,12 @@
 - hosts: fstream-rates
   gather_facts: False
   sudo: yes
-  
+  vars:
+    zookeeper_node:    "{{ groups['zookeeper'][0] }}"
+    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
+    kafka_node:        "{{ groups['kafka'][0] }}"
+    kafka_address:     "{{ hostvars[kafka_node].ansible_eth0.ipv4.address }}"
+    
   vars_prompt:
     - name: fstream_rates_password
       prompt: OANDA FIX password
@@ -21,4 +26,4 @@
       
   # Apply theses roles
   roles: 
-    - { role: fstream_rates, fstream_rates_password: "{{ fstream_rates_password }}", zk_host: "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}", kafka_host: "{{ hostvars[groups['kafka'][0]]['inventory_hostname'] }}" }
+    - { role: fstream_rates, fstream_rates_password: "{{ fstream_rates_password }}", zk_host: "{{ zookeeper_address }}", kafka_host: "{{ kafka_address }}" }

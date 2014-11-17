@@ -11,10 +11,15 @@
 
 # This single play playbook will provision the VM
 - hosts: kafka
-  gather_facts: False
+  gather_facts: True
   sudo: yes
-  
+  vars:
+    zookeeper_node:    "{{ groups['zookeeper'][0] }}"
+    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
+    kafka_node:        "{{ groups['kafka'][0] }}"
+    kafka_address:     "{{ hostvars[kafka_node].ansible_eth0.ipv4.address }}"
+    
   # Apply kafka role
   # TODO: Allow for multiple zookeepers
   roles: 
-    - { role: kafka, kafka_host_name: "{{ hostvars[groups['kafka'][0]]['inventory_hostname'] }}", kafka_server_zookeeper_connect: [ "{{ hostvars[groups['zookeeper'][0]]['inventory_hostname'] }}:2181" ] }
+    - { role: kafka, kafka_host_name: "{{ kafka_address }}", kafka_server_zookeeper_connect: [ "{{ zookeeper_address }}:2181" ] }
