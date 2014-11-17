@@ -40,7 +40,7 @@ public class DistributedStormJobExecutor extends AbstractStormJobExecutor {
   public void execute(@NonNull final StormJob job) {
     setStormJar();
 
-    log.info("Submitting cluster topology '{}'...", job.getId());
+    log.info("Submitting cluster topology '{}' with config {}...", job.getId(), job.getConfig());
     StormSubmitter.submitTopology(job.getId(), job.getConfig(), job.getTopology());
 
     onShutdown(new Runnable() {

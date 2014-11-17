@@ -1,7 +1,7 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Make sure the storm group is present
+- name: Make sure the fstream group is present
   action: group gid={{ fstream_gid }} name={{ fstream_group }} state=present
 
 - name: Make sure the fstream user directory is present

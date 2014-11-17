@@ -71,12 +71,6 @@ public class StormJobFactory {
   @Autowired
   private StormProperties stormProperties;
 
-  public StormJob createJob(@NonNull State state) {
-    val jobId = createJobId();
-
-    return new StormJob(jobId, createConfig(state), createTopology(jobId, state));
-  }
-
   public StormJob createAlertJob(@NonNull Alert alert, List<String> symbols, List<String> common) {
     // Singleton alert
     val state = new State();
@@ -84,7 +78,7 @@ public class StormJobFactory {
     state.setSymbols(symbols);
     state.setStatements(common);
 
-    return createJob(state);
+    return createJob("metric", state);
   }
 
   public StormJob createMetricJob(@NonNull Metric metric, List<String> symbols, List<String> common) {
@@ -94,12 +88,19 @@ public class StormJobFactory {
     state.setSymbols(symbols);
     state.setStatements(common);
 
-    return createJob(state);
+    return createJob("metric", state);
+  }
+
+  private StormJob createJob(@NonNull String prefix, @NonNull State state) {
+    val jobId = createJobId(prefix);
+
+    return new StormJob(jobId, createConfig(state), createTopology(jobId, state));
   }
 
   @SneakyThrows
   private Config createConfig(State state) {
     val config = new Config();
+    config.putAll(stormProperties.getProperties());
     config.setDebug(stormProperties.isDebug());
 
     // Per topology configuration
@@ -209,8 +210,8 @@ public class StormJobFactory {
     return new KafkaSpout(kafkaConf);
   }
 
-  private static String createJobId() {
-    return randomUUID().toString();
+  private static String createJobId(String prefix) {
+    return prefix + "-" + randomUUID().toString();
   }
 
   private static String getTopicZkRoot(Topic topic) {

@@ -36,7 +36,7 @@ public class Port {
     val threshold = System.currentTimeMillis() + duration;
 
     try (val socket = new Socket()) {
-      log.info("Waiting up to {} {} for {} to become available...", timeValue, timeUnit, address);
+      log.info("Waiting up to {} {} for {}:{} to become available...", timeValue, timeUnit, host, port);
       while (System.currentTimeMillis() < threshold) {
         try {
           socket.connect(address, (int) duration);
