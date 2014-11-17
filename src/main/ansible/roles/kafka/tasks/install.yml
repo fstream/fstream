@@ -7,9 +7,6 @@
 - name: Download kafka distribution
   get_url: "url={{ kafka_archive_url }} dest={{ staging_dir }}/{{ kafka_archive}} mode=0444 force=no"
   
-- name: Creating target dir
-  file: "dest={{ target_dir }} state=directory"
-
 - name: Extract kafka
   command: "tar xzf {{ staging_dir }}/{{  kafka_archive }} -C /usr/local/ creates=/usr/local/{{ kafka_dir }}" 
   

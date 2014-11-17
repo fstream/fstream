@@ -19,9 +19,12 @@
 # VBoxManage list runningvms
 # VBoxManage showvminfo virtualbox-multi_fstream-web_1416154748747_32842
 
+# Config
+ansible_path = "../../ansible"
+
 # See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
-ENV['ANSIBLE_ROLES_PATH'] = "../../ansible/roles"
+ENV['ANSIBLE_ROLES_PATH']  = ansible_path + "/" + "roles"
 
 # All boxes in the stack
 boxes = [{
@@ -100,7 +103,7 @@ Vagrant.configure("2") do |config|
         # Execute Ansible provisioner
         if index == boxes.length - 1
 	        vms.vm.provision :ansible do |ansible|
-	          ansible.playbook = "../virtualbox-single/site.yml"
+	          ansible.playbook = ansible_path + "/" + "site.yml"
              ansible.groups = {
                "zookeeper"       => ["zookeeper"],
                "kafka"           => ["kafka"],

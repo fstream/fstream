@@ -10,9 +10,9 @@
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
 # This single play playbook will provision the Cloud 
-- include: ../virtualbox-multi/zookeeper.yml
-- include: ../virtualbox-multi/kafka.yml
-- include: ../virtualbox-multi/storm.yml
-- include: ../virtualbox-multi/fstream-rates.yml
-- include: ../virtualbox-multi/fstream-compute.yml
-- include: ../virtualbox-multi/fstream-web.yml
+- include: zookeeper.yml
+- include: kafka.yml
+- include: storm.yml
+- include: fstream-rates.yml
+- include: fstream-compute.yml
+- include: fstream-web.yml

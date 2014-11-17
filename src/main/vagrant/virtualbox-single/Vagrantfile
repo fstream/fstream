@@ -16,9 +16,12 @@
 #   - http://docs.vagrantup.com/v2/virtualbox/configuration.html
 #   - https://github.com/pjan/the-ansibles
 
+# Config
+ansible_path = "../../ansible"
+
 # See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
-ENV['ANSIBLE_ROLES_PATH'] = "../../ansible/roles"
+ENV['ANSIBLE_ROLES_PATH']  = ansible_path + "/" + "roles"
 
 # Stack in a single box
 boxes = [{
@@ -66,7 +69,7 @@ Vagrant.configure("2") do |config|
         
         # Execute Ansible provisioner
         vms.vm.provision :ansible do |ansible|
-          ansible.playbook = "#{box[:name]}.yml"
+          ansible.playbook = ansible_path + "/" + "site.yml"
           ansible.limit = 'all'
           ansible.groups = {
 			   "zookeeper"       => ["site"],

@@ -18,10 +18,13 @@
 
 # vagrant plugin install vagrant-aws
 
+# Config
+ansible_path = "../../ansible"
+
 # See https://github.com/mitchellh/vagrant/issues/2924
-ENV['VAGRANT_DEFAULT_PROVIDER'] = "aws"
 ENV['PYTHONIOENCODING'] = "utf-8"
-ENV['ANSIBLE_ROLES_PATH'] = "../../ansible/roles"
+ENV['ANSIBLE_ROLES_PATH']  = ansible_path + "/" + "roles"
+ENV['VAGRANT_DEFAULT_PROVIDER'] = "aws"
 
 # All boxes in the stack
 boxes = [{
@@ -79,28 +82,31 @@ Vagrant.configure("2") do |config|
 
   boxes.each_with_index do |box, index|
     config.vm.define box[:name] do |vms|
-      # Hostname of the box 
-      vms.vm.hostname = box[:box]
+      # Naming
+      vms.vm.hostname = box[:name]
       
-		 # Execute AWS provider
+		 # Launching
 		 vms.vm.provider :aws do |aws, override|
-		   # Credentials
+		   # Authentication
 		   aws.access_key_id = ENV['AMAZON_ACCESS_KEY_ID']
 		   aws.secret_access_key = ENV['AMAZON_SECRET_ACCESS_KEY']
 		   
-		   # Ubuntu AMI
-	     aws.ami = "ami-9eaa1cf6"
-	     aws.instance_type = box[:aws_instance_type]
+		   # Instance (Ubuntu)
+	      aws.ami = "ami-9eaa1cf6"
+	      aws.instance_type = box[:aws_instance_type]
+	      
+	      # Security
 		   aws.keypair_name = "fstream-aws-bob"
 		   aws.security_groups = ["default"]
 		   
-		   aws.tags = {
-		     "Name" => box[:box]
-		   }
-		
+		   # Metadata
+		   aws.tags["Name"] = box[:name]
+         
+         # Vagrant base (required)
 		   override.vm.box = "dummy"
 		   override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-		   
+
+         # Access 		   
 		   override.ssh.username = "ubuntu"
 		   override.ssh.private_key_path = "~/.ssh/fstream-aws-bob.pem"
 		 end
@@ -108,7 +114,7 @@ Vagrant.configure("2") do |config|
       if index == boxes.length - 1
 	     # Execute Ansible provisioner
 	     vms.vm.provision :ansible do |ansible|
-          ansible.playbook = "../virtualbox-single/site.yml"
+          ansible.playbook = ansible_path + "/" + "site.yml"
           ansible.groups = {
             "zookeeper"       => ["zookeeper"],
             "kafka"           => ["kafka"],

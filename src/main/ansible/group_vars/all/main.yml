@@ -6,7 +6,5 @@
 
 # Directories
 staging_dir: "/tmp"
-target_dir: "/srv"
-fstream_dir: "../../../.."
+fstream_dir: "../../.."
 fstream_version: "0.0.1-SNAPSHOT"
-
