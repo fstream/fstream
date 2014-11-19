@@ -1,0 +1,46 @@
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+provider: virtualbox
+boxes:
+   - name: zookeeper
+     groups:
+        - zookeeper
+     virtualbox:
+        memory: 512
+        cpus: 1
+   - name: kafka
+     groups:
+        - kafka
+     virtualbox:
+        memory: 512
+        cpus: 1
+   - name: storm
+     groups:
+        - storm
+     virtualbox:
+        memory: 512
+        cpus: 1
+        forwarded_ports:
+           - guest: 8081
+             host: 8080
+   - name: fstream-rates
+     groups:
+        - fstream-rates
+     virtualbox:
+        memory: 512
+        cpus: 1
+   - name: fstream-compute
+     groups:
+        - fstream-compute
+     virtualbox:
+        memory: 512
+        cpus: 1
+   - name: fstream-web
+     groups:
+        - fstream-web
+     virtualbox:
+        memory: 512
+        cpus: 1
+        forwarded_ports:
+           - guest: 8080
+             host: 8081       

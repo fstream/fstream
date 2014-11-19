@@ -1,0 +1,20 @@
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+provider: virtualbox
+boxes:
+   - name: site
+     groups:
+        - zookeeper
+        - kafka
+        - storm
+        - fstream-rates
+        - fstream-compute
+        - fstream-rates
+     virtualbox:
+        memory: 4096
+        cpus: 8
+        forwarded_ports:
+           - guest: 8081
+             host: 8080
+           - guest: 8080
+             host: 8081

@@ -1,0 +1,14 @@
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+provider: aws
+boxes:
+   - name: site
+     groups:
+        - zookeeper
+        - kafka
+        - storm
+        - fstream-rates
+        - fstream-compute
+        - fstream-rates
+     aws:
+        instance_type: t2.medium

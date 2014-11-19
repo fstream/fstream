@@ -1,0 +1,123 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - VirtualBox VM Vagrant file
+#
+# Description: 
+#   The is the Vagrant file for provisioning the fStream stack using the 
+#   VirtualBox provider and Ansible as the provisioner.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/
+#   - http://www.ansibleworks.com/docs/guide_vagrant.html
+#   - http://jinja.pocoo.org/docs/templates/
+#   - http://docs.vagrantup.com/v2/provisioning/ansible.html
+#   - http://docs.vagrantup.com/v2/virtualbox/configuration.html
+#   - https://github.com/pjan/the-ansibles
+
+require "yaml"
+
+# Config
+ansible_path = "../../ansible"
+settings = File.open($settings_file || File.join(File.dirname(__FILE__), 'settings.yml')) { |yf| YAML::load( yf ) }
+boxes = settings['boxes']
+provider = settings['provider']
+
+# See https://github.com/mitchellh/vagrant/issues/2924
+ENV['PYTHONIOENCODING'] = "utf-8"
+ENV['ANSIBLE_ROLES_PATH']  = ansible_path + "/" + "roles"
+ENV['VAGRANT_DEFAULT_PROVIDER'] = provider
+
+# Resolve groups
+groups = {}
+boxes.each do |box|
+   box['groups'].each do |group| 
+      groups[group] = (groups[group] || []) << box['name']
+   end
+end
+
+Vagrant.configure("2") do |config|
+  # Base box
+  if provider == 'virtualbox'
+     config.vm.box = "precise64" 
+     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  end
+  if provider == 'aws'
+     config.vm.box = "dummy" 
+     config.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+  end
+  
+  boxes.each_with_index do |box, index|
+     config.vm.define box['name'] do |vms|
+        # Hostname of the box 
+        vms.vm.hostname = box['name']
+        
+        if provider == 'virtualbox'
+	        # Execute VirtualBox provider
+	        vms.vm.provider :virtualbox do |v|
+	         # Appliance name
+	          v.name = box['name']
+	        
+	          vb = box['virtualbox']
+	          if !vb.nil?
+	             if vb.has_key?("memory")
+                   v.customize ["modifyvm", :id, "--memory", vb['memory']]
+                end
+	             if vb.has_key?("cpus")
+	                v.customize ["modifyvm", :id, "--cpus", vb['cpus']]
+                end
+                if vb.has_key?("forwarded_ports")
+                   vb['forwarded_ports'].each do |port|
+                     vms.vm.network :forwarded_port, guest: port['guest'], host: port['host']
+                   end
+                end
+             end
+	        end
+        end
+        
+        if provider == 'aws'
+           a = box['aws']
+          
+           # Launching
+           vms.vm.provider :aws do |aws, override|
+             # Authentication
+             aws.access_key_id = ENV['AMAZON_ACCESS_KEY_ID']
+             aws.secret_access_key = ENV['AMAZON_SECRET_ACCESS_KEY']
+             
+             # Instance (Ubuntu)
+             aws.ami = "ami-9eaa1cf6"
+             aws.instance_type = a['instance_type']
+             
+             # Security
+             aws.keypair_name = "fstream"
+             aws.security_groups = ["default"]
+             
+             # Metadata
+             aws.tags["Name"] = box[:name]
+             
+             # Vagrant base (required)
+             override.vm.box = "dummy"
+             override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+           
+             # Access          
+             override.ssh.username = "ubuntu"
+             override.ssh.private_key_path = "~/.ssh/fstream.pem"
+           end        
+        end
+        
+        if index == boxes.length - 1
+	        # Execute Ansible provisioner
+	        vms.vm.provision :ansible do |ansible|
+	          ansible.playbook = ansible_path + "/" + "site.yml"
+	          ansible.limit = 'all'
+	          ansible.groups = groups
+	          ansible.verbose = 'vv'
+	          
+	          # Avoids ssh: connect to host <ip-address> port 22: Host is down
+	          ansible.raw_arguments = "--timeout=60"
+	        end
+        end
+     end  
+  end
+end

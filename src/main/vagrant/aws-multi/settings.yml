@@ -1,0 +1,34 @@
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+provider: aws
+boxes:
+   - name: zookeeper
+     groups:
+        - zookeeper
+     aws:
+        instance_type: t2.micro
+   - name: kafka
+     groups:
+        - kafka
+     aws:
+        instance_type: t2.small
+   - name: storm
+     groups:
+        - storm
+     aws:
+        instance_type: t2.small
+   - name: fstream-rates
+     groups:
+        - fstream-rates
+     aws:
+        instance_type: t2.micro
+   - name: fstream-compute
+     groups:
+        - fstream-compute
+     aws:
+        instance_type: t2.micro
+   - name: fstream-web
+     groups:
+        - fstream-web
+     aws:
+        instance_type: t2.micro    
