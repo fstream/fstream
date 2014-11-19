@@ -9,7 +9,7 @@ boxes:
         - storm
         - fstream-rates
         - fstream-compute
-        - fstream-rates
+        - fstream-web
      virtualbox:
         memory: 4096
         cpus: 8

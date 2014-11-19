@@ -9,6 +9,6 @@ boxes:
         - storm
         - fstream-rates
         - fstream-compute
-        - fstream-rates
+        - fstream-web
      aws:
         instance_type: t2.medium
