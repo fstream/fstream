@@ -1,14 +1,22 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Vagrant settings file
+#
+# Description: 
+#   The is the Vagrant setting file for provisioning the fStream stack using the 
+#   AWS provider within a single EC2 instance.
 
 provider: aws
 boxes:
-   - name: site
+
+   # fStream
+   - name: fstream
      groups:
         - zookeeper
         - kafka
         - storm
         - fstream-rates
         - fstream-compute
-        - fstream-rates
+        - fstream-web
      aws:
         instance_type: t2.medium
