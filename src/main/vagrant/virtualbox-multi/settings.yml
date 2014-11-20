@@ -1,19 +1,31 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Vagrant settings file
+#
+# Description: 
+#   The is the Vagrant setting file for provisioning the fStream stack using the 
+#   VirtualBox provider over multiple VMs.
 
 provider: virtualbox
 boxes:
+
+   # ZooKeeper
    - name: zookeeper
      groups:
         - zookeeper
      virtualbox:
         memory: 512
         cpus: 1
+        
+   # Kafka
    - name: kafka
      groups:
         - kafka
      virtualbox:
         memory: 512
         cpus: 1
+        
+   # Storm
    - name: storm
      groups:
         - storm
@@ -23,18 +35,24 @@ boxes:
         forwarded_ports:
            - guest: 8081
              host: 8080
+             
+   # Rates
    - name: fstream-rates
      groups:
         - fstream-rates
      virtualbox:
         memory: 512
         cpus: 1
+        
+   # Compute
    - name: fstream-compute
      groups:
         - fstream-compute
      virtualbox:
         memory: 512
         cpus: 1
+        
+   # Web
    - name: fstream-web
      groups:
         - fstream-web
