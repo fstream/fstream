@@ -1,0 +1,41 @@
+{
+    "variables": {
+        "vm_source_path": "{{env `HOME`}}/.vagrant.d/boxes/ubuntu14.014/0/virtualbox/box.ovf",
+        "vm_username": "vagrant",
+        "vm_password": "vagrant"
+    },
+    "builders": [{
+        "type": "virtualbox-ovf",
+        "source_path": "{{user `vm_source_path` }}",
+
+        "ssh_username": "{{user `vm_username` }}",
+        "ssh_password": "{{user `vm_password` }}",
+        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now "
+
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+        "inline": [
+            "sleep 30",
+            "apt-add-repository ppa:rquillo/ansible",
+            "/usr/bin/apt-get update",
+            "/usr/bin/apt-get -y install ansible"
+        ]
+    }, {
+        "type": "ansible-local",
+        "inventory_file": "hosts",
+        "extra_arguments": "-vvv",
+        "playbook_file": "../ansible/zookeeper.yml",
+        "playbook_dir": "../ansible",
+        "role_paths": [
+            "../ansible/roles"
+        ]
+    }],
+    "post-processors": [{
+        "type": "vagrant",
+        "compression_level": 1,
+        "output": "packer_{{.BuildName}}_{{.Provider}}.box"
+
+    }]
+}
