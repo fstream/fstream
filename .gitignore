@@ -33,6 +33,10 @@ mem.lock.db
 mem.trace.db
 logs/
 
+# Packer
+packer_cache/
+*.box
+
 # *nix temporary files
 *~
 *.swp
