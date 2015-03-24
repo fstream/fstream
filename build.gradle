@@ -66,7 +66,7 @@ buildscript {
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
 		classpath 'org.ajoberstar:gradle-git:0.8.0'
-		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.0'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
 	}
 }
 
@@ -86,7 +86,7 @@ subprojects {
 		main { compileClasspath += configurations.provided }
 	}
 
-	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_7
+	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 	repositories {
 		mavenCentral()
