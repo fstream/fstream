@@ -1,0 +1,98 @@
+<div class="row" ng-controller="chartjsCtrl">
+    <div class="col-lg-4">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Radar type chart
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas radarchart options="radarOptions" data="radarData" responsive=true></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Doughnut bar chart
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas doughnutchart options="doughnutOptions" data="doughnutData" height="140" responsive=true></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Polar type chart
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas polarchart options="polarOptions" data="polarData" height="140" responsive=true></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="row" ng-controller="chartjsCtrl">
+    <div class="col-lg-6">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Line type chart
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas linechart options="lineOptions" data="lineData" height="140" responsive=true ></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Bar type chart
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas barchart options="barOptions" data="barData" height="140" responsive=true ></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" ng-controller="chartjsCtrl">
+    <div class="col-lg-6">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Single Bar type chart
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas barchart options="singleBarOptions" data="singleBarData" height="140" responsive=true ></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="hpanel">
+            <div class="panel-heading">
+                <div panel-tools></div>
+                Line type chart without curve
+            </div>
+            <div class="panel-body">
+                <div>
+                    <canvas linechart options="sharpLineOptions" data="sharpLineData" height="140" responsive=true ></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
