@@ -22,11 +22,7 @@
         'bm.bsTour',                // Angular bootstrap tour
         'datatables',               // Angular datatables plugin
         'xeditable',                // Angular-xeditable
-        'ui.select',                // AngularJS ui-select
-      'ngRoute','underscore',
-    ]);
-  angular.module('underscore', []).factory('_', function() {
-	return window._; // assumes underscore has already been loaded on the page
-}); 
+        'ui.select','ngLodash'                 // AngularJS ui-select
+    ])
 })();
 

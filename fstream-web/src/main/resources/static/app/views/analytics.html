@@ -5,7 +5,7 @@
 <aside id="menu" ng-include="'views/common/navigation.html'"></aside>
 
 <!-- Main Wrapper -->
-<div id="wrapper">
+<div id="wrapper" ng-controller="alertsController">
 
     <div class="content" animate-panel>
 
@@ -15,15 +15,15 @@
                     <div class="panel-body text-center h-200">
                         <i class="pe-7s-graph1 fa-4x"></i>
 
-                        <h1 class="m-xs">$1 206,90</h1>
+                        <h1 class="m-xs">$0</h1>
 
                         <h3 class="font-extra-bold no-margins text-success">
                             All Income
                         </h3>
-                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit vestibulum.</small>
+                        <small>Looks like you're in trouble.</small>
                     </div>
                     <div class="panel-footer">
-                        This is standard panel footer
+                        Could be worse though, could be negative
                     </div>
                 </div>
             </div>
@@ -227,7 +227,7 @@
                         <div class="stats-title pull-left">
                             <h4>Page Views</h4>
                         </div>
-                        <div class="stats-icon pull-right">
+                        <div class="stats-icon pull-right text-warning">
                             <i class="pe-7s-battery fa-4x"></i>
                         </div>
                         <div class="clearfix"></div>
@@ -256,7 +256,7 @@
                         </div>
                     </div>
                     <div class="panel-footer">
-                        This is standard panel footer
+                        Is that a battery in the top right?
                     </div>
                 </div>
             </div>
@@ -310,11 +310,11 @@
                 <div class="hpanel">
                     <div class="panel-body text-center h-200">
                         <i class="pe-7s-global fa-4x"></i>
-                        <h1 class="m-xs text-success">$1 208,20</h1>
-                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit vestibulum consectetur adipiscing elit.</small>
+                        <h1 class="m-xs text-danger">-$100</h1>
+                        <small>This is really just a lot of random stats</small>
                     </div>
                     <div class="panel-footer">
-                        This is standard panel footer
+                        oops!!!
                     </div>
                 </div>
             </div>

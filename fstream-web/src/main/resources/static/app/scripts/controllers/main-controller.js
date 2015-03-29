@@ -1,4 +1,4 @@
-angular.module('homer').controller('mainController', function($scope, _, stateService, eventService) {
+angular.module('homer').controller('mainController', function($scope, lodash, stateService, eventService) {
 	function registerEvents() {
 		// Events
 		$scope.$on('connected', function(e) {
@@ -63,7 +63,7 @@ angular.module('homer').controller('mainController', function($scope, _, stateSe
 		// This could be smarter to allow not updating things that haven't changed
 		$scope.views = [];
 		
-		_.each(state.metrics, function(metric, i) {
+		lodash.each(state.metrics, function(metric, i) {
 			$scope.views.push({
 				type: 'metric-chart',
 				id: metric.id,
@@ -77,7 +77,7 @@ angular.module('homer').controller('mainController', function($scope, _, stateSe
 			type: 'alert-log',
 		});
 	
-		_.each(state.symbols, function(symbol, i) {
+		lodash.each(state.symbols, function(symbol, i) {
 			$scope.views.push({
 				type: 'tick-chart',
 				index: i,
