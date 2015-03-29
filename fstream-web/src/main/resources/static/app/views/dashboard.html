@@ -27,22 +27,12 @@
                 Interesting Chart #1
             </div>
             <div class="panel-body text-center">
-                <div class="row text-center">
-                    <div class="text-center">
-                        <div class="small">
-                           Small Title
-                        </div>
-                        <div>
-                            <h1 class="font-extra-bold m-t-xl m-b-xs">
-                                big title
-                            </h1>
-                            <small>how many titles does one box need? probably not 2</small>
-                        </div>
-                        <div class="small m-t-xl">
-                            <i class="fa fa-clock-o"></i> Data from January
-                        </div>
-                    </div>
-                </div>
+                <div ng-controller="chartController">
+         <div ng-repeat="view in views" ng-switch="view.type" class="view">
+       	  <metric-chart ng-switch-when="metric-chart" options="view"></metric-chart>
+       	  <tick-chart ng-switch-when="tick-chart" options="view"></tick-chart>
+         </div>
+       </div>
             </div>
             <div class="panel-footer">
                     <span class="pull-right">

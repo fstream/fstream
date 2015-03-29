@@ -89,7 +89,9 @@ angular.module('homer').controller('mainController', function($scope, lodash, st
 	function queueEvent(a, value, limit) {
 		return a.length >= limit ? a.pop() : a.unshift(value);
 	};
-		
+    
+    // temporary workaround for Highcahrts opacity animation bug
+    jQuery.cssProps.opacity = 'opacity';
 	// Initialize
 	registerEvents();
 	connect();
