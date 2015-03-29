@@ -1,5 +1,5 @@
 angular.module('homer').factory('eventService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
-	console.log("event service");
+	
 	var stompClient,
 		publishEvent = function (eventName, frame){
 			$timeout(function() {
@@ -12,7 +12,7 @@ angular.module('homer').factory('eventService', ['$rootScope', '$timeout', funct
 		
 		connect: function() {
 			stompClient = Stomp.over(new SockJS('/server'));
-			
+			console.log("? connect");
 			stompClient.connect({}, function(frame) {
 				publishEvent("connected");
 				

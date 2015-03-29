@@ -52,6 +52,10 @@
     "angular-xeditable": "~0.1.8",
     "bootstrap-touchspin": "https://github.com/istvan-ujjmeszaros/bootstrap-touchspin.git#~3.0.1",
     "ui-select": "https://github.com/angular-ui/ui-select.git#~0.11.1",
-    "angular-sanitize": "~1.3.14"
+    "angular-sanitize": "~1.3.14",
+    "sockjs": "latest",
+    "stomp-websocket": "latest",
+    "lodash": "latest",
+    "ng-stomp": "~0.0.2"
   }
 }
