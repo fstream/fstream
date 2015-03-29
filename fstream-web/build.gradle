@@ -8,8 +8,8 @@
  */
 
 apply plugin: 'spring-boot'
-
-build.dependsOn bootRepackage
+apply plugin: 'com.moowork.node'
+apply plugin: 'com.moowork.grunt'
 
 applicationDistribution.with {
   // Exclude defaults in lieu of fat jar
@@ -22,6 +22,23 @@ distTar {
   compression Compression.GZIP
   extension "tar.gz"
 }
+
+node {
+  version = '0.10.33'
+  npmVersion = '2.1.8'
+  download = true
+  workDir = file("${project.buildDir}/node")
+  nodeModulesDir = file("${project.projectDir}/src/main/resources/static")
+}
+
+task grunt(type: GruntTask) {
+  args = ["build", "--gruntfile", "${project.projectDir}/src/main/resources/static/Gruntfile.js"]
+}
+
+grunt.dependsOn 'installGrunt'
+grunt.dependsOn 'npmInstall'
+bootRepackage.dependsOn 'grunt'
+build.dependsOn bootRepackage
 
 dependencies {
   // fStream

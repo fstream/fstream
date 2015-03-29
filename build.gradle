@@ -60,6 +60,7 @@ buildscript {
 		mavenLocal()
 		maven { url "http://repo.spring.io/libs-milestone" }
 		maven { url "http://repo.spring.io/libs-snapshot" }
+		maven { url "https://oss.jfrog.org/oss-snapshot-local" }
 		jcenter()
 	}
 
@@ -67,6 +68,8 @@ buildscript {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
 		classpath 'org.ajoberstar:gradle-git:0.8.0'
 		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+		classpath 'com.moowork.gradle:gradle-node-plugin:0.10-SNAPSHOT'
+		classpath 'com.moowork.gradle:gradle-grunt-plugin:0.10-SNAPSHOT'
 	}
 }
 
