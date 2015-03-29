@@ -31,13 +31,14 @@ node {
   nodeModulesDir = file("${project.projectDir}/src/main/resources/static")
 }
 
-task grunt(type: GruntTask) {
-  args = ["build", "--gruntfile", "${project.projectDir}/src/main/resources/static/Gruntfile.js"]
+task gruntBuild(type: GruntTask) {
+  workingDir = "${project.projectDir}/src/main/resources/static"
+  args = ["build"]
 }
 
-grunt.dependsOn 'installGrunt'
-grunt.dependsOn 'npmInstall'
-bootRepackage.dependsOn 'grunt'
+gruntBuild.dependsOn 'installGrunt'
+gruntBuild.dependsOn 'npmInstall'
+bootRepackage.dependsOn 'gruntBuild'
 build.dependsOn bootRepackage
 
 dependencies {
