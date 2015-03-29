@@ -1,4 +1,7 @@
 'use strict';
+
+var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
+
 module.exports = function (grunt) {
 
     // Load grunt tasks automatically
@@ -26,11 +29,22 @@ module.exports = function (grunt) {
                 hostname: 'localhost',
                 livereload: 35729
             },
+            proxies: [{
+                context: '/server',
+                host: 'localhost',
+                port: 8080,
+                ws: true
+            }, {
+                context: '/state',
+                host: 'localhost',
+                port: 8080
+            }],
             livereload: {
                 options: {
                     open: true,
                     middleware: function (connect) {
                         return [
+                            proxySnippet,
                             connect.static('.tmp'),
                             connect().use(
                                 '/bower_components',
@@ -195,6 +209,7 @@ module.exports = function (grunt) {
     grunt.registerTask('live', [
         'clean:server',
         'copy:styles',
+        'configureProxies:server',
         'connect:livereload',
         'watch'
     ]);
