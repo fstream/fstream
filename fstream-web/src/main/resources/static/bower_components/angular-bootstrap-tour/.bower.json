@@ -1,6 +1,6 @@
 {
   "name": "angular-bootstrap-tour",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "main": "dist/angular-bootstrap-tour.js",
   "ignore": [
     ".editorconfig",
@@ -26,18 +26,16 @@
     "respond": "~1.4.2"
   },
   "resolutions": {
-    "angular": "1.2.16",
-    "angular-route": "1.2.16"
+    "angular": "1.2.16"
   },
   "homepage": "https://github.com/benmarch/angular-bootstrap-tour",
-  "_release": "0.3.1",
+  "_release": "0.3.2",
   "_resolution": {
     "type": "version",
-    "tag": "0.3.1",
-    "commit": "213a33d5296f492ee35432f51c0a3dc6d83d6e37"
+    "tag": "0.3.2",
+    "commit": "ff18966e4ede35f952517fee34f7dd73afa7a467"
   },
   "_source": "git://github.com/benmarch/angular-bootstrap-tour.git",
   "_target": "~0.3.1",
-  "_originalSource": "angular-bootstrap-tour",
-  "_direct": true
+  "_originalSource": "angular-bootstrap-tour"
 }

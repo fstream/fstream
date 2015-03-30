@@ -1,11 +1,11 @@
-# angular-summernote - [AngularJS](http://angularjs.org/) directive to [Summernote](http://hackerwins.github.io/summernote/)
+# angular-summernote - [AngularJS](http://angularjs.org/) directive to [Summernote](http://summernote.org/)
 
 ***
 
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 [![Build Status](https://travis-ci.org/summernote/angular-summernote.png?branch=master)](https://travis-ci.org/summernote/angular-summernote)
-[![Dependency Status](https://gemnasium.com/outsideris/angular-summernote.png)](https://gemnasium.com/outsideris/angular-summernote)
-[![Coverage Status](https://coveralls.io/repos/outsideris/angular-summernote/badge.png)](https://coveralls.io/r/outsideris/angular-summernote)
+[![Dependency Status](https://gemnasium.com/summernote/angular-summernote.png)](https://gemnasium.com/summernote/angular-summernote)
+[![Coverage Status](https://coveralls.io/repos/summernote/angular-summernote/badge.png)](https://coveralls.io/r/summernote/angular-summernote)
 
 angular-summernote is just a directive to bind summmernote's all features.
 You can use summernote with angular way.
@@ -25,13 +25,13 @@ You can use summernote with angular way.
 
 ## Demo
 
-See at [JSFiddle](http://jsfiddle.net/outsider/n8dt4/126/embedded/result%2Chtml%2Cjs%2Ccss/)
+See at [JSFiddle](http://jsfiddle.net/outsider/n8dt4/158/embedded/result%2Chtml%2Cjs%2Ccss/)
 or run example in projects(need to run `bower install` before run)
 
 ## Installation
 
-angular-summernote requires all include files of [Summernote](http://hackerwins.github.io/summernote/).
-see [Summernote's installation](http://hackerwins.github.io/summernote/features.html#installation).
+angular-summernote requires all include files of [Summernote](http://summernote.org/).
+see [Summernote's installation](http://summernote.org/#/features#installation).
 
 Project files are also available through your favourite package manager:
 
@@ -101,12 +101,19 @@ function DemoController($scope) {
     focus: true,
     airMode: true,
     toolbar: [
-      ['style', ['bold', 'italic', 'underline', 'clear']],
-      ['fontsize', ['fontsize']],
-      ['color', ['color']],
-      ['para', ['ul', 'ol', 'paragraph']],
-      ['height', ['height']]
-    ]
+            ['edit',['undo','redo']],
+            ['headline', ['style']],
+            ['style', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+            ['fontface', ['fontname']],
+            ['textsize', ['fontsize']],
+            ['fontclr', ['color']],
+            ['alignment', ['ul', 'ol', 'paragraph', 'lineheight']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link','picture','video','hr']],
+            ['view', ['fullscreen', 'codeview']],
+            ['help', ['help']]
+        ]
   };
 }
 ```
@@ -142,7 +149,9 @@ function DemoController($scope) {
   $scope.focus = function(e) { console.log('Editable area is focused'); }
   $scope.blur = function(e) { console.log('Editable area loses focus'); }
   $scope.paste = function(e) { console.log('Called event paste'); }
-  $scope.change = function(contents, editable$) { console.log('contents are changed:', contents, $scope.editable); };
+  $scope.change = function(contents) {
+    console.log('contents are changed:', contents, $scope.editable);
+  };
   $scope.keyup = function(e) { console.log('Key is released:', e.keyCode); }
   $scope.keydown = function(e) { console.log('Key is pressed:', e.keyCode); }
   $scope.imageUpload = function(files, editor) {
@@ -161,14 +170,14 @@ function DemoController($scope) {
 ```
 
 If you use `$editable` object in `onImageUpload` or `onChange`
-(see [summernote's callback](http://hackerwins.github.io/summernote/features.html#callbacks)),
+(see [summernote's callback](http://summernote.org/#/features#callbacks)),
 you should defined `editable` attribute and use it in `$scope`.
 (Because [AngularJS 1.3.x restricts access to DOM nodes from within expressions](https://docs.angularjs.org/error/$parse/isecdom))
 
 ### i18n Support
 
 If you use i18n, you have to include language files.
-See [summernote's document](http://hackerwins.github.io/summernote/features.html#i18n)
+See [summernote's document](http://summernote.org/#/features#i18n)
 for more details.
 And then you can specify language like:
 

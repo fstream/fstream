@@ -15,6 +15,5 @@
   },
   "_source": "git://github.com/highslide-software/highstock-release.git",
   "_target": "~2.1.4",
-  "_originalSource": "highstock-release",
-  "_direct": true
+  "_originalSource": "highstock-release"
 }

@@ -1,6 +1,6 @@
 {
   "name": "angular-datatables",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": "l-lin",
   "main": "dist/angular-datatables.js",
   "ignore": [
@@ -44,14 +44,13 @@
     "angular-bootstrap": ">=0.10.0"
   },
   "homepage": "https://github.com/l-lin/angular-datatables",
-  "_release": "0.4.1",
+  "_release": "0.4.2",
   "_resolution": {
     "type": "version",
-    "tag": "v0.4.1",
-    "commit": "0eb8288e85a06200ed8ce179b3ddecf364a0fea0"
+    "tag": "v0.4.2",
+    "commit": "6e2b10820d15614fc5a43263d9d84869acbc85f7"
   },
   "_source": "git://github.com/l-lin/angular-datatables.git",
   "_target": "~0.4.1",
-  "_originalSource": "angular-datatables",
-  "_direct": true
+  "_originalSource": "angular-datatables"
 }
