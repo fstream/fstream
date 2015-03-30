@@ -26,7 +26,6 @@ angular.module('homer').directive('tickChart', function() {
 		        chart: {
 		            renderTo: $element[0],
 		            height: 325,
-		            width: 550,
 		            animation: false
 		        },
 		        
