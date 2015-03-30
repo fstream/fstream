@@ -56,6 +56,8 @@
     "sockjs": "latest",
     "stomp-websocket": "latest",
     "lodash": "latest",
-    "ng-stomp": "~0.0.2"
+    "ng-stomp": "~0.0.2",
+    "highstock": "latest",
+    "highstock-release": "~2.1.4"
   }
 }

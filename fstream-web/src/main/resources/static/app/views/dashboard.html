@@ -20,7 +20,8 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-12 ">
+  <div ng-repeat="view in views" ng-switch="view.type" class="view">
+    <div class="col-lg-6 text-center">
         <div class="hpanel">
             <div class="panel-heading">
                 <div panel-tools></div>
@@ -28,11 +29,9 @@
             </div>
             <div class="panel-body text-center">
                 <div ng-controller="chartController">
-         <div ng-repeat="view in views" ng-switch="view.type" class="view">
-       	  <metric-chart ng-switch-when="metric-chart" options="view"></metric-chart>
-       	  <tick-chart ng-switch-when="tick-chart" options="view"></tick-chart>
-         </div>
-       </div>
+                <metric-chart ng-switch-when="metric-chart" options="view"></metric-chart>
+                <tick-chart ng-switch-when="tick-chart" options="view"></tick-chart>
+               </div>
             </div>
             <div class="panel-footer">
                     <span class="pull-right">
@@ -42,71 +41,6 @@
             </div>
         </div>
     </div>
-</div>
-<div class="row">
-  <div class="col-lg-6 ">
-      <div class="hpanel">
-          <div class="panel-heading">
-              <div panel-tools></div>
-              Sorta Less Interesting Chart #2
-          </div>
-          <div class="panel-body text-center">
-              <div class="row text-center">
-                  <div class="text-center">
-                      <div class="small">
-                         Small Title
-                      </div>
-                      <div>
-                          <h1 class="font-extra-bold m-t-xl m-b-xs">
-                              Why did the chicken cross the road?
-                          </h1>
-                          <small>To get to the other side</small>
-                      </div>
-                      <div class="small m-t-xl">
-                          <i class="fa fa-clock-o"></i> Data from January
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="panel-footer">
-                  <span class="pull-right">
-                        look away
-                  </span>
-              who reads the footer?
-          </div>
-      </div>
-  </div>
-  <div class="col-lg-6 ">
-      <div class="hpanel">
-          <div class="panel-heading">
-              <div panel-tools></div>
-              Sorta Less Interesting Chart #3
-          </div>
-          <div class="panel-body text-center">
-              <div class="row text-center">
-                  <div class="text-center">
-                      <div class="small">
-                         Small Title
-                      </div>
-                      <div>
-                          <h1 class="font-extra-bold m-t-xl m-b-xs">
-                              Move along, move along
-                          </h1>
-                          <small>WHY ARE MY EVENTS NOT WORKING</small>
-                      </div>
-                      <div class="small m-t-xl">
-                          <i class="fa fa-clock-o"></i> Data from January
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="panel-footer">
-                  <span class="pull-right">
-                        look away
-                  </span>
-              who reads the footer?
-          </div>
-      </div>
   </div>
 </div>
 </div>

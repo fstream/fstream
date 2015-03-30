@@ -25,7 +25,6 @@ angular.module('homer').directive('metricChart', function() {
 		        chart: {
 		            renderTo: $element[0],
 		            height: 325,
-		            width: 550,
 		            type: 'area',
 		            animation: false
 		        },

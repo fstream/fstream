@@ -73,9 +73,9 @@ angular.module('homer').controller('mainController', function($scope, lodash, st
 			});
 		});
 		
-		$scope.views.push({
-			type: 'alert-log',
-		});
+//		$scope.views.push({
+//			type: 'alert-log',
+//		});
 	
 		lodash.each(state.symbols, function(symbol, i) {
 			$scope.views.push({
