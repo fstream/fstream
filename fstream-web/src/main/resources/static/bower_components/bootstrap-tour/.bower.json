@@ -26,6 +26,5 @@
   },
   "_source": "git://github.com/sorich87/bootstrap-tour.git",
   "_target": "~0.10.2",
-  "_originalSource": "bootstrap-tour",
-  "_direct": true
+  "_originalSource": "bootstrap-tour"
 }
