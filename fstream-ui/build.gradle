@@ -17,22 +17,26 @@ node {
   workDir = file("${project.buildDir}/node")
 }
 
-task gruntBuild(type: GruntTask) {
-  args = ["build"]
+jar {
+  from(fileTree('dist/')) {
+    into 'static/'
+  }
+  
+  outputs.file archivePath
 }
 
 task bowerInstall(type:Exec){
-  commandLine 'bower', 'install'
+	commandLine 'bower', 'install'
 }
 
-gruntBuild.dependsOn 'installGrunt'
-gruntBuild.dependsOn npmInstall
-bowerInstall.dependsOn gruntBuild
-build.dependsOn bowerInstall
+task setup(dependsOn: [bowerInstall, installGrunt, npmInstall])
 
-jar {
-    from(fileTree('dist/')) {
-        into 'static/'
-    }
-    outputs.file archivePath
+task gruntBuild(type: GruntTask, dependsOn: setup) {
+  args = ["build"]
 }
+
+task reset(type: Delete, dependsOn: clean) {
+	delete 'dist', 'node_modules', 'bower_components'
+}
+
+build.dependsOn gruntBuild
