@@ -30,3 +30,9 @@ gruntBuild.dependsOn npmInstall
 bowerInstall.dependsOn gruntBuild
 build.dependsOn bowerInstall
 
+jar {
+    from(fileTree('dist/')) {
+        into 'static/'
+    }
+    outputs.file archivePath
+}
