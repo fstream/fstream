@@ -25,11 +25,7 @@ jar {
   outputs.file archivePath
 }
 
-task bowerInstall(type:Exec){
-	commandLine 'bower', 'install'
-}
-
-task setup(dependsOn: [bowerInstall, installGrunt, npmInstall])
+task setup(dependsOn: [installGrunt, npmInstall])
 
 task gruntBuild(type: GruntTask, dependsOn: setup) {
   args = ["build"]
