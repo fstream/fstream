@@ -22,6 +22,23 @@ module.exports = function (grunt) {
         // Project settings
         homer: appConfig,
 
+        // Bower dependencies
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "prod": {
+                options: {
+                    production: true
+                }
+            },
+            "dev": {
+                options: {
+                    production: false
+                }
+            }
+        },
+
         // The grunt server settings
         connect: {
             options: {
@@ -206,6 +223,10 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.registerTask('bower-install', [
+        'bower-install-simple'
+    ]);
+
     grunt.registerTask('live', [
         'clean:server',
         'copy:styles',
@@ -221,6 +242,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean:dist',
+        'bower-install',
         'less',
         'useminPrepare',
         'concat',
