@@ -32,10 +32,10 @@ $.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings)
       "iTotalPages":    Math.ceil ( oSettings.fnRecordsDisplay () / oSettings._iDisplayLength)};
   } else {
     return {
-      "iStart": 0,          
-      "iEnd": 0,        
+      "iStart": 0,
+      "iEnd": 0,
       "iLength": 0,
-      "iTotal": 0,      
+      "iTotal": 0,
       "iFilteredTotal": 0,
       "iPage": 0,
       "iTotalPages": 0

@@ -1,6 +1,6 @@
 /**
  * Sort by priority through an enumerated list. In this case the words _High_,
- * _Medium_ and _Low_ are used and thus sorted in priority order. This works 
+ * _Medium_ and _Low_ are used and thus sorted in priority order. This works
  * by converting the works to a numerical value and then sorting based on that
  * value.
  *

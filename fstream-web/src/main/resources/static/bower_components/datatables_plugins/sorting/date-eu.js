@@ -1,5 +1,5 @@
 /**
- * Similar to the Date (dd/mm/YY) data sorting plug-in, this plug-in offers 
+ * Similar to the Date (dd/mm/YY) data sorting plug-in, this plug-in offers
  * additional  flexibility with support for spaces between the values and
  * either . or / notation for the separators.
  *
@@ -7,7 +7,7 @@
  * [datetime](//datatables.net/blog/2014-12-18) plug-in provides enhanced
  * functionality and flexibility.
  *
- *  @name Date (dd . mm[ . YYYY]) 
+ *  @name Date (dd . mm[ . YYYY])
  *  @summary Sort dates in the format `dd/mm/YY[YY]` (with optional spaces)
  *  @author [Robert Sedovšek](http://galjot.si/)
  *  @deprecated
@@ -24,7 +24,7 @@ jQuery.extend( jQuery.fn.dataTableExt.oSort, {
 	"date-eu-pre": function ( date ) {
 		date = date.replace(" ", "");
 		var eu_date, year;
-		
+
 		if (date == '') {
 			return 0;
 		}

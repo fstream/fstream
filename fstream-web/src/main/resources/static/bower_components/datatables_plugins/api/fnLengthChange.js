@@ -1,5 +1,5 @@
 /**
- * Change the number of records that can be viewed on a single page in 
+ * Change the number of records that can be viewed on a single page in
  * DataTables.
  *
  * DataTables 1.10 provides the `dt-api page.len()` method to get and set the

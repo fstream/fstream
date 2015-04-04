@@ -1,6 +1,6 @@
 /*
  * Adds a new sorting option to dataTables called `datetime-us`.
- * 
+ *
  * Also included is a type detection plug-in. Matches and sorts date / time
  * strings in the format: `(m)m/(d)d/(yy)yy (h)h/m(m) (am|pm)`. For example:
  *

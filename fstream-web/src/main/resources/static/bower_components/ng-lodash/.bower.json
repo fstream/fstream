@@ -38,7 +38,6 @@
     "commit": "f5831b8b9e425c7a2e3ff60e73963ef13a38bb41"
   },
   "_source": "git://github.com/rockabox/ng-lodash.git",
-  "_target": "~0.2.0",
-  "_originalSource": "ng-lodash",
-  "_direct": true
+  "_target": "*",
+  "_originalSource": "ng-lodash"
 }

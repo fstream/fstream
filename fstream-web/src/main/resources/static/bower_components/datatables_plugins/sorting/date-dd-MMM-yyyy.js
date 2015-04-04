@@ -2,7 +2,7 @@
  * Adds a new sorting option to dataTables called `date-dd-mmm-yyyy`. Also
  * includes a type detection plug-in. Matches and sorts date strings in
  * the format: `dd/mmm/yyyy`. For example:
- * 
+ *
  * * 02-FEB-1978
  * * 17-MAY-2013
  * * 31-JAN-2014

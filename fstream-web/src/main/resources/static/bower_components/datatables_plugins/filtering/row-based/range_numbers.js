@@ -1,5 +1,5 @@
 /**
- * Filter a specific numeric column on the value being between two given 
+ * Filter a specific numeric column on the value being between two given
  * numbers. Note that you will likely need to change the id's on the inputs
  * and the column in which the numeric value is given.
  *
@@ -11,7 +11,7 @@
  *    $(document).ready(function() {
  *        // Initialise datatables
  *        var table = $('#example').DataTable();
- *         
+ *
  *        // Add event listeners to the two range filtering inputs
  *        $('#min').keyup( function() { table.draw(); } );
  *        $('#max').keyup( function() { table.draw(); } );

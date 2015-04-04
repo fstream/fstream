@@ -23,7 +23,7 @@
  *  @example
  *    $(document).ready(function() {
  *        var table = $('#example').dataTable();
- *         
+ *
  *        // Sort in the order that was origially in the HTML
  *        var nTd = table.fnGetTd( $('#example tbody tr:eq(1)')[0], 1 );
  *        console.log( nTd );

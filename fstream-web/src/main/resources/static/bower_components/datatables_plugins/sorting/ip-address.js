@@ -1,10 +1,10 @@
 /**
- * Sorts a column containing IP addresses in typical dot notation. This can 
- * be most useful when using DataTables for a networking application, and 
- * reporting information containing IP address. Also has a matching type 
+ * Sorts a column containing IP addresses in typical dot notation. This can
+ * be most useful when using DataTables for a networking application, and
+ * reporting information containing IP address. Also has a matching type
  * detection plug-in for automatic type detection.
  *
- *  @name IP addresses 
+ *  @name IP addresses
  *  @summary Sort IP addresses numerically
  *  @author Brad Wasson
  *

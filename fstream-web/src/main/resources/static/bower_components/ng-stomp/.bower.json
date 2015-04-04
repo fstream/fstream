@@ -31,6 +31,5 @@
   },
   "_source": "git://github.com/beevelop/angular-stomp.git",
   "_target": "~0.0.2",
-  "_originalSource": "ng-stomp",
-  "_direct": true
+  "_originalSource": "ng-stomp"
 }

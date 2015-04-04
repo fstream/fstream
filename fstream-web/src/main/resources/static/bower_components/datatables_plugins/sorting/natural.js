@@ -2,7 +2,7 @@
  * Data can often be a complicated mix of numbers and letters (file names
  * are a common example) and sorting them in a natural manner is quite a
  * difficult problem.
- * 
+ *
  * Fortunately a deal of work has already been done in this area by other
  * authors - the following plug-in uses the [naturalSort() function by Jim
  * Palmer](http://www.overset.com/2008/09/01/javascript-natural-sort-algorithm-with-unicode-support) to provide natural sorting in DataTables.

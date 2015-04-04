@@ -15,7 +15,7 @@
  *  @example
  *    $(document).ready(function() {
  *        var table = $('#example').dataTable();
- * 
+ *
  *        var a = table.fnFindCellRowIndexes( '1.7' ); // Search all columns
  *
  *        var b = table.fnFindCellRowIndexes( '1.7', 3 );  // Search only column 3

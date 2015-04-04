@@ -63,7 +63,7 @@ div.dataTables_paginate a.paginate_button.last {
 	padding-right: 24px;
 }
 
-div.dataTables_paginate a.first:before, 
+div.dataTables_paginate a.first:before,
 div.dataTables_paginate a.previous:before {
 	position: absolute;
 	top: 8px;
@@ -113,7 +113,7 @@ div.dataTables_paginate li.last > a {
 	padding-right: 24px;
 }
 
-div.dataTables_paginate li.first a:before, 
+div.dataTables_paginate li.first a:before,
 div.dataTables_paginate li.previous a:before {
 	position: absolute;
 	top: 6px;
@@ -148,7 +148,7 @@ div.dataTables_paginate li.last a:after {
 }
 
 /* In Foundation we don't want the padding like in bootstrap */
-div.columns div.dataTables_paginate li.first a:before, 
+div.columns div.dataTables_paginate li.first a:before,
 div.columns div.dataTables_paginate li.previous a:before,
 div.columns div.dataTables_paginate li.next a:after,
 div.columns div.dataTables_paginate li.last a:after {

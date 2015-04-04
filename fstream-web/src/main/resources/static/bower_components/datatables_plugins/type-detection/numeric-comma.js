@@ -1,7 +1,7 @@
 /**
- * Automatically detect numbers which use a comma in the place of a decimal 
+ * Automatically detect numbers which use a comma in the place of a decimal
  * point to allow them to be sorted numerically.
- * 
+ *
  * Please note that the 'Formatted numbers' type detection and sorting plug-ins
  * offer greater flexibility that this plug-in and should be used in preference
  * to this method.

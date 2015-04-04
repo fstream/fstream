@@ -240,7 +240,7 @@ table.dataTable {
       >.sorting_1 { background-color: shade($table-row-background, 2%); } // shade by fa
       >.sorting_2 { background-color: shade($table-row-background, 1.2%); } // shade by fc
       >.sorting_3 { background-color: shade($table-row-background, 0.4%); } // shade by fe
-      
+
       &.selected {
         >.sorting_1 { background-color: shade($table-row-selected, 2%); }
         >.sorting_2 { background-color: shade($table-row-selected, 1.2%); }
@@ -552,7 +552,7 @@ div.DTTT_container {
   cursor: pointer;
 }
 
-.DTTT_button::-moz-focus-inner { 
+.DTTT_button::-moz-focus-inner {
   border: none !important;
   padding: 0;
 }
@@ -570,7 +570,7 @@ div.DTTT_collection {
   background-color: #f3f3f3;
   overflow: hidden;
   z-index: 2002;
-  
+
   box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
@@ -601,13 +601,13 @@ div.DTTT_collection_background {
   background-color: #3f3f3f;
   color: white;
   padding: 10px 30px;
-  
+
   opacity: 0.9;
-  
+
   border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
-  
+
   box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);

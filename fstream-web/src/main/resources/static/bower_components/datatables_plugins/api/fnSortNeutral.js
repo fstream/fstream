@@ -12,7 +12,7 @@
  *  @example
  *    $(document).ready(function() {
  *        var table = $('#example').dataTable();
- *         
+ *
  *        // Sort in the order that was originally in the HTML
  *        table.fnSortNeutral();
  *    } );

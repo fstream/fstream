@@ -4,7 +4,7 @@
  * DataTables 1.10+ has percentage data type detection and sorting abilities
  * built-in. As such this plug-in is marked as deprecated, but might be useful
  * when working with old versions of DataTables.
- * 
+ *
  *  @name Percentage
  *  @summary Sort numeric data with a postfixed percentage symbol
  *  @deprecated

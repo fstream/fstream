@@ -58,7 +58,7 @@ $.fn.dataTableExt.oPagination.listbox = {
 			return false;
 		});
 	},
-	 
+
 	/*
 	 * Function: oPagination.listbox.fnUpdate
 	 * Purpose:  Update the listbox element
