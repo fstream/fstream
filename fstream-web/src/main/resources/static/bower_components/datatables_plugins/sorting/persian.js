@@ -1,6 +1,6 @@
 /**
- * Sorting in Javascript can be difficult to get right with non-Roman 
- * characters - for which special consideration must be made. This plug-in 
+ * Sorting in Javascript can be difficult to get right with non-Roman
+ * characters - for which special consideration must be made. This plug-in
  * performs correct sorting on Persian characters.
  *
  *  @name Persian

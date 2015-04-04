@@ -2,7 +2,7 @@
  * Sorting in Javascript for Turkish Characters. This plug-in will replace the special
  * turkish letters (non english characters) and replace in English.
  *
- *  
+ *
  *  @name Turkish
  *  @summary Sort Turkish characters
  *  @author [Yuksel Beyti](http://yukselbeyti.com)

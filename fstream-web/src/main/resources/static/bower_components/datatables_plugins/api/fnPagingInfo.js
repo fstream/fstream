@@ -1,5 +1,5 @@
 /**
- * Get information about the paging settings that DataTables is currently 
+ * Get information about the paging settings that DataTables is currently
  * using to display each page, including the number of records shown, start
  * and end points in the data set etc.
  *

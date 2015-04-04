@@ -25,7 +25,7 @@
  *
  *  @example
  *    var table = $('#example').dataTable();
- *    
+ *
  *    // Example call to load a new file
  *    table.fnReloadAjax( 'media/examples_support/json_source2.txt' );
  *

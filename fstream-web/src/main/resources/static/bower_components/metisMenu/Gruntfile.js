@@ -5,21 +5,21 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
 
     banner: "/*\n" +
-      " * <%= pkg.title || pkg.name %> - v<%= pkg.version %>\n" +
-      " * <%= pkg.description %>\n" +
-      " * <%= pkg.homepage %>\n" +
-      " *\n" +
-      " * Made by <%= pkg.author.name %>\n" +
-      " * Under <%= pkg.license %> License\n" +
-      " */\n",
+    " * <%= pkg.title || pkg.name %> - v<%= pkg.version %>\n" +
+    " * <%= pkg.description %>\n" +
+    " * <%= pkg.homepage %>\n" +
+    " *\n" +
+    " * Made by <%= pkg.author.name %>\n" +
+    " * Under <%= pkg.license %> License\n" +
+    " */\n",
 
     jshint: {
       options: {
         jshintrc: ".jshintrc"
       },
       all: [
-        "Gruntfile.js",
-        "src/metisMenu.js"
+      "Gruntfile.js",
+      "src/metisMenu.js"
       ]
     },
     concat: {
@@ -46,8 +46,7 @@ module.exports = function(grunt) {
     },
     cssmin: {
       options: {
-        banner: "<%= banner %>",
-        keepSpecialComments: "0"
+        banner: "<%= banner %>"
       },
       menucss: {
         src: ["src/metisMenu.css"],

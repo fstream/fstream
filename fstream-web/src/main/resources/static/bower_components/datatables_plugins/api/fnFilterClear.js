@@ -23,11 +23,11 @@
  *  @example
  *    $(document).ready(function() {
  *        var table = $('#example').dataTable();
- *         
+ *
  *        // Perform a filter
  *        table.fnFilter('Win');
  *        table.fnFilter('Trident', 0);
- *         
+ *
  *        // Remove all filtering
  *        table.fnFilterClear();
  *    } );

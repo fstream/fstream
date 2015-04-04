@@ -41,6 +41,5 @@
   },
   "_source": "git://github.com/cgross/angular-notify.git",
   "_target": "~2.0.2",
-  "_originalSource": "angular-notify",
-  "_direct": true
+  "_originalSource": "angular-notify"
 }

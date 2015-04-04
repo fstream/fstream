@@ -1,6 +1,12 @@
 ### Change Log
 
-#### v0.6 2014-11-29
+#### v0.6.2 2015-03-14
+* Fixed text drag and drop bug.
+
+#### v0.6.1 2015-02-08
+* Fixed bugs about links, bullets and ranges.
+
+#### v0.6.0 2014-11-29
 * Plugin system
 * Extract fontstyle and video plugins from base code.
 

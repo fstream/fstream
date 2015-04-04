@@ -1,6 +1,6 @@
 /**
  * angular-ui-utils - Swiss-Army-Knife of AngularJS tools (with no external dependencies!)
- * @version v0.2.1 - 2015-01-02
+ * @version v0.2.2 - 2015-02-18
  * @link http://angular-ui.github.com
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -290,17 +290,6 @@ angular.module('ui.jq',[]).
 
       return function uiJqLinkingFunction(scope, elm, attrs) {
 
-        var linkOptions = [];
-
-        // If ui-options are passed, merge (or override) them onto global defaults and pass to the jQuery method
-        if (attrs.uiOptions) {
-          linkOptions = scope.$eval('[' + attrs.uiOptions + ']');
-          if (angular.isObject(options) && angular.isObject(linkOptions[0])) {
-            linkOptions[0] = angular.extend({}, options, linkOptions[0]);
-          }
-        } else if (options) {
-          linkOptions = [options];
-        }
         // If change compatibility is enabled, the form input's "change" event will trigger an "input" event
         if (attrs.ngModel && elm.is('select,input,textarea')) {
           elm.bind('change', function() {
@@ -308,10 +297,25 @@ angular.module('ui.jq',[]).
           });
         }
 
+        function createLinkOptions(){
+          var linkOptions = [];
+
+          // If ui-options are passed, merge (or override) them onto global defaults and pass to the jQuery method
+          if (attrs.uiOptions) {
+            linkOptions = scope.$eval('[' + attrs.uiOptions + ']');
+            if (angular.isObject(options) && angular.isObject(linkOptions[0])) {
+              linkOptions[0] = angular.extend({}, options, linkOptions[0]);
+            }
+          } else if (options) {
+            linkOptions = [options];
+          }
+          return linkOptions;
+        }
+
         // Call jQuery method and pass relevant options
         function callPlugin() {
           $timeout(function() {
-            elm[attrs.uiJq].apply(elm, linkOptions);
+            elm[attrs.uiJq].apply(elm, createLinkOptions());
           }, 0, false);
         }
 
@@ -600,7 +604,7 @@ angular.module('ui.mask', [])
           }
 
           function initializeElement(){
-            value = oldValueUnmasked = unmaskValue(controller.$modelValue || '');
+            value = oldValueUnmasked = unmaskValue(controller.$viewValue || '');
             valueMasked = oldValue = maskValue(value);
             isValid = validateValue(value);
             var viewValue = isValid && value.length ? valueMasked : '';
@@ -745,15 +749,13 @@ angular.module('ui.mask', [])
             if (linkOptions.clearOnBlur) {
               oldCaretPosition = 0;
               oldSelectionLength = 0;
-            }
-            if (!isValid || value.length === 0) {
-              if (linkOptions.clearOnBlur) {
+              if (!isValid || value.length === 0) {
                 valueMasked = '';
                 iElement.val('');
+                scope.$apply(function () {
+                  controller.$setViewValue('');
+                });
               }
-              scope.$apply(function (){
-                controller.$setViewValue('');
-              });
             }
           }
 
@@ -1925,26 +1927,36 @@ angular.module('ui.scrollfix',[]).directive('uiScrollfix', ['$window', function 
   return {
     require: '^?uiScrollfixTarget',
     link: function (scope, elm, attrs, uiScrollfixTarget) {
-      var top = elm[0].offsetTop,
+      var absolute = true,
+          shift = 0,
+          fixLimit,
           $target = uiScrollfixTarget && uiScrollfixTarget.$element || angular.element($window);
 
       if (!attrs.uiScrollfix) {
-        attrs.uiScrollfix = top;
+          absolute = false;
       } else if (typeof(attrs.uiScrollfix) === 'string') {
         // charAt is generally faster than indexOf: http://jsperf.com/indexof-vs-charat
         if (attrs.uiScrollfix.charAt(0) === '-') {
-          attrs.uiScrollfix = top - parseFloat(attrs.uiScrollfix.substr(1));
+          absolute = false;
+          shift = - parseFloat(attrs.uiScrollfix.substr(1));
         } else if (attrs.uiScrollfix.charAt(0) === '+') {
-          attrs.uiScrollfix = top + parseFloat(attrs.uiScrollfix.substr(1));
+          absolute = false;
+          shift = parseFloat(attrs.uiScrollfix.substr(1));
         }
       }
 
+      fixLimit = absolute ? attrs.uiScrollfix : elm[0].offsetTop + shift;
+
       function onScroll() {
+
+        var limit = absolute ? attrs.uiScrollfix : elm[0].offsetTop + shift;
+
         // if pageYOffset is defined use it, otherwise use other crap for IE
         var offset = uiScrollfixTarget ? $target[0].scrollTop : getWindowScrollTop();
-        if (!elm.hasClass('ui-scrollfix') && offset > attrs.uiScrollfix) {
+        if (!elm.hasClass('ui-scrollfix') && offset > limit) {
           elm.addClass('ui-scrollfix');
-        } else if (elm.hasClass('ui-scrollfix') && offset < attrs.uiScrollfix) {
+          fixLimit = limit;
+        } else if (elm.hasClass('ui-scrollfix') && offset < fixLimit) {
           elm.removeClass('ui-scrollfix');
         }
       }
@@ -2174,7 +2186,7 @@ function uiUploader($log) {
         xhr.onload = function() {
             self.activeUploads -= 1;
             startUpload(self.options);
-            self.options.onCompleted(file);
+            self.options.onCompleted(file, xhr.responseText);
         };
 
         // Triggered when upload fails:

@@ -1,7 +1,7 @@
 var angles = angular.module("angles", []);
 
 angles.chart = function (type) {
-    return { 
+    return {
         restrict: "A",
         scope: {
             data: "=",
@@ -41,15 +41,15 @@ angles.chart = function (type) {
             $scope.$watch("data", function (newVal, oldVal) {
                 if(chartCreated)
                     chartCreated.destroy();
-                   
+
                 $scope.options = $scope.options || {};
-                    
+
                 // if data not defined, exit
                 if (!newVal) {
                     return;
                 }
                 if ($scope.chart) { type = $scope.chart; }
-                
+
                 if(autosize){
                     $scope.size();
                     chart = new Chart(ctx);

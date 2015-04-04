@@ -56,7 +56,7 @@ jQuery.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUn
 		aiRows = oSettings.aiDisplayMaster; // all row numbers
 	}
 
-	// set up data array    
+	// set up data array
 	var asResultData = [];
 
 	for (var i=0,c=aiRows.length; i<c; i++) {

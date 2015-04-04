@@ -15,9 +15,9 @@
  *  @example
  *    $(document).ready(function() {
  *        var table = $('#example').dataTable();
- *    
+ *
  *        var a = table.fnFindCellRowNodes( '1.7' );    // Search all columns
- *    
+ *
  *        var b = table.fnFindCellRowNodes( '1.7', 3 ); // Search only column 3
  *    } );
  */

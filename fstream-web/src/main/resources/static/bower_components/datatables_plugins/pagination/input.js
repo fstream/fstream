@@ -181,7 +181,7 @@ $.fn.dataTableExt.oPagination.input = {
 		/* Take the brutal approach to cancelling text selection */
 		$('span', nPaging).bind( 'mousedown', function () { return false; } );
 		$('span', nPaging).bind( 'selectstart', function () { return false; } );
-		
+
 		// If we can't page anyway, might as well not show it
 		var iPages = Math.ceil((oSettings.fnRecordsDisplay()) / oSettings._iDisplayLength);
 		if(iPages <= 1)

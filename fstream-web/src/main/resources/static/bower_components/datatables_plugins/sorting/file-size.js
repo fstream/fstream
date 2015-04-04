@@ -2,7 +2,7 @@
  * When dealing with computer file sizes, it is common to append a post fix
  * such as KB, MB or GB to a string in order to easily denote the order of
  * magnitude of the file size. This plug-in allows sorting to take these
- * indicates of size into account. A counterpart type detection plug-in 
+ * indicates of size into account. A counterpart type detection plug-in
  * is also available.
  *
  *  @name File size

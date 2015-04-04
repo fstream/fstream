@@ -12,7 +12,7 @@
   "_resolution": {
     "type": "version",
     "tag": "v0.0.6",
-    "commit": "20e242631d91973e9d03f7fad39c44b4ef22d37a"
+    "commit": "82116d763972a575cfc916ac558dd2d26bcdc96e"
   },
   "_source": "git://github.com/develersrl/angular-flot.git",
   "_target": "~0.0.6",

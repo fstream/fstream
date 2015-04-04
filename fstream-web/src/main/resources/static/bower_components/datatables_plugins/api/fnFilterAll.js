@@ -22,7 +22,7 @@
  *  @example
  *    $(document).ready(function() {
  *      var table = $(".dataTable").dataTable();
- *       
+ *
  *      $("#search").keyup( function () {
  *        // Filter on the column (the index) of this element
  *        table.fnFilterAll(this.value);

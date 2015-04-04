@@ -1,5 +1,5 @@
 /**
- * Enables filtration delay for keeping the browser more responsive while 
+ * Enables filtration delay for keeping the browser more responsive while
  * searching for a longer keyword.
  *
  * This can be particularly useful when working with server-side processing,
@@ -8,7 +8,7 @@
  *
  *  @name fnSetFilteringDelay
  *  @summary Add a key debouce delay to the global filtering input of a table
- *  @author [Zygimantas Berziunas](http://www.zygimantas.com/), 
+ *  @author [Zygimantas Berziunas](http://www.zygimantas.com/),
  *    [Allan Jardine](http://www.sprymedia.co.uk/) and _vex_
  *
  *  @example

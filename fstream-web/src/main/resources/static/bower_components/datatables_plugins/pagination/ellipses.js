@@ -2,10 +2,10 @@
  * This plug-in adds another pagination option similar to `full_numbers`, except
  * it adds ellipses around the page numbers when applicable. You can set how
  * many page numbers should be displayed with the iShowPages option.
- * 
+ *
  * This plug- in extends the oStdClasses object with the following properties:
  * sPageEllipsis, sPageNumber and sPageNumbers.
- * 
+ *
  * It also extends the oSettings object with the following properties:
  * _iShowPages, _iShowPagesHalf, _iCurrentPage, _iTotalPages, _iFirstPage and
  * _iLastPage.

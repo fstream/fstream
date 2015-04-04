@@ -1,5 +1,5 @@
 /**
- * Automatically detect British (`dd/mm/yyyy`) date types. Goes with the UK 
+ * Automatically detect British (`dd/mm/yyyy`) date types. Goes with the UK
  * date sorting plug-in.
  *
  *  @name Date (`dd/mm/yyyy`)

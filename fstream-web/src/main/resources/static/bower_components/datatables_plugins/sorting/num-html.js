@@ -1,10 +1,10 @@
 /**
  * This sorting plug-in allows for HTML tags with numeric data. With the 'html'
- * type it will strip the HTML and then sorts by strings, with this type it 
- * strips the HTML and then sorts by numbers. Note also that this sorting 
+ * type it will strip the HTML and then sorts by strings, with this type it
+ * strips the HTML and then sorts by numbers. Note also that this sorting
  * plug-in has an equivalent type detection plug-in which can make integration
  * easier.
- * 
+ *
  * DataTables 1.10+ has HTML numeric data type detection and sorting abilities
  * built-in. As such this plug-in is marked as deprecated, but might be useful
  * when working with old versions of DataTables.

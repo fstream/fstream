@@ -1,8 +1,8 @@
 /**
- * Creates `rowspan` cells in a column when there are two or more cells in a 
- * row with the same content, effectively grouping them together visually. 
- * 
- * **Note** - this plug-in currently only operates correctly with 
+ * Creates `rowspan` cells in a column when there are two or more cells in a
+ * row with the same content, effectively grouping them together visually.
+ *
+ * **Note** - this plug-in currently only operates correctly with
  * **server-side processing**.
  *
  *  @name fnFakeRowspan

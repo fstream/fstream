@@ -3,7 +3,7 @@
  * elements for sorting and filtering) it can at times be a little tricky to get
  * the next row based on another, while taking into account pagination,
  * filtering, sorting etc.
- * 
+ *
  * This function is designed to address exactly this situation. It takes two
  * parameters, the target node, and a boolean indicating if the adjacent row
  * retrieved should be the next (`true`, or no value) or the previous (`false`).
@@ -20,7 +20,7 @@
  *  @example
  *    $(document).ready(function() {
  *        var table = $('#example').dataTable();
- *         
+ *
  *        var n1 = $('#example tbody tr').eq(2)[0];
  *        var next = table.fnGetAdjacentTr( n1 );
  *        var prev = table.fnGetAdjacentTr( n1, false );
