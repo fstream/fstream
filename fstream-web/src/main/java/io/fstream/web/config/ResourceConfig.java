@@ -9,6 +9,7 @@
 
 package io.fstream.web.config;
 
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Configuration;
@@ -20,31 +21,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class ResourceConfig extends WebMvcConfigurerAdapter {
 
-  /**
-   * At development time, we want the static resources served directly from the <code>ontrack-web</code> project, under
-   * the <code>target/dev</code> directory.
-   */
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    String staticDir = "src/main/resources/static/dist";
-    log.info("Static web resources from: " + staticDir);
+    val staticDir = resolveStaticDir();
+    log.info("Static web resources from: {}", staticDir);
 
-    String prefix = "file:";
-    String dir = prefix + staticDir;
-    if (!dir.endsWith("/")) {
-      dir += "/";
-    }
-    registry.addResourceHandler("/fonts/**").addResourceLocations(dir + "fonts/");
-    registry.addResourceHandler("/images/**").addResourceLocations(dir + "images/");
-    registry.addResourceHandler("/scripts/**").addResourceLocations(dir + "scripts/");
-    registry.addResourceHandler("/styles/**").addResourceLocations(dir + "styles/");
-    registry.addResourceHandler("/views/**").addResourceLocations(dir + "views/");
-    registry.addResourceHandler("index.html").addResourceLocations(dir);
+    registry.addResourceHandler("/**").addResourceLocations(staticDir);
   }
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
     registry.addViewController("/").setViewName("forward:/index.html");
+  }
+
+  private String resolveStaticDir() {
+    return isJar() ? "classpath:/static/" : "file:../fstream-ui/dist/";
+  }
+
+  private boolean isJar() {
+    return getClass().getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jar");
   }
 
 }
