@@ -14,6 +14,7 @@ npm-debug.log
 .cake_task_cache
 public/
 node_modules/
+bower_components/
 dist/
 # create an exception for bower components
 !**/bower_components/**/dist/

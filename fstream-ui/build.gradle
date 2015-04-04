@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+apply plugin: 'com.moowork.node'
+apply plugin: 'com.moowork.grunt'
+
+node {
+  version = '0.10.33'
+  npmVersion = '2.1.8'
+  download = true
+  workDir = file("${project.buildDir}/node")
+}
+
+jar {
+  from(fileTree('dist/')) {
+    into 'static/'
+  }
+  
+  outputs.file archivePath
+}
+
+task setup(dependsOn: [installGrunt, npmInstall])
+
+task gruntBuild(type: GruntTask, dependsOn: setup) {
+  args = ["build"]
+}
+
+task reset(type: Delete, dependsOn: clean) {
+	delete 'dist', 'node_modules', 'bower_components'
+}
+
+build.dependsOn gruntBuild
