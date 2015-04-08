@@ -17,7 +17,7 @@ angular.module('homer').directive('tickChart', function() {
 			var chart,
 			    index = $scope.options.index,
 			    colors = Highcharts.getOptions().colors,
-			    color = '#419641',
+			    color = '#62cb31',
 			    opacity =  0.5 - (index / 6.0)* 0.5,
 			    size = 50,
 			    enabled = true;
@@ -26,7 +26,8 @@ angular.module('homer').directive('tickChart', function() {
 		        chart: {
 		            renderTo: $element[0],
 		            height: 325,
-		            animation: false
+		            animation: false,
+//                    backgroundColor: 'rgba(0,0,0,0)'
 		        },
 		        
 				credits: {
@@ -34,7 +35,10 @@ angular.module('homer').directive('tickChart', function() {
 				},
 		        
 		        title: {
-		        	text: $scope.options.symbol
+		        	text: $scope.options.symbol,
+//                    style:{
+//                        color:'white'
+//                    }
 		        },
 		        
 		        yAxis: {
@@ -42,10 +46,35 @@ angular.module('homer').directive('tickChart', function() {
 		        		text: "Price"
 		        	},
 	                alternateGridColor: '#FDFDfD'
+//                  lineColor:'lightgray',
+//                  tickColor:'lightgray',
+//                  labels:{
+//                    style:{
+//                        color:'lightgray'
+//                    }
+//                  },
+//                  title:{
+//                    style:{
+//                        color:'lightgray'
+//                    }
+//                  }
 		        },
 		        
 	            xAxis: {
-	                type: 'datetime'
+	                type: 'datetime',
+//                    gridLineWidth:'1px',
+//                    lineColor:'lightgray',
+//                    tickColor:'lightgray',
+//                    labels:{
+//                      style:{
+//                          color:'lightgray'
+//                      }
+//                    },
+//                    title:{
+//                      style:{
+//                          color:'lightgray'
+//                      }
+//                    }
 	            },
 	            
 		        tooltip: {
