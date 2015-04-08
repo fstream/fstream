@@ -16,7 +16,7 @@ angular.module('homer').directive('metricChart', function() {
 			var chart,
 			    index = $scope.options.index,
 			    colors = Highcharts.getOptions().colors,
-			    color = colors[0],
+			    color = '#62cb31',
 			    opacity =  0.5,
 			    size = 50,
 			    enabled = true;
@@ -45,7 +45,8 @@ angular.module('homer').directive('metricChart', function() {
 		        },
 		        
 	            xAxis: {
-	                type: 'datetime'
+	                type: 'datetime',
+                    gridLineWidth:'1px'
 	            },
 	            
 		        tooltip: {
