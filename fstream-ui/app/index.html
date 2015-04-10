@@ -41,7 +41,7 @@
 <!-- Body -->
 <!-- appCtrl controller with serveral data used in theme on diferent view -->
 <!-- landing-scrollspy is directive for scrollspy used in landing page -->
-<body ng-controller="mainController" class="{{$state.current.data.specialClass}}" landing-scrollspy tour backdrop="true">
+<body ng-controller="mainController" class="{{$state.current.data.specialClass}} hide-sidebar" landing-scrollspy tour backdrop="true">
 
 <!-- Simple splash screen-->
 <div class="splash"> <div class="color-line"></div><div class="splash-title"><h1>Homer - Responsive Admin Theme</h1><p>Special AngularJS Admin Theme for small and medium webapp with very clean and aesthetic style and feel. </p><img src="images/loading-bars.svg" width="64" height="64" /> </div> </div>
@@ -50,7 +50,7 @@
 <![endif]-->
 
     <!-- Page view wrapper -->
-    <div ui-view autoscroll="true"></div>
+    <div ui-view autoscroll="true" style="background:rgb(237,237,237)"></div>
 
 <!-- build:js(.) scripts/vendor.js -->
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
