@@ -117,7 +117,8 @@
 #logo {
   float: left;
   width: @menu-width;
-  background-color: @color-navy-blue;
+  margin-left: -1%;
+  margin-top: 1px;
   padding: 5px 18px 18px 18px;
   height: 56px;
   text-align: center;
@@ -130,7 +131,7 @@
 }
 
 #logo.light-version {
-  background-color: @color-bright;
+//  background-color: @color-bright;
   border-bottom: 1px solid @border-color;
   text-align: left;
 }
@@ -223,6 +224,12 @@
   background: #fff;
 }
 
+#side-menu li{
+  
+  
+  background: rgb(242,242,242);
+}
+
 .arrow {
   float: right;
 }
@@ -252,15 +259,16 @@
   padding: 18px 26px 17px 26px;
   font-size: 14px;
   float: left;
-  border-right:1px solid @border-color;
-  border-left:1px solid @border-color;
-  margin-right: 15px;
-  background: @color-bright;
+  //border-right:1px solid @border-color;
+//  border-left:1px solid @border-color;
+//  margin-right: 15px;
+  color:white;
+ // background: @color-bright;
   cursor: pointer;
 }
 
 .header-link:hover {
-  background: darken(@color-bright,2%);
+  background: #666;//darken(@color-bright,2%);
 }
 
 
@@ -572,17 +580,12 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 
 @media(max-width:768px) {
 
-  .navbar-form-custom, .navbar-right, #logo {
+  .navbar-form-custom, .navbar-right {
     display: none;
   }
 
   .navbar-static-top {
     margin: 0;
-  }
-
-  .small-logo {
-    display: block;
-    float: left;
   }
 
   // Demo only

@@ -21,23 +21,17 @@
 </div>-->
 <div class="row">
   <div ng-repeat="view in views" ng-switch="view.type" class="view">
-    <div class="col-lg-6 text-center">
+    <div class="col-lg-4 text-center">
         <div class="hpanel">
-            <div class="panel-heading">
-                <div panel-tools></div>
-                Interesting Chart #1
+            <div class="panel-heading"><div panel-tools></div>&emsp;
+
             </div>
             <div class="panel-body text-center">
+                
                 <div ng-controller="chartController">
                 <metric-chart ng-switch-when="metric-chart" options="view"></metric-chart>
                 <tick-chart ng-switch-when="tick-chart" options="view"></tick-chart>
                </div>
-            </div>
-            <div class="panel-footer">
-                    <span class="pull-right">
-                          look away
-                    </span>
-                who reads the footer?
             </div>
         </div>
     </div>

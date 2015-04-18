@@ -1,6 +1,79 @@
-<div class="color-line"></div>
 
+<div id="header" ng-include="'views/common/header.html'"></div>
+<!-- Navigation -->
+<aside id="menu" ng-include="'views/common/navigation.html'"></aside>
+<div id="wrapper">
+<!--
+<div class="row text-center">
+  <img width="25%" src="../../images/1.png" style="margin-bottom:-10px">
+
+<hr class="hr-login">
+</div>
+-->
+<div class="row" style="padding:20px;">
+    <div class="col-lg-3 text-center highlevel-metric">
+        <span id="hl-alerts-metric" class="highlevel-lg-text">0</span>
+      <span class="highlevel-sm-text">incoming<br>alerts</span>
+    </div>
+  <div class="col-lg-3 text-center highlevel-metric">
+        <span id="hl-events-metric" class="highlevel-lg-text">0</span>
+      <span class="highlevel-sm-text">incoming<br>events</span>
+    </div>
+  <div class="col-lg-3 text-center highlevel-metric">
+        <span id="hl-time-metric" class="highlevel-lg-text">.00s</span>
+      <span class="highlevel-sm-text">time<br>delay</span>
+    </div>
+  </div>
+  
+  <hr class="hr-login">
+  <script type="application/javascript">
+    setInterval(function() {
+      $("#hl-alerts-metric").text(Math.round(140+Math.random()*50)+"");
+    }, 1000+Math.random()*1000);
+    setInterval(function() {
+      $("#hl-events-metric").text(Math.round(350+Math.random()*50)+"");
+    }, 1000+Math.random()*1000);
+    setInterval(function() {
+      $("#hl-time-metric").text(((Math.random()*1).toFixed(2)+"s").substring(1));
+    }, 500+Math.random()*1000);
+  </script>
+  
+  <div class="row" style="padding:20px;">
+    <div class="col-lg-3 text-center app" ui-sref="dashboard" onClick="$('body').toggleClass('hide-sidebar').toggleClass('show-sidebar');">
+        <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-line-chart fa-1x"></i></span>
+        <br>
+      <span class="app-text">CHARTS</span>
+    </div>
+    <div class="col-lg-3 text-center app" ui-sref="analytics" onClick="$('body').toggleClass('hide-sidebar').toggleClass('show-sidebar');">
+      <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-list-alt fa-1x"></i></span><br>
+      <span class="app-text">EVENT LOG</span>
+    </div>
+    <div class="col-lg-3 text-center app">
+        <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-bell-o fa-1x"></i></span>
+        <br>
+      <span class="app-text">ALERT LOG</span>
+    </div>
+    
+  </div>
+  <div class="row" style="padding:20px;">
+    <div class="col-lg-6 text-center app">
+        <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-cogs fa-1x"></i></span><br>
+      <span class="app-text">ALERT MANAGER</span>
+    </div>
+  <div class="col-lg-3 text-center app" style="opacity:0.34">
+      <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-question fa-1x"></i></span><br>
+      <span class="app-text">Coming Soon..</span>
+    </div>
+    <div class="col-lg-3 text-center app" style="opacity:0.34">
+      <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-question fa-1x"></i></span><br>
+      <span class="app-text">Coming Soon..</span>
+    </div>
+  </div>
+<!--
 <div class="login-container">
+  <div class="row">
+    
+  </div>
     <div class="row">
         <div class="col-md-12">
             <div class="text-center m-b-md">
@@ -30,4 +103,5 @@
             <strong>FSTREAM</strong> - An app <br/> 2015 Copyright fstream
         </div>
     </div>
+</div>-->
 </div>
