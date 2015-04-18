@@ -9,36 +9,33 @@
 
 package io.fstream.persist.config;
 
-import static org.apache.hadoop.hbase.HConstants.ZOOKEEPER_CLIENT_PORT;
 import lombok.SneakyThrows;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-@Profile("hbase")
+@Slf4j
+@Profile("influxdb")
 @Configuration
-public class HBaseConfig {
+public class InfluxDBConfig {
 
-  @Value("${zk.port}")
-  private String zkConnect;
-
-  @Bean
-  public org.apache.hadoop.conf.Configuration config() {
-    val config = HBaseConfiguration.create();
-    config.set(ZOOKEEPER_CLIENT_PORT, zkConnect);
-
-    return config;
-  }
+  @Value("${influxdb.url}")
+  private String url;
+  @Value("${influxdb.username}")
+  private String username;
+  @Value("${influxdb.password}")
+  private String password;
 
   @Bean
   @SneakyThrows
-  public HBaseAdmin hbaseAdmin() {
-    return new HBaseAdmin(config());
+  public InfluxDB influxDb() {
+    log.info("Connection to '{}' as user '{}'", url, username);
+    return InfluxDBFactory.connect(url, username, password);
   }
 
 }

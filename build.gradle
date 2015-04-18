@@ -25,6 +25,7 @@ buildscript {
 	ext.stormVersion       = '0.9.3-rc1' // Snapshot for https://issues.apache.org/jira/browse/STORM-213
 	ext.hbaseVersion       = '0.98.5-hadoop1'
 	ext.hadoopVersion      = '1.2.1'
+	ext.influxdbVersion    = '1.5'
 	ext.esperVersion       = '4.11.0'
 	ext.curatorVersion     = '2.6.0'
 	ext.guavaVersion       = '18.0'
@@ -52,6 +53,7 @@ buildscript {
 		hadoop:             "org.apache.hadoop:hadoop-core:$hadoopVersion",
 		hadoopTest:         "org.apache.hadoop:hadoop-test:$hadoopVersion",
 		hbaseClient:        "org.apache.hbase:hbase-client:$hbaseVersion",
+		influxdb:           "org.influxdb:influxdb-java:$influxdbVersion",
 		curator:            "org.apache.curator:curator-recipes:$curatorVersion",
 		curatorTest:        "org.apache.curator:curator-test:$curatorVersion"
 	]
