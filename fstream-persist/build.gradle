@@ -30,6 +30,9 @@ dependencies {
   // Spring
   compile libraries.springBootActuator
 
+  // InfluxDB  
+  compile libraries.influxdb
+
   // Hadoop
   compile libraries.hadoop
 

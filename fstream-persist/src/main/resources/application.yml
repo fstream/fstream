@@ -6,6 +6,11 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
 
+# Spring
+spring:
+   profiles:
+      active: influxdb
+
 # ZooKeeper
 zk:
    host: localhost
@@ -21,3 +26,13 @@ kafka:
       zookeeper.connection.timeout.ms: 1000000
       group.id: 1
       broker.id: 0
+
+# InfluxDB
+influxdb:
+   username: root
+   password: root
+   port: 8086
+   host: localhost
+   database: ticks
+   url: http://${influxdb.host}:${influxdb.port}
+   
