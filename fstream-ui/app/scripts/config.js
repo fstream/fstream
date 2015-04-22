@@ -24,29 +24,38 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
         })
 
         // Dashboard - Main page
-        .state('dashboard', {
-            url: "/dashboard",
-            templateUrl: "views/dashboard.html",
+        .state('charts', {
+            url: "/charts",
+            templateUrl: "views/charts.html",
             data: {
-                pageTitle: 'Dashboard',
+                pageTitle: 'Charts',
             }
         })
 
         // Analytics
-        .state('analytics', {
-            url: "/analytics",
-            templateUrl: "views/analytics.html",
+        .state('events', {
+            url: "/events",
+            templateUrl: "views/events.html",
             data: {
-                pageTitle: 'Analytics',
+                pageTitle: 'Events',
             }
         })
 
-        // Widgets
-        .state('widgets', {
-            url: "/widgets",
-            templateUrl: "views/widgets.html",
+            // Analytics
+        .state('history', {
+            url: "/history",
+            templateUrl: "views/history.html",
             data: {
-                pageTitle: 'Widgets',
+                pageTitle: 'History',
+            }
+        })
+    
+        // Widgets
+        .state('alerts', {
+            url: "/alerts",
+            templateUrl: "views/alerts.html",
+            data: {
+                pageTitle: 'Alerts',
             }
         })
 
@@ -269,7 +278,7 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
         })
 
         // Charts
-        .state('charts', {
+        .state('charts-bak', {
             abstract: true,
             url: "/charts",
             templateUrl: "views/common/content.html",
