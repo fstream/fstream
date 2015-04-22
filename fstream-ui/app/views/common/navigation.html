@@ -10,7 +10,7 @@
 
             <div class="dropdown" dropdown >
                 <a dropdown-toggle class="dropdown-toggle" href="#">
-                    <small class="text-muted">Founder of App <b class="caret"></b></small>
+                        <small class="text-muted">Founder of App <b class="caret"></b></small>
                 </a>
                 <ul class="dropdown-menu animated fadeInRight m-t-xs">
                     <li><a ui-sref="app_views.contacts">Contacts</a></li>
@@ -35,17 +35,18 @@
 
     <ul side-navigation class="nav" id="side-menu">
         <li ui-sref-active="active">
-            <a ui-sref="dashboard"> <span class="nav-label">Charts</span></a>
+            <a ui-sref="charts"> <span class="nav-label">Charts</span></a>
         </li>
-        <li ui-sref-active="active">
-            <a ui-sref="analytics"> <span class="nav-label">Event log</span></a>
+        <li>
+            <a ui-sref="events"> <span class="nav-label">Streams</span></a>
         </li>
-      <li ui-sref-active="active">
-            <a> 
-              <span class="nav-label">Alert Log</span>
-                
-              </a>
-        </li><!--
+        <li>
+           <a ui-sref="alerts"><span class="nav-label">Alerts</span></a>
+        </li>
+        <li>
+           <a ui-sref="history"> <span class="nav-label">History</span></a>
+        </li>
+        <!--
         <li ng-class="{active: $state.includes('interface')}">
             <a href="#"><span class="nav-label">Interface</span><span class="fa arrow"></span> </a>
             <ul class="nav nav-second-level" ng-class="{in: $state.includes('interface')}">

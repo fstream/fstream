@@ -1,0 +1,43 @@
+<!-- Header -->
+<div id="header" ng-include="'views/common/header.html'"></div>
+
+<!-- Navigation -->
+<aside id="menu" ng-include="'views/common/navigation.html'"></aside>
+
+<!-- Main Wrapper -->
+<div id="wrapper">
+    <div class="content" animate-panel>
+        <h1><i class="fa fa-clock-o"></i> History</h1>
+        <p class="lead">Showing events in the selected time range</p>
+        <div class="row">
+            <div class="hpanel">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table cellpadding="1" cellspacing="1" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Symbol</th>
+                                    <th>Ask</th>
+                                    <th>Bid</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="rate in [{'symbol': 'EUR/USD', 'ask':1.0, 'bid': 2.0},{'symbol': 'EUR/USD', 'ask':1.5, 'bid': 2.5}] track by $index">
+                                    <td><a href="#">Today - 00:33:33 3333.333</a>
+                                    </td>
+                                    <td>{{rate.symbol}}</td>
+                                    <td>{{rate.ask | number:4}}</td>
+                                    <td>{{rate.bid | number:4}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    Total - <b>1</b> events
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
