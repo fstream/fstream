@@ -6,7 +6,7 @@
 
 <!-- Main Wrapper -->
 <div id="wrapper">
-    <div class="content" animate-panel>
+    <div ng-controller="historyCtrl" class="content" animate-panel>
         <h1><i class="fa fa-clock-o"></i> History</h1>
         <p class="lead">Showing events in the selected time range</p>
         <div class="row">
@@ -23,12 +23,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="rate in [{'symbol': 'EUR/USD', 'ask':1.0, 'bid': 2.0},{'symbol': 'EUR/USD', 'ask':1.5, 'bid': 2.5}] track by $index">
-                                    <td><a href="#">Today - 00:33:33 3333.333</a>
+                                <tr ng-repeat="rate in history track by $index">
+                                    <td><a href="#">{{rate.points[0][0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a>
                                     </td>
-                                    <td>{{rate.symbol}}</td>
-                                    <td>{{rate.ask | number:4}}</td>
-                                    <td>{{rate.bid | number:4}}</td>
+                                    <td>{{rate.name}}</td>
+                                    <td>{{rate.points[0][2] | number:4}}</td>
+                                    <td>{{rate.points[0][3] | number:4}}</td>
                                 </tr>
                             </tbody>
                         </table>

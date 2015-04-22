@@ -23,7 +23,7 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
             }
         })
 
-        // Dashboard - Main page
+        // Charts
         .state('charts', {
             url: "/charts",
             templateUrl: "views/charts.html",
@@ -32,16 +32,16 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
             }
         })
 
-        // Analytics
-        .state('events', {
-            url: "/events",
-            templateUrl: "views/events.html",
+        // Streams
+        .state('streams', {
+            url: "/streams",
+            templateUrl: "views/streams.html",
             data: {
-                pageTitle: 'Events',
+                pageTitle: 'Streams',
             }
         })
 
-            // Analytics
+        // History
         .state('history', {
             url: "/history",
             templateUrl: "views/history.html",
@@ -50,7 +50,7 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
             }
         })
     
-        // Widgets
+        // Alerts
         .state('alerts', {
             url: "/alerts",
             templateUrl: "views/alerts.html",
