@@ -9,6 +9,10 @@
     <div ng-controller="historyCtrl" class="content" animate-panel>
         <h1><i class="fa fa-clock-o"></i> History</h1>
         <p class="lead">Showing events in the selected time range</p>
+        <form class="clearfix">
+        <timepicker class="pull-left" ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></timepicker>
+        <timepicker class="pull-left" ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></timepicker>
+        </form>
         <div class="row">
             <div class="hpanel">
                 <div class="panel-body">
