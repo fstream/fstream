@@ -149,7 +149,7 @@ task up << {
 		TimeUnit.SECONDS.sleep(seconds)
 	}
 
-	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name == "bootRun" }.collectEntries{[it.project.name, it]}
+	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name in ["bootRun", "run"] }.collectEntries{[it.project.name, it]}
 	def seconds = 10
 
 	[
