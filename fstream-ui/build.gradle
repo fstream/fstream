@@ -27,12 +27,17 @@ jar {
 
 task setup(dependsOn: [installGrunt, npmInstall])
 
+task reset(type: Delete, dependsOn: clean) {
+  delete 'dist', 'node_modules', 'bower_components'
+}
+
 task gruntBuild(type: GruntTask, dependsOn: setup) {
   args = ["build"]
 }
 
-task reset(type: Delete, dependsOn: clean) {
-	delete 'dist', 'node_modules', 'bower_components'
+task run(type: GruntTask, dependsOn: setup) {
+  args = ["live"]
+  ext.main = ""
 }
 
 build.dependsOn gruntBuild

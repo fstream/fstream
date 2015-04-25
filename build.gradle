@@ -157,7 +157,8 @@ task up << {
 		'fstream-test',
 		'fstream-rates',
 		'fstream-compute',
-		'fstream-web'
+		'fstream-web',
+		'fstream-ui'
 	].each { projectName ->
 		Thread.start {
 			println "Running $projectName..."
@@ -172,6 +173,12 @@ task up << {
 		TimeUnit.SECONDS.sleep(seconds)
 	}
 
+	// Finished
+	println ""
+	println '#' * 100
+	println "Finished starting system"
+	println '#' * 100
+	println ""
 	TimeUnit.DAYS.sleep(1)
 }
 
