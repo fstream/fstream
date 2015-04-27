@@ -145,6 +145,7 @@ subprojects {
 task up << {
 	addShutdownHook {
 		println "**** Shutting down..."
+		
 		println "Waiting ${seconds}s ..."
 		TimeUnit.SECONDS.sleep(seconds)
 	}
@@ -179,6 +180,7 @@ task up << {
 	println "Finished starting system"
 	println '#' * 100
 	println ""
+	
 	TimeUnit.DAYS.sleep(1)
 }
 
