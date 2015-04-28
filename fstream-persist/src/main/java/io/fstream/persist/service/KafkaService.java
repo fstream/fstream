@@ -11,7 +11,8 @@ package io.fstream.persist.service;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static io.fstream.core.util.PropertiesUtils.getProperties;
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.Event;
+import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 import io.fstream.persist.config.KafkaProperties;
 
@@ -25,23 +26,24 @@ import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 @Slf4j
-@Service
+@RequiredArgsConstructor
 public class KafkaService extends AbstractExecutionThreadService {
 
   /**
    * Configuration.
    */
-  private final String topicName = "rates";
+  private final Topic topic;
+  private final Class<? extends Event> eventClass;
 
   /**
    * Dependencies.
@@ -61,7 +63,7 @@ public class KafkaService extends AbstractExecutionThreadService {
 
   @PostConstruct
   public void init() throws Exception {
-    log.info("Initializing...");
+    log.info("Initializing '{}'...", topic);
     this.consumerConnector = createConsumerConnector();
     this.stream = createStream();
 
@@ -70,7 +72,7 @@ public class KafkaService extends AbstractExecutionThreadService {
 
   @PreDestroy
   public void destroy() throws Exception {
-    log.info("Destroying...");
+    log.info("Destroying '{}'...", topic);
     stopAsync();
 
     consumerConnector.commitOffsets();
@@ -79,14 +81,14 @@ public class KafkaService extends AbstractExecutionThreadService {
 
   @Override
   protected void run() throws Exception {
-    log.info("Running!");
+    log.info("Running '{}'!", topic);
 
     for (val messageAndMetadata : stream) {
       val message = messageAndMetadata.message();
       val text = new String(message);
 
       log.info("Received: {}", text);
-      val rate = Codec.decodeText(text, TickEvent.class);
+      val rate = Codec.decodeText(text, eventClass);
       persistenceService.persist(rate);
     }
   }
@@ -97,6 +99,7 @@ public class KafkaService extends AbstractExecutionThreadService {
 
   private KafkaStream<byte[], byte[]> createStream() {
     val topicStreamCount = 1;
+    val topicName = topic.getId();
 
     // lombok: issue with byte[] and generics
     Map<String, List<KafkaStream<byte[], byte[]>>> topicMessageStreams =

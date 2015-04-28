@@ -9,6 +9,7 @@
 
 package io.fstream.persist.service;
 
+import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.TickEvent;
 
 import javax.annotation.PostConstruct;
@@ -86,15 +87,17 @@ public class HBaseService implements PersistenceService {
 
   @Override
   @SneakyThrows
-  public void persist(TickEvent event) {
+  public void persist(Event event) {
     val table = connection.getTable(TABLE_NAME);
     try {
-      val key = createKey(event);
+      // TODO: Support other types!
+      val tickEvent = (TickEvent) event;
+      val key = createKey(tickEvent);
 
       val row = new Put(Bytes.toBytes(key));
-      row.add(CF_DATA, COLUMN_BID, Bytes.toBytes(event.getBid()));
-      row.add(CF_DATA, COLUMN_ASK, Bytes.toBytes(event.getAsk()));
-      row.add(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(event.getSymbol()));
+      row.add(CF_DATA, COLUMN_BID, Bytes.toBytes(tickEvent.getBid()));
+      row.add(CF_DATA, COLUMN_ASK, Bytes.toBytes(tickEvent.getAsk()));
+      row.add(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(tickEvent.getSymbol()));
 
       log.info("**** Putting row");
       table.put(row);
