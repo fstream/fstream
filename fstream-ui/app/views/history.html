@@ -42,12 +42,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="rate in history track by $index">
+                                <tr ng-repeat="stream in history track by $index">
                                     <td><a href="#">{{rate.points[0][0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a>
                                     </td>
-                                    <td>{{rate.name}}</td>
-                                    <td>{{rate.points[0][2] | number:4}}</td>
-                                    <td>{{rate.points[0][3] | number:4}}</td>
+                                    <td>{{stream.name}}</td>
+                                    <td>{{stream.points[0][2] | number:4}}</td>
+                                    <td>{{stream.points[0][3] | number:4}}</td>
                                 </tr>
                             </tbody>
                         </table>
