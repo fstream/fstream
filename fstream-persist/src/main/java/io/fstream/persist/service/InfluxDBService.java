@@ -9,6 +9,10 @@
 
 package io.fstream.persist.service;
 
+import io.fstream.core.model.event.AlertEvent;
+import io.fstream.core.model.event.Event;
+import io.fstream.core.model.event.EventType;
+import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.event.TickEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -58,17 +62,34 @@ public class InfluxDBService implements PersistenceService {
   }
 
   @Override
-  public void persist(TickEvent event) {
+  public void persist(Event event) {
     val serie = createSerie(event);
 
     influxDb.write(databaseName, TimeUnit.MILLISECONDS, serie);
   }
 
-  private Serie createSerie(TickEvent event) {
-    return new Serie.Builder(event.getSymbol())
-        .columns("time", "ask", "bid")
-        .values(event.getDateTime().getMillis(), event.getAsk(), event.getBid())
-        .build();
+  private Serie createSerie(Event event) {
+    if (event.getType() == EventType.TICK) {
+      val tickEvent = (TickEvent) event;
+      return new Serie.Builder(tickEvent.getSymbol())
+          .columns("time", "ask", "bid")
+          .values(event.getDateTime().getMillis(), tickEvent.getAsk(), tickEvent.getBid())
+          .build();
+    } else if (event.getType() == EventType.METRIC) {
+      val metricEvent = (MetricEvent) event;
+      return new Serie.Builder("metrics")
+          .columns("time", "id", "data")
+          .values(event.getDateTime().getMillis(), metricEvent.getId(), metricEvent.getData().toString())
+          .build();
+    } else if (event.getType() == EventType.ALERT) {
+      val alertEvent = (AlertEvent) event;
+      return new Serie.Builder("alerts")
+          .columns("time", "id", "data")
+          .values(event.getDateTime().getMillis(), alertEvent.getId(), alertEvent.getData().toString())
+          .build();
+    }
+
+    return null;
   }
 
 }

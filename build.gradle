@@ -156,6 +156,7 @@ task up << {
 	[
 		'fstream-configure',
 		'fstream-test',
+		'fstream-persist',
 		'fstream-rates',
 		'fstream-compute',
 		'fstream-web',
