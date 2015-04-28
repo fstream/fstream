@@ -9,10 +9,10 @@
 
 package io.fstream.persist.service;
 
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.Event;
 
 public interface PersistenceService {
 
-  void persist(TickEvent event);
+  void persist(Event event);
 
 }
