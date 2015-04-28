@@ -29,7 +29,7 @@
             </form>
         </div>
         <div class="row m-t">
-            <div class="hpanel">
+            <div class="hpanel" ng-repeat="stream in history">
                 <div class="panel-body">
                     <div class="table-responsive">
                         <table cellpadding="1" cellspacing="1" class="table">
@@ -42,19 +42,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="stream in history track by $index">
-                                    <td><a href="#">{{rate.points[0][0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a>
-                                    </td>
+                                <tr ng-repeat="event in stream.points">
+                                    <td><a href="#">{{event[0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
                                     <td>{{stream.name}}</td>
-                                    <td>{{stream.points[0][2] | number:4}}</td>
-                                    <td>{{stream.points[0][3] | number:4}}</td>
+                                    <td>{{event[2] | number:4}}</td>
+                                    <td>{{event[3] | number:4}}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="panel-footer">
-                    Total - <b>{{history.length}}</b> events
+                    Total - <b>{{stream.points.length}}</b> events
                 </div>
             </div>
         </div>

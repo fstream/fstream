@@ -15,7 +15,7 @@ angular
    return {
         getHistory: function(symbol, start, end, limit) {
             symbol = (symbol || '.*').replace('/', '\\/');
-            limit = limit || 50;
+            limit = limit || 10;
             return $http.get('http://localhost:8086/db/ticks/series', {
                 params: {u: 'root', p: 'root', q: 'select * from /' + symbol + '/ LIMIT ' + limit}
             });
