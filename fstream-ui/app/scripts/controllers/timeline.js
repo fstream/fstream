@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('timelineCtrl', timelineCtrl)
 
 function timelineCtrl($scope) {

@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .filter('propsFilter', propsFilter)
 
 function propsFilter(){

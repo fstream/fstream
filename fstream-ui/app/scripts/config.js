@@ -1,5 +1,5 @@
 /**
- * HOMER - Responsive Admin Theme
+ * fstream - ui
  * Copyright 2015 Webapplayers.com
  *
  */
@@ -447,7 +447,7 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
 }
 
 angular
-    .module('homer')
+    .module('fstream')
     .config(configState)
     .run(function($rootScope, $state, editableOptions) {
         $rootScope.$state = $state;

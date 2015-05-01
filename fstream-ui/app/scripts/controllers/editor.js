@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('editorCtrl', editorCtrl)
 
 function editorCtrl($scope) {

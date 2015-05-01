@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('wizardOneCtrl', wizardOneCtrl)
 
 function wizardOneCtrl($scope, notify, sweetAlert) {

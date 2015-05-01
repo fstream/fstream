@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('appCtrl', appCtrl);
 
 function appCtrl($http, $scope, $timeout) {

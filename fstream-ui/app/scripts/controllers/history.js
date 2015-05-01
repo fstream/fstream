@@ -5,12 +5,12 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('historyCtrl', historyCtrl)
 
 
 angular
-    .module('homer')
+    .module('fstream')
     .factory('historyService', function($http) {
    return {
         getHistory: function(symbol, start, end, limit) {

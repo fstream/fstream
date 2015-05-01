@@ -1,4 +1,4 @@
-angular.module('homer').factory('eventService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+angular.module('fstream').factory('eventService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
 	var stompClient,
 		publishEvent = function (eventName, frame){
 			$timeout(function() {

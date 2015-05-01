@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('calendarCtrl', calendarCtrl)
 
 function calendarCtrl($scope) {

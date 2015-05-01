@@ -1,4 +1,4 @@
-angular.module('homer').controller('alertController', function($scope, $filter, ngTableParams) {
+angular.module('fstream').controller('alertController', function($scope, $filter, ngTableParams) {
     $scope.$on('alert', function(e, alert) {
     	$scope.tableParams.reload();
     });

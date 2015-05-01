@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('modalCtrl', modalCtrl)
 
 function modalCtrl($scope, $modal) {

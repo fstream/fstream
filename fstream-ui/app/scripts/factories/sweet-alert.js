@@ -1,5 +1,5 @@
 /**
- * HOMER - Responsive Admin Theme
+ * fstream - ui
  * Copyright 2015 Webapplayers.com
  *
  * Sweet Alert Directive
@@ -52,5 +52,5 @@ function sweetAlert($timeout, $window) {
  * Pass function into module
  */
 angular
-    .module('homer')
+    .module('fstream')
     .factory('sweetAlert', sweetAlert)

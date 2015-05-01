@@ -1,10 +1,10 @@
 /**
- * HOMER - Responsive Admin Theme
+ * fstream - ui
  * Copyright 2015 Webapplayers.com
  *
  */
 (function () {
-    angular.module('homer', [
+    angular.module('fstream', [
         'ui.router',                // Angular flexible routing
         'ngSanitize',               // Angular-sanitize
         'ui.bootstrap',             // AngularJS native directives for Bootstrap

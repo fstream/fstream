@@ -1,4 +1,4 @@
-angular.module('homer').directive('metricChart', function() {
+angular.module('fstream').directive('metricChart', function() {
     Highcharts.setOptions({
         global : {
             useUTC : false

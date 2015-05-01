@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('charts_flotCtrl', charts_flotCtrl)
 
 function charts_flotCtrl($scope) {

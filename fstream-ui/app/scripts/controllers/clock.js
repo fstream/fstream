@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('clockCtrl', clockCtrl)
 
 function clockCtrl($scope, $timeout) {
