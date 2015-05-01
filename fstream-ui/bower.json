@@ -1,10 +1,10 @@
 {
-  "name": "HOMER",
+  "name": "fstream-ui",
   "version": "1.4.0",
   "authors": [
-    "Damian Dudziak - WebAppLayers"
+    "Bob Tiernay"
   ],
-  "description": "HOMER - AngularJS WebApp Theme",
+  "description": "fstream - UI",
   "main": "app/index.html",
   "private": true,
   "ignore": [
@@ -57,7 +57,6 @@
     "stomp-websocket": "latest",
     "ng-lodash": "latest",
     "ng-stomp": "~0.0.2",
-    "highstock": "latest",
     "highstock-release": "~2.1.4"
   },
   "resolutions": {

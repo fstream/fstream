@@ -13,7 +13,6 @@ angular.module('homer').directive('tickChart', function() {
 	    replace: true,
 		template : '<div class="tick-chart"></div>',
 		link: function($scope, $element, $attr){
-          console.log("tick dir");
 			var chart,
 			    index = $scope.options.index,
 			    colors = Highcharts.getOptions().colors,
