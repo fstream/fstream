@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('alertsCtrl', alertsCtrl)
 
 function alertsCtrl($scope, sweetAlert, notify) {

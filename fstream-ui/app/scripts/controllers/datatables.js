@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('datatablesCtrl', datatablesCtrl)
 
 function datatablesCtrl($scope, DTOptionsBuilder, DTColumnBuilder) {

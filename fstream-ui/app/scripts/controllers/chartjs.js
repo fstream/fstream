@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('chartjsCtrl', chartjsCtrl)
 
 function chartjsCtrl($scope) {

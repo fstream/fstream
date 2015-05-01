@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('nestableCtrl', nestableCtrl)
 
 function nestableCtrl($scope) {

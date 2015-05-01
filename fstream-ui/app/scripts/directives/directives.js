@@ -1,11 +1,11 @@
 /**
- * HOMER - Responsive Admin Theme
- * Copyright 2015 Webapplayers.com
+ * fstream - ui
+ * Copyright 2015 fstream.io
  *
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .directive('pageTitle', pageTitle)
     .directive('sideNavigation', sideNavigation)
     .directive('minimalizaMenu', minimalizaMenu)
@@ -24,9 +24,9 @@ function pageTitle($rootScope, $timeout) {
         link: function(scope, element) {
             var listener = function(event, toState, toParams, fromState, fromParams) {
                 // Default title
-                var title = 'HOMER | AngularJS Responsive WebApp';
+                var title = 'fstream | UI';
                 // Create your own title pattern
-                if (toState.data && toState.data.pageTitle) title = 'HOMER | ' + toState.data.pageTitle;
+                if (toState.data && toState.data.pageTitle) title = 'fstream | ' + toState.data.pageTitle;
                 $timeout(function() {
                     element.text(title);
                 });
@@ -54,8 +54,6 @@ function sideNavigation($timeout) {
                     $("body").toggleClass("show-sidebar");
               //  }
             });
-
-
         }
     };
 };
@@ -268,5 +266,3 @@ function landingScrollspy(){
         }
     }
 }
-
-

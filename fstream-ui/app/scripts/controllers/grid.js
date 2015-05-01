@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('nggridCtrl', nggridCtrl)
 
 function nggridCtrl($scope) {

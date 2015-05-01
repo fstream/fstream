@@ -1,11 +1,11 @@
 /**
- * HOMER - Responsive Admin Theme
+ * fstream - ui
  * Copyright 2015 Webapplayers.com
  *
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .directive('touchSpin', touchSpin)
 
 

@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('googleMapCtrl', googleMapCtrl)
 
 function googleMapCtrl($scope, $timeout) {

@@ -1,4 +1,4 @@
-angular.module('homer').directive('alertLog', function(ngTableParams) {
+angular.module('fstream').directive('alertLog', function(ngTableParams) {
 	return {
 		restrict : 'E',
 		template:

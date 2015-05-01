@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('inlineChartsCtrl', inlineChartsCtrl)
 
 function inlineChartsCtrl($scope) {

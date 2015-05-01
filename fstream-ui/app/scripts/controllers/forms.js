@@ -5,7 +5,7 @@
  */
 
 angular
-    .module('homer')
+    .module('fstream')
     .controller('formsCtrl', formsCtrl)
     .controller('SelectLocalCtrl', SelectLocalCtrl)
     .controller('RadiolistCtrl', RadiolistCtrl)

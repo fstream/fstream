@@ -1,4 +1,4 @@
-angular.module('homer').directive('tickChart', function() {
+angular.module('fstream').directive('tickChart', function() {
 	Highcharts.setOptions({
 		global : {
 			useUTC : false

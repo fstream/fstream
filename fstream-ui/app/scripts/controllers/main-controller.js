@@ -1,4 +1,4 @@
-angular.module('homer').controller('mainController', function($scope, lodash, stateService, eventService) {
+angular.module('fstream').controller('mainController', function($scope, lodash, stateService, eventService) {
 	function registerEvents() {
 		// Events
 		$scope.$on('connected', function(e) {
