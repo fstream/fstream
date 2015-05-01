@@ -1,6 +1,6 @@
 /**
  * fstream - ui
- * Copyright 2015 Webapplayers.com
+ * Copyright 2015 fstream.io
  *
  */
 (function () {
