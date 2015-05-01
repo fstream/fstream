@@ -43,7 +43,7 @@ angular.module('homer').directive('metricChart', function() {
 		        	},
 	                alternateGridColor: '#FDFDfD'
 		        },
-		        
+                
 	            xAxis: {
 	                type: 'datetime',
                     gridLineWidth:'1px'
@@ -52,25 +52,8 @@ angular.module('homer').directive('metricChart', function() {
 		        tooltip: {
 		            crosshairs: [true, true],
 		            shared: true
-		        },
+		        },              
                 
-                rangeSelector: {
-                    buttons: [{
-                        count: 1,
-                        type: 'minute',
-                        text: '1M'
-                    }, {
-                        count: 5,
-                        type: 'minute',
-                        text: '5M'
-                    }, {
-                        type: 'all',
-                        text: 'All'
-                    }],
-                    inputEnabled: false,
-                    selected: 0
-                },
-		        
 				series: [{
 			    	name: $scope.options.name,
 			    	data: [],
