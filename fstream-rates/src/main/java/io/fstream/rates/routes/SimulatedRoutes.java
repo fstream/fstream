@@ -55,6 +55,12 @@ public class SimulatedRoutes extends RouteBuilder {
     from("timer://tick-event6?period=" + period * 6)
       .process(new RandomTickEventGenerator("USD/CAD", 1.0138f, 1.1279f))
       .to("direct:sink");
+    from("timer://tick-event6?period=" + period * 6)
+      .process(new RandomTickEventGenerator("AUD/NZD", 1.0138f, 1.1279f))
+      .to("direct:sink");
+    from("timer://tick-event6?period=" + period * 6)
+      .process(new RandomTickEventGenerator("NZD/USD", 1.0138f, 1.1279f))
+      .to("direct:sink");    
     
     //
     // Sink
