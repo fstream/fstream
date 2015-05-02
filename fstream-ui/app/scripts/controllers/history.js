@@ -1,7 +1,5 @@
 /**
- *
- * alertsCtrl
- *
+ * historyCtrl
  */
 
 angular
@@ -14,7 +12,13 @@ function historyCtrl($scope, historyService) {
    $scope.updateHistory = updateHistory;
 
    function updateHistory() {
-      historyService.getHistory({symbol: $scope.symbol}).then(function(history) {
+      var params = {
+         symbol:    $scope.symbol, 
+         startTime: $scope.startTime, 
+         endTime:   $scope.endTime
+      };
+
+      historyService.getHistory(params).then(function(history) {
          $scope.history = history
       });
    }
