@@ -13,6 +13,7 @@ package io.fstream.rates.routes;
 import io.fstream.rates.camel.CodecDataFormat;
 import io.fstream.rates.handler.RandomTickEventGenerator;
 import lombok.Setter;
+import lombok.val;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
@@ -34,22 +35,24 @@ public class SimulatedRoutes extends RouteBuilder {
     // Sources (6 Majors)
     //
     
-    from("timer://tick-event1?period=100")
+    val period = 5000L;
+    
+    from("timer://tick-event1?period=" + period * 1)
       .process(new RandomTickEventGenerator("EUR/USD", 1.2757f, 1.3990f))
       .to("direct:sink");
-    from("timer://tick-event2?period=100")
+    from("timer://tick-event2?period=" + period * 2)
       .process(new RandomTickEventGenerator("USD/JPY", 93.8675f, 105.4415f))
       .to("direct:sink");
-    from("timer://tick-event3?period=100")
+    from("timer://tick-event3?period=" + period * 3)
       .process(new RandomTickEventGenerator("GBP/USD", 1.4817f, 1.6997f))
       .to("direct:sink");
-    from("timer://tick-event4?period=100")
+    from("timer://tick-event4?period=" + period * 4)
       .process(new RandomTickEventGenerator("AUD/USD", 0.8661f, 0.9791f))
       .to("direct:sink");
-    from("timer://tick-event5?period=100")
+    from("timer://tick-event5?period=" + period * 5)
       .process(new RandomTickEventGenerator("USD/CHF", 0.8701f, 0.9792f))
       .to("direct:sink");
-    from("timer://tick-event6?period=100")
+    from("timer://tick-event6?period=" + period * 6)
       .process(new RandomTickEventGenerator("USD/CAD", 1.0138f, 1.1279f))
       .to("direct:sink");
     
