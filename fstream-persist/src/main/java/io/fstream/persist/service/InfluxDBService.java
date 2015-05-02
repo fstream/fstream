@@ -35,6 +35,11 @@ import org.springframework.stereotype.Service;
 public class InfluxDBService implements PersistenceService {
 
   /**
+   * Constants.
+   */
+  private static final TimeUnit PRECISION = TimeUnit.MILLISECONDS;
+
+  /**
    * Configuration.
    */
   @Value("${influxdb.database}")
@@ -48,32 +53,33 @@ public class InfluxDBService implements PersistenceService {
 
   @PostConstruct
   public void initialize() {
+    if (!isDBExists()) {
+      // Doesn't exist
+      log.info("Initializing database '{}'...", databaseName);
+      influxDb.createDatabase(databaseName);
 
-    for (val database : influxDb.describeDatabases()) {
-      val exists = database.getName().equals(databaseName);
-      if (exists) {
-        return;
-      }
+      // Register "fanout continuous query"
+      influxDb.query(databaseName, "SELECT ask, bid FROM ticks INTO ticks.[symbol]", PRECISION);
     }
 
-    // Doesn't exist
-    log.info("Initializing database '{}'...", databaseName);
-    influxDb.createDatabase(databaseName);
+    // Drop all queries to ensure consistent state. This makes this class the canonical / only accepted way to create
+    // such queries.
+    // dropContinuousQueries();
   }
 
   @Override
   public void persist(Event event) {
     val serie = createSerie(event);
 
-    influxDb.write(databaseName, TimeUnit.MILLISECONDS, serie);
+    influxDb.write(databaseName, PRECISION, serie);
   }
 
   private Serie createSerie(Event event) {
     if (event.getType() == EventType.TICK) {
       val tickEvent = (TickEvent) event;
-      return new Serie.Builder(tickEvent.getSymbol())
-          .columns("time", "ask", "bid")
-          .values(event.getDateTime().getMillis(), tickEvent.getAsk(), tickEvent.getBid())
+      return new Serie.Builder("ticks")
+          .columns("time", "symbol", "ask", "bid")
+          .values(event.getDateTime().getMillis(), tickEvent.getSymbol(), tickEvent.getAsk(), tickEvent.getBid())
           .build();
     } else if (event.getType() == EventType.METRIC) {
       val metricEvent = (MetricEvent) event;
@@ -90,6 +96,25 @@ public class InfluxDBService implements PersistenceService {
     }
 
     return null;
+  }
+
+  @SuppressWarnings("unused")
+  private void dropContinuousQueries() {
+    // See https://github.com/influxdb/influxdb-java/issues/30
+    for (val continuousQuery : influxDb.describeContinuousQueries(databaseName)) {
+      influxDb.deleteContinuousQuery(databaseName, continuousQuery.getId());
+    }
+  }
+
+  private boolean isDBExists() {
+    for (val database : influxDb.describeDatabases()) {
+      val exists = database.getName().equals(databaseName);
+      if (exists) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }

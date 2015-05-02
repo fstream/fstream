@@ -6,56 +6,54 @@
 
 <!-- Main Wrapper -->
 <div id="wrapper">
-    <div ng-controller="historyCtrl" class="content" animate-panel>
-        <div class="row">
-            <h1><i class="fa fa-clock-o"></i> History</h1>
-            <p class="lead">Showing events in the selected time range</p>
-        </div>
-        <div class="row">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label class="sr-only" for="startTime">Start Date / Time</label>
-                    <input class="form-control" id="startTime" placeholder="Start Date / Time" ng-model="startTime">
-                </div>
-                <div class="form-group">
-                    <label class="sr-only" for="endTime">End Date / Time</label>
-                    <input class="form-control" id="endTime" placeholder="End Date / Time" ng-model="endTime">
-                </div>
-                <div class="form-group">
-                    <label class="sr-only" for="symbol">Symbol</label>
-                    <input class="form-control" id="symbol" placeholder="Symbol" ng-model="symbol">
-                </div>                
-                <button type="submit" class="btn btn-default" ng-click="submit()">Filter</button>
-            </form>
-        </div>
-        <div class="row m-t">
-            <div class="hpanel" ng-repeat="stream in history">
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table cellpadding="1" cellspacing="1" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Symbol</th>
-                                    <th>Ask</th>
-                                    <th>Bid</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="event in stream.points">
-                                    <td><a href="#">{{event[0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
-                                    <td>{{stream.name}}</td>
-                                    <td>{{event[2] | number:4}}</td>
-                                    <td>{{event[3] | number:4}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="panel-footer">
-                    Total - <b>{{stream.points.length}}</b> events
-                </div>
+   <div ng-controller="historyCtrl" class="content" animate-panel>
+      <div class="row">
+         <h1><i class="fa fa-clock-o"></i> History</h1>
+         <p class="lead">Showing events in the selected time range</p>
+      </div>
+      <div class="row">
+         <form class="form-inline">
+            <div class="form-group">
+               <label class="sr-only" for="startTime">Start Date / Time</label>
+               <input class="form-control" id="startTime" placeholder="Start Date / Time" ng-model="startTime">
             </div>
-        </div>
-    </div>
+            <div class="form-group">
+               <label class="sr-only" for="endTime">End Date / Time</label>
+               <input class="form-control" id="endTime" placeholder="End Date / Time" ng-model="endTime">
+            </div>
+            <div class="form-group">
+               <label class="sr-only" for="symbol">Symbol</label>
+               <input class="form-control" id="symbol" placeholder="Symbol" ng-model="symbol">
+            </div>                
+            <button type="submit" class="btn btn-default" ng-click="submit()">Filter</button>
+         </form>
+      </div>
+      <div class="row m-t">
+         <div class="hpanel">
+            <div class="panel-body">
+               <table class="table table-striped table-hover">
+                  <thead>
+                     <tr>
+                        <th>Time</th>
+                        <th>Symbol</th>
+                        <th>Ask</th>
+                        <th>Bid</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="event in history.points">
+                        <td><a href="#">{{ event[0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
+                        <td>{{ event[2] }}</td>
+                        <td>{{ event[3] | number:4}}</td>
+                        <td>{{ event[4] | number:4}}</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="panel-footer">
+               Total - <b>{{history.points.length}}</b> events
+            </div>
+         </div>
+      </div>
+   </div>
 </div>

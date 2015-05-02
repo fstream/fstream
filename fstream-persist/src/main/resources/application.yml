@@ -33,6 +33,6 @@ influxdb:
    password: root
    port: 8086
    host: localhost
-   database: ticks
+   database: fstream-events
    url: http://${influxdb.host}:${influxdb.port}
    
