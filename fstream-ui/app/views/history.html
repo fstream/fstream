@@ -25,7 +25,7 @@
                <label class="sr-only" for="symbol">Symbol</label>
                <input class="form-control" id="symbol" placeholder="Symbol" ng-model="symbol">
             </div>                
-            <button type="submit" class="btn btn-default" ng-click="submit()">Filter</button>
+            <button type="submit" class="btn btn-default" ng-click="updateHistory()">Filter</button>
          </form>
       </div>
       <div class="row m-t">
@@ -41,11 +41,11 @@
                      </tr>
                   </thead>
                   <tbody>
-                     <tr ng-repeat="event in history.points">
-                        <td><a href="#">{{ event[0] | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
-                        <td>{{ event[2] }}</td>
-                        <td>{{ event[3] | number:4}}</td>
-                        <td>{{ event[4] | number:4}}</td>
+                     <tr ng-repeat="tick in history">
+                        <td><a href="#">{{ tick.time | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
+                        <td>{{ tick.symbol }}</td>
+                        <td>{{ tick.ask | number:4}}</td>
+                        <td>{{ tick.bid | number:4}}</td>
                      </tr>
                   </tbody>
                </table>
