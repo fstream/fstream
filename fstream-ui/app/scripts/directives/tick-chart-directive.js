@@ -1,123 +1,140 @@
-angular.module('fstream').directive('tickChart', function() {
-	Highcharts.setOptions({
-		global : {
-			useUTC : false
-		}
-	});
-	
-	return {
-		restrict : 'E',
-		scope: {
-	      options: '='
-	    },
-	    replace: true,
-		template : '<div class="tick-chart"></div>',
-		link: function($scope, $element, $attr){
-			var chart,
-			    index = $scope.options.index,
-			    colors = Highcharts.getOptions().colors,
-			    color = '#62cb31',
-			    opacity =  0.5 - (index / 6.0)* 0.5,
-			    size = 50,
-			    enabled = true;
-			
-			chart = new Highcharts.Chart({
-		        chart: {
-		            renderTo: $element[0],
-		            height: 325,
-		            animation: false,
-//                    backgroundColor: 'rgba(0,0,0,0)'
-		        },
-		        
-				credits: {
-					enabled: false
-				},
-		        
-		        title: {
-		        	text: $scope.options.symbol,
-//                    style:{
-//                        color:'white'
-//                    }
-		        },
-		        
-		        yAxis: {
-		        	title: {
-		        		text: "Price"
-		        	},
-	                alternateGridColor: '#FDFDfD'
-//                  lineColor:'lightgray',
-//                  tickColor:'lightgray',
-//                  labels:{
-//                    style:{
-//                        color:'lightgray'
-//                    }
-//                  },
-//                  title:{
-//                    style:{
-//                        color:'lightgray'
-//                    }
-//                  }
-		        },
-		        
-	            xAxis: {
-	                type: 'datetime',
-//                    gridLineWidth:'1px',
-//                    lineColor:'lightgray',
-//                    tickColor:'lightgray',
-//                    labels:{
-//                      style:{
-//                          color:'lightgray'
-//                      }
-//                    },
-//                    title:{
-//                      style:{
-//                          color:'lightgray'
-//                      }
-//                    }
-	            },
-	            
-		        tooltip: {
-		            crosshairs: [true, true],
-		            shared: true
-		        },	
-		        
-				series: [{
-			    	name: 'Price',
-			    	data: [],
-			    	zIndex: 1,
-			    	step: true,
-			    	color: color,
-			    	lineColor: color,
-			    	marker: {
-			    		fillColor: 'white',
-			    		lineWidth: 2,
-			    		radius: 3,
-			    		lineColor: color
-			    	}
-				}, {
-			        name: 'Spread',
-			        data: [],
-			        step: true,
-			        type: 'arearange',
-			        lineWidth: 0.5,
-			    	linkedTo: ':previous',
-			    	color: color,
-			    	fillOpacity: opacity,
-			    	zIndex: 0
-				}]
-			});
-			
-		    $scope.$on('rate', function(e, rate) {
-		    	if (rate.symbol !== $scope.options.symbol) {
-		    		return;
-		    	}
-		    	
-	    		var shift = chart.series[0].data.length >= size,
-    		    	animate = false;
-	    		
-	    		chart.series[0].addPoint([rate.dateTime, (rate.ask + rate.bid)/2.0], false, shift, animate);
-	    		chart.series[1].addPoint([rate.dateTime, rate.bid, rate.ask], enabled, shift, animate);
-		    });
-		}
-	}
-})
+angular.module('fstream').directive('tickChart', ['historyService', 'lodash', function(historyService, lodash) {
+   Highcharts.setOptions({
+      global : {
+         useUTC : false
+      }
+   });
+
+   return {
+      restrict : 'E',
+      scope: {
+         options: '='
+      },
+      replace: true,
+      template : '<div class="tick-chart"></div>',
+      link: function($scope, $element, $attr){
+         $scope.maxTime = 0;
+         $scope.loading = true;
+
+         var chart,
+             index = $scope.options && $scope.options.index || 0,
+             colors = Highcharts.getOptions().colors,
+             color = '#62cb31',
+             opacity =  0.5 - (index / 6.0)* 0.5,
+             maxTime = 0,
+             enabled = true;
+
+         chart = new Highcharts.StockChart({
+            chart: {
+               renderTo: $element[0],
+               height: 325,
+               animation: false
+            },
+
+            credits: {
+               enabled: false
+            },
+
+            title: {
+               text: $scope.options.symbol
+            },
+
+            yAxis: {
+               title: {
+                  text: "Price"
+               },
+               alternateGridColor: '#FDFDfD'
+            },
+
+            xAxis: {
+               type: 'datetime',
+               minRange: 1000
+            },
+
+            tooltip: {
+               crosshairs: [true, true],
+               shared: true
+            },
+
+            rangeSelector: {
+               inputEnabled: false,
+               buttons: [
+                  {
+                     type: 'minute',
+                     count: 1,
+                     text: '1m'
+                  }, {
+                     type: 'hour',
+                     count: 1,
+                     text: '1h'                  
+                  }, {
+                     type: 'day',
+                     count: 1,
+                     text: '1d'                  
+                  }, {
+                     type: 'All',
+                     text: 'all'                  
+                  }
+               ]
+            },
+
+            series: [{
+               name: 'Price',
+               data: [],
+               zIndex: 1,
+               step: true,
+               color: color,
+               lineColor: color,
+               marker: {
+                  fillColor: 'white',
+                  lineWidth: 2,
+                  radius: 3,
+                  lineColor: color
+               }
+            }, {
+               name: 'Spread',
+               data: [],
+               step: true,
+               type: 'arearange',
+               lineWidth: 0.5,
+               linkedTo: ':previous',
+               color: color,
+               fillOpacity: opacity,
+               zIndex: 0
+            }]
+         });
+
+         $scope.$on('rate', function(e, tick) {
+            if ($scope.loading || tick.symbol !== $scope.options.symbol || tick.dateTime < $scope.maxTime) {
+               return;
+            }
+
+            $scope.maxTime = tick.dateTime;
+
+            var shift = false,
+                animate = false;
+
+            chart.series[0].addPoint([tick.dateTime, (tick.ask + tick.bid)/2.0], false, shift, animate);
+            chart.series[1].addPoint([tick.dateTime, tick.bid, tick.ask], enabled, shift, animate);
+         });
+
+         historyService.getTicks({symbol: $scope.options.symbol, interval: 'm'}).then(function(ticks) {
+            var sorted = lodash.sortBy(ticks, 'time');
+
+            var mids = lodash.map(sorted, function(tick) {
+               return [tick.time, (tick.ask + tick.bid)/2.0];
+            });
+            var rates = lodash.map(sorted, function(tick) {
+               return [tick.time, tick.bid, tick.ask];
+            });
+
+            $scope.maxTime = ticks[ticks.length - 1].time;
+
+            chart.series[0].setData(mids, false, false);
+            chart.series[1].setData(rates, true, false);
+
+            $scope.loading = false;
+         });
+      }
+   }
+}])

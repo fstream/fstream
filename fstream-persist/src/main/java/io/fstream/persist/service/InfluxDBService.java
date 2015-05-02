@@ -59,12 +59,18 @@ public class InfluxDBService implements PersistenceService {
       influxDb.createDatabase(databaseName);
 
       // Register "fanout continuous query"
-      influxDb.query(databaseName, "SELECT ask, bid FROM ticks INTO ticks.[symbol]", PRECISION);
-    }
+      influxDb.query(databaseName,
+          "SELECT ask, bid FROM ticks INTO ticks.[symbol]", PRECISION);
 
-    // Drop all queries to ensure consistent state. This makes this class the canonical / only accepted way to create
-    // such queries.
-    // dropContinuousQueries();
+      // Register "downsampling continuous query"
+      influxDb
+          .query(
+              databaseName,
+              "SELECT MEAN(ask) AS ask, MEAN(bid) AS bid FROM /^ticks\\..*/ GROUP BY time(1m) INTO rollups.1m.:series_name",
+              PRECISION);
+      influxDb.query(databaseName,
+          "SELECT MEAN(ask), MEAN(bid) FROM /^ticks\\..*/ GROUP BY time(1h) INTO rollups.1h.:series_name", PRECISION);
+    }
   }
 
   @Override
