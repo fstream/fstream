@@ -1,18 +1,18 @@
-angular.module('fstream').directive('tickChart', ['historyService', 'lodash', function(historyService, lodash) {
+angular.module('fstream').directive('tickChart', ['historyService', 'lodash', function (historyService, lodash) {
    Highcharts.setOptions({
-      global : {
-         useUTC : false
+      global: {
+         useUTC: false
       }
    });
 
    return {
-      restrict : 'E',
+      restrict: 'E',
       scope: {
          options: '='
       },
       replace: true,
-      template : '<div class="tick-chart"></div>',
-      link: function($scope, $element, $attr){
+      template: '<div class="tick-chart"></div>',
+      link: function ($scope, $element, $attr) {
          $scope.maxTime = 0;
          $scope.loading = true;
 
@@ -20,7 +20,7 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
              index = $scope.options && $scope.options.index || 0,
              colors = Highcharts.getOptions().colors,
              color = '#62cb31',
-             opacity =  0.5 - (index / 6.0)* 0.5,
+             opacity = 0.5 - (index / 6.0) * 0.5,
              maxTime = 0,
              enabled = true;
 
@@ -33,10 +33,6 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
 
             credits: {
                enabled: false
-            },
-
-            title: {
-               text: $scope.options.symbol
             },
 
             yAxis: {
@@ -58,6 +54,9 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
 
             rangeSelector: {
                inputEnabled: false,
+               
+               selected: 1,
+               
                buttons: [
                   {
                      type: 'minute',
@@ -66,16 +65,27 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
                   }, {
                      type: 'hour',
                      count: 1,
-                     text: '1h'                  
+                     text: '1h'
                   }, {
                      type: 'day',
                      count: 1,
-                     text: '1d'                  
+                     text: '1d'
                   }, {
                      type: 'All',
-                     text: 'all'                  
+                     text: 'all'
                   }
-               ]
+               ],
+
+               buttonTheme: {
+                  states: {
+                     hover: {
+                        fill: 'rgba(192, 192, 192, 0.5)'
+                     },
+                     select: {
+                        fill: 'rgba(191, 220, 180, 0.5)'
+                     }                     
+                  }
+               },
             },
 
             series: [{
@@ -101,10 +111,24 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
                color: color,
                fillOpacity: opacity,
                zIndex: 0
-            }]
+            }],
+
+            scrollbar: {
+               barBackgroundColor: '#9fcc83',
+            },
+
+            navigator: {
+               outlineColor: '#489125',
+               maskFill: 'rgba(191, 220, 180, 0.5)',
+
+               series: {
+                  color: '#9fcc83',
+                  lineColor: '#489125'
+               }
+            }
          });
 
-         $scope.$on('rate', function(e, tick) {
+         $scope.$on('rate', function (e, tick) {
             if ($scope.loading || tick.symbol !== $scope.options.symbol || tick.dateTime < $scope.maxTime) {
                return;
             }
@@ -114,17 +138,20 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
             var shift = false,
                 animate = false;
 
-            chart.series[0].addPoint([tick.dateTime, (tick.ask + tick.bid)/2.0], false, shift, animate);
+            chart.series[0].addPoint([tick.dateTime, (tick.ask + tick.bid) / 2.0], false, shift, animate);
             chart.series[1].addPoint([tick.dateTime, tick.bid, tick.ask], enabled, shift, animate);
          });
 
-         historyService.getTicks({symbol: $scope.options.symbol, interval: 'm'}).then(function(ticks) {
+         historyService.getTicks({
+            symbol: $scope.options.symbol,
+            interval: 'm'
+         }).then(function (ticks) {
             var sorted = lodash.sortBy(ticks, 'time');
 
-            var mids = lodash.map(sorted, function(tick) {
-               return [tick.time, (tick.ask + tick.bid)/2.0];
+            var mids = lodash.map(sorted, function (tick) {
+               return [tick.time, (tick.ask + tick.bid) / 2.0];
             });
-            var rates = lodash.map(sorted, function(tick) {
+            var rates = lodash.map(sorted, function (tick) {
                return [tick.time, tick.bid, tick.ask];
             });
 
