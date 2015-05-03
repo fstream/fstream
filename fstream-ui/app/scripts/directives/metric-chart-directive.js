@@ -1,4 +1,4 @@
-angular.module('fstream').directive('metricChart', function () {
+angular.module('fstream').directive('metricChart', ['historyService', 'lodash', function (historyService, lodash) {
    Highcharts.setOptions({
       global: {
          useUTC: false
@@ -13,6 +13,9 @@ angular.module('fstream').directive('metricChart', function () {
       replace: true,
       template: '<div class="metric-chart"></div>',
       link: function ($scope, $element, $attr) {
+         $scope.maxTime = 0;
+         $scope.loading = true;
+
          var chart,
              index = $scope.options.index,
              colors = Highcharts.getOptions().colors,
@@ -62,25 +65,39 @@ angular.module('fstream').directive('metricChart', function () {
             },
 
             rangeSelector: {
-               buttons: [{
-                  type: 'hour',
-                  count: 1,
-                  text: '1h'
-               }, {
-                  type: 'day',
-                  count: 1,
-                  text: '1D'
-               }, {
-                  type: 'all',
-                  count: 1,
-                  text: 'All'
-               }],
-               selected: 1,
-               inputEnabled: false
-            },
+               inputEnabled: false,
 
-            navigator: {
-               maskFill: 'rgba(255, 255, 255, 0.45)'
+               selected: 1,
+
+               buttons: [
+                  {
+                     type: 'minute',
+                     count: 1,
+                     text: '1m'
+                  }, {
+                     type: 'hour',
+                     count: 1,
+                     text: '1h'
+                  }, {
+                     type: 'day',
+                     count: 1,
+                     text: '1d'
+                  }, {
+                     type: 'All',
+                     text: 'all'
+                  }
+               ],
+
+               buttonTheme: {
+                  states: {
+                     hover: {
+                        fill: 'rgba(192, 192, 192, 0.5)'
+                     },
+                     select: {
+                        fill: 'rgba(191, 220, 180, 0.5)'
+                     }
+                  }
+               },
             },
 
             series: [{
@@ -95,19 +112,51 @@ angular.module('fstream').directive('metricChart', function () {
                   radius: 3,
                   lineColor: color
                }
-            }]
+            }],
+
+            scrollbar: {
+               barBackgroundColor: '#9fcc83',
+            },
+
+            navigator: {
+               outlineColor: '#489125',
+               maskFill: 'rgba(191, 220, 180, 0.5)',
+
+               series: {
+                  color: '#9fcc83',
+                  lineColor: '#489125'
+               }
+            }
          });
 
          $scope.$on('metric', function (e, metric) {
-            if (metric.id !== $scope.options.id) {
+            if ($scope.loading || metric.id !== $scope.options.id || metric.dateTime < $scope.maxTime) {
                return;
             }
 
-            var shift = chart.series[0].data.length >= size,
+            $scope.maxTime = metric.dateTime;
+
+            var shift = false,
                 animate = false;
 
             chart.series[0].addPoint([metric.dateTime, metric.data.count], enabled, shift, animate);
          });
+
+         historyService.getMetrics({
+            id: $scope.options.id
+         }).then(function (metrics) {
+            var sorted = lodash.sortBy(metrics, 'time');
+
+            var values = lodash.map(sorted, function (value) {
+               return [value.time, JSON.parse(value.data).count];
+            });
+
+            $scope.maxTime = lodash.last(sorted).time;
+
+            chart.series[0].setData(values, true, false);
+
+            $scope.loading = false;
+         });         
       }
    }
-})
+}])

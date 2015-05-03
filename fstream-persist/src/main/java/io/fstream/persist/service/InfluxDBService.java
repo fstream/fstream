@@ -14,6 +14,7 @@ import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.util.Codec;
 
 import java.util.concurrent.TimeUnit;
 
@@ -91,13 +92,13 @@ public class InfluxDBService implements PersistenceService {
       val metricEvent = (MetricEvent) event;
       return new Serie.Builder("metrics")
           .columns("time", "id", "data")
-          .values(event.getDateTime().getMillis(), metricEvent.getId(), metricEvent.getData().toString())
+          .values(event.getDateTime().getMillis(), metricEvent.getId(), Codec.encodeText(metricEvent.getData()))
           .build();
     } else if (event.getType() == EventType.ALERT) {
       val alertEvent = (AlertEvent) event;
       return new Serie.Builder("alerts")
           .columns("time", "id", "data")
-          .values(event.getDateTime().getMillis(), alertEvent.getId(), alertEvent.getData().toString())
+          .values(event.getDateTime().getMillis(), alertEvent.getId(), Codec.encodeText(alertEvent.getData()))
           .build();
     }
 

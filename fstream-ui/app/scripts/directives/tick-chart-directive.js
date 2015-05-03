@@ -35,6 +35,17 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
                enabled: false
             },
 
+            lang: {
+               noData: 'EMPTY'
+            },
+            noData: {
+               style: {
+                  fontWeight: 'bold',
+                  fontSize: '3em',
+                  color: 'rgba(82, 132, 78, 0.29)'
+               }
+            },
+
             yAxis: {
                title: {
                   text: "Price"
@@ -54,9 +65,9 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
 
             rangeSelector: {
                inputEnabled: false,
-               
+
                selected: 1,
-               
+
                buttons: [
                   {
                      type: 'minute',
@@ -155,7 +166,7 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
                return [tick.time, tick.bid, tick.ask];
             });
 
-            $scope.maxTime = ticks[ticks.length - 1].time;
+            $scope.maxTime = lodash.last(sorted).time;
 
             chart.series[0].setData(mids, false, false);
             chart.series[1].setData(rates, true, false);
