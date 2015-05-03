@@ -23,6 +23,15 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
             }
         })
 
+        // Dashboard
+        .state('dashboard', {
+            url: "/dashboard",
+            templateUrl: "views/dashboard.html",
+            data: {
+                pageTitle: 'Dashboard'
+            }
+        })
+    
         // Charts
         .state('charts', {
             url: "/charts",
