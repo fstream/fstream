@@ -4,6 +4,7 @@
       ".tmp",
       ".project",
       ".classpath",
+      ".settings",
       "node_modules",
       "bower_components",
       "build",
