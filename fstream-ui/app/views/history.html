@@ -11,15 +11,15 @@
          <h1><i class="fa fa-clock-o"></i> History</h1>
          <p class="lead">Showing events in the selected time range</p>
       </div>
-      <div class="row">
+      <div class="row history-form">
          <form class="form-inline">
             <div class="form-group">
                <label class="sr-only" for="startTime">Start Date / Time</label>
-               <input class="form-control" id="startTime" placeholder="Start Date / Time" ng-model="startTime">
+               <input class="form-control" id="startTime" date-time-picker placeholder="Start Date / Time" ng-model="startTime">
             </div>
             <div class="form-group">
                <label class="sr-only" for="endTime">End Date / Time</label>
-               <input class="form-control" id="endTime" placeholder="End Date / Time" ng-model="endTime">
+               <input class="form-control" id="endTime" date-time-picker placeholder="End Date / Time" ng-model="endTime">
             </div>
             <div class="form-group">
                <ui-select style="height: 34px; min-width: 168px" multiple ng-model="symbols.selected" theme="bootstrap" ng-disabled="disabled">
@@ -29,7 +29,7 @@
                   </ui-select-choices>
                </ui-select>
             </div>                
-            <button type="submit" class="btn btn-default" ng-click="updateHistory()">Filter</button>
+            <button type="submit" class="btn btn-outline btn-success" ng-click="updateHistory()">Filter</button>
          </form>
       </div>
       <div class="row m-t">
