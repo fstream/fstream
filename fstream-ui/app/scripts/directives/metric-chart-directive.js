@@ -1,23 +1,23 @@
-angular.module('fstream').directive('metricChart', function() {
+angular.module('fstream').directive('metricChart', function () {
    Highcharts.setOptions({
-      global : {
-         useUTC : false
+      global: {
+         useUTC: false
       }
    });
 
    return {
-      restrict : 'E',
+      restrict: 'E',
       scope: {
          options: '='
       },
       replace: true,
-      template : '<div class="metric-chart"></div>',
-      link: function($scope, $element, $attr){
+      template: '<div class="metric-chart"></div>',
+      link: function ($scope, $element, $attr) {
          var chart,
              index = $scope.options.index,
              colors = Highcharts.getOptions().colors,
              color = '#62cb31',
-             opacity =  0.5,
+             opacity = 0.5,
              size = 50,
              enabled = true;
 
@@ -33,8 +33,15 @@ angular.module('fstream').directive('metricChart', function() {
                enabled: false
             },
 
-            title: {
-               text: $scope.options.title
+            lang: {
+               noData: 'EMPTY'
+            },
+            noData: {
+               style: {
+                  fontWeight: 'bold',
+                  fontSize: '3em',
+                  color: 'rgba(82, 132, 78, 0.29)'
+               }
             },
 
             yAxis: {
@@ -46,30 +53,30 @@ angular.module('fstream').directive('metricChart', function() {
 
             xAxis: {
                type: 'datetime',
-               gridLineWidth:'1px'
+               gridLineWidth: '1px'
             },
 
             tooltip: {
                crosshairs: [true, true],
                shared: true
-            }, 
+            },
 
-            rangeSelector : {
-               buttons : [{
-                  type : 'hour',
-                  count : 1,
-                  text : '1h'
+            rangeSelector: {
+               buttons: [{
+                  type: 'hour',
+                  count: 1,
+                  text: '1h'
                }, {
-                  type : 'day',
-                  count : 1,
-                  text : '1D'
+                  type: 'day',
+                  count: 1,
+                  text: '1D'
                }, {
-                  type : 'all',
-                  count : 1,
-                  text : 'All'
+                  type: 'all',
+                  count: 1,
+                  text: 'All'
                }],
-               selected : 1,
-               inputEnabled : false
+               selected: 1,
+               inputEnabled: false
             },
 
             navigator: {
@@ -91,7 +98,7 @@ angular.module('fstream').directive('metricChart', function() {
             }]
          });
 
-         $scope.$on('metric', function(e, metric) {
+         $scope.$on('metric', function (e, metric) {
             if (metric.id !== $scope.options.id) {
                return;
             }
