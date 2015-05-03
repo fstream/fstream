@@ -56,7 +56,8 @@ angular.module('fstream').directive('metricChart', ['historyService', 'lodash', 
 
             xAxis: {
                type: 'datetime',
-               gridLineWidth: '1px'
+               gridLineWidth: '1px',
+               minRange: 1000
             },
 
             tooltip: {
