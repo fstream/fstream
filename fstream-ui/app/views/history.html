@@ -22,8 +22,12 @@
                <input class="form-control" id="endTime" placeholder="End Date / Time" ng-model="endTime">
             </div>
             <div class="form-group">
-               <label class="sr-only" for="symbol">Symbol</label>
-               <input class="form-control" id="symbol" placeholder="Symbol" ng-model="symbol">
+               <ui-select style="height: 34px; min-width: 168px" multiple ng-model="symbols.selected" theme="bootstrap" ng-disabled="disabled">
+                  <ui-select-match placeholder="Symbols">{{$item.name}}</ui-select-match>
+                  <ui-select-choices repeat="symbol in availableSymbols">
+                     {{symbol.name}}
+                  </ui-select-choices>
+               </ui-select>
             </div>                
             <button type="submit" class="btn btn-default" ng-click="updateHistory()">Filter</button>
          </form>

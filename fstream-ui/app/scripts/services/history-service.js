@@ -1,14 +1,23 @@
 angular
    .module('fstream')
-   .factory('historyService', historyService);
+   .factory('historyService', ['$http', 'lodash', historyService]);
 
-function historyService($http, lodash) {
+function historyService($http, _) {
    return {
       getMetrics: getMetrics,
       getHistory: getHistory,
-      getTicks: getTicks
+      getTicks: getTicks,
+      getAvailableSymbols: getAvailableSymbols
    };
 
+   function getAvailableSymbols() {
+      return executeQuery('LIST SERIES').then(function(result){
+         return _.compact(_.map(result, function(series) {
+            var match = /^ticks\.([^.]+)/.exec(series.name);
+            return match && {name: match[1]};
+         }));
+      });
+   }
 
    function getMetrics(params) {
       var series = 'metrics';
@@ -48,13 +57,13 @@ function historyService($http, lodash) {
 
    function getWhere(params, columns) {
       var conditions = [];
-      if (params.symbol && lodash.contains(columns, 'symbol')) {
+      if (params.symbol && _.contains(columns, 'symbol')) {
          conditions.push('symbol = \'' + params.symbol + '\'');
       }
-      if (params.startTime && lodash.contains(columns, 'time')) {
+      if (params.startTime && _.contains(columns, 'time')) {
          conditions.push('time > ' + params.startTime + '');
       }
-      if (params.endTime && lodash.contains(columns, 'time')) {
+      if (params.endTime && _.contains(columns, 'time')) {
          conditions.push('time < ' + params.endTime + '');
       }      
 
@@ -76,8 +85,8 @@ function historyService($http, lodash) {
    function transformPoints(result) {
       var data = result.data && result.data[0] || {};
 
-      return lodash.map(data.points, function(point) {
-         return lodash.zipObject(data.columns, point);
+      return _.map(data.points, function(point) {
+         return _.zipObject(data.columns, point);
       });
    }
 }
