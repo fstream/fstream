@@ -6,10 +6,13 @@
 
 <!-- Main Wrapper -->
 <div id="wrapper">
-    <div class="content" animate-panel>
-        <h1><i class="fa fa-arrow-right"></i> Streams</h1>
-        <p class="lead">Showing <b>{{ rates.length }}</b> events for <b>{{ state.symbols.length }}</b> registered streams</p>
-        <div id="rates"><pre ng-repeat="rate in rates">{{ rate | json }}</pre>
-        </div>
-    </div>
+   <div class="content" animate-panel>
+      <div class="row">
+         <h1><i class="fa fa-arrow-right"></i> Streams</h1>
+         <p class="lead">Showing <b>{{ rates.length }}</b> events for <b>{{ state.symbols.length }}</b> registered streams</p>
+      </div>
+      <div class="row">
+         <div id="rates"><pre ng-repeat="rate in rates">{{ rate | json }}</pre></div>
+      </div>
+   </div>
 </div>

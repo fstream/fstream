@@ -212,7 +212,7 @@ function animatePanel($timeout,$state) {
             var currentState = $state.current.name;
 
             // Set default values for attrs
-            if(!attrs.effect) { attrs.effect = 'zoomIn'};
+            if(!attrs.effect) { attrs.effect = 'fadeIn'};
             if(attrs.delay) { delay = attrs.delay / 10 } else { delay = 0.06 };
             if(!attrs.child) { attrs.child = '.row > div'} else {attrs.child = "." + attrs.child};
 
