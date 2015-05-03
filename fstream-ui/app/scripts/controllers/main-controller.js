@@ -1,4 +1,8 @@
-angular.module('fstream').controller('mainController', function($scope, lodash, stateService, eventService) {
+angular
+   .module('fstream')
+   .controller('mainController', mainController);
+
+function mainController($scope, lodash, stateService, eventService) {
 	function registerEvents() {
 		// Events
 		$scope.$on('connected', function(e) {
@@ -90,9 +94,10 @@ angular.module('fstream').controller('mainController', function($scope, lodash, 
 		return a.length >= limit ? a.pop() : a.unshift(value);
 	};
     
-    // temporary workaround for Highcahrts opacity animation bug
+    // Temporary workaround for Highcahrts opacity animation bug
     jQuery.cssProps.opacity = 'opacity';
+   
 	// Initialize
 	registerEvents();
 	connect();
-});
+};

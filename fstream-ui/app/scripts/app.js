@@ -22,7 +22,7 @@
         'bm.bsTour',                // Angular bootstrap tour
         'datatables',               // Angular datatables plugin
         'xeditable',                // Angular-xeditable
-        'ui.select','ngLodash'                 // AngularJS ui-select
+        'ui.select','ngLodash'      // AngularJS ui-select
     ])
 })();
 
