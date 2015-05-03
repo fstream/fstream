@@ -13,7 +13,8 @@ function historyService($http, lodash) {
    function getMetrics(params) {
       var series = 'metrics';
       var limit = 1000;
-      var query = 'SELECT * FROM "' + series + '"' + ' LIMIT ' + limit;
+      var where = params.id ? ' WHERE id = ' + params.id + ' '  : '';
+      var query = 'SELECT * FROM "' + series + '"' + where + ' LIMIT ' + limit;
 
       return executeQuery(query);      
    }
