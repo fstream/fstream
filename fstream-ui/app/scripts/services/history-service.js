@@ -4,68 +4,79 @@ angular
 
 function historyService($http, lodash) {
    return {
+      getMetrics: getMetrics,
       getHistory: getHistory,
       getTicks: getTicks
    };
 
-   function getHistory(options) {
-      options = options || {}
-      var series = 'ticks';
-      var where = getWhere(options, ['time', 'symbol']);
-      var groupBy = 'symbol'
-      var limit = getLimit(options);
-      var params = {u: 'root', p: 'root', q: 'SELECT * FROM "' + series + '" ' + where + ' GROUP BY ' + groupBy + ' LIMIT ' + limit};
 
-      return get(params).then(transformPoints);
-   };
-   
-   function getTicks(options) {
-      var series = getSeries(options);
-      var where = getWhere(options, ['time']);
+   function getMetrics(params) {
+      var series = 'metrics';
       var limit = 1000;
-      var params = {u: 'root', p: 'root', q: 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit}; 
-      
-      return get(params).then(transformPoints);
+      var query = 'SELECT * FROM "' + series + '"' + ' LIMIT ' + limit;
+
+      return executeQuery(query);      
    }
-   
-   function getSeries(options) {
-      var prefix = options.interval ? 'rollups.1' + options.interval + '.' : ''
-      var suffix = options.symbol ? 'ticks.' + options.symbol : 'ticks';
-      
+
+   function getHistory(params) {
+      params = params || {};
+      var series = 'ticks';
+      var where = getWhere(params, ['time', 'symbol']);
+      var groupBy = 'symbol'
+      var limit = getLimit(params);
+      var query = 'SELECT * FROM "' + series + '" ' + where + ' GROUP BY ' + groupBy + ' LIMIT ' + limit;
+
+      return executeQuery(query);
+   };
+
+   function getTicks(params) {
+      var series = getSeries(params);
+      var where = getWhere(params, ['time']);
+      var limit = 1000;
+      var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit; 
+
+      return executeQuery(query);
+   }
+
+   function getSeries(params) {
+      var prefix = params.interval ? 'rollups.1' + params.interval + '.' : ''
+      var suffix = params.symbol ? 'ticks.' + params.symbol : 'ticks';
+
       return prefix + suffix;
    }
-   
-   function getWhere(options, columns) {
+
+   function getWhere(params, columns) {
       var conditions = [];
-      if (options.symbol && lodash.contains(columns, 'symbol')) {
-         conditions.push('symbol = \'' + options.symbol + '\'');
+      if (params.symbol && lodash.contains(columns, 'symbol')) {
+         conditions.push('symbol = \'' + params.symbol + '\'');
       }
-      if (options.startTime && lodash.contains(columns, 'time')) {
-         conditions.push('time > ' + options.startTime + '');
+      if (params.startTime && lodash.contains(columns, 'time')) {
+         conditions.push('time > ' + params.startTime + '');
       }
-      if (options.endTime && lodash.contains(columns, 'time')) {
-         conditions.push('time < ' + options.endTime + '');
+      if (params.endTime && lodash.contains(columns, 'time')) {
+         conditions.push('time < ' + params.endTime + '');
       }      
-      
+
       return conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
    }
 
-   function getLimit(options) {
-      return options.limit || 50;
+   function getLimit(params) {
+      return params.limit || 50;
    }
-   
+
+   function executeQuery(query) {
+      var databaseName =  'fstream-events';
+      var url = 'http://localhost:8086/db/' + databaseName + '/series';
+      var params = {u: 'root', p: 'root', q: query};
+
+      return $http.get(url, {params: params}).then(transformPoints);
+   }
+
    function transformPoints(result) {
       var data = result.data && result.data[0] || {};
-      
+
       return lodash.map(data.points, function(point) {
          return lodash.zipObject(data.columns, point);
       });
-   }
-   
-   function get(params) {
-      var databaseName =  'fstream-events';
-      var url = 'http://localhost:8086/db/' + databaseName + '/series';
-      
-      return $http.get(url, {params: params});
    }
 }
