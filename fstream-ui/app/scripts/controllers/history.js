@@ -1,35 +1,41 @@
-/**
- * historyCtrl
- */
+(function () {
+   'use strict';
 
-angular
-   .module('fstream')
-   .controller('historyCtrl', historyCtrl)
+   angular
+      .module('fstream')
+      .controller('historyCtrl', historyCtrl);
 
-function historyCtrl($scope, historyService) {
-   $scope.updateHistory = updateHistory;
-   $scope.symbols = {
-      selected: []
-   };
-   
-   updateHistory();
-   getAvailableSymbols();
+   historyCtrl.$inject = ['$scope', 'historyService'];
 
-   function updateHistory() {
-      var params = {
-         symbol:    $scope.symbols.selected.length && $scope.symbols.selected[0].name, 
-         startTime: $scope.startTime, 
-         endTime:   $scope.endTime
+   function historyCtrl($scope, historyService) {
+      $scope.updateHistory = updateHistory;
+      $scope.symbols = {
+         selected: []
       };
 
-      historyService.getHistory(params).then(function(history) {
-         $scope.history = history;
-      });
+      activate();
+
+      function activate() {
+         updateHistory();
+         getAvailableSymbols();
+      }
+
+      function updateHistory() {
+         var params = {
+            symbol: $scope.symbols.selected.length && $scope.symbols.selected[0].name,
+            startTime: $scope.startTime,
+            endTime: $scope.endTime
+         };
+
+         historyService.getHistory(params).then(function (history) {
+            $scope.history = history;
+         });
+      }
+
+      function getAvailableSymbols() {
+         historyService.getSymbols().then(function (symbols) {
+            $scope.availableSymbols = symbols;
+         });
+      }
    }
-   
-   function getAvailableSymbols() {
-      historyService.getAvailableSymbols().then(function(availableSymbols) {
-         $scope.availableSymbols = availableSymbols;
-      });
-   }   
-}
+})();
