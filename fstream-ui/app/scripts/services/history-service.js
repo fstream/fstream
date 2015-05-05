@@ -40,7 +40,7 @@
 
       function getAlerts(params) {
          var series = 'alerts';
-         var limit = 1000;
+         var limit = 50;
          var where = params.id ? ' WHERE id = ' + params.id + ' ' : '';
          var query = 'SELECT * FROM "' + series + '"' + where + ' LIMIT ' + limit;
 
