@@ -736,11 +736,15 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 }
 
 .pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
-  background-color: @color-blue;
-  border-color: darken(@color-blue, 5%);
+  background-color: @color-green;
+  border-color: darken(@color-green, 5%);
   color: #fff;
   cursor: default;
   z-index: 2;
+}
+
+.pagination > li > a {
+   color: darken(@color-green, 5%);
 }
 
 .hbreadcrumb a.active {
