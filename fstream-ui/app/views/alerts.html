@@ -1,4 +1,4 @@
-<!-- Header -->
+   <!-- Header -->
 <div id="header" ng-include="'views/common/header.html'"></div>
 
 <!-- Navigation -->
@@ -6,83 +6,48 @@
 
 <!-- Main Wrapper -->
 <div id="wrapper">
-   <div class="content" animate-panel>
+   <div ng-controller="alertsCtrl" class="content" animate-panel>
       <div class="row">
          <h1><i class="fa fa-exclamation-triangle"></i> Alerts</h1>
-         <p class="lead">Recent alerts</p>
+         <p class="lead">Showing alerts in the selected time range</p>
       </div>
-      <div class="row">
-         <div class="col-md-3">
-            <div class="hpanel">
-               <div class="panel-body">
-                  <div class="stats-title pull-left">
-                     <h4>Arbitrage</h4>
-                  </div>
-                  <div class="stats-icon pull-right">
-                     <i class="pe-7s-attention fa-4x"></i>
-                  </div>
-                  <div class="m-t-xl">
-                     <h1 class="text-danger">680</h1>
-                     <small>
-                        An <strong>arbitrage</strong> condition was detected
-                     </small>
-                  </div>
-               </div>
+      <div class="row history-form">
+         <form class="form-inline">
+            <div class="form-group">
+               <label class="sr-only" for="startTime">Start Date / Time</label>
+               <input class="form-control" id="startTime" date-time-picker placeholder="Start Date / Time" ng-model="startTime">
             </div>
-         </div>
+            <div class="form-group">
+               <label class="sr-only" for="endTime">End Date / Time</label>
+               <input class="form-control" id="endTime" date-time-picker placeholder="End Date / Time" ng-model="endTime">
+            </div>               
+            <button type="submit" class="btn btn-outline btn-success" ng-click="updateHistory()">Filter</button>
+         </form>
       </div>
-      <div class="row">
-         <div class="col-md-3">
-            <div class="hpanel hbgred">
-               <div class="panel-body">
-                  <div class="text-center">
-                     <h3>Scalper</h3>
-                     <p class="text-big font-light">
-                        52%
-                     </p>
-                     <small>
-                        A scalper condition was detected.
-                     </small>
-                  </div>
-               </div>
+      <div class="row m-t">
+         <div class="hpanel">
+            <div class="panel-body">
+               <table class="table table-striped table-hover">
+                  <thead>
+                     <tr>
+                        <th>Time</th>
+                        <th>ID</th>
+                        <th>Sequence Number</th>
+                        <th>Alert</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="alert in alerts">
+                        <td><a href="#">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
+                        <td>{{ alert.id }}</td>
+                        <td>{{ alert.sequence_number }}</td>
+                        <td><code>{{ alert.data }}</code></td>
+                     </tr>
+                  </tbody>
+               </table>
             </div>
-         </div>
-      </div>
-      <div class="row">
-         <div class="col-md-3">
-            <div class="hpanel">
-               <div class="panel-body">
-                  <div class="table-responsive">
-                     <table class="table table-striped">
-                        <thead>
-                           <tr>
-                              <th>Symbol</th>
-                              <th>Date</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           <tr>
-                              <td>
-                                 <span class="text-danger font-bold">EUR/USD</span>
-                              </td>
-                              <td>Jul 14, 2013</td>
-                           </tr>
-                           <tr>
-                              <td>
-                                 <span class="text-danger font-bold">USD/CAD</span>
-                              </td>
-                              <td>Jul 09, 2015</td>
-                           </tr>
-                           <tr>
-                              <td>
-                                 <span class="text-danger font-bold">EUR/CAD</span>
-                              </td>
-                              <td>Jul 24, 2014</td>
-                           </tr>
-                        </tbody>
-                     </table>
-                  </div>
-               </div>
+            <div class="panel-footer">
+               Total - <b>{{alerts.length}}</b> events
             </div>
          </div>
       </div>
