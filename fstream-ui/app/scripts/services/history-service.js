@@ -15,7 +15,7 @@
          getTicks: getTicks,
          getHistory: getHistory,
       };
-      
+
       return service;
 
       function getSymbols() {
@@ -41,8 +41,8 @@
       function getAlerts(params) {
          var series = 'alerts';
          var limit = 50;
-         var where = params.id ? ' WHERE id = ' + params.id + ' ' : '';
-         var query = 'SELECT * FROM "' + series + '"' + where + ' LIMIT ' + limit;
+         var where = getWhere(params, ['id', 'time']);
+         var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit;
 
          return executeQuery(query);
       }
@@ -76,14 +76,17 @@
 
       function getWhere(params, columns) {
          var conditions = [];
+         if (params.id && _.contains(columns, 'id')) {
+            conditions.push('id = \'' + params.id + '\'');
+         }
          if (params.symbol && _.contains(columns, 'symbol')) {
             conditions.push('symbol = \'' + params.symbol + '\'');
          }
          if (params.startTime && _.contains(columns, 'time')) {
-            conditions.push('time > ' + params.startTime + '');
+            conditions.push('time > ' + params.startTime + 's');
          }
          if (params.endTime && _.contains(columns, 'time')) {
-            conditions.push('time < ' + params.endTime + '');
+            conditions.push('time < ' + params.endTime + 's');
          }
 
          return conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
