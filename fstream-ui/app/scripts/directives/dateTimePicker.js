@@ -23,7 +23,8 @@ function dateTimePicker($rootScope) {
          elem.datetimepicker({
             pick12HourFormat: scope.pick12HourFormat,
             language: scope.language,
-            useCurrent: scope.useCurrent
+            useCurrent: scope.useCurrent,
+            format: 'YYYY-mm-DD HH:mm:ss'
          })
       }
    }
