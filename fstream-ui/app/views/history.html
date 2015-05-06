@@ -46,7 +46,7 @@
                   </thead>
                   <tbody>
                      <tr ng-repeat="tick in history">
-                        <td><a href="#">{{ tick.time | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
+                        <td><a href="#" class="hover-link">{{ tick.time | date:'yyyy-MM-dd HH:mm:ss Z' }}</a></td>
                         <td>{{ tick.symbol }}</td>
                         <td>{{ tick.ask | number:4}}</td>
                         <td>{{ tick.bid | number:4}}</td>

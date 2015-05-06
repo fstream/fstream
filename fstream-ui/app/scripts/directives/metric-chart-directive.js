@@ -23,6 +23,8 @@ angular.module('fstream').directive('metricChart', ['historyService', 'lodash', 
              opacity = 0.5,
              size = 50,
              enabled = true;
+         
+         var highlightColor = "#62CB31";
 
          chart = new Highcharts.StockChart({
             chart: {
@@ -116,11 +118,18 @@ angular.module('fstream').directive('metricChart', ['historyService', 'lodash', 
             }],
 
             scrollbar: {
-               barBackgroundColor: '#9fcc83',
+               barBackgroundColor: highlightColor,
+               barBorderColor: highlightColor,
+               
+               buttonArrowColor: highlightColor,
+               buttonBorderColor: highlightColor,
+               buttonBackgroundColor: 'white',
+               
+               rifleColor: 'white' 
             },
 
             navigator: {
-               outlineColor: '#489125',
+               outlineColor: highlightColor,
                maskFill: 'rgba(191, 220, 180, 0.5)',
 
                series: {
