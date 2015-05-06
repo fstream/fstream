@@ -23,6 +23,8 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
              opacity = 0.5 - (index / 6.0) * 0.5,
              maxTime = 0,
              enabled = true;
+         
+         var highlightColor = "#62CB31";
 
          chart = new Highcharts.StockChart({
             chart: {
@@ -125,11 +127,11 @@ angular.module('fstream').directive('tickChart', ['historyService', 'lodash', fu
             }],
 
             scrollbar: {
-               barBackgroundColor: '#9fcc83',
+               barBackgroundColor: highlightColor,
             },
 
             navigator: {
-               outlineColor: '#489125',
+               outlineColor: highlightColor,
                maskFill: 'rgba(191, 220, 180, 0.5)',
 
                series: {
