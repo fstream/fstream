@@ -39,6 +39,7 @@
                   <thead>
                      <tr>
                         <th>Time</th>
+                        <th>Broker</th>
                         <th>Symbol</th>
                         <th>Ask</th>
                         <th>Bid</th>
@@ -46,8 +47,9 @@
                   </thead>
                   <tbody>
                      <tr ng-repeat="tick in history">
-                        <td><a href="#" class="hover-link">{{ tick.time | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
-                        <td>{{ tick.symbol }}</td>
+                        <td><a ng-href="#"  class="hover-link" ng-click="updateTimeRange(tick.time)">{{ tick.time | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
+                        <td>OANDA</td>
+                        <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(tick.symbol)">{{ tick.symbol }}</a></td>
                         <td>{{ tick.ask | number:4}}</td>
                         <td>{{ tick.bid | number:4}}</td>
                      </tr>
