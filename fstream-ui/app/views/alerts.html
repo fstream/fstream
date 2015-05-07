@@ -20,7 +20,7 @@
             <div class="form-group">
                <label class="sr-only" for="endTime">End Date / Time</label>
                <input class="form-control" id="endTime" date-time-picker placeholder="End Date / Time" ng-model="endTime">
-            </div>               
+            </div>
             <button type="submit" class="btn btn-outline btn-success" ng-click="updateAlerts()">Filter</button>
          </form>
       </div>
@@ -39,21 +39,27 @@
                </thead>
                <tbody>
                   <tr ng-repeat="alert in alerts">
-                     <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
+                     <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a>
+                     </td>
                      <td>{{ alert.id }}</td>
                      <td>{{ alert.sequence_number }}</td>
                      <td>OANDA</td>
-                     <td><code>{{ alert.data }}</code></td>
+                     <td><code>{{ alert.data }}</code>
+                     </td>
                      <td>
                         <div class="input-group">
                            <div class="input-group-btn">
                               <button tabindex="-1" class="btn btn-default" type="button">Assign</button>
-                              <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><span class="caret"></span></button>
+                              <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><span class="caret"></span>
+                              </button>
                               <ul class="dropdown-menu pull-right">
-                                 <li><a href="">Flag</a></li>
-                                 <li><a href="">Review</a></li>
+                                 <li><a href="">Flag</a>
+                                 </li>
+                                 <li><a href="">Review</a>
+                                 </li>
                                  <li class="divider"></li>
-                                 <li><a href="">Report</a></li>
+                                 <li><a href="">Report</a>
+                                 </li>
                               </ul>
                            </div>
                         </div>
