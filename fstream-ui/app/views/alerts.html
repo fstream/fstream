@@ -39,7 +39,7 @@
                </thead>
                <tbody>
                   <tr ng-repeat="alert in alerts">
-                     <td><a href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
+                     <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
                      <td>{{ alert.id }}</td>
                      <td>{{ alert.sequence_number }}</td>
                      <td>OANDA</td>

@@ -19,8 +19,8 @@
 
       function updateAlerts() {
          var params = {
-            startTime: $scope.startTime && (moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix() - 1,
-            endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix()
+            startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
+            endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
          }
          historyService.getAlerts(params).then(function (alerts) {
             $scope.alerts = alerts;
