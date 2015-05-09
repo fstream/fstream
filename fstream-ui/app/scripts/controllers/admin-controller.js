@@ -8,5 +8,6 @@
    adminController.$inject = ['$scope'];
    
    function adminController($scope) {
+      $scope.test = 'foo'
    }
 })();

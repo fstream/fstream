@@ -28,8 +28,8 @@
                   <tr ng-repeat="alert in state.alerts">
                      <td>{{ alert.id }}</td>
                      <td>{{ alert.version }}</td>
-                     <td>{{ alert.description }}</td>
-                     <td><code>{{ alert.statement }}</code>
+                     <td><h4>{{ alert.name }}</h4>{{ alert.description }}</td>
+                     <td><prism class="language-sql" code="{{ alert.statement }}"></prism>
                      </td>
                      <td>
                         <div class="input-group">
@@ -69,8 +69,8 @@
                   <tr ng-repeat="metric in state.metrics">
                      <td>{{ metric.id }}</td>
                      <td>{{ metric.version }}</td>
-                     <td>{{ metric.description }}</td>
-                     <td><code>{{ metric.statement }}</code>
+                     <td><h4>{{ metric.name }}</h4>{{ metric.description }}</td>
+                     <td><prism class="language-sql" code="{{ metric.statement }}"></prism>
                      </td>
                      <td>
                         <div class="input-group">
