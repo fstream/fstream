@@ -1,13 +1,19 @@
-angular
-   .module('fstream')
-   .factory('stateService', ['$http', stateService]);
+(function(){
+   'use strict';
+   
+   angular
+      .module('fstream')
+      .factory('stateService', stateService);
 
-function stateService($http) {
-	return {
-		getState: function() {
-			return $http.get('/state').then(function(response) {
-				return response.data;
-			});              
-		}
-	} 
-}
+   stateService.$inject = ['$http'];
+   
+   function stateService($http) {
+      return {
+         getState: function() {
+            return $http.get('/state').then(function(response) {
+               return response.data;
+            });              
+         }
+      } 
+   }
+})();
