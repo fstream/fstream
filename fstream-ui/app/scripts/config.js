@@ -67,7 +67,16 @@ function configState($stateProvider, $urlRouterProvider, $compileProvider) {
                 pageTitle: 'Alerts',
             }
         })
-
+    
+        // Admin
+        .state('admin', {
+            url: "/admin",
+            templateUrl: "views/admin.html",
+            data: {
+                pageTitle: 'Admin',
+            }
+        })
+    
         // Interface
         .state('interface', {
             abstract: true,
