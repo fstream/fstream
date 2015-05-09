@@ -12,7 +12,11 @@
          <p class="lead">Showing <b>{{ rates.length }}</b> events for <b>{{ state.symbols.length }}</b> registered streams</p>
       </div>
       <div class="row">
-         <div id="rates"><prism ng-repeat="rate in rates" class="language-javascript" code="{{ rate | json }}"></prism></div>
+         <div id="rates">
+            <div class="col-sm-3" ng-repeat="rate in rates" >
+               <prism class="language-javascript" code="{{ rate | json }}"></prism>
+            </div>
+         </div>
       </div>
    </div>
 </div>
