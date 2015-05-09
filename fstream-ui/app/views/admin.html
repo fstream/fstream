@@ -13,6 +13,14 @@
       </div>
       <div class="row">
          <h3>Alerts</h3>
+         <div ui-ace="{
+           useWrapMode : true,
+           showGutter: true,
+           theme:'tomorrow',
+           mode: 'sql',
+           onLoad: aceLoaded,
+           onChange: aceChanged
+         }"></div>
          <div>
             <table datatable="ng" class="table table-striped table-hover">
                <thead>

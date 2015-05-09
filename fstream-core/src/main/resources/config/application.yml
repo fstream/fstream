@@ -80,7 +80,7 @@ state:
         description: Identifies AUDNZD cross pair mispricing
         statement: |
            SELECT 
-               adt, bdt, cdt,
+               adt,  bdt,  cdt,
                amid, bmid, cmid, 
                amid - (bmid * cmid) AS diff
            FROM 
@@ -97,7 +97,8 @@ state:
                   B AS Rate.symbol = 'AUD/NZD',
                   C AS Rate.symbol = 'NZD/USD'
            )
-           WHERE amid - (bmid * cmid) > 0.00001
+           WHERE
+               amid - (bmid * cmid) > 0.00001
 
    metrics:
 
