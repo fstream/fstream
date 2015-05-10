@@ -44,7 +44,9 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
   @PostConstruct
   public void initialize() {
     log.info("Creating local cluster using external zookeeper: {}:{}...", zkHost, zkPort);
-    this.cluster = new LocalCluster(zkHost, zkPort);
+    this.cluster = LocalClusters.createLocalCluster(zkHost, zkPort);
+
+    logClusterState();
   }
 
   @Override
