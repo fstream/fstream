@@ -5,9 +5,15 @@
       .module('fstream')
       .controller('adminController', adminController);
 
-   adminController.$inject = ['$scope', 'lodash'];
+   adminController.$inject = ['$scope', 'lodash', 'eventService'];
 
-   function adminController($scope, _) {
+   function adminController($scope, _, eventService) {
+      $scope.alert = {
+         name: '',
+         description: '',
+         statement: '',
+      };
+      
       $scope.aceLoaded = function (editor) {
          // Options
          editor.completers.push({
@@ -19,7 +25,10 @@
                callback(null, activeSymbols);
             }
          });
-
       };
+      
+      $scope.registerAlert = function(alert) {
+         eventService.register(alert);
+      }
    }
 })();

@@ -12,20 +12,46 @@
          <p class="lead">System alert and metric management</p>
       </div>
       <div class="row">
-         <h3>Alerts</h3>
-         <h4>Create New Alert</h4>
-         <div ui-ace="{
-           useWrapMode : true,
-           showGutter: true,
-           theme:'fstream',
-           mode: 'sql',
-           onLoad: aceLoaded,
-           require: ['ace/ext/language_tools'],
-           advanced: {
-               enableBasicAutocompletion: true,
-               enableLiveAutocompletion: true
-           }                      
-         }"></div>
+         <h3>Register Alert</h3>
+         <form class="form-horizontal">
+            <div class="form-group">
+               <label for="alert-name" class="col-sm-2 control-label">Name</label>
+               <div class="col-sm-6">
+                  <input type="text" ng-model="alert.name" class="form-control" id="alert-name" placeholder="Name">
+               </div>
+            </div>
+            <div class="form-group">
+               <label for="alert-description" class="col-sm-2 control-label">Description</label>
+               <div class="col-sm-6">
+                  <textarea id="alert-description" ng-model="alert.description" class="form-control" rows="3" placeholder="Description"></textarea>
+               </div>
+            </div>
+            <div class="form-group">
+               <label for="alert-statement" class="col-sm-2 control-label">Statement</label>
+               <div class="col-sm-6">
+                  <div id="alert-statement" ng-model="alert.statement" ui-ace="{
+                                                          useWrapMode : true,
+                                                          showGutter: true,
+                                                          theme:'fstream',
+                                                          mode: 'sql',
+                                                          onLoad: aceLoaded,
+                                                          require: ['ace/ext/language_tools'],
+                                                          advanced: {
+                                                          enableBasicAutocompletion: true,
+                                                          enableLiveAutocompletion: true
+                                                          }                      
+                                                          }"></div>
+               </div>
+            </div>            
+            <div class="form-group">
+               <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-outline btn-success" ng-click="registerAlert(alert)">Register</button>
+               </div>
+            </div>
+         </form>
+      </div>
+      <div class="row">
+         <h3>Alert Listing</h3>
          <div>
             <table datatable="ng" class="table table-striped table-hover">
                <thead>
@@ -65,8 +91,8 @@
             </table>
          </div>
       </div>
-       <div class="row">
-          <h3>Metrics</h3>
+      <div class="row">
+         <h3>Metric Listing</h3>
          <div>
             <table datatable="ng" class="table table-striped table-hover">
                <thead>
