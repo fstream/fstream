@@ -115,6 +115,11 @@ public class ComputeService implements StateListener {
         continue;
       }
 
+      if (metric.getId() == 0) {
+        val id = nextMetricId();
+        metric.setId(id);
+      }
+
       submitMetric(metric, symbols, common);
     }
   }
@@ -131,6 +136,10 @@ public class ComputeService implements StateListener {
 
   private int nextAlertId() {
     return Ordering.natural().max(this.alerts.keySet()) + 1;
+  }
+
+  private int nextMetricId() {
+    return Ordering.natural().max(this.metrics.keySet()) + 1;
   }
 
   private boolean isAlertExecuting(Alert alert) {
