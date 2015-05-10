@@ -5,9 +5,9 @@
       .module('fstream')
       .factory('eventService', eventService);
 
-   eventService = ['$rootScope', '$timeout'];
+   eventService = ['$rootScope', '$timeout', '$q'];
 
-   function eventService($rootScope, $timeout) {
+   function eventService($rootScope, $timeout, $q) {
       var stompClient,
           publishEvent = function (eventName, frame){
              $timeout(function() {
@@ -54,6 +54,9 @@
 
          register: function(alert){
             stompClient.send("/web/register", {}, angular.toJson(alert));
+            var deferred = $q.defer();
+            deferred.resolve({success: true});
+            return deferred.promise;
          }
 
       } 
