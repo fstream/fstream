@@ -11,7 +11,7 @@
       $scope.alert = {
          name: '',
          description: '',
-         statement: '',
+         statement: ''
       };
       
       $scope.aceLoaded = function (editor) {
