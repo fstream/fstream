@@ -22,7 +22,7 @@ buildscript {
 	ext.quickfixjVersion   = '1.5.3'
 	ext.camelVersion       = '2.13.2'
 	ext.kafkaVersion       = '0.8.1.1'
-	ext.stormVersion       = '0.9.3-rc1' // Snapshot for https://issues.apache.org/jira/browse/STORM-213
+	ext.stormVersion       = '0.9.4'
 	ext.hbaseVersion       = '0.98.5-hadoop1'
 	ext.hadoopVersion      = '1.2.1'
 	ext.influxdbVersion    = '1.5'
