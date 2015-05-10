@@ -57,7 +57,8 @@ public class StormJobFactory {
   /**
    * Constants.
    */
-  private static final int PARALLELISM = 1;
+  private static final int NUM_WORKERS = 1;
+  private static final int TASK_PARALLELISM = 1;
   private static final String FSTREAM_ZK_ROOT = "/storm";
   private static final String TOPIC_CONSUMER_ID_PREFIX = "storm-kafka-spout";
 
@@ -72,29 +73,29 @@ public class StormJobFactory {
   private StormProperties stormProperties;
 
   public StormJob createAlertJob(@NonNull Alert alert, List<String> symbols, List<String> common) {
-    // Singleton alert
+    // Single statement per alert
     val state = new State();
     state.setAlerts(ImmutableList.of(alert));
     state.setSymbols(symbols);
     state.setStatements(common);
 
-    return createJob("metric", state);
+    return createJob("alert" + "-" + alert.getId(), state);
   }
 
   public StormJob createMetricJob(@NonNull Metric metric, List<String> symbols, List<String> common) {
-    // Singleton metric
+    // Single statement per metric
     val state = new State();
     state.setMetrics(ImmutableList.of(metric));
     state.setSymbols(symbols);
     state.setStatements(common);
 
-    return createJob("metric", state);
+    return createJob("metric" + "-" + metric.getId(), state);
   }
 
   private StormJob createJob(@NonNull String prefix, @NonNull State state) {
     val jobId = createJobId(prefix);
 
-    return new StormJob(jobId, createConfig(state), createTopology(jobId, state));
+    return new StormJob(jobId, createConfig(state), createTopology(prefix, jobId, state));
   }
 
   @SneakyThrows
@@ -113,30 +114,30 @@ public class StormJobFactory {
     config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(state.getMetrics()));
 
     // Parallelism
-    config.setMaxTaskParallelism(PARALLELISM);
-    config.setNumWorkers(PARALLELISM);
+    config.setMaxTaskParallelism(TASK_PARALLELISM);
+    config.setNumWorkers(NUM_WORKERS);
 
     return config;
   }
 
-  private StormTopology createTopology(String jobId, State state) {
+  private StormTopology createTopology(String prefix, String jobId, State state) {
 
     /**
      * Setup
      */
     // IDs
-    val ratesSpoutId = "rates-spout";
-    val alertsSpoutId = "alerts-spout";
-    val alertsBoltId = "alerts-bolt";
-    val alertsKafkaBoltId = "alerts-kafka-bolt";
-    val metricsBoltId = "metrics-bolt";
-    val metricsKafkaBoltId = "metrics-kafka-bolt";
-    val loggerBoltId = "logger-bolt";
+    val ratesSpoutId = prefix + "-rates-spout";
+    val alertsSpoutId = prefix + "-alerts-spout";
+    val alertsBoltId = prefix + "-alerts-bolt";
+    val alertsKafkaBoltId = prefix + "-alerts-kafka-bolt";
+    val metricsBoltId = prefix + "-metrics-bolt";
+    val metricsKafkaBoltId = prefix + "-metrics-kafka-bolt";
+    val loggerBoltId = prefix + "-logger-bolt";
 
     // Shorthands
     val alertsExist = !state.getAlerts().isEmpty();
     val metricsExist = !state.getMetrics().isEmpty();
-    val parallelismHint = PARALLELISM;
+    val parallelismHint = TASK_PARALLELISM;
 
     // State
     val topologyBuilder = new TopologyBuilder();
@@ -147,12 +148,12 @@ public class StormJobFactory {
 
     if (alertsExist || metricsExist) {
       // Alerts and metrics Kafka rates input
-      topologyBuilder.setSpout(ratesSpoutId, createKafkaSpout(zkConnect, RATES), parallelismHint);
+      topologyBuilder.setSpout(ratesSpoutId, createKafkaSpout(prefix, zkConnect, RATES), parallelismHint);
     }
 
     if (metricsExist) {
       // Metrics Kafka alerts input
-      topologyBuilder.setSpout(alertsSpoutId, createKafkaSpout(zkConnect, ALERTS), parallelismHint);
+      topologyBuilder.setSpout(alertsSpoutId, createKafkaSpout(prefix, zkConnect, ALERTS), parallelismHint);
     }
 
     /**
@@ -198,10 +199,10 @@ public class StormJobFactory {
     return topologyBuilder.createTopology();
   }
 
-  private static IRichSpout createKafkaSpout(String zkConnect, Topic topic) {
+  private static IRichSpout createKafkaSpout(String prefix, String zkConnect, Topic topic) {
     val hosts = new ZkHosts(zkConnect);
     val zkRoot = getTopicZkRoot(topic);
-    val consumerId = createTopicConsumerId(topic);
+    val consumerId = createTopicConsumerId(topic, prefix);
 
     // Collect configuration
     val kafkaConf = new SpoutConfig(hosts, topic.getId(), zkRoot, consumerId);
@@ -221,9 +222,9 @@ public class StormJobFactory {
     return zkRoot;
   }
 
-  private static String createTopicConsumerId(Topic topic) {
+  private static String createTopicConsumerId(Topic topic, String id) {
     // The unique id for this consumer for storing the consumer offsets in ZooKeeper
-    val consumerId = TOPIC_CONSUMER_ID_PREFIX + "-" + topic.getId() + "-" + randomUUID().toString();
+    val consumerId = TOPIC_CONSUMER_ID_PREFIX + "-" + topic.getId() + "-" + id;
 
     return consumerId;
   }

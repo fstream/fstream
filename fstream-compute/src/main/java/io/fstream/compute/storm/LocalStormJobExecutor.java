@@ -14,6 +14,7 @@ import javax.annotation.PreDestroy;
 
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +45,6 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
   public void initialize() {
     log.info("Creating local cluster using external zookeeper: {}:{}...", zkHost, zkPort);
     this.cluster = new LocalCluster(zkHost, zkPort);
-    log.info("Finished creating local cluster");
   }
 
   @Override
@@ -52,6 +52,8 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
     log.info("Submitting local storm job '{}'...", job.getId());
     cluster.submitTopology(job.getId(), job.getConfig(), job.getTopology());
     log.info("Finished submitting local storm job '{}'", job.getId());
+
+    logClusterState();
   }
 
   @PreDestroy
@@ -59,6 +61,23 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
     log.info("Shutting down cluster...");
     cluster.shutdown();
     log.info("Finished shutting down cluster");
+  }
+
+  private void logClusterState() {
+    log.info("Cluster supervisors:");
+    for (val supervisor : cluster.getClusterInfo().get_supervisors()) {
+      log.info("  {}", supervisor);
+    }
+
+    log.info("Cluster topologies:");
+    for (val topology : cluster.getClusterInfo().get_topologies()) {
+      log.info("  {}", topology);
+    }
+
+    log.info("Cluster state:");
+    for (val entry : cluster.getState().entrySet()) {
+      log.info("  {}", entry);
+    }
   }
 
 }
