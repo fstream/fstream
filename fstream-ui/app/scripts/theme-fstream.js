@@ -48,18 +48,20 @@ color: #D1D1D1\
 .ace-tomorrow .ace_storage,\
 .ace-tomorrow .ace_storage.ace_type,\
 .ace-tomorrow .ace_support.ace_type {\
-color: #8959A8\
+color: #1990B8\
 }\
 .ace-tomorrow .ace_keyword.ace_operator {\
-color: #3E999F\
+color: #A67F59\
+}\
+.ace-tomorrow .ace_constant.ace_language {\
+color: #A67F59\
 }\
 .ace-tomorrow .ace_constant.ace_character,\
-.ace-tomorrow .ace_constant.ace_language,\
 .ace-tomorrow .ace_constant.ace_numeric,\
 .ace-tomorrow .ace_keyword.ace_other.ace_unit,\
 .ace-tomorrow .ace_support.ace_constant,\
 .ace-tomorrow .ace_variable.ace_parameter {\
-color: #F5871F\
+color: #C92C2C\
 }\
 .ace-tomorrow .ace_constant.ace_other {\
 color: #666969\
@@ -79,7 +81,7 @@ border-color: #4D4D4C\
 .ace-tomorrow .ace_entity.ace_name.ace_function,\
 .ace-tomorrow .ace_support.ace_function,\
 .ace-tomorrow .ace_variable {\
-color: #4271AE\
+color: #2F9C0A\
 }\
 .ace-tomorrow .ace_support.ace_class,\
 .ace-tomorrow .ace_support.ace_type {\
