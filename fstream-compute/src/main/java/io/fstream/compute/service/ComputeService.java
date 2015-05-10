@@ -32,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Ordering;
+
 /**
  * Compute job submission entry point.
  */
@@ -87,6 +89,11 @@ public class ComputeService implements StateListener {
         continue;
       }
 
+      if (alert.getId() == 0) {
+        val id = nextAlertId();
+        alert.setId(id);
+      }
+
       submitAlert(alert, symbols, common);
     }
   }
@@ -120,6 +127,10 @@ public class ComputeService implements StateListener {
 
     // TODO: Need to store job as well. Use Table
     metrics.put(metric.getId(), metric);
+  }
+
+  private int nextAlertId() {
+    return Ordering.natural().max(this.alerts.keySet()) + 1;
   }
 
   private boolean isAlertExecuting(Alert alert) {
