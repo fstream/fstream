@@ -1,9 +1,11 @@
 /**
  * fstream - ui
  * Copyright 2015 fstream.io
- *
  */
+
 (function () {
+   'use strict';
+   
    angular.module('fstream', [
       'ui.router',                // Angular flexible routing
       'ngSanitize',               // Angular-sanitize
@@ -26,6 +28,5 @@
       'ngLodash',
       'prism',
       'ui.ace'
-   ])
+   ]);
 })();
-
