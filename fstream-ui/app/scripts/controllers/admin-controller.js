@@ -32,6 +32,7 @@
       };
 
       $scope.registerAlert = function (alert) {
+         $scope.isSaving = true;
          eventService.register(alert).then(function(){
             sweetAlert.swal({
                title: "Registration Successful",
@@ -39,6 +40,7 @@
                type: "success",
                confirmButtonColor: "#62cb31"
             })
+            $scope.isSaving = false;
          });
       }
    }

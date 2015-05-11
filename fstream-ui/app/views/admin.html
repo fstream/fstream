@@ -14,6 +14,7 @@
       <div class="row">
          <h3>Register Alert</h3>
          <form class="form-horizontal">
+            <fieldset  ng-disabled="isSaving">
             <div class="form-group">
                <label for="alert-name" class="col-sm-2 control-label">Name</label>
                <div class="col-sm-6">
@@ -43,6 +44,7 @@
                                                           }"></div>
                </div>
             </div>            
+            </fieldset>
             <div class="form-group">
                <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-outline btn-success" ng-click="registerAlert(alert)">Register</button>
