@@ -1,7 +1,5 @@
 /**
- *
  * propsFilter
- *
  */
 
 angular
