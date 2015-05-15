@@ -59,3 +59,4 @@ packer_cache/
 
 # Vagrant
 .vagrant/
+/bin/
