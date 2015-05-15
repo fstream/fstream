@@ -21,3 +21,12 @@ kafka:
       zookeeper.connection.timeout.ms: 1000000
       group.id: 1
       broker.id: 0
+
+# InfluxDB
+influxdb:
+   username: root
+   password: root
+   port: 8086
+   host: localhost
+   database: fstream-events
+   url: http://${influxdb.host}:${influxdb.port}

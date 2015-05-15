@@ -97,16 +97,8 @@
       }
 
       function executeQuery(query) {
-         var databaseName = 'fstream-events';
-         var url = 'http://localhost:8086/db/' + databaseName + '/series';
-         var params = {
-            u: 'root',
-            p: 'root',
-            q: query
-         };
-
-         return $http.get(url, {
-            params: params
+         return $http.get('/history', {
+            params: {query: query}
          }).then(transformPoints);
       }
 
