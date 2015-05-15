@@ -24,7 +24,7 @@ Provisioning
 ---
 To create and provision the VM, clone the project, navigate to the `vagrant` directory and issue [`vagrant up`](http://docs.vagrantup.com/v2/cli/up.html):
  
- 	git clone git@github.com:icgc-dcc/dcc.git
+ 	git clone <project>
  	cd fstream/fstream/src/main/vagrant/aws
 	vagrant up
 

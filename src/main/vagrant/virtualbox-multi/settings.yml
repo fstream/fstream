@@ -9,6 +9,14 @@
 provider: virtualbox
 boxes:
 
+   # InfluxDB
+   - name: influxdb
+     groups:
+        - influxdb
+     virtualbox:
+        memory: 512
+        cpus: 1
+
    # ZooKeeper
    - name: zookeeper
      groups:

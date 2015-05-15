@@ -9,6 +9,13 @@
 provider: aws
 boxes:
 
+   # InfluxDB
+   - name: influxdb
+     groups:
+        - influxdb
+     aws:
+        instance_type: t2.micro
+
    # ZooKeeper
    - name: zookeeper
      groups:
