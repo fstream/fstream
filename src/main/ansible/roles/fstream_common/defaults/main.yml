@@ -7,6 +7,8 @@ fstream_uid: 3080
 fstream_gid: 3080
 fstream_rates_password:
 
+influxdb_host: localhost
+influxdb_port: 8086
 zk_host: localhost
 zk_port: 2181
 kafka_host: localhost
