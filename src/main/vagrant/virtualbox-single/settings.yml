@@ -12,6 +12,7 @@ boxes:
    # fStream
    - name: fstream
      groups:
+        - influxdb
         - zookeeper
         - kafka
         - storm
