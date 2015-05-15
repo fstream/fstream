@@ -51,6 +51,10 @@
 						<id>org.eclipse.ui.ide.multiFilter</id>
 						<arguments>1.0-projectRelativePath-equals-true-false-fstream-web</arguments>
 					</matcher>
+					<matcher>
+						<id>org.eclipse.ui.ide.multiFilter</id>
+						<arguments>1.0-projectRelativePath-equals-true-false-fstream-ui</arguments>
+					</matcher>
 				</arguments>
 			</matcher>
 		</filter>
