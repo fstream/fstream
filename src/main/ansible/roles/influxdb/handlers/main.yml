@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Restart influxdb
+  service: name=influxdb state=restarted
+
+- name: Wait for influxdb port
+  wait_for: port={{influxdb_client_port}} state=started
+
