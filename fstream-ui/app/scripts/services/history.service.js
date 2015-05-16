@@ -5,7 +5,7 @@
       .module('fstream')
       .factory('historyService', historyService);
 
-   historyService.$inject = ['$http', 'lodash']
+   historyService.$inject = ['$http', 'lodash'];
 
    function historyService($http, _) {
       var service = {
@@ -13,7 +13,7 @@
          getMetrics: getMetrics,
          getAlerts: getAlerts,
          getTicks: getTicks,
-         getHistory: getHistory,
+         getHistory: getHistory
       };
 
       return service;
@@ -60,12 +60,12 @@
          params = params || {};
          var series = 'ticks';
          var where = getWhere(params, ['time', 'symbol']);
-         var groupBy = 'symbol'
+         var groupBy = 'symbol';
          var limit = getLimit(params);
          var query = 'SELECT * FROM "' + series + '" ' + where + ' GROUP BY ' + groupBy + ' LIMIT ' + limit;
 
          return executeQuery(query);
-      };
+      }
 
       function getSeries(params) {
          var prefix = params.interval ? 'rollups.1' + params.interval + '.' : ''

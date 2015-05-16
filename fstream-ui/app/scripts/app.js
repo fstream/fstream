@@ -26,7 +26,6 @@
       'xeditable',                // Angular-xeditable
       'ui.select',                // AngularJS ui-select
       'ngLodash',
-      'prism',
       'ui.ace'
    ]);
 })();
