@@ -5,7 +5,7 @@
 
 (function () {
    'use strict';
-   
+
    angular
       .module('fstream')
       .config(configState)
@@ -13,6 +13,8 @@
          $rootScope.$state = $state;
          editableOptions.theme = 'bs3';
       });
+
+   configState.$inject = ['$stateProvider', '$urlRouterProvider', '$compileProvider'];
 
    function configState($stateProvider, $urlRouterProvider, $compileProvider) {
 
@@ -86,7 +88,7 @@
             pageTitle: 'Admin',
          }
       })
-      
+
       // Common views
       .state('common', {
             abstract: true,
