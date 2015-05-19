@@ -46,6 +46,14 @@ boxes:
         forwarded_ports:
            - guest: 8081
              host: 8080
+
+   # Persist
+   - name: fstream-persist
+     groups:
+        - fstream-persist
+     virtualbox:
+        memory: 512
+        cpus: 1
              
    # Rates
    - name: fstream-rates

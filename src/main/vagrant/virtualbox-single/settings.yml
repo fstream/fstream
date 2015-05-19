@@ -16,6 +16,7 @@ boxes:
         - zookeeper
         - kafka
         - storm
+        - fstream-persist
         - fstream-rates
         - fstream-compute
         - fstream-web
