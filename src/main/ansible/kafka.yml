@@ -14,12 +14,9 @@
   gather_facts: True
   sudo: yes
   vars:
-    zookeeper_node:    "{{ groups['zookeeper'][0] }}"
-    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
-    kafka_node:        "{{ groups['kafka'][0] }}"
-    kafka_address:     "{{ hostvars[kafka_node].ansible_eth0.ipv4.address }}"
+    kafka_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"    
     
   # Apply kafka role
   # TODO: Allow for multiple zookeepers
   roles: 
-    - { role: kafka, kafka_host_name: "{{ kafka_address }}", kafka_server_zookeeper_connect: [ "{{ zookeeper_address }}:2181" ] }
+    - { role: kafka, kafka_host_name: "{{ ansible_default_ipv4.address }}", kafka_server_zookeeper_hosts: "{{ kafka_zookeeper_servers }}" }
