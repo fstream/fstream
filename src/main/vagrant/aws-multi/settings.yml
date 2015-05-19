@@ -36,6 +36,13 @@ boxes:
         - storm
      aws:
         instance_type: t2.small
+
+   # Persist
+   - name: fstream-persist
+     groups:
+        - fstream-persist
+     aws:
+        instance_type: t2.micro
         
    # Rates
    - name: fstream-rates
