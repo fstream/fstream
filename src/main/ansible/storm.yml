@@ -14,10 +14,9 @@
   gather_facts: True
   sudo: yes
   vars:
-    zookeeper_node:    "{{ groups['zookeeper'][0] }}"
-    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
+    storm_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"
   
   # Apply Storm roles
   roles:
-    - { role: storm_supervisor, storm_zookeeper_servers: [ "{{ zookeeper_address }}" ] }
-    - { role: storm_nimbus,     storm_zookeeper_servers: [ "{{ zookeeper_address }}" ] }
+    - { role: storm_supervisor, storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }
+    - { role: storm_nimbus,     storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }

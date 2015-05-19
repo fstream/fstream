@@ -27,3 +27,5 @@ boxes:
              host: 8080
            - guest: 8080
              host: 8081
+           - guest: 8083
+             host: 9000             
