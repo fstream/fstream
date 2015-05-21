@@ -9,11 +9,13 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the Cloud
+# Provision the infrastructure
 - include: influxdb.yml 
 - include: zookeeper.yml
 - include: kafka.yml
 - include: storm.yml
+
+# Provision the application
 - include: fstream-rates.yml
 - include: fstream-compute.yml
 - include: fstream-persist.yml

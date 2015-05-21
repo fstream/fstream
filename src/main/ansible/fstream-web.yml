@@ -9,17 +9,17 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the VM
+# This single play playbook will provision fstream-web hosts
 - hosts: fstream-web
   gather_facts: False
   sudo: yes
   vars:
     influxdb_node:     "{{ groups['influxdb'][0] }}"
-    influxdb_address:  "{{ hostvars[influxdb_node].ansible_eth0.ipv4.address }}"  
+    influxdb_address:  "{{ hostvars[influxdb_node].ansible_default_ipv4.address }}"  
     zookeeper_node:    "{{ groups['zookeeper'][0] }}"
-    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
+    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_default_ipv4.address }}"
     kafka_node:        "{{ groups['kafka'][0] }}"
-    kafka_address:     "{{ hostvars[kafka_node].ansible_eth0.ipv4.address }}"
+    kafka_address:     "{{ hostvars[kafka_node].ansible_default_ipv4.address }}"
   
   # Apply theses roles
   roles: 

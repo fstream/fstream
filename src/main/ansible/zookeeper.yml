@@ -9,11 +9,13 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the VM
+# This single play playbook will provision ZooKeeper hosts
 - hosts: zookeeper
   gather_facts: True
   sudo: yes
+  vars:
+    zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"  
   
   # Apply theses roles
   roles: 
-    - zookeeper
+    - { role: zookeeper, zookeeper_servers: "{{ zookeeper_servers }}" }

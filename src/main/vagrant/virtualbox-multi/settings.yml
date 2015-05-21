@@ -39,7 +39,8 @@ boxes:
    # Storm
    - name: storm
      groups:
-        - storm
+        - storm-nimbus
+        - storm-supervisor
      virtualbox:
         memory: 512
         cpus: 1

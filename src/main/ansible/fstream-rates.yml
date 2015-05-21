@@ -9,15 +9,15 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the VM
+# This single play playbook will provision fstream-rates hosts
 - hosts: fstream-rates
   gather_facts: False
   sudo: yes
   vars:
     zookeeper_node:    "{{ groups['zookeeper'][0] }}"
-    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
+    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_default_ipv4.address }}"
     kafka_node:        "{{ groups['kafka'][0] }}"
-    kafka_address:     "{{ hostvars[kafka_node].ansible_eth0.ipv4.address }}"
+    kafka_address:     "{{ hostvars[kafka_node].ansible_default_ipv4.address }}"
     
   vars_prompt:
     - name: fstream_rates_password
