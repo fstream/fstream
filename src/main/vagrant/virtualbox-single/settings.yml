@@ -15,7 +15,8 @@ boxes:
         - influxdb
         - zookeeper
         - kafka
-        - storm
+        - storm-nimbus
+        - storm-supervisor
         - fstream-persist
         - fstream-rates
         - fstream-compute

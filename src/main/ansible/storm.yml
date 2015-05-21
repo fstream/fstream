@@ -9,14 +9,23 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the VM
-- hosts: storm
+# This multi play playbook will provision Storm hosts
+- hosts: storm-nimbus
   gather_facts: True
   sudo: yes
   vars:
     storm_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"
   
-  # Apply Storm roles
+  # Apply Storm nimbus role
+  roles:
+    - { role: storm_nimbus, storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }
+    
+- hosts: storm-supervisor
+  gather_facts: True
+  sudo: yes
+  vars:
+    storm_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"
+  
+  # Apply Storm supervisor role
   roles:
     - { role: storm_supervisor, storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }
-    - { role: storm_nimbus,     storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }

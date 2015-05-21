@@ -9,13 +9,13 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the VM
+# This single play playbook will provision fstream-persist hosts
 - hosts: fstream-persist
   gather_facts: False
   sudo: yes
   vars:
     influxdb_node:    "{{ groups['influxdb'][0] }}"
-    influxdb_address: "{{ hostvars[influxdb_node].ansible_eth0.ipv4.address }}"
+    influxdb_address: "{{ hostvars[influxdb_node].ansible_default_ipv4.address }}"
   
   # Apply theses roles
   roles: 

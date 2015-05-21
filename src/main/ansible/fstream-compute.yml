@@ -9,18 +9,18 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision the VM
+# This single play playbook will provision fstream-compute hosts
 - hosts: fstream-compute
   gather_facts: False
   sudo: yes
   vars:
-    zookeeper_node:    "{{ groups['zookeeper'][0] }}"
-    zookeeper_address: "{{ hostvars[zookeeper_node].ansible_eth0.ipv4.address }}"
-    kafka_node:        "{{ groups['kafka'][0] }}"
-    kafka_address:     "{{ hostvars[kafka_node].ansible_eth0.ipv4.address }}"
-    storm_node:        "{{ groups['storm'][0] }}"
-    storm_address:     "{{ hostvars[storm_node].ansible_eth0.ipv4.address }}"
+    zookeeper_node:       "{{ groups['zookeeper'][0] }}"
+    zookeeper_address:    "{{ hostvars[zookeeper_node].ansible_default_ipv4.address }}"
+    kafka_node:           "{{ groups['kafka'][0] }}"
+    kafka_address:        "{{ hostvars[kafka_node].ansible_default_ipv4.address }}"
+    storm_nimbus_node:    "{{ groups['storm-nimbus'][0] }}"
+    storm_nimbus_address: "{{ hostvars[storm_nimbus_node].ansible_default_ipv4.address }}"
   
   # Apply theses roles
   roles: 
-    - { role: fstream_compute, zk_host: "{{ zookeeper_address }}", kafka_host: "{{ kafka_address }}", storm_host: "{{ storm_address }}" }
+    - { role: fstream_compute, zk_host: "{{ zookeeper_address }}", kafka_host: "{{ kafka_address }}", storm_host: "{{ storm_nimbus_address }}" }

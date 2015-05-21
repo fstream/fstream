@@ -33,7 +33,8 @@ boxes:
    # Storm
    - name: storm
      groups:
-        - storm
+        - storm-nimbus
+        - storm-supervisor
      aws:
         instance_type: t2.small
 
