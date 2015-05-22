@@ -16,7 +16,7 @@ zk:
 kafka:
    host: localhost
    port: 6667
-   producerProperties: &kafkaProducerProperties
+   producerProperties:
       metadata.broker.list:  ${kafka.host}:${kafka.port}
       request.required.acks: 1
       serializer.class: kafka.serializer.StringEncoder
