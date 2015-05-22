@@ -9,6 +9,7 @@
 
 package io.fstream.core.util;
 
+import static com.google.common.base.Stopwatch.createStarted;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.IOException;
@@ -35,19 +36,21 @@ public class Port {
     val duration = timeUnit.toMillis(timeValue);
     val threshold = System.currentTimeMillis() + duration;
 
-    try (val socket = new Socket()) {
-      log.info("Waiting up to {} {} for {}:{} to become available...", timeValue, timeUnit, host, port);
-      while (System.currentTimeMillis() < threshold) {
-        try {
-          socket.connect(address, (int) duration);
+    log.info("Waiting up to {} {} for {}:{} to become available...", timeValue, timeUnit, host, port);
+    val watch = createStarted();
+    while (System.currentTimeMillis() < threshold) {
+      try (val socket = new Socket()) {
+        socket.connect(address, (int) duration);
 
-          break;
-        } catch (SocketException e) {
-          log.info("Waiting...");
-          Thread.sleep(SECONDS.toMillis(10));
-        }
+        log.info("Port available!");
+        return;
+      } catch (SocketException e) {
+        log.info("Waiting ({})...", watch);
+        Thread.sleep(SECONDS.toMillis(5));
       }
     }
+
+    log.warn("After {} {} portal not available for {}:{}!", timeValue, timeUnit, host, port);
   }
 
 }
