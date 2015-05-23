@@ -10,6 +10,7 @@
 package io.fstream.persist.config;
 
 import static org.apache.hadoop.hbase.HConstants.ZOOKEEPER_CLIENT_PORT;
+import static org.apache.hadoop.hbase.HConstants.ZOOKEEPER_QUORUM;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -24,12 +25,15 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class HBaseConfig {
 
+  @Value("${zk.host}")
+  private String zkHost;
   @Value("${zk.port}")
   private String zkPort;
 
   @Bean
   public org.apache.hadoop.conf.Configuration config() {
     val config = HBaseConfiguration.create();
+    config.set(ZOOKEEPER_QUORUM, zkHost);
     config.set(ZOOKEEPER_CLIENT_PORT, zkPort);
 
     return config;

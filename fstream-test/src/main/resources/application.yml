@@ -20,4 +20,3 @@ kafka:
       zookeeper.connect: ${zk.connect}
       zookeeper.connection.timeout.ms: 1000000
       group.id: 0
-      broker.id: 0

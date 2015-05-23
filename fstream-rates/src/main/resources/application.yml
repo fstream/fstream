@@ -14,10 +14,8 @@ zk:
 
 # Kafka
 kafka:
-   host: localhost
-   port: 6667
    producerProperties:
-      metadata.broker.list: ${kafka.host}:${kafka.port}
+      metadata.broker.list: localhost:6667
       partitioner.class: kafka.producer.DefaultPartitioner
       serializer.class: kafka.serializer.StringEncoder
 
