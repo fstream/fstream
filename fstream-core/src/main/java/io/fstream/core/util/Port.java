@@ -12,7 +12,6 @@ package io.fstream.core.util;
 import static com.google.common.base.Stopwatch.createStarted;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -20,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +31,8 @@ public class Port {
   private final String host;
   private final int port;
 
-  public void waitFor(long timeValue, TimeUnit timeUnit) throws IOException, InterruptedException {
+  @SneakyThrows
+  public void waitFor(long timeValue, TimeUnit timeUnit) {
     val address = new InetSocketAddress(host, port);
     val duration = timeUnit.toMillis(timeValue);
     val threshold = System.currentTimeMillis() + duration;

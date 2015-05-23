@@ -9,12 +9,18 @@
 
 package io.fstream.core.config;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import io.fstream.core.model.state.State;
 import io.fstream.core.service.StateService;
+import io.fstream.core.util.Port;
+import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 @ComponentScan("io.fstream")
@@ -25,5 +31,14 @@ public class CoreConfig {
 
   @Autowired
   protected StateService stateService;
+
+  @Bean
+  @Profile("disabled")
+  public Port zkPort(@Value("${zk.host}") String host, @Value("${zk.port}") int port) {
+    val zkPort = new Port(host, port);
+    zkPort.waitFor(1L, MINUTES);
+
+    return zkPort;
+  }
 
 }

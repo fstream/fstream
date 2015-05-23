@@ -25,12 +25,12 @@ import org.springframework.context.annotation.Profile;
 public class HBaseConfig {
 
   @Value("${zk.port}")
-  private String zkConnect;
+  private String zkPort;
 
   @Bean
   public org.apache.hadoop.conf.Configuration config() {
     val config = HBaseConfiguration.create();
-    config.set(ZOOKEEPER_CLIENT_PORT, zkConnect);
+    config.set(ZOOKEEPER_CLIENT_PORT, zkPort);
 
     return config;
   }
