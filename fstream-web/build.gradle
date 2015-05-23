@@ -31,8 +31,8 @@ dependencies {
   // Spring
   compile libraries.springBootActuator
   compile libraries.springBootWeb
-  compile "org.springframework.boot:spring-boot-starter-websocket:$springBootVersion"
-  compile "org.springframework:spring-messaging:$springVersion"
+  compile "org.springframework.boot:spring-boot-starter-websocket"
+  compile "org.springframework:spring-messaging"
 
   // InfluxDB
   compile libraries.influxdb
