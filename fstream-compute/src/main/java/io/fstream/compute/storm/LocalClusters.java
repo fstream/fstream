@@ -32,10 +32,10 @@ import backtype.storm.testing.TestJob;
 public final class LocalClusters {
 
   @NonNull
-  public static LocalCluster createLocalCluster(String zkHost, long zkPort) {
+  public static LocalCluster createLocalCluster(String zkServers, long zkPort) {
     val daemonConf = new Config();
     daemonConf.put(Config.TOPOLOGY_ACKER_EXECUTORS, 0);
-    daemonConf.put(Config.STORM_ZOOKEEPER_SERVERS, ImmutableList.of(zkHost));
+    daemonConf.put(Config.STORM_ZOOKEEPER_SERVERS, ImmutableList.of(zkServers));
     daemonConf.put(Config.STORM_ZOOKEEPER_PORT, zkPort);
 
     val clusterParams = new MkClusterParam();

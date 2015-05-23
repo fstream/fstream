@@ -32,7 +32,7 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
    * Configuration.
    */
   @Value("${zk.host}")
-  private String zkHost;
+  private String zkServers;
   @Value("${zk.port}")
   private long zkPort;
 
@@ -43,8 +43,8 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
 
   @PostConstruct
   public void initialize() {
-    log.info("Creating local cluster using external zookeeper: {}:{}...", zkHost, zkPort);
-    this.cluster = LocalClusters.createLocalCluster(zkHost, zkPort);
+    log.info("Creating local cluster using external zookeeper(s): {}:{}...", zkServers, zkPort);
+    this.cluster = LocalClusters.createLocalCluster(zkServers, zkPort);
 
     logClusterState();
   }
