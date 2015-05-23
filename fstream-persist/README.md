@@ -1,5 +1,5 @@
 fStream - Persist
----
+===
 
 This is the fStream persistence module. It can write to HBase or InfluxDB as a backend. To configure a backend, edit `spring.profiles.active` in `application.yml` to be `hbase` or `influxdb`
 

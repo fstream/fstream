@@ -9,6 +9,9 @@
 
 package io.fstream.compute.storm;
 
+import static io.fstream.core.util.ZooKeepers.parseZkPort;
+import static io.fstream.core.util.ZooKeepers.parseZkServers;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -31,10 +34,8 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
   /**
    * Configuration.
    */
-  @Value("${zk.host}")
-  private String zkServers;
-  @Value("${zk.port}")
-  private long zkPort;
+  @Value("${zk.connect}")
+  private String zkConnect;
 
   /**
    * State.
@@ -43,7 +44,10 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
 
   @PostConstruct
   public void initialize() {
-    log.info("Creating local cluster using external zookeeper(s): {}:{}...", zkServers, zkPort);
+    log.info("Creating local cluster using external zookeeper(s): {}...", zkConnect);
+
+    val zkServers = parseZkServers(zkConnect);
+    val zkPort = parseZkPort(zkConnect);
     this.cluster = LocalClusters.createLocalCluster(zkServers, zkPort);
 
     logClusterState();

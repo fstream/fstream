@@ -11,6 +11,7 @@ package io.fstream.compute.storm;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -18,9 +19,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
-
-import org.apache.storm.guava.collect.ImmutableList;
-
 import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
 import backtype.storm.LocalCluster;
@@ -32,10 +30,10 @@ import backtype.storm.testing.TestJob;
 public final class LocalClusters {
 
   @NonNull
-  public static LocalCluster createLocalCluster(String zkServers, long zkPort) {
+  public static LocalCluster createLocalCluster(List<String> zkServers, long zkPort) {
     val daemonConf = new Config();
     daemonConf.put(Config.TOPOLOGY_ACKER_EXECUTORS, 0);
-    daemonConf.put(Config.STORM_ZOOKEEPER_SERVERS, ImmutableList.of(zkServers));
+    daemonConf.put(Config.STORM_ZOOKEEPER_SERVERS, zkServers);
     daemonConf.put(Config.STORM_ZOOKEEPER_PORT, zkPort);
 
     val clusterParams = new MkClusterParam();

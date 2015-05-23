@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import io.fstream.core.model.state.State;
 import io.fstream.core.service.StateService;
 import io.fstream.core.util.Port;
+import io.fstream.core.util.ZooKeepers;
 import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,11 @@ public class CoreConfig {
 
   @Bean
   @Profile("disabled")
-  public Port zkPort(@Value("${zk.host}") String host, @Value("${zk.port}") int port) {
-    val zkPort = new Port(host, port);
+  public Port zkPort(@Value("${zk.connect}") String zkConnect) {
+    val hosts = ZooKeepers.parseZkConnect(zkConnect);
+    val host = hosts.get(0); // Arbitrary
+
+    val zkPort = new Port(host.getHostText(), host.getPort());
     zkPort.waitFor(1L, MINUTES);
 
     return zkPort;

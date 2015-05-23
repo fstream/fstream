@@ -13,9 +13,7 @@ spring:
 
 # ZooKeeper
 zk:
-   host: localhost
-   port: 21812
-   connect: ${zk.host}:${zk.port}
+   connect: localhost:21812
 
 # Kafka
 kafka:
