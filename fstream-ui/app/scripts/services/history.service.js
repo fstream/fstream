@@ -105,9 +105,7 @@
       function transformPoints(result) {
          var data = _.get(result, 'data[0]', {});
 
-         return _.map(data.points, function (point) {
-            return _.zipObject(data.columns, point);
-         });
+         return data.rows;
       }
    }
 })();
