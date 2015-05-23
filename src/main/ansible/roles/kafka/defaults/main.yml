@@ -2,7 +2,7 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 # The version of Kafka to install
-kafka_version: "0.8.1.1"
+kafka_version: "0.8.2.0"
 
 # The version of Scala for Kafka to install with
 kafka_scala_version: "2.10"
