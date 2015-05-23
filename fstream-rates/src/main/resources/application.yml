@@ -8,9 +8,7 @@
 
 # ZooKeeper
 zk:
-   host: localhost
-   port: 21812
-   connect: ${zk.host}:${zk.port}
+   connect: localhost:21812
 
 # Kafka
 kafka:
@@ -26,8 +24,7 @@ fstream:
         "kafka:\
         ${kafka.producerProperties.metadata.broker.list}?\
         topic=rates&\
-        zookeeperHost=${zk.host}&\
-        zookeeperPort=${zk.port}&\
+        zookeeperConnect=${zk.connect}&\
         partitioner=${kafka.producerProperties.partitioner.class}&\
         serializerClass=${kafka.producerProperties.serializer.class}"
 

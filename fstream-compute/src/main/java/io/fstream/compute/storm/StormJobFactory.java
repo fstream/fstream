@@ -9,9 +9,13 @@
 
 package io.fstream.compute.storm;
 
+import static backtype.storm.Config.STORM_ZOOKEEPER_PORT;
+import static backtype.storm.Config.STORM_ZOOKEEPER_SERVERS;
 import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import static io.fstream.core.model.topic.Topic.RATES;
+import static io.fstream.core.util.ZooKeepers.parseZkPort;
+import static io.fstream.core.util.ZooKeepers.parseZkServers;
 import static java.util.UUID.randomUUID;
 import io.fstream.compute.bolt.AlertBolt;
 import io.fstream.compute.bolt.EsperBolt;
@@ -101,6 +105,8 @@ public class StormJobFactory {
   @SneakyThrows
   private Config createConfig(State state) {
     val config = new Config();
+    config.put(STORM_ZOOKEEPER_SERVERS, parseZkServers(zkConnect));
+    config.put(STORM_ZOOKEEPER_PORT, parseZkPort(zkConnect));
     config.putAll(stormProperties.getProperties());
     config.setDebug(stormProperties.isDebug());
 
