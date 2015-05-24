@@ -7,4 +7,9 @@
 # Directories
 staging_dir: "/tmp"
 fstream_dir: "../../.."
+
+# Versions
 fstream_version: "0.0.1-SNAPSHOT"
+
+# Hosts
+zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"  

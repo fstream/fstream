@@ -11,10 +11,10 @@
   command: "tar xzf {{ staging_dir }}/{{  kafka_archive }} -C /usr/local/ creates=/usr/local/{{ kafka_dir }}" 
   
 - name: Update the kafka install permissions
-  file: path=/usr/local/kafka_2.10-0.8.1.1 owner={{ kafka_user }} group={{ kafka_group }} state=directory recurse=yes
+  file: path=/usr/local/{{ kafka_artifact }} owner={{ kafka_user }} group={{ kafka_group }} state=directory recurse=yes
 
 - name: Update the symbolic link to the kafka install
-  file: path=/usr/local/kafka src=/usr/local/kafka_2.10-0.8.1.1 state=link force=yes
+  file: path=/usr/local/kafka src=/usr/local/{{ kafka_artifact }} state=link force=yes
 
 - name: Make sure the local working directory for kafka is present
   file: path={{ kafka_local_dir }} owner={{ kafka_user }} group={{ kafka_group }} mode=0750 state=directory

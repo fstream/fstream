@@ -9,6 +9,7 @@
 
 package io.fstream.test.hbase;
 
+import static io.fstream.core.util.ZooKeepers.parseZkPort;
 import static org.apache.hadoop.hbase.HConstants.ZOOKEEPER_CLIENT_PORT;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -48,15 +49,13 @@ public class EmbeddedHBase {
   }
 
   private Configuration createConfiguration() {
+    val clientPort = parseZkPort(zkConnect);
+
     log.info("Creating configuation with zkConnect = '{}'", zkConnect);
     val config = HBaseConfiguration.create();
-    config.set("test." + ZOOKEEPER_CLIENT_PORT, getZkClientPort());
+    config.set("test." + ZOOKEEPER_CLIENT_PORT, Integer.toString(clientPort));
 
     return config;
-  }
-
-  private String getZkClientPort() {
-    return zkConnect.split(":")[1];
   }
 
 }

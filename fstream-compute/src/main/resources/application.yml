@@ -13,7 +13,7 @@ zk:
 # Kafka
 kafka:
    producerProperties:
-      metadata.broker.list: localhost:6667
+      metadata.broker.list: ${kafka.broker.list:localhost:6667}
       request.required.acks: 1
       serializer.class: kafka.serializer.StringEncoder
       
