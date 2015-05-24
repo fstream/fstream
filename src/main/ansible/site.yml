@@ -10,10 +10,10 @@
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
 # Provision the infrastructure
-- include: influxdb.yml 
 - include: zookeeper.yml
-- include: kafka.yml
 - include: storm.yml
+- include: kafka.yml
+- include: influxdb.yml 
 
 # Provision the application
 - include: fstream-rates.yml
