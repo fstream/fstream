@@ -13,9 +13,7 @@
 - hosts: kafka
   gather_facts: True
   sudo: yes
-  vars:
-    kafka_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"    
     
   # Apply kafka role
   roles: 
-    - { role: kafka, kafka_host_name: "{{ ansible_default_ipv4.address }}", kafka_server_zookeeper_hosts: "{{ kafka_zookeeper_servers }}" }
+    - { role: kafka, kafka_host_name: "{{ ansible_default_ipv4.address }}", kafka_server_zookeeper_hosts: "{{ zookeeper_servers }}" }

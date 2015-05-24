@@ -13,19 +13,15 @@
 - hosts: storm-nimbus
   gather_facts: True
   sudo: yes
-  vars:
-    storm_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"
   
   # Apply Storm nimbus role
   roles:
-    - { role: storm_nimbus, storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }
+    - { role: storm_nimbus, storm_zookeeper_servers: "{{ zookeeper_servers }}" }
     
 - hosts: storm-supervisor
   gather_facts: True
   sudo: yes
-  vars:
-    storm_zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"
   
   # Apply Storm supervisor role
   roles:
-    - { role: storm_supervisor, storm_zookeeper_servers: "{{ storm_zookeeper_servers }}" }
+    - { role: storm_supervisor, storm_zookeeper_servers: "{{ zookeeper_servers }}" }

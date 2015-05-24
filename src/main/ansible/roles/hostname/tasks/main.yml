@@ -1,5 +1,5 @@
 ---
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Update hostname
   command: sudo hostname {{ hostname }}
@@ -9,3 +9,5 @@
 
 - name: Update /etc/hosts
   lineinfile: dest=/etc/hosts regexp="^127.0.0.1    {{ fqdn }}    {{ hostname }}" line="127.0.0.1    {{ fqdn }}    {{ hostname }}" state=present
+
+- include: hosts.yml

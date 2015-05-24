@@ -9,6 +9,8 @@
 
 package io.fstream.test.zk;
 
+import static io.fstream.core.util.ZooKeepers.parseZkPort;
+
 import java.io.File;
 
 import lombok.NonNull;
@@ -36,7 +38,8 @@ public class EmbeddedZooKeeper {
   private TestingServer server;
 
   public void startUp() throws Exception {
-    val clientPort = getZkClientPort();
+    log.info("Parsing client port with zkConnect = '{}'", zkConnect);
+    val clientPort = parseZkPort(zkConnect);
 
     log.info("Starting testing server using tempDir '{}'...", tempDir.getAbsolutePath());
     server = new TestingServer(clientPort, tempDir);
@@ -47,11 +50,6 @@ public class EmbeddedZooKeeper {
     log.info("Stopping testing server...");
     server.stop();
     log.info("Finished topting testing server");
-  }
-
-  private int getZkClientPort() {
-    log.info("Parsing client port with zkConnect = '{}'", zkConnect);
-    return Integer.valueOf(zkConnect.split(":")[1]);
   }
 
 }

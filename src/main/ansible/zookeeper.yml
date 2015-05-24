@@ -13,8 +13,6 @@
 - hosts: zookeeper
   gather_facts: True
   sudo: yes
-  vars:
-    zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"  
   
   # Apply theses roles
   roles: 
