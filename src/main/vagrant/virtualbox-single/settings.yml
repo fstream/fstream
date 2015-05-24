@@ -22,7 +22,7 @@ boxes:
         - fstream-compute
         - fstream-web
      virtualbox:
-        memory: 4096
+        memory: 8192
         cpus: 8
         forwarded_ports:
            - guest: 8081

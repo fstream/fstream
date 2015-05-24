@@ -20,6 +20,8 @@ supervisor.slots.ports:
 
 storm.local.dir: {{storm_local_dir}}
 
+storm.log.dir: {{storm_log_dir}}
+
 drpc.servers:
 {% for server in storm_drpc_servers %}
   - {{server}}
