@@ -1,5 +1,5 @@
 [program:kafka-broker]
-command=env JMX_PORT={{kafka_server_JMX_PORT}} 
+command=env JMX_PORT={{ kafka_server_JMX_PORT }} LOG_DIR={{ kafka_logs_dir }}
    /usr/local/kafka/bin/kafka-server-start.sh 
    /usr/local/kafka/config/server.properties
 priority=2

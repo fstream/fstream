@@ -8,6 +8,7 @@ storm_artifact: "apache-storm-{{ storm_version }}"
 storm_archive: "{{ storm_artifact }}.tar.gz"
 storm_archive_url: "{{ storm_url }}/{{ storm_artifact }}/{{ storm_archive }}"
 storm_dir: "{{ storm_artifact }}"
+storm_log_dir: "/var/log/storm"
 
 storm_user: storm
 storm_group: storm
