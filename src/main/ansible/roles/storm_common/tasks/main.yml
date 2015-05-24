@@ -1,14 +1,6 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Make sure storm is not running under supervisord
-  supervisorctl: name={{ item }} state=stopped
-  with_items:
-    - storm-drpc
-    - storm-nimbus
-    - storm-ui
-    - storm-supervisor
-
 - include: dependencies.yml
 - include: jzmq.yml
 - include: user.yml

@@ -5,5 +5,5 @@
   service: name=influxdb state=restarted
 
 - name: Wait for influxdb port
-  wait_for: port={{influxdb_client_port}} state=started
+  wait_for: port={{ influxdb_client_port }} state=started
 

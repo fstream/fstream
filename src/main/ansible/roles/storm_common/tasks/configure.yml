@@ -1,8 +1,8 @@
 ---
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Update the storm configuration
   template: src=storm.yaml.j2 dest=/usr/local/storm/conf/storm.yaml owner={{ storm_user }} group={{ storm_group }} mode=0644
 
-# - name: Update the storm logging
+#- name: Update the storm logging
 #  template: src=cluster.xml.j2 dest=/usr/local/storm/logback/cluster.xml owner={{ storm_user }} group={{ storm_group }} mode=0644

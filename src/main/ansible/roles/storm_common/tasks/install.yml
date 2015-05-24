@@ -2,7 +2,7 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 - name: Make sure the storm log dir exists
-  file: path=/var/log/storm state=directory owner={{ storm_user }} group={{ storm_group }} mode=0755 recurse=yes
+  file: path={{ storm_log_dir }} state=directory owner={{ storm_user }} group={{ storm_group }} mode=0755 recurse=yes
 
 - name: Download storm distribution
   get_url: "url={{ storm_archive_url }} dest=/tmp/{{ storm_archive }} mode=0444"
