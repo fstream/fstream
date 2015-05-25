@@ -41,3 +41,4 @@ task run(type: GruntTask, dependsOn: setup) {
 }
 
 build.dependsOn gruntBuild
+jar.dependsOn gruntBuild
