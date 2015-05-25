@@ -198,3 +198,13 @@ task kill << {
 		}
 	}
 }
+
+
+/**
+ * Provisions Vagrant.
+ */
+task vagrant(type:Exec) {
+	workingDir "src/main/vagrant/virtualbox-single"
+	commandLine "vagrant", "up"
+	standardInput = System.in
+}
