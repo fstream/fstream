@@ -137,7 +137,6 @@ subprojects {
 	}
 }
 
-
 /**
  * Run fStream in "vagrant up / fig up" style.
  */
@@ -199,11 +198,10 @@ task kill << {
 	}
 }
 
-
 /**
  * Provisions Vagrant.
  */
-task vagrant(type:Exec) {
+task vagrant(type: Exec, dependsOn: subprojects.collectNested { p -> p.tasks.matching { t -> t.name.endsWith("distTar") } }) {
 	workingDir "src/main/vagrant/virtualbox-single"
 	commandLine "vagrant", "up"
 	standardInput = System.in

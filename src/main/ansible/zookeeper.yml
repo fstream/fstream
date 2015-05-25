@@ -16,4 +16,4 @@
   
   # Apply theses roles
   roles: 
-    - { role: zookeeper, zookeeper_servers: "{{ zookeeper_servers }}" }
+    - { role: zookeeper, zookeeper_servers: "{{ zookeeper_connect_servers }}", zookeeper_client_port: "{{ zookeeper_connect_port }}" }

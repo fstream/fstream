@@ -13,10 +13,7 @@
 - hosts: fstream-persist
   gather_facts: False
   sudo: yes
-  vars:
-    influxdb_node:    "{{ groups['influxdb'][0] }}"
-    influxdb_address: "{{ hostvars[influxdb_node].ansible_default_ipv4.address }}"
   
   # Apply theses roles
   roles: 
-    - { role: fstream_persist, influxdb_host: "{{ influxdb_address }}" }
+    - fstream_persist

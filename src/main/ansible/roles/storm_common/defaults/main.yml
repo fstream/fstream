@@ -15,14 +15,20 @@ storm_group: storm
 storm_uid: 3060
 storm_gid: 3060
 
+storm_zookeeper_port: 2181
 storm_zookeeper_servers:
   - "localhost"
-storm_zookeeper_port: 2181
+
 storm_nimbus_host: "localhost"
 storm_nimbus_childopts: "-Xmx1024m -Djava.net.preferIPv4Stack=true"
+
 storm_ui_childopts: "-Xmx768m -Djava.net.preferIPv4Stack=true"
-storm_supervisor_childopts: "-Djava.net.preferIPv4Stack=true"
+
 storm_worker_childopts: "-Xmx768m -Djava.net.preferIPv4Stack=true"
+
+storm_supervisor_childopts: "-Djava.net.preferIPv4Stack=true"
+
+# TODO: Make dynamic based on a count
 storm_supervisor_slots_ports:
   - "6700"
   - "6701"
@@ -30,6 +36,7 @@ storm_supervisor_slots_ports:
   - "6703"
   - "6704"
   - "6705"
+  
 storm_local_dir: /home/storm
 storm_drpc_servers:
   - "localhost"
