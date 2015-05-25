@@ -5,10 +5,10 @@ command=java
    --server.port={{ http_port }} 
    --influxdb.host={{ influxdb_host }} 
    --influxdb.port={{ influxdb_port }} 
-   --zk.connect={{ zk_host }}:{{ zk_port }} 
-   --kafka.producerProperties.metadata.broker.list={{ kafka_host }}:{{ kafka_port }}
+   --zk.connect={{ zookeeper_connect }} 
+   --kafka.broker.list={{ kafka_broker_list }}
    --storm.local=false 
-   --storm.host={{ storm_host }} 
+   --storm.host={{ storm_nimbus_host }} 
    --rates.password={{ fstream_rates_password }} 
    start-foreground
 priority={{ priority }}

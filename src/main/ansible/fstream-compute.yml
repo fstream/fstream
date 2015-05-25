@@ -13,14 +13,7 @@
 - hosts: fstream-compute
   gather_facts: False
   sudo: yes
-  vars:
-    zookeeper_node:       "{{ groups['zookeeper'][0] }}"
-    zookeeper_address:    "{{ hostvars[zookeeper_node].ansible_default_ipv4.address }}"
-    kafka_node:           "{{ groups['kafka'][0] }}"
-    kafka_address:        "{{ hostvars[kafka_node].ansible_default_ipv4.address }}"
-    storm_nimbus_node:    "{{ groups['storm-nimbus'][0] }}"
-    storm_nimbus_address: "{{ hostvars[storm_nimbus_node].ansible_default_ipv4.address }}"
   
   # Apply theses roles
   roles: 
-    - { role: fstream_compute, zk_host: "{{ zookeeper_address }}", kafka_host: "{{ kafka_address }}", storm_host: "{{ storm_nimbus_address }}" }
+    - fstream_compute

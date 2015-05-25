@@ -16,4 +16,4 @@
     
   # Apply kafka role
   roles: 
-    - { role: kafka, kafka_host_name: "{{ ansible_default_ipv4.address }}", kafka_server_zookeeper_hosts: "{{ zookeeper_servers }}" }
+    - { role: kafka, kafka_host_name: "{{ inventory_hostname }}", kafka_server_port: "{{ kafka_broker_port }}", kafka_zookeeper_connect: "{{ zookeeper_connect }}" }

@@ -9,9 +9,10 @@ fstream_rates_password:
 
 influxdb_host: localhost
 influxdb_port: 8086
-zk_host: localhost
-zk_port: 2181
-kafka_host: localhost
-kafka_port: 9092
+
+zookeeper_connect: localhost:2181
+
+kafka_broker_list: localhost:9092
+
 storm_host: localhost
 storm_port: 6627

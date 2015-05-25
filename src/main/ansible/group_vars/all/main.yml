@@ -11,5 +11,15 @@ fstream_dir: "../../.."
 # Versions
 fstream_version: "0.0.1-SNAPSHOT"
 
-# Hosts
-zookeeper_servers: "{{ hostvars | group_ips(groups, 'zookeeper') }}"  
+# ZooKeeper
+zookeeper_connect_port: "2181"
+zookeeper_connect_servers: "{{ groups.zookeeper }}"
+zookeeper_connect: "{{ zookeeper_connect_servers | join(':' + zookeeper_connect_port + ',') }}:{{ zookeeper_connect_port }}"
+
+# Kafka
+kafka_broker_port: "9092"
+kafka_broker_servers: "{{ groups.kafka }}"
+kafka_broker_list: "{{ kafka_broker_servers | join(':' + kafka_broker_port + ',') }}:{{ kafka_broker_port }}"
+
+# Storm
+storm_nimbus_host: "{{ groups['storm-nimbus'][0] }}"
