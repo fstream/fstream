@@ -8,11 +8,11 @@ command=java
    --zk.connect={{ zookeeper_connect }} 
    --kafka.broker.list={{ kafka_broker_list }}
    --storm.local=false 
-   --storm.host={{ storm_nimbus_host }} 
+   --storm.nimbus.host={{ storm_nimbus_host }} 
    --rates.password={{ fstream_rates_password }} 
    start-foreground
 priority={{ priority }}
-user={{fstream_user}}
+user={{ fstream_user }}
 autostart=true
 autorestart=true
 startsecs=10
