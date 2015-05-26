@@ -14,7 +14,7 @@ boxes:
      groups:
         - influxdb
      virtualbox:
-        memory: 512
+        memory: 1024
         cpus: 1
         forwarded_ports:
            - guest: 8083
@@ -25,7 +25,7 @@ boxes:
      groups:
         - zookeeper
      virtualbox:
-        memory: 512
+        memory: 256
         cpus: 1
         
    # Kafka
@@ -33,7 +33,7 @@ boxes:
      groups:
         - kafka
      virtualbox:
-        memory: 512
+        memory: 1024
         cpus: 1
         
    # Storm
@@ -42,7 +42,7 @@ boxes:
         - storm-nimbus
         - storm-supervisor
      virtualbox:
-        memory: 512
+        memory: 1024
         cpus: 1
         forwarded_ports:
            - guest: 8081
