@@ -12,7 +12,7 @@
   when: config_has_ip|failed
 
 - name: Update config
-  template: src=config.toml dest=/opt/influxdb/shared/config.toml
+  template: src=config.toml dest=/opt/influxdb/current/config.toml
   notify:
     - Restart influxdb
     - Wait for influxdb port
