@@ -30,7 +30,10 @@ provider = settings['provider']
 
 # Ansible config
 @ansible_path = "../../ansible"
+@playbook = @ansible_path + "/" + "site.yml"
+@limit = ['all']
 @extra_vars = {}
+@verbose = 'vv'
 
 # Ansible environment. See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
@@ -139,11 +142,12 @@ end
 
 def provision(vms)
   vms.vm.provision :ansible do |ansible|
-    ansible.playbook = @ansible_path + "/" + "site.yml"
-    ansible.limit = 'all'
+    # Base configuration
+    ansible.playbook = @playbook
+    ansible.limit = @limit
     ansible.groups = @groups
     ansible.extra_vars = @extra_vars
-    ansible.verbose = 'vv'
+    ansible.verbose = @verbose
     
     # Avoids ssh: connect to host <ip-address> port 22: Host is down
     ansible.raw_arguments = "--timeout=60"
