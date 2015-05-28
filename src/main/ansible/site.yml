@@ -22,6 +22,11 @@
 #    - { role: hostname, sudo: yes }
 #
 
+# Upfront, gather all the IPs required to generate the /etc/hosts on each machine. 
+# The alternative would only have cumulative IPs as provisioning proceeds serially through hosts. 
+- hosts: all
+  gather_facts: True
+
 # Provision the infrastructure
 - include: influxdb.yml 
 - include: zookeeper.yml
