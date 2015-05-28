@@ -26,6 +26,8 @@
 # The alternative would only have cumulative IPs as provisioning proceeds serially through hosts. 
 - hosts: all
   gather_facts: True
+  roles:
+    - ntp
 
 # Provision the infrastructure
 - include: influxdb.yml 
