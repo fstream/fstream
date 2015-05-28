@@ -1,0 +1,16 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- name: Install NTP daemon
+  sudo: true
+  apt: pkg=ntp state=present
+
+- name: Ensure NTP daemon autostart
+  sudo: true
+  service: name=ntp enabled=yes
+
+- name: Setup NTP daemon config
+  sudo: true
+  #template: src=etc/ntpd.conf.j2 dest=/etc/ntpd.conf
+  debug: msg=Hi!
+  notify: Restart NTP daemon
