@@ -9,6 +9,19 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
+# ***
+# *** Enable this for debugging:
+# ***
+
+#- hosts: all
+#  tasks:
+#    - debug: var=hostvars['influxdb']
+#    - debug: var=default_ipv4_interface
+#    - debug: var=hostvars['influxdb'][default_ipv4_interface]
+#  roles:
+#    - { role: hostname, sudo: yes }
+#
+
 # Provision the infrastructure
 - include: influxdb.yml 
 - include: zookeeper.yml

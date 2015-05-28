@@ -7,6 +7,7 @@
 # Directories
 staging_dir: "/tmp"
 fstream_dir: "../../.."
+default_ipv4_interface: ansible_eth0
 
 # Versions
 fstream_version: "0.0.1-SNAPSHOT"

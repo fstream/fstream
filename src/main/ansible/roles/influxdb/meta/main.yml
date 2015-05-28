@@ -2,4 +2,4 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 dependencies:
-  - { role: hostname }
+  - { role: hostname, sudo: yes }
