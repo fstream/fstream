@@ -14,7 +14,7 @@ supervisor.childopts: {{ storm_supervisor_childopts }}
 worker.childopts: {{ storm_worker_childopts }}
 
 supervisor.slots.ports:
-{% for port in storm_supervisor_slots_ports %}
+{% for port in range(6700, 6700 + storm_supervisor_slots) %}
   - {{ port }}
 {% endfor %}
 
