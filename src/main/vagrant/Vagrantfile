@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# Copyright (c) 2015 fStream. All Rights Reserved.
 #
 # fStream - VirtualBox VM Vagrant file
 #
@@ -9,9 +10,12 @@
 #   meta data driven provider and Ansible provisioner.
 #
 # See:
+#   Vagrant:
 #   - http://docs.vagrantup.com/v2/provisioning/ansible.html
 #   - http://docs.vagrantup.com/v2/virtualbox/configuration.html
 #   - https://github.com/mitchellh/vagrant-aws
+#
+#   Ansible:
 #   - http://www.ansibleworks.com/docs/
 #   - http://www.ansibleworks.com/docs/guide_vagrant.html
 #   - http://jinja.pocoo.org/docs/templates/
@@ -72,7 +76,9 @@ Vagrant.configure("2") do |config|
 	       aws(vms, box)
        end
        
-       # Last box always runs Ansible provisioner
+       #
+       # Pro tip: Last box always runs Ansible provisione for all the boxes. Forces all boxes to be up beforehand
+       #
        if index == boxes.length - 1
 	       provision(vms)
        end
@@ -111,27 +117,25 @@ def virtualbox(vms, box)
 end
 
 def aws(vms, box) 
-  a = box['aws']
- 
-  # Launching
+  # Execute AWS provider
   vms.vm.provider :aws do |aws, override|
+    # Instance parameters
+    aws.ami = "ami-9eaa1cf6" # Ubuntu
+    aws.instance_type = box['aws']['instance_type']
+    
     # Authentication
     aws.access_key_id = ENV['AMAZON_ACCESS_KEY_ID']
     aws.secret_access_key = ENV['AMAZON_SECRET_ACCESS_KEY']
-    
-    # Instance (Ubuntu)
-    aws.ami = "ami-9eaa1cf6"
-    aws.instance_type = a['instance_type']
     
     # Security
     aws.keypair_name = "fstream"
     aws.security_groups = ["default"]
     
     # Metadata
-    aws.tags["Name"] = box[:name]
+    aws.tags["Name"] = box['name'] # Will show as instance name
     
     # Vagrant base (required)
-    override.vm.box = "dummy"
+    override.vm.box = "dummy" # vagrant-aws method. See github
     override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
   
     # Access          
@@ -149,7 +153,8 @@ def provision(vms)
     ansible.extra_vars = @extra_vars
     ansible.verbose = @verbose
     
-    # Avoids ssh: connect to host <ip-address> port 22: Host is down
+    # Special configuration
+    # - Avoids ssh: connect to host <ip-address> port 22: Host is down
     ansible.raw_arguments = "--timeout=60"
   end
 end

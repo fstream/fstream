@@ -34,6 +34,7 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +56,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * Factory responsible for creating fully initialized {@link StormJob} instances.
  */
+@Slf4j
 @Component
 public class StormJobFactory {
 
@@ -104,22 +106,27 @@ public class StormJobFactory {
 
   @SneakyThrows
   private Config createConfig(State state) {
+    log.info("Creating storm config using storm properties: {}", stormProperties);
     val config = new Config();
-    config.put(STORM_ZOOKEEPER_SERVERS, parseZkServers(zkConnect));
-    config.put(STORM_ZOOKEEPER_PORT, parseZkPort(zkConnect));
     config.putAll(stormProperties.getProperties());
     config.setDebug(stormProperties.isDebug());
+
+    log.info("Configuring zookeeper to {}:{}", parseZkServers(zkConnect), parseZkPort(zkConnect));
+    config.put(STORM_ZOOKEEPER_SERVERS, parseZkServers(zkConnect));
+    config.put(STORM_ZOOKEEPER_PORT, parseZkPort(zkConnect));
 
     // Per topology configuration
     // config.put(Config.TOPOLOGY_WORKER_CHILDOPTS, "-Xmx1024m");
 
     // Serialize state
+    log.info("Creating storm kafka config using kafka producer properties: {}", kafkaProperties.getProducerProperties());
     config.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, kafkaProperties.getProducerProperties());
     config.put(EsperBolt.STATEMENTS_CONFIG_KEY, Codec.encodeText(state.getStatements()));
     config.put(AlertBolt.ALERTS_CONFIG_KEY, Codec.encodeText(state.getAlerts()));
     config.put(MetricBolt.METRICS_CONFIG_KEY, Codec.encodeText(state.getMetrics()));
 
     // Parallelism
+    log.info("Configuring storm max task parallelism to {} and num workers to {}", TASK_PARALLELISM, NUM_WORKERS);
     config.setMaxTaskParallelism(TASK_PARALLELISM);
     config.setNumWorkers(NUM_WORKERS);
 
