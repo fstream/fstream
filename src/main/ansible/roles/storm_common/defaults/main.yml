@@ -36,6 +36,10 @@ storm_supervisor_slots_ports:
   - "6703"
   - "6704"
   - "6705"
+  - "6706"
+  - "6707"
+  - "6708"
+  - "6709"
   
 storm_local_dir: /home/storm
 storm_drpc_servers:
