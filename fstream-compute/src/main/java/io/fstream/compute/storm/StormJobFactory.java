@@ -197,12 +197,14 @@ public class StormJobFactory {
     }
 
     // Logging
-    val loggingBolt = topologyBuilder.setBolt(loggerBoltId, new LoggingBolt());
-    if (alertsExist) {
-      loggingBolt.shuffleGrouping(alertsBoltId);
-    }
-    if (metricsExist) {
-      loggingBolt.shuffleGrouping(metricsBoltId);
+    if (stormProperties.isDebug()) {
+      val loggingBolt = topologyBuilder.setBolt(loggerBoltId, new LoggingBolt());
+      if (alertsExist) {
+        loggingBolt.shuffleGrouping(alertsBoltId);
+      }
+      if (metricsExist) {
+        loggingBolt.shuffleGrouping(metricsBoltId);
+      }
     }
 
     /**

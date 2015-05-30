@@ -19,6 +19,7 @@ import org.apache.thrift7.TException;
 
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.KillOptions;
+import backtype.storm.generated.Nimbus.Client;
 import backtype.storm.generated.NotAliveException;
 import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
@@ -39,6 +40,11 @@ public class DistributedStormJobExecutor extends AbstractStormJobExecutor {
   @SneakyThrows
   public void execute(@NonNull final StormJob job) {
     setStormJar();
+
+    val totalAvailableSlots = getTotalAvailableSlots();
+    if (totalAvailableSlots == 0) {
+      log.warn("*** No slots available!!!");
+    }
 
     log.info("Submitting cluster topology '{}' with config {}...", job.getId(), job.getConfig());
     StormSubmitter.submitTopology(job.getId(), job.getConfig(), job.getTopology());
@@ -68,13 +74,25 @@ public class DistributedStormJobExecutor extends AbstractStormJobExecutor {
     System.setProperty(STORM_JAR_PROPERTY_NAME, stormJar);
   }
 
+  @SneakyThrows
+  private int getTotalAvailableSlots() {
+    val client = getClient();
+    val summary = client.getClusterInfo();
+
+    return getTotalAvailableSlots(summary);
+  }
+
   private static void killTopology(String name) throws NotAliveException, TException {
-    val client = NimbusClient.getConfiguredClient(Utils.readStormConfig()).getClient();
+    val client = getClient();
     val killOpts = new KillOptions();
 
     log.info("Killing topology '{}'", name);
     client.killTopologyWithOpts(name, killOpts);
     log.info("Killed topology '{}'.", name);
+  }
+
+  private static Client getClient() {
+    return NimbusClient.getConfiguredClient(Utils.readStormConfig()).getClient();
   }
 
 }

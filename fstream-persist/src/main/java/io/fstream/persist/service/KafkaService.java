@@ -85,10 +85,12 @@ public class KafkaService extends AbstractExecutionThreadService {
 
     for (val messageAndMetadata : stream) {
       val message = messageAndMetadata.message();
-      val text = new String(message);
 
-      log.info("Received: {}", text);
-      val rate = Codec.decodeText(text, eventClass);
+      if (log.isDebugEnabled()) {
+        log.debug("Received: {}", new String(message));
+      }
+
+      val rate = Codec.decodeText(message, eventClass);
       persistenceService.persist(rate);
     }
   }

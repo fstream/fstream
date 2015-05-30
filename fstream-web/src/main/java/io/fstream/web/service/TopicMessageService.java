@@ -86,9 +86,12 @@ public class TopicMessageService extends AbstractExecutionThreadService {
 
     for (val messageAndMetadata : stream) {
       val message = messageAndMetadata.message();
-      val text = new String(message);
 
-      log.debug("Received: {}", text);
+      if (log.isDebugEnabled()) {
+        val text = new String(message);
+        log.debug("Received: {}", text);
+      }
+
       template.send(getMessageDestination(), convert(message));
     }
   }
