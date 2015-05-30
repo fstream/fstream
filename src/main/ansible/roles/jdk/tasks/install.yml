@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- name: Make sure openjdk is uninstalled
+  apt: pkg=openjdk state=absent purge=true
+
+- name: Make a directory that holds the Java binaries
+  file: path={{ jdk_dir }} state=directory
+
+- name: Download JDK
+  command: "wget --max-redirect=2 --header 'Cookie: oraclelicense=accept-securebackup-cookie' '{{ jdk_download_url }}' chdir=/tmp creates=/tmp/{{ jdk_download_filename }}"
+
+- name: Unpack the compressed JDK binaries
+  command: tar -xvzf /tmp/{{ jdk_download_filename }} chdir={{ jdk_dir }} creates={{ jdk_dir }}/{{ jdk_version }}
+
+- name: Update the symbolic link to the JDK install
+  file: path={{ jdk_dir }}/jdk src={{ jdk_dir }}/{{ jdk_version }} state=link force=yes

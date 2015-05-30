@@ -1,0 +1,41 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the base Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+# Enable this for debugging:
+#- hosts: all
+#  tasks:
+#    - debug: var=default_ipv4_interface
+#    - debug: var=hostvars['influxdb']
+#    - debug: var=hostvars['influxdb'][default_ipv4_interface]
+#  roles:
+#    - { role: hostname, sudo: yes }
+#
+
+# Upfront, gather all the IPs required to generate the /etc/hosts on each machine. 
+# The alternative would only have cumulative IPs as provisioning proceeds serially through hosts. 
+- hosts: all
+  gather_facts: True
+  sudo: yes
+  roles:
+    - base
+    - ntp
+    - role: logstash
+      logstash_inputs: |
+        file {
+          type => "supervisor"
+          path => [ "/var/log/supervisor/*.log" ]
+        }
+        
+      logstash_outputs: |
+        file {
+          type => "supervisor"
+          path => "/tmp/supervisor.log"
+        }

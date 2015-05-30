@@ -8,3 +8,16 @@ jdk_version: jdk1.{{ jdk_release }}.0_{{ jdk_update }}
 
 jdk_download_filename: "jdk-{{ jdk_release }}u{{ jdk_update }}-linux-x64.tar.gz"
 jdk_download_url: "http://download.oracle.com/otn-pub/java/jdk/{{ jdk_release }}u{{ jdk_update }}-b{{ jdk_build }}/{{ jdk_download_filename }}"
+
+jdk_dir: /usr/local/java
+jdk_tools:
+  - java
+  - javac
+  - javaws
+  - javah
+  - jar
+  - jps
+  - jstack
+  - jinfo
+  - jmap
+  - jhat
