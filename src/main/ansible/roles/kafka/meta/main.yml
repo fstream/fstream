@@ -5,4 +5,5 @@ dependencies:
   - { role: hostname, sudo: yes }
   - { role: python }
   - { role: jdk }
+  - { role: jvmtop }  
   - { role: supervisor }

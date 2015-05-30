@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- name: Download jvmtop distribution
+  get_url: "url={{ jvmtop_archive_url }} dest=/tmp/{{ jvmtop_archive }} mode=0444"
+  
+- name: Creating target dir
+  file: "dest={{ jvmtop_dir }} state=directory"
+
+- name: Extract arhive
+  unarchive: "src=/tmp/{{ jvmtop_archive }} dest={{ jvmtop_dir }} copy=no"
+  
+- name: Make executable
+  file: path={{ jvmtop_dir }}/jvmtop.sh mode=0755
+  
+- name: Copy wrapper script
+  template: src=jvmtop.j2 dest=/usr/local/bin/jvmtop mode=0755

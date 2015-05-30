@@ -1,0 +1,7 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+jvmtop_version: 0.8.0
+jvmtop_dir: /usr/local/jvmtop
+jvmtop_archive: "jvmtop-{{ jvmtop_version }}.tar.gz"
+jvmtop_archive_url: "https://jvmtop.googlecode.com/files/{{ jvmtop_archive }}"
