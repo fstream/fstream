@@ -55,7 +55,12 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
 
   @Override
   public void execute(@NonNull StormJob job) {
-    log.info("Submitting local storm job '{}'...", job.getId());
+    val totalAvailableSlots = getTotalAvailableSlots();
+    if (totalAvailableSlots == 0) {
+      log.warn("*** No slots available!!!");
+    }
+
+    log.info("Submitting local storm job '{}'  with config {}...", job.getId(), job.getConfig());
     cluster.submitTopology(job.getId(), job.getConfig(), job.getTopology());
     log.info("Finished submitting local storm job '{}'", job.getId());
 
@@ -67,6 +72,12 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
     log.info("Shutting down cluster...");
     cluster.shutdown();
     log.info("Finished shutting down cluster");
+  }
+
+  private int getTotalAvailableSlots() {
+    val summary = cluster.getClusterInfo();
+
+    return getTotalAvailableSlots(summary);
   }
 
   private void logClusterState() {

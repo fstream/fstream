@@ -39,7 +39,14 @@ public final class Codec {
     MAPPER.writeValue(stream, value);
   }
 
-  @SneakyThrows
+  public static <T> T decodeText(byte[] text, Class<T> type) {
+    try {
+      return MAPPER.readValue(text, type);
+    } catch (Throwable t) {
+      throw new RuntimeException("Error converting '" + text + "' to " + type, t);
+    }
+  }
+
   public static <T> T decodeText(String text, Class<T> type) {
     try {
       return MAPPER.readValue(text, type);
