@@ -12,5 +12,5 @@
 - name: Setup NTP daemon config
   sudo: true
   #template: src=etc/ntpd.conf.j2 dest=/etc/ntpd.conf
-  debug: msg=Hi!
+  debug: msg=*** Skipping
   notify: Restart NTP daemon
