@@ -27,6 +27,7 @@
 - hosts: all
   gather_facts: True
   roles:
+    - base
     - ntp
 
 # Provision the infrastructure

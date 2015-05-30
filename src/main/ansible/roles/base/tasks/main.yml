@@ -1,0 +1,30 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- name: Update package list
+  apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
+
+- name: Install base packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - wget
+    - unzip
+    - rsync
+    - curl
+    - acl
+    - vim
+  sudo: yes
+
+- name: Add vim config syntax highlighting
+  lineinfile: >
+    dest=/etc/vim/vimrc
+    line='syntax on'
+    regexp='^"syntax on'
+    state=present
+    backrefs=yes
+  sudo: yes
+
+- name: Make vim the default editor
+  alternatives: name=editor path=/usr/bin/vim.basic
+  sudo: yes
