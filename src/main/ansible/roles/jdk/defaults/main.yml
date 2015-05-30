@@ -1,6 +1,10 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-jdk_download_url: "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.tar.gz"
-jdk_download_filename: jdk-8u45-linux-x64.tar.gz
-jdk_version: jdk1.8.0_45
+jdk_release: 8
+jdk_update: 45
+jdk_build: 14
+jdk_version: jdk1.{{ jdk_release }}.0_{{ jdk_update }}
+
+jdk_download_filename: "jdk-{{ jdk_release }}u{{ jdk_update }}-linux-x64.tar.gz"
+jdk_download_url: "http://download.oracle.com/otn-pub/java/jdk/{{ jdk_release }}u{{ jdk_update }}-b{{ jdk_build }}/{{ jdk_download_filename }}"

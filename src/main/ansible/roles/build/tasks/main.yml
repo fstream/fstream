@@ -1,7 +1,8 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-- apt: update_cache=yes cache_valid_time=3600
+- name: Update package list
+  apt: update_cache=yes cache_valid_time=3600
 
 - name: Make sure common build/dev tools and compilers are installed/up-to-date
   apt: pkg={{ item }}

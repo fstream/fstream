@@ -34,10 +34,10 @@ provider = settings['provider']
 
 # Ansible config
 @ansible_path = "../../ansible"
-@playbook = @ansible_path + "/" + "site.yml"
-@limit = ['all']
-@extra_vars = {}
-@verbose = 'vv'
+@playbook = @ansible_path + "/" + (ENV['playbook'] || "site.yml")
+@limit      = ENV['limit']      || ['all']
+@extra_vars = ENV['extra_vars'] || {}
+@verbose    = ENV['verbose']    || 'vv'
 
 # Ansible environment. See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
@@ -56,8 +56,8 @@ end
 Vagrant.configure("2") do |config|
   # Base box
   if provider == 'virtualbox'
-     config.vm.box = "precise64" 
-     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+     config.vm.box = "trusty64" 
+     config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
   end
   if provider == 'aws'
      config.vm.box = "dummy" 
@@ -134,10 +134,6 @@ def aws(vms, box)
     # Metadata
     aws.tags["Name"] = box['name'] # Will show as instance name
     
-    # Vagrant base (required)
-    override.vm.box = "dummy" # vagrant-aws method. See github
-    override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-  
     # Access          
     override.ssh.username = "ubuntu"
     override.ssh.private_key_path = "~/.ssh/fstream.pem"
