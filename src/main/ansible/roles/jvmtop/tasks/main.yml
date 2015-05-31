@@ -7,7 +7,7 @@
 - name: Creating target dir
   file: "dest={{ jvmtop_dir }} state=directory"
 
-- name: Extract arhive
+- name: Extract archive
   unarchive: "src=/tmp/{{ jvmtop_archive }} dest={{ jvmtop_dir }} copy=no"
   
 - name: Make executable

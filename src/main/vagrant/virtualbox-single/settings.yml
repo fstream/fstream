@@ -13,11 +13,13 @@ boxes:
    - name: fstream
      groups:
         - ops
+        
         - influxdb
         - zookeeper
         - kafka
         - storm-nimbus
         - storm-supervisor
+        
         - fstream-persist
         - fstream-rates
         - fstream-compute
@@ -34,3 +36,5 @@ boxes:
              host: 18083
            - guest: 9200
              host: 19200                       
+           - guest: 5601
+             host: 15601                       

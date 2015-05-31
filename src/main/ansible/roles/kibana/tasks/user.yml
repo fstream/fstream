@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Make sure the kibana group is present
+  action: group gid={{ kibana_gid }} name={{ kibana_group }} state=present
+
+- name: Make sure the kibana user directory is present
+  action: file path="/home/{{ kibana_user }}" state=directory
+
+- name: Make sure the kibana user is present
+  user: uid={{ kibana_uid }} name={{ kibana_user }} group={{ kibana_group }} home="/home/{{ kibana_user }}" shell=/bin/bash state=present comment="Kibana user"
+
+- name: Set the right kibana user directory permissions
+  action: file path="/home/{{ kibana_user }}" owner={{ kibana_user }} group={{ kibana_group }} mode=0700 state=directory
+
+- name: Set the right expiration on the kibana user
+  command: "sudo chage -I -1 -E -1 -m -1 -M -1 -W -1 -E -1 {{ kibana_user }}"

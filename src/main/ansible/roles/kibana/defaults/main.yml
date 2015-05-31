@@ -1,12 +1,19 @@
 ---
-# Set the user ansible will log in with
-user: ubuntu
+# Copyright (c) 2014 fStream. All Rights Reserved.
 
-# Set the domain name kibana will resolve to - this is for the nginx configuration
-kibana_domain: log.example.com
+# Kibana artifact
+kibana_version: 4.0.2
+kibana_artifact: kibana-{{ kibana_version }}-linux-x64
+kibana_archive: "{{ kibana_artifact }}.tar.gz"
 
-# Set the url to retrieve kibana from
-kibana_url: https://github.com/elasticsearch/kibana/archive/master.zip
+# Kibana download
+kibana_download_url: https://download.elastic.co/kibana/kibana/{{ kibana_archive }}
 
-# Set the location of the elastic search database
-es_address: localhost
+# Kibana installation
+kibana_dir: /usr/local/{{ kibana_artifact }}
+
+# Kibana account
+kibana_user: kibana
+kibana_group: kibana
+kibana_uid: 3090
+kibana_gid: 3090

@@ -1,13 +1,9 @@
 ---
-galaxy_info:
-  author: John Hamelink
-  license: MIT
-  min_ansible_version: 1.4.3
-  platforms:
-    - name: Ubuntu
-      versions:
-        - saucy
-        - precise
-  categories:
-    - monitoring
-  dependencies: []
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+dependencies:
+  - { role: hostname, sudo: yes }
+  - { role: python }
+  - { role: jdk }
+  - { role: jvmtop }  
+  - { role: supervisor }

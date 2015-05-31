@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Make sure the kibana log dir exists
+  file: path=/var/log/kibana state=directory owner={{ kibana_user }} group={{ kibana_group }} mode=0755 recurse=yes
+
+- name: Download the kibana source in /tmp if not yet present
+  command: wget {{ kibana_download_url }} chdir=/tmp creates=/tmp/{{ kibana_archive }}
+
+- name: Extract kibana archive
+  unarchive: "src=/tmp/{{ kibana_archive }} dest={{ kibana_dir }} copy=no"
+
+- name: Update the kibana install permissions
+  file: path=/usr/local/{{ kibana_artifact }} owner={{ kibana_user }} group={{ kibana_group }} state=directory recurse=yes
+
+- name: Update the symbolic link to the kibana install
+  file: path=/usr/local/kibana src={{ kibana_dir }} state=link force=yes

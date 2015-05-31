@@ -1,3 +1,5 @@
 ---
-- name: restart nginx
-  service: name=nginx state=restarted
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+- name: Restart kibana supervisor
+  supervisorctl: name=kibana state=restarted

@@ -1,0 +1,12 @@
+[program:kibana]
+command=/usr/local/kibana/bin/kibana start-foreground 
+priority=1
+user={{ kibana_user }}
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+redirect_stderr=true
+stdout_logfile=/var/log/kibana/kibana.log
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10

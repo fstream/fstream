@@ -18,7 +18,6 @@ ops_host: "{{ groups['ops'][0] }}"
 # InfluxDB
 influxdb_host: "{{ groups['influxdb'][0] }}"
 
-
 # ZooKeeper
 zookeeper_connect_port: "2181"
 zookeeper_connect_servers: "{{ groups.zookeeper }}"

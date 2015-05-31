@@ -29,7 +29,7 @@ storm_worker_childopts: "-Xmx768m -Djava.net.preferIPv4Stack=true"
 storm_supervisor_childopts: "-Djava.net.preferIPv4Stack=true"
 
 # Number of ports per supervisor. Controls number of topologies per supervisor
-storm_supervisor_slots: 10
+storm_supervisor_slots: 6
 
 storm_local_dir: /home/storm
 storm_drpc_servers:
