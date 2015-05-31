@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+filter {
+
+  {{ logstash_filters | default("") }}
+
+}

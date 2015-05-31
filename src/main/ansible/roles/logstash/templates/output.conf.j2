@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+output {
+
+  {{ logstash_outputs | default("") }}
+
+}

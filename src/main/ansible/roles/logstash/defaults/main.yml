@@ -1,0 +1,13 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+logstash_version: "1.5"
+
+logstash_apt_repo: "deb http://packages.elasticsearch.org/logstash/{{ logstash_version }}/debian stable main"
+logstash_repo_key: "http://packages.elasticsearch.org/GPG-KEY-elasticsearch"
+
+logstash_conf_dir: "/etc/logstash/conf.d/"
+
+logstash_defaults: "LS_USER=logstash"
+
+logstash_defaults_file: "/etc/default/logstash"
