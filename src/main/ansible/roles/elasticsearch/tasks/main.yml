@@ -1,40 +1,34 @@
 ---
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
-# install apt key
-- name: adding elasticsearch gpg key
+# Install apt key
+- name: Adding elasticsearch gpg key
   apt_key: url=http://packages.elasticsearch.org/GPG-KEY-elasticsearch state=present
   tags: [elasticsearch]
 
-# set dedicated repository
-- name: add elasticsearch repository 
+# Set dedicated repository
+- name: Add elasticsearch repository 
   apt_repository: repo='deb http://packages.elasticsearch.org/elasticsearch/{{es_version}}/debian stable main' state=present
   tags: [elasticsearch]
 
-# install java if requested
-- name: install java version from elasticsearch role
-  apt: name={{ es_java_version }} state=present update_cache=yes cache_valid_time=3600
-  when: es_install_java
-  tags: [elasticsearch]
-
-# install elasticsearch with dependancies
-- name: install elasticsearch
+# Install elasticsearch with dependancies
+- name: Install elasticsearch
   apt: name=elasticsearch state=present update_cache=yes cache_valid_time=3600
   notify: init elasticsearch
   tags: [elasticsearch]
 
-- name: update group gid
+- name: Update group gid
   group: name=elasticsearch gid={{ es_gid }} state=present
   when: es_gid
   tags: [elasticsearch]
 
-- name: update user uid and gid
+- name: Update user uid and gid
   user: name=elasticsearch uid={{ es_uid }} group=elasticsearch state=present
   when: es_uid
   tags: [elasticsearch]
 
-# set limits.conf
-- name: limits.conf tuning
+# Set limits.conf
+- name: Limits.conf tuning
   lineinfile: dest=/etc/security/limits.conf line="{{ item }}" 
   tags: elasticsearch
   with_items:
@@ -42,11 +36,11 @@
     - 'elasticsearch hard nofile 32000'
   tags: [elasticsearch]
 
-# ensure service started
+# Ensure Service started
 - service: name=elasticsearch state=started
   when: es_manage_service
   tags: [elasticsearch]
 
-# install plugins
+# Install plugins
 - include: plugins.yml
   tags: [elasticsearch, elasticsearch-plugins]

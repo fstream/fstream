@@ -1,7 +1,7 @@
 ---
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
-# Install dependancies
+# Install dependencies
 - apt: name=python-pip state=present
 
 # Install Curator

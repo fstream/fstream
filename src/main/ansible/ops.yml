@@ -4,16 +4,15 @@
 # fStream - Master playbook 
 #
 # Description: 
-#   The is the master Ansible playbook file for provisioning the fStream system.
+#   The is the base Ansible playbook file for provisioning the fStream system.
 #
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision InfluxDB hosts
-- hosts: influxdb
+# This single play playbook will provision the operation host
+- hosts: ops
   gather_facts: True
   sudo: yes
-  
-  # Apply role
-  roles: 
-    - influxdb
+  roles:
+    - elasticsearch
+    - kibana

@@ -12,6 +12,7 @@ boxes:
    # fStream
    - name: fstream
      groups:
+        - ops
         - influxdb
         - zookeeper
         - kafka
@@ -25,9 +26,11 @@ boxes:
         memory: 8192
         cpus: 8
         forwarded_ports:
-           - guest: 8081
-             host: 8080
            - guest: 8080
-             host: 8081
+             host: 18080
+           - guest: 8081
+             host: 18081
            - guest: 8083
-             host: 9000             
+             host: 18083
+           - guest: 9200
+             host: 19200                       

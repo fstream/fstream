@@ -14,6 +14,6 @@
   gather_facts: True
   sudo: yes
     
-  # Apply kafka role
+  # Apply role
   roles: 
     - { role: kafka, kafka_host_name: "{{ inventory_hostname }}", kafka_server_port: "{{ kafka_broker_port }}", kafka_zookeeper_connect: "{{ zookeeper_connect }}" }
