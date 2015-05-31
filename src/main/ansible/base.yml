@@ -30,12 +30,36 @@
     - role: logstash
       logstash_inputs: |
         file {
-          type => "supervisor"
-          path => [ "/var/log/supervisor/*.log" ]
+          type => "influxdb"
+          path => [ 
+            "/var/log/influxdb/*.log" 
+          ]
         }
-        
+        file {
+          type => "zookeeper"
+          path => [ 
+            "/var/log/zookeeper/*.log"
+          ]
+        }        
+        file {
+          type => "kafka"
+          path => [ 
+            "/var/log/kafka/*.log"
+          ]
+        }
+        file {
+          type => "storm"
+          path => [ 
+            "/var/log/storm/*.log"
+          ]
+        }
+        file {
+          type => "fstream"
+          path => [ 
+            "/var/log/fstream-*/*.log"
+          ]
+        }        
       logstash_outputs: |
         file {
-          type => "supervisor"
-          path => "/tmp/supervisor.log"
+          path => "/tmp/fstream-global.log"
         }

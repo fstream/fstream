@@ -10,12 +10,15 @@
     - python3
     - python-dev
 
-# Ubuntu's python-setuptools, python-pip and python-virtualenv packages are broken
-- name: Get the setuptools install-script
-  get_url: dest=/tmp url=https://bootstrap.pypa.io/ez_setup.py mode=0644
+## Ubuntu's python-setuptools, python-pip and python-virtualenv packages are broken
+#- name: Get the setuptools install-script
+#  get_url: dest=/tmp url=https://bootstrap.pypa.io/ez_setup.py mode=0644
+#
+#- name: Make sure pip is installed (from script)
+#  shell: python ez_setup.py && /usr/local/bin/easy_install pip chdir=/tmp
 
-- name: Make sure pip is installed (from script)
-  shell: python ez_setup.py && /usr/local/bin/easy_install pip chdir=/tmp
+# Install dependancies
+- apt: name=python-pip state=present
 
 - name: Make sure virtualenv is installed
   pip: name=virtualenv

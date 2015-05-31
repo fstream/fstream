@@ -5,7 +5,11 @@
   file: path=/var/log/{{ fstream_module }} state=directory owner={{ fstream_user }} group={{ fstream_group }} mode=0755 recurse=yes
 
 - name: Copy {{ fstream_module }}
-  copy: src={{ fstream_dir}}/{{ fstream_module }}/build/distributions/{{ fstream_module }}-{{ fstream_version }}.tar.gz dest={{ staging_dir }}/{{ fstream_module }}-{{ fstream_version }}.tar.gz
+  copy: src={{ fstream_dist_dir }}
+        dest={{ staging_dir }}/{{ fstream_archive }}
   
 - name: Extract {{ fstream_module }}
-  command: "tar zxf /tmp/{{ fstream_module }}-{{ fstream_version }}.tar.gz -C /usr/local"
+  command: "tar zxf /tmp/{{ fstream_archive }} -C /usr/local"
+  
+- name: Symlink{{ fstream_artifact }}
+  file: path=/usr/local/{{ fstream_module }} src=/usr/local/{{ fstream_artifact }} state=link force=yes
