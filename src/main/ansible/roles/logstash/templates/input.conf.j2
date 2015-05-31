@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+input {
+
+  {{ logstash_inputs | default("") }}
+
+}

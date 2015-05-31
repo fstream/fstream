@@ -1,0 +1,6 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- include: packages.yml
+- include: install.yml
+- include: configure.yml

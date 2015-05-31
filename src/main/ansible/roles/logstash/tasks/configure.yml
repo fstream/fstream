@@ -1,0 +1,30 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- name: Copy input configuration
+  template: src=input.conf.j2
+            dest={{ logstash_conf_dir }}input.conf
+            owner=root 
+            group=root 
+            mode=0644
+  notify:
+   - Restart logstash
+
+- name: Copy filter configuration
+  template: src=filters.conf.j2
+            dest={{ logstash_conf_dir }}filters.conf
+            owner=root 
+            group=root 
+            mode=0644
+  notify:
+   - Restart logstash
+
+- name: Copy output configuration
+  template: src=output.conf.j2
+            dest={{ logstash_conf_dir }}output.conf
+            owner=root 
+            group=root 
+            mode=0644
+  notify:
+   - Restart logstash
+
