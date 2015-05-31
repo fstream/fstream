@@ -1,7 +1,7 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Make sure the storm group is present
+- name: Make sure the zookeeper group is present
   action: group gid={{ zookeeper_gid }} name={{ zookeeper_group }} state=present
 
 - name: Make sure the zookeeper user directory is present
