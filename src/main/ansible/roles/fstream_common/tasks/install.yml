@@ -11,5 +11,5 @@
 - name: Extract {{ fstream_module }}
   command: "tar zxf /tmp/{{ fstream_archive }} -C /usr/local"
   
-- name: Symlink{{ fstream_artifact }}
+- name: Symlink {{ fstream_artifact }}
   file: path=/usr/local/{{ fstream_module }} src=/usr/local/{{ fstream_artifact }} state=link force=yes

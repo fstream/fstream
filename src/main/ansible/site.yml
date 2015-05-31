@@ -12,6 +12,9 @@
 # Provision the base setup
 - include: base.yml
 
+# Provision ops
+- include: ops.yml
+
 # Provision the infrastructure
 - include: influxdb.yml 
 - include: zookeeper.yml

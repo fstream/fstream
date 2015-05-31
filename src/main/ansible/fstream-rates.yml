@@ -19,6 +19,6 @@
       prompt: OANDA FIX password
       confirm: yes
       
-  # Apply theses roles
+  # Apply role
   roles: 
     - fstream_rates

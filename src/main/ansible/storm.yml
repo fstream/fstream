@@ -14,7 +14,7 @@
   gather_facts: True
   sudo: yes
   
-  # Apply Storm nimbus role
+  # Apply nimbus role
   roles:
     - { role: storm_nimbus, storm_zookeeper_servers: "{{ zookeeper_connect_servers }}", storm_zookeeper_port: "{{ zookeeper_connect_port }}" }
     
@@ -22,6 +22,6 @@
   gather_facts: True
   sudo: yes
   
-  # Apply Storm supervisor role
+  # Apply supervisor role
   roles:
     - { role: storm_supervisor, storm_zookeeper_servers: "{{ zookeeper_connect_servers }}", storm_zookeeper_port: "{{ zookeeper_connect_port }}" }

@@ -15,9 +15,6 @@
 #    - debug: var=default_ipv4_interface
 #    - debug: var=hostvars['influxdb']
 #    - debug: var=hostvars['influxdb'][default_ipv4_interface]
-#  roles:
-#    - { role: hostname, sudo: yes }
-#
 
 # Upfront, gather all the IPs required to generate the /etc/hosts on each machine. 
 # The alternative would only have cumulative IPs as provisioning proceeds serially through hosts. 
@@ -27,39 +24,5 @@
   roles:
     - base
     - ntp
-    - role: logstash
-      logstash_inputs: |
-        file {
-          type => "influxdb"
-          path => [ 
-            "/var/log/influxdb/*.log" 
-          ]
-        }
-        file {
-          type => "zookeeper"
-          path => [ 
-            "/var/log/zookeeper/*.log"
-          ]
-        }        
-        file {
-          type => "kafka"
-          path => [ 
-            "/var/log/kafka/*.log"
-          ]
-        }
-        file {
-          type => "storm"
-          path => [ 
-            "/var/log/storm/*.log"
-          ]
-        }
-        file {
-          type => "fstream"
-          path => [ 
-            "/var/log/fstream-*/*.log"
-          ]
-        }        
-      logstash_outputs: |
-        file {
-          path => "/tmp/fstream-global.log"
-        }
+    - logstash
+

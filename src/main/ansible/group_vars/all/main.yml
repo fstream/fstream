@@ -12,8 +12,12 @@ default_ipv4_interface: ansible_eth0
 # Versions
 fstream_version: "0.0.1-SNAPSHOT"
 
+# Operations
+ops_host: "{{ groups['ops'][0] }}"
+
 # InfluxDB
 influxdb_host: "{{ groups['influxdb'][0] }}"
+
 
 # ZooKeeper
 zookeeper_connect_port: "2181"
@@ -27,3 +31,43 @@ kafka_broker_list: "{{ groups.kafka | join(':' + kafka_broker_port + ',') }}:{{ 
 
 # Storm
 storm_nimbus_host: "{{ groups['storm-nimbus'][0] }}"
+
+# Logging 
+logstash_inputs: |
+  file {
+    type => "influxdb"
+    path => [ 
+      "/var/log/influxdb/*.log" 
+    ]
+  }
+  file {
+    type => "zookeeper"
+    path => [ 
+      "/var/log/zookeeper/*.log"
+    ]
+  }        
+  file {
+    type => "kafka"
+    path => [ 
+      "/var/log/kafka/*.log"
+    ]
+  }
+  file {
+    type => "storm"
+    path => [ 
+      "/var/log/storm/*.log"
+    ]
+  }
+  file {
+    type => "fstream"
+    path => [ 
+      "/var/log/fstream-*/*.log"
+    ]
+  }
+logstash_outputs: |
+  file {
+    path => "/tmp/fstream.log"
+  }
+  elasticsearch { 
+    host => {{ ops_host }} 
+  }

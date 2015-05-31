@@ -11,6 +11,7 @@
 
 - name: Setup NTP daemon config
   sudo: true
+  # Not read for prime time
   #template: src=etc/ntpd.conf.j2 dest=/etc/ntpd.conf
-  debug: msg=*** Skipping
+  debug: msg="*** Skipping"
   notify: Restart NTP daemon
