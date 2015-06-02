@@ -1,0 +1,20 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the base Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+# This single play playbook will provision HDFS and Spark
+- hosts: all
+  gather_facts: True
+  sudo: yes
+  roles:
+    - base
+    - { role: hdfs, hdfs_namenode: True }
+    - { role: hdfs, hdfs_namenode: False }
+    - spark

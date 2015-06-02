@@ -1,8 +1,7 @@
 ---
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
-hdfs_version: "2.6.0+cdh5.4.*"
-hdfs_cloudera_distribution: "cdh5.4"
+hdfs_cloudera_distribution: "cdh5.4.2"
 hdfs_conf_dir: "/etc/hadoop/conf"
 hdfs_namenode: False
 hdfs_namenode_host: localhost
