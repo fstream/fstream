@@ -2,7 +2,7 @@
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Install Hadoop DataNode and client
-  apt: pkg={{ item }}={{ hdfs_version }}
+  apt: pkg={{ item }}
        state=present
   with_items:
     - hadoop-hdfs-datanode

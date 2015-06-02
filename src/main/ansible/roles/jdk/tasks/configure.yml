@@ -2,10 +2,16 @@
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Add the JDK binaries to the system path (/etc/profile)
-  lineinfile: "dest={{ item.dest }} line={{ item.line }} state={{ item.state }}"
-  with_items:
-    - { dest: '/etc/profile', regexp: '^JAVA_HOME={{ jdk_dir }}/jdk', line: 'JAVA_HOME={{ jdk_dir }}/jdk', state: 'present' }
-    - { dest: '/etc/profile', regexp: '^PATH=.*JAVA_HOME.*', line: 'PATH=$PATH:$HOME/bin:$JAVA_HOME/bin', state: 'present' }
+  lineinfile:
+    dest: /etc/profile
+    regexp: ^export JAVA_HOME
+    line: export JAVA_HOME='{{ jdk_dir }}/jdk'
+
+- name: Add the JDK binaries to the system path (/etc/profile)
+  lineinfile:
+    dest: /etc/profile
+    regexp: ^export PATH=\$JAVA_HOME
+    line: export PATH=$JAVA_HOME/bin:$PATH
 
 - name: Inform the system where JDK is located
   command: "update-alternatives --install /usr/bin/{{ item }} {{ item }} {{ jdk_dir }}/jdk/bin/{{ item }} 1"

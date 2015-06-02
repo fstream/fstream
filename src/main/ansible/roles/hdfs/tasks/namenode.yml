@@ -2,7 +2,7 @@
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Install Hadoop HDFS NameNode
-  apt: pkg=hadoop-hdfs-namenode={{ hdfs_version }}
+  apt: pkg=hadoop-hdfs-namenode
        state=present
 
 - name: Configure Hadoop HDFS NameNode
