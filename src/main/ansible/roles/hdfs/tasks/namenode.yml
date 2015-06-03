@@ -5,6 +5,12 @@
   apt: pkg=hadoop-hdfs-namenode
        state=present
 
+- name: Add the JAVA_HOME for CDH packages
+  lineinfile:
+    dest: /etc/default/bigtop-utils
+    regexp: ^export JAVA_HOME
+    line: export JAVA_HOME={{ jdk_home }}
+
 - name: Configure Hadoop HDFS NameNode
   template: src={{ item }}.xml.j2 dest={{ hdfs_conf_dir }}/{{ item | replace("namenode-", "") }}.xml
   with_items:

@@ -14,4 +14,4 @@
   command: tar -xvzf /tmp/{{ jdk_download_filename }} chdir={{ jdk_dir }} creates={{ jdk_dir }}/{{ jdk_version }}
 
 - name: Update the symbolic link to the JDK install
-  file: path={{ jdk_dir }}/jdk src={{ jdk_dir }}/{{ jdk_version }} state=link force=yes
+  file: path={{ jdk_home }} src={{ jdk_dir }}/{{ jdk_version }} state=link force=yes
