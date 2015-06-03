@@ -11,5 +11,8 @@
 simulate:
    seconds: 60
    instruments:
-      - EUR/USD
-      - USD/JPY
+      - RY
+      - BMO
+      - TD
+      - BBM
+      - HUF
