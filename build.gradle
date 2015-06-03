@@ -62,6 +62,7 @@ buildscript {
 		maven { url "http://repo.spring.io/libs-milestone" }
 		maven { url "http://repo.spring.io/libs-snapshot" }
 		maven { url "https://oss.jfrog.org/oss-snapshot-local" }
+		maven { url "http://repo.akka.io/snapshots/" }
 		jcenter()
 	}
 
@@ -101,6 +102,7 @@ subprojects {
 		maven { url 'http://clojars.org/repo' }
 		maven { url 'http://conjars.org/repo' }
 		maven { url 'http://twitter4j.org/maven2' }
+		maven { url "http://repo.akka.io/snapshots/" }
 	}
 
 	configurations {
