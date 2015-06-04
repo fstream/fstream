@@ -1,6 +1,7 @@
 ---
 - name: put fetched SSH key to all other hosts
   copy: src=sshkeys/{{ item }} dest={{ clusteruser_home }}/.ssh/{{ item }}
+  sudo_user: "{{ clusteruser }}"
   with_items:
     - id_rsa
     - id_rsa.pub
@@ -10,6 +11,7 @@
 
 - name: ensure proper permissions on SSH keys
   file: path={{ clusteruser_home }}/.ssh/{{ item }} mode=0600
+  sudo_user: "{{ clusteruser }}"
   with_items:
     - id_rsa
     - id_rsa.pub
