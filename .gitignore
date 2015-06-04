@@ -60,3 +60,6 @@ packer_cache/
 # Vagrant
 .vagrant/
 /bin/
+
+# Ansible
+ansible.log
