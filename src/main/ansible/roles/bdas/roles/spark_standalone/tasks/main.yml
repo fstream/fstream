@@ -18,10 +18,6 @@
   tags:
     - configure
 
-- include_vars: roles/tachyon/vars/main.yml
-  tags:
-    - configure
-
 - name: Configure Spark to run in standalone deploy mode
   template: src=conf/spark-env.sh.j2 dest={{ spark_root }}/conf/spark-env.sh
   tags:
@@ -39,7 +35,8 @@
 
 - name: Attempt to start Spark cluster  
   shell: "{{ spark_root }}/sbin/start-all.sh"
-  when: ansible_hostname == "master"
+  when: ansible_hostname == "{{ master_hostname }}"
+  # TODO: This needs hadoop to own the installation dir (logs / work): sudo_user: "{{ clusteruser }}"
   ignore_errors: true
   tags:
     - configure

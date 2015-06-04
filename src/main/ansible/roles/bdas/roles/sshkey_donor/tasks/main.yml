@@ -6,6 +6,7 @@
 
 - name: prepare for passwordless ssh
   shell: /bin/cat /{{ clusteruser_home }}/.ssh/id_rsa.pub >> /{{ clusteruser_home }}/.ssh/authorized_keys
+  sudo_user: "{{ clusteruser }}"  
   tags:
     - configure
 
