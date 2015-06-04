@@ -12,6 +12,9 @@ boxes:
    # fStream
    - name: fstream
      groups:
+        - master
+        - workers     
+     
         - ops
         
         - influxdb
