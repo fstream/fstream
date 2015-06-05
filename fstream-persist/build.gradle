@@ -32,6 +32,9 @@ dependencies {
 
   // InfluxDB  
   compile libraries.influxdb
+  
+  // Spark
+  compile libraries.sparkStreaming
 
   // Hadoop
   compile libraries.hadoop

@@ -1,6 +1,5 @@
 ---
-#spark_version: "0.9.2-bin-hadoop2"
-spark_version: "1.2.0-bin-hadoop2.4"
+spark_version: "1.3.1-bin-hadoop2.6"
 spark_download_url: "http://d3kbcqa49mib13.cloudfront.net/spark-{{ spark_version }}.tgz"
 
 spark_root: "/opt/spark"
@@ -8,7 +7,7 @@ spark_master_host: "{{ master_hostname }}"
 spark_master_port: 7077
 
 # memory per executor, increase if see java out-of-memory exceptions in spark shell
-spark_executor_memory: "{{ (ansible_memtotal_mb * 0.6)|round|int }}m"
+spark_executor_memory: "{{ (ansible_memtotal_mb * 0.6) | round | int }}m"
 
 # total memory for use by all apps
 # make sure to leave at least 1gb for the system on slaves
