@@ -9,11 +9,15 @@
 
 package io.fstream.persist.service;
 
+import java.io.IOException;
+
 import javax.annotation.PostConstruct;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -33,12 +37,17 @@ public class SparkService {
 
   @Autowired
   private JavaSparkContext sparkContext;
+  @Autowired
+  private FileSystem fileSystem;
 
   @PostConstruct
-  public void run() {
+  public void run() throws IOException {
+    val path = new Path("/tmp/test.txt");
+    fileSystem.delete(path, true);
+
     log.info("Running!");
     val rdd = sparkContext.parallelize(ImmutableList.of(1, 2, 3));
-    rdd.saveAsTextFile("/tmp/test.txt");
+    rdd.saveAsTextFile(path.toString());
     log.info("Count: {}", rdd.count());
   }
 
