@@ -23,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HConnection;
-import org.apache.hadoop.hbase.client.HConnectionManager;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +57,9 @@ public class HBaseService implements PersistenceService {
    */
   @Setter
   @Autowired
-  private HBaseAdmin admin;
+  private Admin admin;
 
-  /**
-   * State.
-   */
-  private HConnection connection;
+  private Connection connection;
 
   @PostConstruct
   public void initialize() {
@@ -95,9 +92,9 @@ public class HBaseService implements PersistenceService {
       val key = createKey(tickEvent);
 
       val row = new Put(Bytes.toBytes(key));
-      row.add(CF_DATA, COLUMN_BID, Bytes.toBytes(tickEvent.getBid()));
-      row.add(CF_DATA, COLUMN_ASK, Bytes.toBytes(tickEvent.getAsk()));
-      row.add(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(tickEvent.getSymbol()));
+      row.addColumn(CF_DATA, COLUMN_BID, Bytes.toBytes(tickEvent.getBid()));
+      row.addColumn(CF_DATA, COLUMN_ASK, Bytes.toBytes(tickEvent.getAsk()));
+      row.addColumn(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(tickEvent.getSymbol()));
 
       log.info("**** Putting row");
       table.put(row);
@@ -143,9 +140,9 @@ public class HBaseService implements PersistenceService {
   }
 
   @SneakyThrows
-  private HConnection createConnection() {
+  private Connection createConnection() {
     log.info("Creating connection...");
-    val connection = HConnectionManager.createConnection(admin.getConfiguration());
+    val connection = ConnectionFactory.createConnection(admin.getConfiguration());
     log.info("Connection created.");
 
     return connection;

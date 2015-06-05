@@ -17,7 +17,9 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,8 +49,14 @@ public class HBaseConfig {
 
   @Bean
   @SneakyThrows
-  public HBaseAdmin hbaseAdmin() {
-    return new HBaseAdmin(config());
+  public Connection hbaseConnection() {
+    return ConnectionFactory.createConnection(config());
+  }
+
+  @Bean
+  @SneakyThrows
+  public Admin hbaseAdmin() {
+    return hbaseConnection().getAdmin();
   }
 
 }
