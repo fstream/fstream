@@ -1,5 +1,7 @@
 package io.fstream.simulate.agents;
 
+
+
 public class HFTAgent implements IAgent {
 
 	@Override

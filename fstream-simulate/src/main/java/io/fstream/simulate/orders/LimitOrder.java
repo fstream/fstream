@@ -1,5 +1,7 @@
 package io.fstream.simulate.orders;
 
+import io.fstream.core.model.event.TickEvent;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -18,7 +20,7 @@ public class LimitOrder implements IOrder, Comparable<LimitOrder> {
 	int amount;
 	float price;
 	String userid;
-	DateTime receivedTime;
+	DateTime processedTime;
 	
 
 	public LimitOrder (OrderSide side, OrderType type,DateTime time, int oid,String brokerId,String symbol, int amount, float price,String userid) {
@@ -62,13 +64,19 @@ public class LimitOrder implements IOrder, Comparable<LimitOrder> {
 	
 	@Override
 	public String toString() {
-		return String.format("%s,%s,%s,%s,%s,%s,%s", this.getSentTime(),this.getOid(),this.getSymbol(),this.getAmount(),this.getPrice(),this.getSide(),this.getUserId());
+		return String.format("%s,%s,%s,%s,%s,%s,%s,%s", this.getSentTime(),this.getProcessedTime(),this.getOid(),this.getUserId(),this.getSymbol(),this.getPrice(),this.getAmount(),this.getSide());
 		
 	}
 
 	@Override
 	public DateTime getSentTime() {
 		return sentTime;
+	}
+
+
+	public DateTime getProcessedTime() {
+		// TODO Auto-generated method stub
+		return this.processedTime;
 	}
 
 }

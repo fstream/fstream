@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -28,28 +30,25 @@ import akka.util.Timeout;
 
 @Slf4j
 @Getter
-public class InstitutionalAgent extends UntypedActor implements IAgent {
+public class InstitutionalAgent extends AgentActor {
 	
-	Random random;
-	private int sleep;
-	private String name;
-	private ActorRef exchange;
-	final int MAX_TRADE_SIZE = 5000;
 	ActiveInstruments activeinstruments = new ActiveInstruments();
-	Timeout bookquerytimeout = new Timeout(Duration.create(5, "seconds"));
+	
 	Positions positions;
+	
+	final float PROB_MARKET = 0.30f;
+	final float PROB_BUY = 0.49f;
+	final float PROB_BESTPRICE = 0.70f;
 
 	public InstitutionalAgent (String name,ActorRef exchange) {
-		
-		this.name = name;
-		this.exchange = exchange;
-		init();
+		super(name,exchange);
 	}
 	
-	private void init () {
-		random = new Random();
-		this.sleep = random.nextInt(5)+1;
+	
+	protected void init() {
+		super.init();
 		positions = new Positions();
+		max_trade_size = 5000;
 	}
 	@Override
 	public void executeAction() {
@@ -60,7 +59,7 @@ public class InstitutionalAgent extends UntypedActor implements IAgent {
 	}
 	
 	private IOrder createOrder () {
-		int next = random.nextInt(MAX_TRADE_SIZE);
+		int next = random.nextInt(max_trade_size);
 		int amount = next+1;
 		OrderType type = OrderType.ADD;
 		OrderSide side;
@@ -87,27 +86,27 @@ public class InstitutionalAgent extends UntypedActor implements IAgent {
 		float bestbid = bbbo.getBestbid() != Float.MIN_VALUE ? bbbo.getBestbid() : 8;
 		float bestask = bbbo.getBestoffer() != Float.MAX_VALUE ? bbbo.getBestoffer() : 10;
 		
-		if (random.nextDouble() > 0.49 ) {
-			side = OrderSide.ASK;
-			if (random.nextDouble() > 0.40) {
-				price = Math.min(bestask + random.nextFloat(),15);
-			} else {
-				price = Float.MIN_VALUE; // trigger market order
-				type = OrderType.MO;
+		side = decideSide(1-PROB_BUY, OrderSide.ASK);
+		
+		type = decideOrderType(PROB_MARKET);
+		
+		if (type == OrderType.MO) {
+			if (side == OrderSide.ASK) {
+				price = Float.MIN_VALUE;
 			}
-			
+			else {
+				price = Float.MAX_VALUE;
+			}
 		}
 		else {
-			side = OrderSide.BID;
-			if (random.nextDouble() > 0.40) {
-				price = Math.max(bestbid - random.nextFloat(),5);
-			} else {
-				//price = bestask; // trigger market order
-				price = Float.MAX_VALUE;
-				type = OrderType.MO;
+			if (side == OrderSide.ASK) {
+				price = decidePrice(bestask, bestask+5, bestask, PROB_BESTPRICE);
+			}
+			else {
+				price = decidePrice(bestbid-5, bestbid, bestask, PROB_BESTPRICE);
 			}
 			
-		}
+		}		
 		return new LimitOrder(side, type, DateTime.now(), Exchange.getOID(), "xx", symbol, amount, price, name);
 		
 	}

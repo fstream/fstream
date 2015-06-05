@@ -20,6 +20,7 @@ public class Trade {
 	private boolean activebuy;
 	private String symbol;
 	private DateTime time;
+	private DateTime ordertime;
 	private int amount;
 
 	public Trade(String buyuser, String selluser, boolean activebuy,

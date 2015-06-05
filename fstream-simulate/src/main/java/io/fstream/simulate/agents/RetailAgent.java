@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
@@ -27,32 +28,27 @@ import akka.actor.UntypedActor;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+
+
 @Getter
 @Setter
 @Slf4j
-public class RetailAgent extends UntypedActor implements IAgent { 
+public class RetailAgent extends AgentActor { 
 	
 	/**
 	 * data structures    s
 	 */
 	HashMap<String,Integer> positions;
 	ActiveInstruments activeinstruments = new ActiveInstruments();
-	
-	
-	Random random;
-	String name;
-	int sleep; // agent sleep time
-	final int MAX_TRADE_SIZE = 100;
-	
-	Timeout bookquerytimeout = new Timeout(Duration.create(5, "seconds"));
-	
-	ActorRef exchange;
+	final float PROB_MARKET = 0.49f;
+	final float PROB_BUY = 0.49f;
+	final float PROB_BESTPRICE = 0.19f;
 	
 	public RetailAgent (String name,ActorRef exchange) {
-		random = new Random();
-		this.sleep = random.nextInt(5)+1;
-		this.name = name;
-		this.exchange = exchange;
+		super(name,exchange);
 	}
 		
 	public void executeAction() {
@@ -63,7 +59,7 @@ public class RetailAgent extends UntypedActor implements IAgent {
 	}
 	
 	private IOrder createOrder ()  {
-		int next = random.nextInt(MAX_TRADE_SIZE);
+		int next = random.nextInt(max_trade_size);
 		int amount = next+1;
 		OrderSide side;
 		OrderType type = OrderType.ADD;
@@ -90,26 +86,30 @@ public class RetailAgent extends UntypedActor implements IAgent {
 		
 		float bestbid = bbbo.getBestbid() != Float.MIN_VALUE ? bbbo.getBestbid() : 8;
 		float bestask = bbbo.getBestoffer() != Float.MAX_VALUE ? bbbo.getBestoffer() : 10;
-		if (random.nextDouble() > 0.49 ) {
-			side = OrderSide.ASK;
-			if (random.nextDouble() > 0.69) {
-				price = Math.min(bestask + random.nextFloat(),15);
-			} else {
-				type = OrderType.MO;
-				price = Float.MIN_VALUE; // trigger market order
+		float mid = (bestask+bestbid)/2;
+		
+		side = decideSide(1-PROB_BUY, OrderSide.ASK);
+		
+		type = decideOrderType(PROB_MARKET);
+		
+		if (type == OrderType.MO) {
+			if (side == OrderSide.ASK) {
+				price = Float.MIN_VALUE;
+			}
+			else {
+				price = Float.MAX_VALUE;
+			}
+		}
+		else {
+			if (side == OrderSide.ASK) {
+				price = decidePrice(bestask, bestask+5, bestask, PROB_BESTPRICE);
+			}
+			else {
+				price = decidePrice(bestbid-5, bestbid, bestask, PROB_BESTPRICE);
 			}
 			
 		}
-		else {
-			side = OrderSide.BID;
-			if (random.nextDouble() > 0.69) {
-				price = Math.max(bestbid - random.nextFloat(),5);
-			} else {
-				type = OrderType.MO;
-				price = Float.MAX_VALUE; // trigger market order
-			}
-			
-		}		
+		
 		return new LimitOrder(side, type, DateTime.now(), Exchange.getOID(), "xx", symbol, amount, price, name);
 	}
 
@@ -145,5 +145,6 @@ public class RetailAgent extends UntypedActor implements IAgent {
 	public void postRestart(Throwable reason) {
 		
 	}
+
 	
 }

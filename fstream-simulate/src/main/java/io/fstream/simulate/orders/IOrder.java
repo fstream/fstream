@@ -27,6 +27,5 @@ public interface IOrder {
 	
 	public String getUserId();
 	
-	public DateTime getReceivedTime();
 
 }

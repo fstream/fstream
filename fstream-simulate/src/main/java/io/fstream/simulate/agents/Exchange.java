@@ -13,11 +13,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
+
 @Slf4j
 public class Exchange extends UntypedActor {
 
@@ -27,6 +31,7 @@ public class Exchange extends UntypedActor {
 	private ActorRef tradebook;
 	ActiveInstruments activeinstruments;
 	
+
 	
 	public Exchange () {
 		init();

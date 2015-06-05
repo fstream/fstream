@@ -8,6 +8,7 @@ import io.fstream.simulate.orders.IOrder;
 import io.fstream.simulate.orders.IOrder.OrderSide;
 import io.fstream.simulate.orders.IOrder.OrderType;
 import io.fstream.simulate.orders.LimitOrder;
+import io.fstream.simulate.orders.Quote;
 import io.fstream.simulate.orders.Trade;
 
 import java.util.Collections;
@@ -184,8 +185,14 @@ public class OrderBook extends UntypedActor {
 	 * updates best ask/bid
 	 */
 	private void updateBestPrices() {
+		val prevbestaks = this.bestask;
+		val prevbestbid = this.bestbid;
 		this.bestask = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey() ;
 		this.bestbid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey() ;
+		if (this.bestask != prevbestaks || this.bestbid != prevbestbid) {
+			val quote = new Quote(DateTime.now(),this.getSymbol(),this.getBestask(),this.getBestbid());
+			log.info(quote.toString());
+		}
 	}
 
 	/**
@@ -333,8 +340,8 @@ public class OrderBook extends UntypedActor {
 			}
 			this.askdepth = this.askdepth + order.getAmount();
 		}
-		order.setReceivedTime(DateTime.now());
-		if (Seconds.secondsBetween(order.getReceivedTime(), order.getSentTime()).getSeconds() > 5) {
+		order.setProcessedTime(DateTime.now());
+		if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
 			log.info(String.format("order took more than 5 seconds to be processed %s", order.toString()));
 		}
 	}
