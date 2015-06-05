@@ -66,6 +66,8 @@ public class SparkConfig {
   public JavaSparkContext sparkContext() {
     log.info("Creating JavaSparkContext...");
     val sparkContext = new JavaSparkContext(sparkConf());
+
+    log.info("Adding hadoop properties to config...: {}", hadoop.getProperties());
     Configurations.setAll(sparkContext.hadoopConfiguration(), hadoop.getProperties());
 
     val jobJar = getJobJar();
