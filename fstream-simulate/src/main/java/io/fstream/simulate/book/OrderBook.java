@@ -76,6 +76,7 @@ public class OrderBook extends UntypedActor {
 	public void processOrder(IOrder order) {
 		assert (order.getSymbol() == this.symbol);	
 		ordercount += 1;
+		order.setProcessedTime(DateTime.now());
 		if (order.getType() == OrderType.MO) { // process market order
 			log.info(String.format("processing market order %s ", order.toString()));
 			LimitOrder limitorder = (LimitOrder)order;

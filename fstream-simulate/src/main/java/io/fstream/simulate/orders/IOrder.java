@@ -27,5 +27,7 @@ public interface IOrder {
 	
 	public String getUserId();
 	
+	public void setProcessedTime(DateTime datetime);
+	
 
 }

@@ -74,9 +74,4 @@ public class LimitOrder implements IOrder, Comparable<LimitOrder> {
 	}
 
 
-	public DateTime getProcessedTime() {
-		// TODO Auto-generated method stub
-		return this.processedTime;
-	}
-
 }
