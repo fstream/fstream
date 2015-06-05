@@ -11,12 +11,15 @@ package io.fstream.persist.service;
 
 import javax.annotation.PostConstruct;
 
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.spark.api.java.JavaSparkContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Service responsible for persisting to the long-term HDFS backing store.
@@ -34,6 +37,9 @@ public class SparkService {
   @PostConstruct
   public void run() {
     log.info("Running!");
+    val rdd = sparkContext.parallelize(ImmutableList.of(1, 2, 3));
+    rdd.saveAsTextFile("/tmp/test.txt");
+    log.info("Count: {}", rdd.count());
   }
 
 }

@@ -60,21 +60,23 @@ public class SparkConfig {
     val sparkContext = new JavaSparkContext(sparkConf());
 
     val jobJar = getJobJar();
-    log.info("Adding job jar: {}", jobJar);
-    sparkContext.addJar(jobJar);
+    if (jobJar != null) {
+      log.info("Adding job jar: {}", jobJar);
+      sparkContext.addJar(jobJar);
+    }
 
     return sparkContext;
   }
 
-  private String getJobJar() {
+  private static String getJobJar() {
     val jarAnchor = SparkConfig.class;
     val path = getPath(jarAnchor);
 
-    return isExpoded(path) ? getPath(getClass()) : path;
+    return isExpoded(path) ? null : path;
   }
 
   private static boolean isExpoded(String path) {
-    return path.contains("classes");
+    return path.contains("/bin") || path.contains("/build");
   }
 
   private static String getPath(Class<?> type) {

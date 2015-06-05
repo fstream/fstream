@@ -23,7 +23,6 @@ import static com.google.common.collect.Maps.newLinkedHashMap;
 import java.util.Map;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +38,12 @@ public class PersistProperties {
   }
 
   @Bean
+  @ConfigurationProperties(prefix = "hadoop")
+  public HadoopProperties hadoopProperties() {
+    return new HadoopProperties();
+  }
+
+  @Bean
   @ConfigurationProperties(prefix = "hbase")
   public HBaseProperties hbaseProperties() {
     return new HBaseProperties();
@@ -48,12 +53,6 @@ public class PersistProperties {
   @ConfigurationProperties(prefix = "spark")
   public SparkProperties sparkProperties() {
     return new SparkProperties();
-  }
-
-  @Bean
-  @ConfigurationProperties(prefix = "hadoop")
-  public HadoopProperties hadoopProperties() {
-    return new HadoopProperties();
   }
 
   @Data
@@ -71,16 +70,17 @@ public class PersistProperties {
   }
 
   @Data
-  @EqualsAndHashCode(callSuper = true)
-  public static class SparkProperties extends HadoopProperties {
+  public static class HBaseProperties {
 
-    private String master;
+    private Map<String, String> properties = newLinkedHashMap();
 
   }
 
   @Data
-  @EqualsAndHashCode(callSuper = true)
-  public static class HBaseProperties extends HadoopProperties {
+  public static class SparkProperties {
+
+    private String master;
+    private Map<String, String> properties = newLinkedHashMap();
 
   }
 

@@ -30,14 +30,17 @@ influxdb:
    host: localhost
    database: fstream-events
    url: http://${influxdb.host}:${influxdb.port}
-
-# HBase
-hbase:
+   
+# Hadoop
+hadoop:
+   properties:
+      fs.defaultFS: file:///
 
 # Spark
 spark:
    # Virtual box
    # master: "spark://172.28.128.3:7077"
+   # master: "spark://localhost:17077"
    master: local
    properties:
      spark.default.parallelism: 1

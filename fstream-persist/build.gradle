@@ -37,10 +37,14 @@ dependencies {
   compile libraries.sparkStreaming
 
   // Hadoop
-  compile libraries.hadoop
+  compile(libraries.hadoopClient) {
+    exclude group: 'javax.servlet',  module: 'servlet-api'
+  }
 
   // HBase
-  compile libraries.hbaseClient
+  compile(libraries.hbaseClient) {
+    exclude group: 'javax.servlet',  module: 'servlet-api'
+  }
 
   // Kafka
   compile libraries.kafka
