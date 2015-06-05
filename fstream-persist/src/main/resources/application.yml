@@ -9,7 +9,8 @@
 # Spring
 spring:
    profiles:
-      active: influxdb,spark
+      active: spark
+      # active: influxdb,spark
 
 # ZooKeeper
 zk:
@@ -34,13 +35,14 @@ influxdb:
 # Hadoop
 hadoop:
    properties:
+      # Virtual box
+      # fs.defaultFS: hdfs://fstream
       fs.defaultFS: file:///
 
 # Spark
 spark:
    # Virtual box
    # master: "spark://172.28.128.3:7077"
-   # master: "spark://localhost:17077"
    master: local
    properties:
      spark.default.parallelism: 1

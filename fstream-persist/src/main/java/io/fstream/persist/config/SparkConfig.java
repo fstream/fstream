@@ -18,7 +18,9 @@
 package io.fstream.persist.config;
 
 import static scala.collection.JavaConversions.asScalaMap;
+import io.fstream.persist.config.PersistProperties.HadoopProperties;
 import io.fstream.persist.config.PersistProperties.SparkProperties;
+import io.fstream.persist.util.Configurations;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Spark configuration.
@@ -37,6 +40,7 @@ import org.springframework.context.annotation.Lazy;
 @Slf4j
 @Lazy
 @Configuration
+@Profile("spark")
 public class SparkConfig {
 
   /**
@@ -44,20 +48,25 @@ public class SparkConfig {
    */
   @Autowired
   SparkProperties spark;
+  @Autowired
+  HadoopProperties hadoop;
 
   @Bean
   public SparkConf sparkConf() {
     log.info("Creating SparkConf with spark properties '{}'", spark);
-    return new SparkConf()
+    val conf = new SparkConf()
         .setAppName("fstream-persist")
         .setMaster(spark.getMaster())
         .setAll(asScalaMap(spark.getProperties()));
+
+    return conf;
   }
 
   @Bean(destroyMethod = "stop")
   public JavaSparkContext sparkContext() {
     log.info("Creating JavaSparkContext...");
     val sparkContext = new JavaSparkContext(sparkConf());
+    Configurations.setAll(sparkContext.hadoopConfiguration(), hadoop.getProperties());
 
     val jobJar = getJobJar();
     if (jobJar != null) {
@@ -80,7 +89,7 @@ public class SparkConfig {
   }
 
   private static String getPath(Class<?> type) {
-    return type.getProtectionDomain().getCodeSource().getLocation().getPath();
+    return type.getProtectionDomain().getCodeSource().getLocation().getPath().replace("!/", "");
   }
 
 }
