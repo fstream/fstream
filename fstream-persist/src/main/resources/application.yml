@@ -9,7 +9,7 @@
 # Spring
 spring:
    profiles:
-      active: influxdb
+      active: influxdb,spark
 
 # ZooKeeper
 zk:
@@ -30,4 +30,15 @@ influxdb:
    host: localhost
    database: fstream-events
    url: http://${influxdb.host}:${influxdb.port}
+
+# HBase
+hbase:
+
+# Spark
+spark:
+   # Virtual box
+   # master: "spark://172.28.128.3:7077"
+   master: local
+   properties:
+     spark.default.parallelism: 1
    
