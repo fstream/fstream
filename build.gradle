@@ -54,6 +54,7 @@ buildscript {
 		kafka:              "org.apache.kafka:kafka_2.10:$kafkaVersion",
 		storm:              "org.apache.storm:storm-core:${stormVersion}",
 		stormKafka:         "org.apache.storm:storm-kafka:${stormVersion}",
+		sparkSql:           "org.apache.spark:spark-sql_2.10:$sparkVersion",
 		sparkStreaming:     "org.apache.spark:spark-streaming_2.10:$sparkVersion",
 		esper:              "com.espertech:esper:${esperVersion}",
 		hadoopClient:       "org.apache.hadoop:hadoop-client:$hadoopVersion",
