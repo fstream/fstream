@@ -32,8 +32,7 @@ dependencies {
   compile libraries.springBootActuator
 
   // Akka
-  compile group: 'com.typesafe.akka', name: 'akka-actor_2.10', version: '2.4-SNAPSHOT'
-  compile group: 'com.typesafe.akka', name: 'akka-testkit_2.10', version: '2.4-SNAPSHOT'
+  compile 'com.typesafe.akka:akka-actor_2.10:2.3.11'
   
   // Kafak
   compile libraries.kafka
