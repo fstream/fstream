@@ -14,7 +14,7 @@ import static io.fstream.core.util.PropertiesUtils.getProperties;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
-import io.fstream.persist.config.KafkaProperties;
+import io.fstream.persist.config.PersistProperties.KafkaProperties;
 
 import java.util.List;
 import java.util.Map;

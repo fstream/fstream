@@ -41,7 +41,8 @@ provider = settings['provider']
 
 # Ansible environment. See https://github.com/mitchellh/vagrant/issues/2924
 ENV['PYTHONIOENCODING'] = "utf-8"
-ENV['ANSIBLE_ROLES_PATH']  = @ansible_path + "/" + "roles"
+ENV['ANSIBLE_CONFIG'] = @ansible_path + "/" + "ansible.cfg"
+ENV['ANSIBLE_ROLES_PATH']  = @ansible_path + "/" + "roles:" + @ansible_path + "/" + "roles/bdas"
 ENV['VAGRANT_DEFAULT_PROVIDER'] = provider
 
 # Ansible groups

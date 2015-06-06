@@ -36,6 +36,7 @@ mem.h2.db
 mem.lock.db
 mem.trace.db
 logs/
+*.jar
 
 # Packer
 packer_cache/
@@ -60,3 +61,6 @@ packer_cache/
 # Vagrant
 .vagrant/
 /bin/
+
+# Ansible
+ansible.log

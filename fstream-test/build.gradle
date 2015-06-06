@@ -16,6 +16,8 @@ apply plugin: 'com.github.johnrengelman.shadow'
 mainClassName = "io.fstream.test.TestMain"
 
 shadowJar {
+  zip64 true
+  
   exclude 'META-INF/*.SF'
   exclude 'META-INF/*.DSA'
   exclude 'META-INF/*.RSA'
@@ -56,8 +58,8 @@ dependencies {
   compile libraries.springBootActuator
 
   // Hadoop
-  compile libraries.hadoop
-  compile libraries.hadoopTest
+  compile libraries.hadoopClient
+  compile libraries.hadoopMiniCluster
 
   // HBase
   compile libraries.hbaseClient

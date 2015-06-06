@@ -1,0 +1,70 @@
+---
+- name: apply common configuration to all nodes
+  hosts: all
+  sudo: True
+  roles:
+    - common
+  any_errors_fatal: yes
+
+- name: create non-root clusteruser user
+  hosts: all
+  sudo: True
+  roles:
+    - clusteruser_common
+  any_errors_fatal: yes
+
+- name: setup passwordless SSH for clusteruser - donor key
+  hosts: master
+  sudo: True
+  roles: 
+    - { role: sshkey_donor }
+  any_errors_fatal: yes
+
+- name: setup passwordless SSH for clusteruser - accept key
+  hosts: workers
+  sudo: True
+  roles:
+    - { role: sshkey_acceptor }
+  any_errors_fatal: yes
+
+- name: setup passwordless SSH for user root - donor key
+  hosts: master
+  sudo: True
+  roles:
+    - { role: sshkey_donor, clusteruser: root, clusteruser_home: '/root' }
+  any_errors_fatal: yes
+
+- name: setup passwordless SSH for user root - accept key
+  hosts: workers
+  sudo: True
+  roles:
+    - { role: sshkey_acceptor, clusteruser: root, clusteruser_home: '/root' }
+  any_errors_fatal: yes
+
+- name: setup HDFS namenode
+  hosts: master
+  sudo: True
+  vars_files:
+    - group_vars/components.yml
+  roles:
+    - { role: hdfs_namenode, when: install_spark or install_mapred or install_mesos or install_tachyon }
+  any_errors_fatal: yes
+
+- name: setup HDFS datanodes
+  hosts: workers
+  sudo: True
+  vars_files:
+    - group_vars/components.yml
+  roles:
+    - { role: hdfs_datanode, when: install_spark or install_mapred or install_mesos or install_tachyon }
+  any_errors_fatal: yes
+
+- name: deploy standalone Spark
+  hosts: all
+  sudo: True
+  vars_files:
+    - group_vars/components.yml
+  roles:
+    - { role: spark_standalone, when: install_spark }
+  any_errors_fatal: yes
+

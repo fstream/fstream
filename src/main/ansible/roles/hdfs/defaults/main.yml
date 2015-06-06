@@ -6,7 +6,7 @@ hdfs_conf_dir: "/etc/hadoop/conf"
 hdfs_namenode: False
 hdfs_namenode_host: localhost
 hdfs_namenode_port: 8020
-hdfs_disks: []
+hdfs_disks: [{ mount_point: '/dfs/data', device: '/dev/sda1' }]
 
 hdfs_core_properties:
   - { name: "fs.defaultFS", value: "hdfs://{{ hdfs_namenode_host }}:{{ hdfs_namenode_port }}" }

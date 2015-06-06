@@ -12,6 +12,10 @@ boxes:
    # fStream
    - name: fstream
      groups:
+        # Spark / HDFS
+        - master
+        - workers     
+     
         - ops
         
         - influxdb
@@ -35,6 +39,10 @@ boxes:
            - guest: 8083
              host: 18083
            - guest: 9200
-             host: 19200                       
+             host: 19200
            - guest: 5601
-             host: 15601                       
+             host: 15601
+           
+           # Spark master port
+           - guest: 7077
+             host: 17077

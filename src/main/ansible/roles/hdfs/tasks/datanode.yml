@@ -8,6 +8,12 @@
     - hadoop-hdfs-datanode
     - hadoop-client
 
+- name: Add the JAVA_HOME for CDH packages
+  lineinfile:
+    dest: /etc/default/bigtop-utils
+    regexp: ^export JAVA_HOME
+    line: export JAVA_HOME={{ jdk_home }}
+
 - name: Configure Hadoop HDFS DataNode
   template: src={{ item }}.xml.j2 dest={{ hdfs_conf_dir }}/{{ item | replace("datanode-", "") }}.xml
   with_items:
@@ -22,26 +28,26 @@
   register: existing_data_directory
   with_items: hdfs_disks
 
-- name: Check if device already has a file system
-  command: blkid -c /dev/null -o value -s TYPE {{ item.device }}
-  with_items: hdfs_disks
-  when: existing_data_directory | changed
-  register: existing_filesystem
-  changed_when: existing_filesystem.rc == 2
-  failed_when: False
-
-- name: Format Hadoop HDFS disks as ext3
-  command: "mkfs.ext3 {{ item.device }} -F"
-  when: existing_filesystem | changed
-  with_items: hdfs_disks
-
-- name: Mount Hadoop HDFS disks
-  mount: name={{ item.mount_point }}
-         src={{ item.device }}
-         fstype=ext3
-         state=mounted
-  when: existing_data_directory | changed
-  with_items: hdfs_disks
+#- name: Check if device already has a file system
+#  command: blkid -c /dev/null -o value -s TYPE {{ item.device }}
+#  with_items: hdfs_disks
+#  when: existing_data_directory | changed
+#  register: existing_filesystem
+#  changed_when: existing_filesystem.rc == 2
+#  failed_when: False
+#
+#- name: Format Hadoop HDFS disks as ext3
+#  command: "mkfs.ext3 {{ item.device }} -F"
+#  when: existing_filesystem | changed
+#  with_items: hdfs_disks
+#
+#- name: Mount Hadoop HDFS disks
+#  mount: name={{ item.mount_point }}
+#         src={{ item.device }}
+#         fstype=ext3
+#         state=mounted
+#  when: existing_data_directory | changed
+#  with_items: hdfs_disks
 
 - name: Ensure Hadoop HDFS DataNode data directory ownership
   file: path={{ item.mount_point }}
