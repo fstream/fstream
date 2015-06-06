@@ -99,7 +99,7 @@ public class Simulator {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				tradingApp.terminate();
+				tradingApp.shutdown();
 			}
 		}, tradingApp.dispatcher());
 	}
