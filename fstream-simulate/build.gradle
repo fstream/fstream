@@ -31,15 +31,13 @@ dependencies {
   // Spring
   compile libraries.springBootActuator
 
-  // Put module dependencies here!
+  // Akka
+  compile group: 'com.typesafe.akka', name: 'akka-actor_2.10', version: '2.4-SNAPSHOT'
+  compile group: 'com.typesafe.akka', name: 'akka-testkit_2.10', version: '2.4-SNAPSHOT'
+  
+  // Kafak
+  compile libraries.kafka
   
   // Utilities
   compile libraries.guava
-  
-  // akka.io
-  compile 'org.scala-lang:scala-library:2.11.6'
-  compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.4-SNAPSHOT'
-  compile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: '2.4-SNAPSHOT'
-  compile group: 'org.scala-lang', name: 'scala-library', version: '2.11.6'
 }
-

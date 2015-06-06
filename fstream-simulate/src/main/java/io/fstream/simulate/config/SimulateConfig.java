@@ -20,5 +20,5 @@ public class SimulateConfig {
 	public Config akkaConfiguration() {
 		return ConfigFactory.load();
 	}
-
+	
 }

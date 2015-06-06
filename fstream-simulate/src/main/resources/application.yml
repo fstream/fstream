@@ -6,8 +6,12 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
 
-# Config here
+# Spring
+spring:
+   profiles:
+      active: kafka
 
+# Application
 simulate:
    seconds: 60
    instruments:
@@ -16,3 +20,11 @@ simulate:
       - TD
       - BBM
       - HUF
+      
+# Kafka
+kafka:
+   producerProperties:
+      metadata.broker.list: ${kafka.broker.list:localhost:6667}
+      partitioner.class: kafka.producer.DefaultPartitioner
+      serializer.class: kafka.serializer.StringEncoder
+      
