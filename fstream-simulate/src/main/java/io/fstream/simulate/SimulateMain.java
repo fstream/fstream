@@ -18,9 +18,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class SimulateMain {
 
   public static void main(String... args) throws Exception {
-    new SpringApplicationBuilder()
-        .sources(SimulateMain.class)
-        .run(args);
+    new SpringApplicationBuilder().sources(SimulateMain.class).run(args);
   }
 
 }

@@ -11,11 +11,11 @@ import akka.actor.Props;
 @Component
 public class SpringExtension implements Extension {
 
-	@Autowired
-    private ApplicationContext applicationContext;
+  @Autowired
+  private ApplicationContext applicationContext;
 
-    public Props props(Class<? extends Actor> actorBeanClass, Object... actorConstructorArgs) {
-        return Props.create(SpringActorProducer.class, applicationContext, actorBeanClass, actorConstructorArgs);
-    }
-    
+  public Props props(Class<? extends Actor> actorBeanClass, Object... actorConstructorArgs) {
+    return Props.create(SpringActorProducer.class, applicationContext, actorBeanClass, actorConstructorArgs);
+  }
+
 }

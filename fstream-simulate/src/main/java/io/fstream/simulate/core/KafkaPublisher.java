@@ -20,42 +20,46 @@ import org.springframework.stereotype.Component;
 @Profile("kafka")
 public class KafkaPublisher implements Publisher {
 
-	/**
-	 * Constants. 
-	 */
-	private static final String PUBLISH_TOPIC = "toq";
-	
-	/**
-	 * Dependencies.
-	 */
-	private final Producer<String, String> producer;
+  /**
+   * Constants.
+   */
+  private static final String PUBLISH_TOPIC = "toq";
 
-	@Autowired
-	public KafkaPublisher(@NonNull KafkaProperties properties) {
-		this.producer = new Producer<>(createConfig(properties.getProducerProperties()));
-	}
+  /**
+   * Dependencies.
+   */
+  private final Producer<String, String> producer;
 
-	@Override
-	public void publish(Event event) {
-        val key = "1"; // TODO: this should probably be a symbol
-		val value = Codec.encodeText(event);
-		
-		val message = new KeyedMessage<String, String>(PUBLISH_TOPIC, key, value);
-        
-        producer.send(message);
-	}
+  @Autowired
+  public KafkaPublisher(@NonNull KafkaProperties properties) {
+    this.producer = new Producer<>(
+        createConfig(properties.getProducerProperties()));
+  }
 
-	private static ProducerConfig createConfig(Map<String, String> producerProperties) {
-		val config = new ProducerConfig(createProperties(producerProperties));
-		
-		return config;
-	}
+  @Override
+  public void publish(Event event) {
+    val key = "1"; // TODO: this should probably be a symbol
+    val value = Codec.encodeText(event);
 
-	private static Properties createProperties(Map<String, String> producerProperties) {
-		val properties = new Properties();
-		properties.putAll(producerProperties);
-		
-		return properties;
-	}
+    val message = new KeyedMessage<String, String>(PUBLISH_TOPIC, key,
+        value);
+
+    producer.send(message);
+  }
+
+  private static ProducerConfig createConfig(
+      Map<String, String> producerProperties) {
+    val config = new ProducerConfig(createProperties(producerProperties));
+
+    return config;
+  }
+
+  private static Properties createProperties(
+      Map<String, String> producerProperties) {
+    val properties = new Properties();
+    properties.putAll(producerProperties);
+
+    return properties;
+  }
 
 }

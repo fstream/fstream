@@ -5,6 +5,7 @@ import lombok.Setter;
 
 /**
  * Data structure to represent best bid/best offer
+ * 
  * @author bdevani
  *
  *
@@ -13,14 +14,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BbBo {
-	
-	String symbol;
-	float bestbid;
-	float bestoffer;
-	
-	public BbBo (String symbol) {
-		this.symbol = symbol;
-	}
-	
+
+  String symbol;
+  float bestbid;
+  float bestoffer;
+
+  public BbBo(String symbol) {
+    this.symbol = symbol;
+  }
 
 }

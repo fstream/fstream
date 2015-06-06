@@ -11,9 +11,9 @@ import io.fstream.core.model.event.Event;
 @Profile("!kafka")
 public class LogPublisher implements Publisher {
 
-	@Override
-	public void publish(Event event) {
-		log.info("Event: {}", event);
-	}
+  @Override
+  public void publish(Event event) {
+    log.info("Event: {}", event);
+  }
 
 }

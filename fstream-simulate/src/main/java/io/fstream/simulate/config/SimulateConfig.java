@@ -11,14 +11,14 @@ import com.typesafe.config.ConfigFactory;
 @Configuration
 public class SimulateConfig {
 
-	@Bean
-	public ActorSystem actorSystem() {
-		return ActorSystem.create("tradingApp", akkaConfiguration());
-	}
+  @Bean
+  public ActorSystem actorSystem() {
+    return ActorSystem.create("tradingApp", akkaConfiguration());
+  }
 
-	@Bean
-	public Config akkaConfiguration() {
-		return ConfigFactory.load();
-	}
-	
+  @Bean
+  public Config akkaConfiguration() {
+    return ConfigFactory.load();
+  }
+
 }

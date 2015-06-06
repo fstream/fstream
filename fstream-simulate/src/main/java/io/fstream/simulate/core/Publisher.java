@@ -4,6 +4,6 @@ import io.fstream.core.model.event.Event;
 
 public interface Publisher {
 
-	void publish(Event event);
-	
+  void publish(Event event);
+
 }

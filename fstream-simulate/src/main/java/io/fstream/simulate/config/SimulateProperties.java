@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("simulate")
 public class SimulateProperties {
 
-	private int seconds;
-	
-	private List<String> instruments = newArrayList();
-	
+  private int seconds;
+
+  private List<String> instruments = newArrayList();
+
 }
