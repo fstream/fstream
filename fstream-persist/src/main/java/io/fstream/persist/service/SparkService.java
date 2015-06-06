@@ -9,6 +9,8 @@
 
 package io.fstream.persist.service;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
@@ -20,13 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Service responsible for persisting to the long-term HDFS backing store.
@@ -45,22 +46,28 @@ public class SparkService {
 
   @PostConstruct
   public void run() throws IOException {
-    val path = new Path("/tmp/test.txt");
-    fileSystem.delete(path, true);
+    val workDir = "/fstream";
 
+    log.info("Deleting work dir '{}'...", workDir);
+    fileSystem.delete(new Path(workDir), true);
+
+    val interval = SECONDS.toMillis(30);
+
+    // Contexts
     @Cleanup
-    val streamingContext = new JavaStreamingContext(sparkContext, new Duration(1000));
+    val streamingContext = new JavaStreamingContext(sparkContext, new Duration(interval));
+    val sqlContext = new SQLContext(sparkContext);
 
-    val input = streamingContext.textFileStream("/tmp");
-    input.print();
+    val input = streamingContext.textFileStream(workDir);
+    input.foreachRDD((rdd, time) -> {
+      val schemaRdd = sqlContext.jsonRDD(rdd);
+      schemaRdd.saveAsParquetFile(workDir + "/data-" + time.milliseconds());
+
+      return null;
+    });
 
     streamingContext.start();
-
-    log.info("Running!");
-    val rdd = sparkContext.parallelize(ImmutableList.of(1, 2, 3));
-    rdd.saveAsTextFile(path.toString());
-    log.info("Count: {}", rdd.count());
-
     streamingContext.awaitTermination();
   }
+
 }
