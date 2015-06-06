@@ -8,8 +8,6 @@
  */
 package io.fstream.simulate;
 
-import static java.lang.System.out;
-
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
@@ -23,9 +21,6 @@ public class SimulateMain {
     new SpringApplicationBuilder()
         .sources(SimulateMain.class)
         .run(args);
-
-    out.println("\n\n*** Running simulate. Press CTLR+C to shutdown\n\n");
-    Thread.sleep(Long.MAX_VALUE);
   }
 
 }

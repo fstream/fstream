@@ -1,19 +1,17 @@
 package io.fstream.simulate.core;
 
 import static akka.pattern.Patterns.gracefulStop;
+import io.fstream.simulate.agents.Exchange;
+import io.fstream.simulate.agents.InstitutionalAgent;
+import io.fstream.simulate.agents.RetailAgent;
+import io.fstream.simulate.config.SimulateProperties;
+import io.fstream.simulate.messages.Messages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-
-import io.fstream.simulate.agents.Exchange;
-import io.fstream.simulate.agents.InstitutionalAgent;
-import io.fstream.simulate.agents.RetailAgent;
-import io.fstream.simulate.messages.Messages;
-import io.fstream.simulate.config.SimulateProperties;
-import io.fstream.simulate.config.SpringExtension;
 
 import javax.annotation.PostConstruct;
 
@@ -36,24 +34,18 @@ import akka.actor.Props;
 public class Simulator {
 
 	/**
-	 * Dependencies.
-	 */
-//	@Autowired
-//	private Akka akka;
-//	@Autowired
-//	private SomeOtherComponent other;
-	
-	/**
 	 * Configuration.
 	 */
 	@Autowired
 	private SimulateProperties properties;
 	
+	/**
+	 * Dependencies.
+	 */
 	@Autowired
 	private ActorSystem tradingApp;
-	
 	@Autowired
-	private SpringExtension springext;
+	private ActorFactory actorFactory;
 	
 	@PostConstruct
 	public void simulate() {
@@ -67,7 +59,10 @@ public class Simulator {
 		agents.put("retail", new ArrayList<ActorRef>());
 		for (int i = 0; i < 1000; i++) {
 			String name = "ret" + i;
-			agents.get("retail").add(tradingApp.actorOf(Props.create(RetailAgent.class,name,exchange), name));
+			// val retailActor = tradingApp.actorOf(Props.create(RetailAgent.class,name,exchange), name);
+			
+			val retailActor = actorFactory.createRetailAgent(name);
+			agents.get("retail").add(retailActor);
 			//agents.get("retail").add(tradingApp.actorOf(springext.props("retailagent")));
 		}
 		agents.put("inst", new ArrayList<ActorRef>());
