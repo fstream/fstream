@@ -53,25 +53,27 @@ public class Simulator {
 		//ActorSystem tradingApp = ActorSystem.create("tradingApp");
 		
 		
-		ActorRef exchange = tradingApp.actorOf(Props.create(Exchange.class), "exchange");
+		// val exchange = tradingApp.actorOf(Props.create(Exchange.class), "exchange");
+		val exchange = actorFactory.createExchange();
 		
 		val agents = new HashMap<String,List<ActorRef>>();
 		agents.put("retail", new ArrayList<ActorRef>());
 		for (int i = 0; i < 1000; i++) {
 			String name = "ret" + i;
 			// val retailActor = tradingApp.actorOf(Props.create(RetailAgent.class,name,exchange), name);
-			
 			val retailActor = actorFactory.createRetailAgent(name);
+			
 			agents.get("retail").add(retailActor);
-			//agents.get("retail").add(tradingApp.actorOf(springext.props("retailagent")));
 		}
 		agents.put("inst", new ArrayList<ActorRef>());
 		for (int i = 0; i < 3000; i++) {
 			String name = "inst" + i;
-			agents.get("inst").add(tradingApp.actorOf(Props.create(InstitutionalAgent.class,name,exchange), name));
+			
+			//val institutionalActor = tradingApp.actorOf(Props.create(InstitutionalAgent.class,name,exchange), name);
+			val institutionalActor = actorFactory.createInstitutionalAgent(name);
+			
+			agents.get("inst").add(institutionalActor);
 		}
-		
-	
 		
 		tradingApp.scheduler().scheduleOnce(Duration.create(20,TimeUnit.SECONDS), new Runnable() {
 			@Override
