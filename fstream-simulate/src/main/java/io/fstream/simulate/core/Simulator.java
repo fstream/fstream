@@ -1,6 +1,9 @@
 package io.fstream.simulate.core;
 
 import static akka.pattern.Patterns.gracefulStop;
+import io.fstream.simulate.agents.Exchange;
+import io.fstream.simulate.agents.InstitutionalAgent;
+import io.fstream.simulate.agents.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.messages.Messages;
 import io.fstream.simulate.spring.SpringExtension;
@@ -50,14 +53,14 @@ public class Simulator {
 		//ActorSystem tradingApp = ActorSystem.create("tradingApp");
 		
 		// val exchange = tradingApp.actorOf(Props.create(Exchange.class), "exchange");
-		val exchange = tradingApp.actorOf(spring.props("exchange"), "exchange");
+		val exchange = tradingApp.actorOf(spring.props(Exchange.class), "exchange");
 		
 		val agents = new HashMap<String,List<ActorRef>>();
 		agents.put("retail", new ArrayList<ActorRef>());
 		for (int i = 0; i < 1000; i++) {
 			String name = "ret" + i;
 			// val retailActor = tradingApp.actorOf(Props.create(RetailAgent.class,name,exchange), name);
-			val retailAgent = tradingApp.actorOf(spring.props("retailAgent", name, exchange), name);
+			val retailAgent = tradingApp.actorOf(spring.props(RetailAgent.class, name, exchange), name);
 			
 			agents.get("retail").add(retailAgent);
 		}
@@ -66,7 +69,7 @@ public class Simulator {
 			String name = "inst" + i;
 			
 			// val institutionalAgent = tradingApp.actorOf(Props.create(InstitutionalAgent.class,name,exchange), name);
-			val institutionalAgent = tradingApp.actorOf(spring.props("institutionalAgent", name, exchange), name);
+			val institutionalAgent = tradingApp.actorOf(spring.props(InstitutionalAgent.class, name, exchange), name);
 			
 			agents.get("inst").add(institutionalAgent);
 		}

@@ -1,5 +1,7 @@
 package io.fstream.simulate.agents;
 
+import io.fstream.simulate.book.OrderBook;
+import io.fstream.simulate.book.TradeBook;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.messages.ActiveInstruments;
 import io.fstream.simulate.messages.BbBo;
@@ -49,7 +51,7 @@ public class Exchange extends UntypedActor {
 	public void init() {
 		activeinstruments = new ActiveInstruments();
 		activeinstruments.setActiveinstruments(Arrays.asList("RY","BBM","BMO","TD","CIBC","HUF"));
-		tradebook = context().actorOf(spring.props("tradeBook"), "tradebook");
+		tradebook = context().actorOf(spring.props(TradeBook.class), "tradebook");
 		processors = new HashMap<String, ActorRef>() ;
 	}
 	
@@ -122,7 +124,7 @@ public class Exchange extends UntypedActor {
 		final ActorRef maybeprocessor = (ActorRef) processors.get(instrument);
 		if (maybeprocessor == null) {
 			// final ActorRef processor = context().actorOf(Props.create(OrderBook.class,instrument,self()), instrument);
-			val processor = context().actorOf(spring.props("orderBook", instrument, self()), instrument);
+			val processor = context().actorOf(spring.props(OrderBook.class, instrument, self()), instrument);
 			
 			processors.put(instrument, processor);
 			return processor;

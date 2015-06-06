@@ -9,8 +9,8 @@ import akka.actor.Actor;
 import akka.actor.IndirectActorProducer;
 
 /**
- * An actor producer that let's spring create the Actor instances
- * Follows free (no conditions opensource) typesafe template example
+ * An actor producer that let's spring create the Actor instances Follows free
+ * (no conditions opensource) typesafe template example
  * 
  * @author bdevani
  */
@@ -18,21 +18,20 @@ import akka.actor.IndirectActorProducer;
 public class SpringActorProducer implements IndirectActorProducer {
 
 	@NonNull
-    private final ApplicationContext applicationContext;
+	private final ApplicationContext applicationContext;
 	@NonNull
-    private final String actorBeanName;
+	private final Class<? extends Actor> actorBeanClass;
 	@NonNull
 	private final Object[] actorConstructorArgs;
 
-    @Override
-    public Actor produce() {
-        return (Actor) applicationContext.getBean(actorBeanName, actorConstructorArgs);
-    }
+	@Override
+	public Actor produce() {
+		return applicationContext.getBean(actorBeanClass, actorConstructorArgs);
+	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-    public Class<? extends Actor> actorClass() {
-        return (Class<? extends Actor>) applicationContext.getType(actorBeanName);
-    }
-	
+	public Class<? extends Actor> actorClass() {
+		return actorBeanClass;
+	}
+
 }
