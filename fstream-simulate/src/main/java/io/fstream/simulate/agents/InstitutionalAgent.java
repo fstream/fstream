@@ -10,7 +10,6 @@ import io.fstream.simulate.orders.IOrder.OrderType;
 import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Positions;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
@@ -24,12 +23,12 @@ import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
 import akka.pattern.Patterns;
-import akka.util.Timeout;
 
 @Slf4j
 @Getter
+@Component
+@Scope("prototype")
 public class InstitutionalAgent extends AgentActor {
 	
 	ActiveInstruments activeinstruments = new ActiveInstruments();
@@ -142,7 +141,5 @@ public class InstitutionalAgent extends AgentActor {
 	public void postRestart(Throwable reason) {
 		
 	}
-
-
 
 }

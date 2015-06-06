@@ -10,32 +10,29 @@ import io.fstream.simulate.orders.IOrder.OrderType;
 import io.fstream.simulate.orders.LimitOrder;
 
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
 import akka.pattern.Patterns;
-import akka.util.Timeout;
-
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 
 
 @Getter
 @Setter
 @Slf4j
+@Component
+@Scope("prototype")
 public class RetailAgent extends AgentActor { 
 	
 	/**

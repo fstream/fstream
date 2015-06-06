@@ -1,54 +1,57 @@
 package io.fstream.simulate.agents;
 
-import io.fstream.simulate.book.OrderBook;
-import io.fstream.simulate.book.TradeBook;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.messages.ActiveInstruments;
 import io.fstream.simulate.messages.BbBo;
 import io.fstream.simulate.messages.Messages;
 import io.fstream.simulate.messages.State;
 import io.fstream.simulate.orders.IOrder;
 import io.fstream.simulate.orders.Trade;
+import io.fstream.simulate.spring.SpringExtension;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import javax.annotation.PostConstruct;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.actor.UntypedActor;
 
 @Slf4j
+@Lazy // This is required otherwise Akka will complain it was created outside of a factory
+@Component
 public class Exchange extends UntypedActor {
 
 	private static AtomicInteger OID = new AtomicInteger(0);
 	
+	@Autowired
+	private SpringExtension spring;
+	@Autowired
+	private SimulateProperties properties;
+	
 	private HashMap<String,ActorRef> processors;
 	private ActorRef tradebook;
 	ActiveInstruments activeinstruments;
-	
 
-	
-	public Exchange () {
-		init();
-	}
-	
 	public ActorRef getOrderBook (String instrument) {
 		return processors.get(instrument);
-
 	}
 	
-	private void init() {
+	@PostConstruct
+	public void init() {
 		activeinstruments = new ActiveInstruments();
 		activeinstruments.setActiveinstruments(Arrays.asList("RY","BBM","BMO","TD","CIBC","HUF"));
-		tradebook = context().actorOf(Props.create(TradeBook.class), "tradebook");
+		tradebook = context().actorOf(spring.props("tradeBook"), "tradebook");
 		processors = new HashMap<String, ActorRef>() ;
 	}
-	
 	
 	public synchronized static int getOID() {
 		return OID.incrementAndGet();
@@ -118,7 +121,9 @@ public class Exchange extends UntypedActor {
 	private ActorRef getProcessor (String instrument) {
 		final ActorRef maybeprocessor = (ActorRef) processors.get(instrument);
 		if (maybeprocessor == null) {
-			final ActorRef processor = context().actorOf(Props.create(OrderBook.class,instrument,self()), instrument);
+			// final ActorRef processor = context().actorOf(Props.create(OrderBook.class,instrument,self()), instrument);
+			val processor = context().actorOf(spring.props("orderBook", instrument, self()), instrument);
+			
 			processors.put(instrument, processor);
 			return processor;
 		}

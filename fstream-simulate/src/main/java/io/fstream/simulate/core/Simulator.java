@@ -1,11 +1,9 @@
 package io.fstream.simulate.core;
 
 import static akka.pattern.Patterns.gracefulStop;
-import io.fstream.simulate.agents.Exchange;
-import io.fstream.simulate.agents.InstitutionalAgent;
-import io.fstream.simulate.agents.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.messages.Messages;
+import io.fstream.simulate.spring.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +24,6 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 
 @Slf4j
 @Data
@@ -45,34 +42,33 @@ public class Simulator {
 	@Autowired
 	private ActorSystem tradingApp;
 	@Autowired
-	private ActorFactory actorFactory;
+	private SpringExtension spring;
 	
 	@PostConstruct
 	public void simulate() {
 		log.info("Simulating for {} seconds with instruments {}", properties.getSeconds(), properties.getInstruments());
 		//ActorSystem tradingApp = ActorSystem.create("tradingApp");
 		
-		
 		// val exchange = tradingApp.actorOf(Props.create(Exchange.class), "exchange");
-		val exchange = actorFactory.createExchange();
+		val exchange = tradingApp.actorOf(spring.props("exchange"), "exchange");
 		
 		val agents = new HashMap<String,List<ActorRef>>();
 		agents.put("retail", new ArrayList<ActorRef>());
 		for (int i = 0; i < 1000; i++) {
 			String name = "ret" + i;
 			// val retailActor = tradingApp.actorOf(Props.create(RetailAgent.class,name,exchange), name);
-			val retailActor = actorFactory.createRetailAgent(name);
+			val retailAgent = tradingApp.actorOf(spring.props("retailAgent", name, exchange), name);
 			
-			agents.get("retail").add(retailActor);
+			agents.get("retail").add(retailAgent);
 		}
 		agents.put("inst", new ArrayList<ActorRef>());
 		for (int i = 0; i < 3000; i++) {
 			String name = "inst" + i;
 			
-			//val institutionalActor = tradingApp.actorOf(Props.create(InstitutionalAgent.class,name,exchange), name);
-			val institutionalActor = actorFactory.createInstitutionalAgent(name);
+			// val institutionalAgent = tradingApp.actorOf(Props.create(InstitutionalAgent.class,name,exchange), name);
+			val institutionalAgent = tradingApp.actorOf(spring.props("institutionalAgent", name, exchange), name);
 			
-			agents.get("inst").add(institutionalActor);
+			agents.get("inst").add(institutionalAgent);
 		}
 		
 		tradingApp.scheduler().scheduleOnce(Duration.create(20,TimeUnit.SECONDS), new Runnable() {
@@ -105,9 +101,4 @@ public class Simulator {
 		}, tradingApp.dispatcher());
 	}
 		
-		
-		
-		
-	
-	
 }

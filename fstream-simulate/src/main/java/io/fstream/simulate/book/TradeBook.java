@@ -5,6 +5,9 @@ import io.fstream.simulate.orders.Trade;
 
 import java.util.ArrayList;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +18,11 @@ import akka.actor.UntypedActor;
  * @author bdevani
  *
  */
+@Slf4j
 @Getter
 @Setter
-@Slf4j
+@Component
+@Scope("prototype")
 public class TradeBook extends UntypedActor {
 	
 	private static ArrayList<Trade> TRADES = new ArrayList<Trade>();

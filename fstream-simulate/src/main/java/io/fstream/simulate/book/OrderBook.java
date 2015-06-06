@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
@@ -38,9 +40,11 @@ import akka.actor.UntypedActor;
  * @author bdevani
  *
  */
+@Slf4j
 @Getter
 @Setter
-@Slf4j
+@Component
+@Scope("prototype")
 public class OrderBook extends UntypedActor {
 
 	TreeMap<Float, TreeSet<LimitOrder>> bids;
