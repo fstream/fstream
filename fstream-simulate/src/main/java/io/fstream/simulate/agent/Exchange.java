@@ -67,7 +67,6 @@ public class Exchange extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
-      message = message;
       if (!activeinstruments.getActiveinstruments().contains(((Order) message).getSymbol())) {
         log.error(String.format("order sent for inactive symbol %s", ((Order) message).getSymbol()));
       } else {
