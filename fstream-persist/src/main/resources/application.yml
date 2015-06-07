@@ -38,6 +38,7 @@ hadoop:
       # Virtual box
       # fs.defaultFS: hdfs://fstream
       fs.defaultFS: file:///
+      # parquet.block.size: 1048576
 
 # Spark
 spark:

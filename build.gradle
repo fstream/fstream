@@ -17,7 +17,7 @@ buildscript {
 	// Versions
 	//
 	
-	ext.springBootVersion  = "1.2.3.RELEASE"
+	ext.springBootVersion  = "1.2.4.RELEASE"
 	ext.springCloudVersion = "1.0.0.M2"
 	
 	ext.kafkaVersion       = '0.8.2.0'

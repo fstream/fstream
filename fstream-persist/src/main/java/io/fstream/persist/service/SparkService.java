@@ -24,7 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
@@ -89,8 +91,15 @@ public class SparkService {
 
     val kafkaStream = createKafkaStream(streamingContext);
     kafkaStream.foreachRDD((rdd, time) -> {
-      val schemaRdd = sqlContext.jsonRDD(rdd.map(Tuple2::_2));
-      schemaRdd.saveAsParquetFile(workDir + "/data-" + time.milliseconds());
+      JavaRDD<String> messages = rdd.map(Tuple2::_2);
+      log.info("Partition count: {}", messages.partitions().size());
+      log.info("Message count: {}", messages.count());
+
+      JavaRDD<String> combined = messages.coalesce(1);
+
+      DataFrame schemaRdd = sqlContext.jsonRDD(combined);
+      String parquetFile = workDir + "/data-" + time.milliseconds();
+      schemaRdd.saveAsParquetFile(parquetFile);
 
       return null;
     });
