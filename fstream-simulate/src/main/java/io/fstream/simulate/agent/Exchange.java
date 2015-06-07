@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
+import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,7 @@ import akka.actor.UntypedActor;
 // This is required otherwise Akka will complain it was created outside of a
 // factory
 @Component
+@Setter
 public class Exchange extends UntypedActor {
 
   private static AtomicInteger OID = new AtomicInteger(0);
@@ -43,7 +45,7 @@ public class Exchange extends UntypedActor {
 
   private HashMap<String, ActorRef> processors;
   private ActorRef tradebook;
-  ActiveInstruments activeinstruments;
+  private ActiveInstruments activeinstruments;
 
   public ActorRef getOrderBook(String instrument) {
     return processors.get(instrument);
@@ -52,10 +54,8 @@ public class Exchange extends UntypedActor {
   @PostConstruct
   public void init() {
     activeinstruments = new ActiveInstruments();
-    activeinstruments.setActiveinstruments(Arrays.asList("RY", "BBM",
-        "BMO", "TD", "CIBC", "HUF"));
-    tradebook = context().actorOf(spring.props(TradeBook.class),
-        "tradebook");
+    activeinstruments.setActiveinstruments(Arrays.asList("RY", "BBM", "BMO", "TD", "CIBC", "HUF"));
+    tradebook = context().actorOf(spring.props(TradeBook.class), "tradebook");
     processors = new HashMap<String, ActorRef>();
   }
 
@@ -68,11 +68,8 @@ public class Exchange extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
-      message = (Order) message;
-      if (!activeinstruments.getActiveinstruments().contains(
-          ((Order) message).getSymbol())) {
-        log.error(String.format("order sent for inactive symbol %s",
-            ((Order) message).getSymbol()));
+      if (!activeinstruments.getActiveinstruments().contains(((Order) message).getSymbol())) {
+        log.error(String.format("order sent for inactive symbol %s", ((Order) message).getSymbol()));
       } else {
         dispatch((Order) message);
       }
@@ -90,11 +87,9 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof Trade) {
       tradebook.tell(message, self());
     } else if (message instanceof String) {
-      message = (String) message;
       if (message.equals(Messages.PRINT_ORDER_BOOK)) {
         for (val processor : processors.entrySet()) {
-          processor.getValue()
-              .tell(Messages.PRINT_ORDER_BOOK, self());
+          processor.getValue().tell(Messages.PRINT_ORDER_BOOK, self());
         }
       } else if (message.equals(Messages.PRINT_TRADE_BOOK)) {
         tradebook.tell(Messages.PRINT_TRADE_BOOK, self());
@@ -106,8 +101,7 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof ActiveInstruments) {
       // TODO implement clone method
       ActiveInstruments activeinstrument = new ActiveInstruments();
-      activeinstrument.setActiveinstruments(this.activeinstruments
-          .getActiveinstruments());
+      activeinstrument.setActiveinstruments(this.activeinstruments.getActiveinstruments());
       sender().tell(activeinstrument, self());
     } else {
       unhandled(message);
@@ -120,14 +114,12 @@ public class Exchange extends UntypedActor {
   }
 
   private ActorRef getProcessor(String instrument) {
-    final ActorRef maybeprocessor = (ActorRef) processors.get(instrument);
+    final ActorRef maybeprocessor = processors.get(instrument);
     if (maybeprocessor == null) {
       // final ActorRef processor =
       // context().actorOf(Props.create(OrderBook.class,instrument,self()),
       // instrument);
-      val processor = context().actorOf(
-          spring.props(OrderBook.class, instrument, self()),
-          instrument);
+      val processor = context().actorOf(spring.props(OrderBook.class, instrument, self()), instrument);
 
       processors.put(instrument, processor);
       return processor;

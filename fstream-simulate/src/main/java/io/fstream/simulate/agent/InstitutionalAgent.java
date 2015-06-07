@@ -71,26 +71,21 @@ public class InstitutionalAgent extends AgentActor {
       exchange.tell(activeinstruments, self());
       return null;
     }
-    String symbol = activeinstruments.getActiveinstruments()
-        .get(random.nextInt(activeinstruments.getActiveinstruments()
-            .size()));
+    String symbol =
+        activeinstruments.getActiveinstruments().get(random.nextInt(activeinstruments.getActiveinstruments().size()));
 
     BbBo bbbo = new BbBo(symbol);
-    Future<Object> futurestate = Patterns.ask(exchange, bbbo,
-        bookquerytimeout);
+    Future<Object> futurestate = Patterns.ask(exchange, bbbo, bookquerytimeout);
 
     try {
-      bbbo = (BbBo) Await
-          .result(futurestate, bookquerytimeout.duration());
+      bbbo = (BbBo) Await.result(futurestate, bookquerytimeout.duration());
     } catch (Exception e) {
       log.error("timeout awaiting state");
       return null;
     }
 
-    float bestbid = bbbo.getBestbid() != Float.MIN_VALUE ? bbbo
-        .getBestbid() : 8;
-    float bestask = bbbo.getBestoffer() != Float.MAX_VALUE ? bbbo
-        .getBestoffer() : 10;
+    float bestbid = bbbo.getBestbid() != Float.MIN_VALUE ? bbbo.getBestbid() : 8;
+    float bestask = bbbo.getBestoffer() != Float.MAX_VALUE ? bbbo.getBestoffer() : 10;
 
     side = decideSide(1 - PROB_BUY, OrderSide.ASK);
 
@@ -104,23 +99,19 @@ public class InstitutionalAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestask, bestask + 5, bestask,
-            PROB_BESTPRICE);
+        price = decidePrice(bestask, bestask + 5, bestask, PROB_BESTPRICE);
       } else {
-        price = decidePrice(bestbid - 5, bestbid, bestask,
-            PROB_BESTPRICE);
+        price = decidePrice(bestbid - 5, bestbid, bestask, PROB_BESTPRICE);
       }
 
     }
-    return new LimitOrder(side, type, DateTime.now(), Exchange.getOID(),
-        "xx", symbol, amount, price, name);
+    return new LimitOrder(side, type, DateTime.now(), Exchange.getOID(), "xx", symbol, amount, price, name);
 
   }
 
   @Override
   public void onReceive(Object message) throws Exception {
-    log.debug("agent message received by " + this.getName() + " "
-        + message.toString());
+    log.debug("agent message received by " + this.getName() + " " + message.toString());
     if (message instanceof State) {
       State state = (State) message;
       log.debug("Received state: {}", state);
@@ -130,14 +121,11 @@ public class InstitutionalAgent extends AgentActor {
         getContext()
             .system()
             .scheduler()
-            .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS),
-                getSelf(), Messages.AGENT_EXECUTE_ACTION,
+            .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS), getSelf(), Messages.AGENT_EXECUTE_ACTION,
                 getContext().dispatcher(), null);
       }
     } else if (message instanceof ActiveInstruments) {
-      this.activeinstruments
-          .setActiveinstruments(((ActiveInstruments) message)
-              .getActiveinstruments());
+      this.activeinstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
     } else {
       unhandled(message);
     }
@@ -149,8 +137,7 @@ public class InstitutionalAgent extends AgentActor {
     getContext()
         .system()
         .scheduler()
-        .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS),
-            getSelf(), Messages.AGENT_EXECUTE_ACTION,
+        .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS), getSelf(), Messages.AGENT_EXECUTE_ACTION,
             getContext().dispatcher(), null);
   }
 

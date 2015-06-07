@@ -72,8 +72,7 @@ public class OrderBook extends UntypedActor {
   }
 
   private void init() {
-    this.bids = new TreeMap<Float, TreeSet<LimitOrder>>(
-        Collections.reverseOrder());
+    this.bids = new TreeMap<Float, TreeSet<LimitOrder>>(Collections.reverseOrder());
     this.asks = new TreeMap<Float, TreeSet<LimitOrder>>();
     this.bestbid = Float.MIN_VALUE;
     this.bestask = Float.MAX_VALUE;
@@ -84,8 +83,7 @@ public class OrderBook extends UntypedActor {
     ordercount += 1;
     order.setProcessedTime(DateTime.now());
     if (order.getType() == OrderType.MO) { // process market order
-      log.info(String.format("processing market order %s ",
-          order.toString()));
+      log.info(String.format("processing market order %s ", order.toString()));
       LimitOrder limitorder = (LimitOrder) order;
 
       if (order.getSide() == OrderSide.ASK) {
@@ -95,8 +93,7 @@ public class OrderBook extends UntypedActor {
       }
       this.processMarketOrder(limitorder);
     } else { // process limit order
-      log.info(String.format("processing limitorder %s ",
-          order.toString()));
+      log.info(String.format("processing limitorder %s ", order.toString()));
       this.processLimitOrder((LimitOrder) order);
     }
   }
@@ -112,15 +109,13 @@ public class OrderBook extends UntypedActor {
     TreeMap<Float, TreeSet<LimitOrder>> book;
     if (order.getSide() == OrderSide.ASK) {
       if (this.bids.isEmpty()) {
-        log.info(String.format("No depth. Order not filled %s",
-            order.toString()));
+        log.info(String.format("No depth. Order not filled %s", order.toString()));
         return order.getAmount();
       }
       book = this.bids;
     } else {
       if (this.asks.isEmpty()) {
-        log.info(String.format("No depth. Order not filled %s",
-            order.toString()));
+        log.info(String.format("No depth. Order not filled %s", order.toString()));
         return order.getAmount();
       }
       book = this.asks;
@@ -129,12 +124,10 @@ public class OrderBook extends UntypedActor {
     int unfilledsize = order.getAmount();
     int executedsize = 0;
     int totalexecutedsize = 0;
-    Iterator<Entry<Float, TreeSet<LimitOrder>>> bookiterator = book
-        .entrySet().iterator();
+    Iterator<Entry<Float, TreeSet<LimitOrder>>> bookiterator = book.entrySet().iterator();
     while (bookiterator.hasNext()) {
       Entry<Float, TreeSet<LimitOrder>> pricelevel = bookiterator.next();
-      Iterator<LimitOrder> orderiterator = pricelevel.getValue()
-          .iterator();
+      Iterator<LimitOrder> orderiterator = pricelevel.getValue().iterator();
       while (orderiterator.hasNext()) {
         LimitOrder passiveorder = orderiterator.next();
 
@@ -144,20 +137,18 @@ public class OrderBook extends UntypedActor {
         if (order.getSide() == OrderSide.ASK) { // limit price exists,
           // respect bounds
           if (order.getPrice() > passiveorder.getPrice()) {
-            log.info(String
-                .format("breaking price crossed on active ASK (SELL) MO for %s orderprice=%s passiveorder=%s",
-                    this.getSymbol(), order.getPrice(),
-                    passiveorder.getPrice()));
+            log.info(String.format(
+                "breaking price crossed on active ASK (SELL) MO for %s orderprice=%s passiveorder=%s",
+                this.getSymbol(), order.getPrice(), passiveorder.getPrice()));
             this.updateDepth(order.getSide(), totalexecutedsize);
             this.updateBestPrices();
             return unfilledsize; // price has crossed
           }
         } else {
           if (order.getPrice() < passiveorder.getPrice()) {
-            log.info(String
-                .format("breaking price crossed on active BID (BUY) MO for %s orderprice=%s passiveorder=%s",
-                    this.getSymbol(), order.getPrice(),
-                    passiveorder.getPrice()));
+            log.info(String.format(
+                "breaking price crossed on active BID (BUY) MO for %s orderprice=%s passiveorder=%s", this.getSymbol(),
+                order.getPrice(), passiveorder.getPrice()));
             this.updateDepth(order.getSide(), totalexecutedsize);
             this.updateBestPrices();
             return unfilledsize; // price has crossed
@@ -210,13 +201,10 @@ public class OrderBook extends UntypedActor {
   private void updateBestPrices() {
     val prevbestaks = this.bestask;
     val prevbestbid = this.bestbid;
-    this.bestask = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks
-        .firstKey();
-    this.bestbid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids
-        .firstKey();
+    this.bestask = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
+    this.bestbid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestask != prevbestaks || this.bestbid != prevbestbid) {
-      val quote = new Quote(DateTime.now(), this.getSymbol(),
-          this.getBestask(), this.getBestbid());
+      val quote = new Quote(DateTime.now(), this.getSymbol(), this.getBestask(), this.getBestbid());
       log.info(quote.toString());
     }
   }
@@ -249,9 +237,7 @@ public class OrderBook extends UntypedActor {
       }
     }
     if (biddepth != this.biddepth) {
-      log.error(String.format(
-          "bid depth does not add up record = %s actual = %s",
-          this.biddepth, biddepth));
+      log.error(String.format("bid depth does not add up record = %s actual = %s", this.biddepth, biddepth));
       return false;
     }
     int askdepth = 0;
@@ -261,9 +247,7 @@ public class OrderBook extends UntypedActor {
       }
     }
     if (askdepth != this.askdepth) {
-      log.error(String.format(
-          "aks depth does not add up record = %s actual = %s",
-          this.askdepth, askdepth));
+      log.error(String.format("aks depth does not add up record = %s actual = %s", this.askdepth, askdepth));
       return false;
     }
     return true;
@@ -280,11 +264,8 @@ public class OrderBook extends UntypedActor {
     tradecount += 1;
     Trade trade = new Trade(DateTime.now(), active, passive, executedsize);
     exchange.tell(trade, self());
-    if (Seconds.secondsBetween(active.getSentTime(), trade.getTime())
-        .getSeconds() > 5) {
-      log.info(String.format(
-          "order took more than 5 seconds to be processed %s",
-          active.toString()));
+    if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
+      log.info(String.format("order took more than 5 seconds to be processed %s", active.toString()));
     }
   }
 
@@ -363,8 +344,7 @@ public class OrderBook extends UntypedActor {
 
     if (sidebook.isEmpty() || sidebook.get(order.getPrice()) == null) {
       // add order to order book
-      TreeSet<LimitOrder> orderlist = new TreeSet<LimitOrder>(
-          orderTimeComparator);
+      TreeSet<LimitOrder> orderlist = new TreeSet<LimitOrder>(orderTimeComparator);
       orderlist.add(order);
       sidebook.put(order.getPrice(), orderlist);
 
@@ -386,11 +366,8 @@ public class OrderBook extends UntypedActor {
       this.askdepth = this.askdepth + order.getAmount();
     }
     order.setProcessedTime(DateTime.now());
-    if (Seconds.secondsBetween(order.getProcessedTime(),
-        order.getSentTime()).getSeconds() > 5) {
-      log.info(String.format(
-          "order took more than 5 seconds to be processed %s",
-          order.toString()));
+    if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
+      log.info(String.format("order took more than 5 seconds to be processed %s", order.toString()));
     }
 
     // TODO: Add these to the right location
@@ -444,11 +421,9 @@ public class OrderBook extends UntypedActor {
       if (order1.equals(order2)) {
         return 0;
       }
-      if (order1.getSentTime().getMillis() < order2.getSentTime()
-          .getMillis()) {
+      if (order1.getSentTime().getMillis() < order2.getSentTime().getMillis()) {
         return -1;
-      } else if (order1.getSentTime().getMillis() > order2.getSentTime()
-          .getMillis()) {
+      } else if (order1.getSentTime().getMillis() > order2.getSentTime().getMillis()) {
         return 1;
       } else {
         return -1; // TODO this is a hack so orders at same time are not
@@ -466,10 +441,10 @@ public class OrderBook extends UntypedActor {
     for (val ask : asks.entrySet()) {
       book = book + String.format("%s -> ", ask.getKey());
       for (val firstnode : ask.getValue()) {
-        book = book
-            + String.format("( %s,%s,%s) -> ", firstnode
-                .getSentTime().toString(),
-                firstnode.getPrice(), firstnode.getAmount());
+        book =
+            book
+                + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
+                    firstnode.getAmount());
       }
       book = book + "\n";
     }
@@ -477,19 +452,18 @@ public class OrderBook extends UntypedActor {
     for (val bid : bids.entrySet()) {
       book = book + String.format("%s -> ", bid.getKey());
       for (val firstnode : bid.getValue()) {
-        book = book
-            + String.format("( %s,%s,%s) -> ", firstnode
-                .getSentTime().toString(),
-                firstnode.getPrice(), firstnode.getAmount());
+        book =
+            book
+                + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
+                    firstnode.getAmount());
       }
       book = book + "\n";
     }
-    book = book
-        + String.format("bid depth = %s, ask depth = %s\n",
-            this.biddepth, this.askdepth);
-    book = book
-        + String.format("best ask = %s, best bid =%s, spread = %s\n",
-            this.bestask, this.bestbid, this.bestask - this.bestbid);
+    book = book + String.format("bid depth = %s, ask depth = %s\n", this.biddepth, this.askdepth);
+    book =
+        book
+            + String.format("best ask = %s, best bid =%s, spread = %s\n", this.bestask, this.bestbid, this.bestask
+                - this.bestbid);
     book = book + "----- END -----\n";
     log.info(book);
   }
@@ -518,11 +492,9 @@ public class OrderBook extends UntypedActor {
         this.printBook();
         sender().tell(true, self());
       } else if (message.equals(Messages.PRINT_SUMMARY)) {
-        log.info(String
-            .format(
-                "%s orders processed=%s, trades processed=%s, biddepth=%s, askdepth=%s bestask=%s bestbid=%s spread=%s",
-                symbol, ordercount, tradecount, biddepth,
-                askdepth, bestask, bestbid, bestask - bestbid));
+        log.info(String.format(
+            "%s orders processed=%s, trades processed=%s, biddepth=%s, askdepth=%s bestask=%s bestbid=%s spread=%s",
+            symbol, ordercount, tradecount, biddepth, askdepth, bestask, bestbid, bestask - bestbid));
       }
     } else {
       unhandled(message);
