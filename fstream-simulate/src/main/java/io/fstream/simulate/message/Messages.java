@@ -1,4 +1,4 @@
-package io.fstream.simulate.messages;
+package io.fstream.simulate.message;
 
 public class Messages {
 

@@ -1,10 +1,9 @@
-package io.fstream.simulate.core;
+package io.fstream.simulate.publisher;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
-import io.fstream.core.model.event.Event;
 
 @Slf4j
 @Component
@@ -12,8 +11,8 @@ import io.fstream.core.model.event.Event;
 public class LogPublisher implements Publisher {
 
   @Override
-  public void publish(Event event) {
-    log.info("Event: {}", event);
+  public void publish(Object message) {
+    log.info("Event: {}", message);
   }
 
 }

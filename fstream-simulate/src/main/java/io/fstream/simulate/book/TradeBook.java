@@ -1,6 +1,6 @@
 package io.fstream.simulate.book;
 
-import io.fstream.simulate.messages.Messages;
+import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.orders.Trade;
 
 import java.util.ArrayList;

@@ -43,7 +43,7 @@ hadoop:
 spark:
    # Virtual box
    # master: "spark://172.28.128.3:7077"
-   master: local
+   master: local[3]
    workDir: /tmp/fstream
    interval: 20
    properties:

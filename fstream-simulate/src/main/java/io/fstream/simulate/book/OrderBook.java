@@ -1,14 +1,15 @@
 package io.fstream.simulate.book;
 
-import io.fstream.simulate.messages.BbBo;
-import io.fstream.simulate.messages.Messages;
-import io.fstream.simulate.messages.State;
+import io.fstream.simulate.message.BbBo;
+import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.message.State;
+import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Quote;
 import io.fstream.simulate.orders.Trade;
+import io.fstream.simulate.publisher.Publisher;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +61,9 @@ public class OrderBook extends UntypedActor {
   private int tradecount = 0;
 
   ActorRef exchange;
+
+  @Autowired
+  private Publisher publisher;
 
   public OrderBook(String symbol, ActorRef exchange) {
     this.symbol = symbol;
@@ -387,6 +392,9 @@ public class OrderBook extends UntypedActor {
           "order took more than 5 seconds to be processed %s",
           order.toString()));
     }
+
+    // TODO: Add these to the right location
+    publisher.publish(order);
   }
 
   /**

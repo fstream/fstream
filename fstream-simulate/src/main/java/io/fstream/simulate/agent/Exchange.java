@@ -1,12 +1,12 @@
-package io.fstream.simulate.agents;
+package io.fstream.simulate.agent;
 
 import io.fstream.simulate.book.OrderBook;
 import io.fstream.simulate.book.TradeBook;
 import io.fstream.simulate.config.SimulateProperties;
-import io.fstream.simulate.messages.ActiveInstruments;
-import io.fstream.simulate.messages.BbBo;
-import io.fstream.simulate.messages.Messages;
-import io.fstream.simulate.messages.State;
+import io.fstream.simulate.message.ActiveInstruments;
+import io.fstream.simulate.message.BbBo;
+import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.message.State;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Trade;
 import io.fstream.simulate.spring.SpringExtension;

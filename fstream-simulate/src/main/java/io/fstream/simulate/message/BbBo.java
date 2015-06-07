@@ -1,4 +1,4 @@
-package io.fstream.simulate.messages;
+package io.fstream.simulate.message;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,10 +7,7 @@ import lombok.Setter;
  * Data structure to represent best bid/best offer
  * 
  * @author bdevani
- *
- *
  */
-
 @Getter
 @Setter
 public class BbBo {

@@ -1,4 +1,4 @@
-package io.fstream.simulate.agents;
+package io.fstream.simulate.agent;
 
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;

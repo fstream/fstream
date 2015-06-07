@@ -1,11 +1,11 @@
 package io.fstream.simulate.book;
 
 import static org.junit.Assert.assertTrue;
-import io.fstream.simulate.agents.Exchange;
-import io.fstream.simulate.book.OrderBook;
+import io.fstream.simulate.agent.Exchange;
+import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.LimitOrder;
+import io.fstream.simulate.publisher.LogPublisher;
 import lombok.val;
 
 import org.joda.time.DateTime;
@@ -19,16 +19,8 @@ public class OrderBookTests {
 
   @Test
   public void testAddLimitOrders() {
-    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
-    final Props props = Props.create(Exchange.class);
-    final TestActorRef<Exchange> refexchange = TestActorRef.create(
-        testTradingApp, props, "testExchange");
-
-    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
-    final TestActorRef<OrderBook> refob = TestActorRef.create(
-        testTradingApp, props2, "testOB");
-    final OrderBook ob = refob.underlyingActor();
-    DateTime now = DateTime.now();
+    val ob = createOrderBook();
+    val now = DateTime.now();
 
     val ask1 = new LimitOrder(OrderSide.ASK, OrderType.ADD, now, 1, "tsx",
         "RY", 1000, 25f, "u1");
@@ -79,16 +71,8 @@ public class OrderBookTests {
 
   @Test
   public void addLimitTest2() {
-    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
-    final Props props = Props.create(Exchange.class);
-    final TestActorRef<Exchange> refexchange = TestActorRef.create(
-        testTradingApp, props, "testExchange");
-
-    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
-    final TestActorRef<OrderBook> refob = TestActorRef.create(
-        testTradingApp, props2, "testOB");
-    final OrderBook ob = refob.underlyingActor();
-    DateTime now = DateTime.now();
+    val ob = createOrderBook();
+    val now = DateTime.now();
 
     val ask0 = new LimitOrder(OrderSide.ASK, OrderType.ADD, now, 1, "tsx",
         "RY", 91, 10.277141f, "u1");
@@ -119,16 +103,8 @@ public class OrderBookTests {
 
   @Test
   public void addLimitTest3() {
-    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
-    final Props props = Props.create(Exchange.class);
-    final TestActorRef<Exchange> refexchange = TestActorRef.create(
-        testTradingApp, props, "testExchange");
-
-    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
-    final TestActorRef<OrderBook> refob = TestActorRef.create(
-        testTradingApp, props2, "testOB");
-    final OrderBook ob = refob.underlyingActor();
-    DateTime now = DateTime.now();
+    val ob = createOrderBook();
+    val now = DateTime.now();
 
     // processing 2015-05-20T10:29:05.506-04:00,34,7.9161587,BID,hft1
     // processing 2015-05-20T10:29:05.506-04:00,89,10.97681,ASK,hft2
@@ -165,16 +141,8 @@ public class OrderBookTests {
     // processing 2015-05-20T21:02:27.740-04:00,55,10.0,BID,hft2
     // processing 2015-05-20T21:02:27.741-04:00,83,10.0,ASK,hft1
 
-    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
-    final Props props = Props.create(Exchange.class);
-    final TestActorRef<Exchange> refexchange = TestActorRef.create(
-        testTradingApp, props, "testExchange");
-
-    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
-    final TestActorRef<OrderBook> refob = TestActorRef.create(
-        testTradingApp, props2, "testOB");
-    final OrderBook ob = refob.underlyingActor();
-    DateTime now = DateTime.now();
+    val ob = createOrderBook();
+    val now = DateTime.now();
 
     val bid1 = new LimitOrder(OrderSide.BID, OrderType.ADD, now, 1, "tsx",
         "RY", 7, 6.180016f, "u1");
@@ -199,16 +167,8 @@ public class OrderBookTests {
     // processing 2015-05-20T22:19:11.284-04:00,3,35,10.0,BID,hft1
     // processing 2015-05-20T22:19:11.284-04:00,4,32,10.0,BID,hft2
 
-    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
-    final Props props = Props.create(Exchange.class);
-    final TestActorRef<Exchange> refexchange = TestActorRef.create(
-        testTradingApp, props, "testExchange");
-
-    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
-    final TestActorRef<OrderBook> refob = TestActorRef.create(
-        testTradingApp, props2, "testOB");
-    final OrderBook ob = refob.underlyingActor();
-    DateTime now = DateTime.now();
+    val ob = createOrderBook();
+    val now = DateTime.now();
 
     val bid1 = new LimitOrder(OrderSide.BID, OrderType.ADD, now, 1, "tsx",
         "RY", 47, 7.5659113f, "u1");
@@ -233,16 +193,8 @@ public class OrderBookTests {
     // processing 2015-05-21T12:48:20.574-04:00,3,98,8.0,ASK,hft2
     // processing 2015-05-21T12:48:20.574-04:00,4,32,8.0,BID,hft1
 
-    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
-    final Props props = Props.create(Exchange.class);
-    final TestActorRef<Exchange> refexchange = TestActorRef.create(
-        testTradingApp, props, "testExchange");
-
-    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
-    final TestActorRef<OrderBook> refob = TestActorRef.create(
-        testTradingApp, props2, "testOB");
-    final OrderBook ob = refob.underlyingActor();
-    DateTime now = DateTime.now();
+    val ob = createOrderBook();
+    val now = DateTime.now();
 
     val ask1 = new LimitOrder(OrderSide.ASK, OrderType.ADD, now, 1, "tsx",
         "RY", 81, 8.0f, "u1");
@@ -372,4 +324,19 @@ public class OrderBookTests {
     // now.plusMinutes(6), 7, "tsx", "RY", 5000, 19f,"u7");
     //
   }
+
+  private OrderBook createOrderBook() {
+    ActorSystem testTradingApp = ActorSystem.create("testTradingApp");
+    final Props props = Props.create(Exchange.class);
+    final TestActorRef<Exchange> refexchange = TestActorRef.create(
+        testTradingApp, props, "testExchange");
+
+    final Props props2 = Props.create(OrderBook.class, "RY", refexchange);
+    final TestActorRef<OrderBook> refob = TestActorRef.create(
+        testTradingApp, props2, "testOB");
+    final OrderBook ob = refob.underlyingActor();
+    ob.setPublisher(new LogPublisher());
+    return ob;
+  }
+
 }

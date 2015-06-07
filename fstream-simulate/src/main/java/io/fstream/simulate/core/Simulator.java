@@ -1,11 +1,11 @@
 package io.fstream.simulate.core;
 
 import static akka.pattern.Patterns.gracefulStop;
-import io.fstream.simulate.agents.Exchange;
-import io.fstream.simulate.agents.InstitutionalAgent;
-import io.fstream.simulate.agents.RetailAgent;
+import io.fstream.simulate.agent.Exchange;
+import io.fstream.simulate.agent.InstitutionalAgent;
+import io.fstream.simulate.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
-import io.fstream.simulate.messages.Messages;
+import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.spring.SpringExtension;
 
 import java.util.ArrayList;

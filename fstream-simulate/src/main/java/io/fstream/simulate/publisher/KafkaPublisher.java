@@ -1,11 +1,11 @@
-package io.fstream.simulate.core;
+package io.fstream.simulate.publisher;
+
+import io.fstream.core.util.Codec;
+import io.fstream.simulate.config.KafkaProperties;
 
 import java.util.Map;
 import java.util.Properties;
 
-import io.fstream.core.model.event.Event;
-import io.fstream.core.util.Codec;
-import io.fstream.simulate.config.KafkaProperties;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -37,14 +37,13 @@ public class KafkaPublisher implements Publisher {
   }
 
   @Override
-  public void publish(Event event) {
+  public void publish(Object message) {
     val key = "1"; // TODO: this should probably be a symbol
-    val value = Codec.encodeText(event);
+    val value = Codec.encodeText(message);
 
-    val message = new KeyedMessage<String, String>(PUBLISH_TOPIC, key,
-        value);
+    val keyedMessage = new KeyedMessage<String, String>(PUBLISH_TOPIC, key, value);
 
-    producer.send(message);
+    producer.send(keyedMessage);
   }
 
   private static ProducerConfig createConfig(

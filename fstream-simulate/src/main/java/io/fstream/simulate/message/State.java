@@ -1,4 +1,4 @@
-package io.fstream.simulate.messages;
+package io.fstream.simulate.message;
 
 import io.fstream.simulate.orders.LimitOrder;
 

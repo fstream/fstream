@@ -1,4 +1,4 @@
-package io.fstream.simulate.agents;
+package io.fstream.simulate.agent;
 
 public class HFTAgent implements Agent {
 
