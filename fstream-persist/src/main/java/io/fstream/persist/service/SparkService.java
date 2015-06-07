@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 
+import kafka.serializer.StringDecoder;
 import lombok.Cleanup;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -113,13 +115,17 @@ public class SparkService {
    * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
    */
   private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
-    val partitions = ImmutableMap.of(TOQ.getId(), 1);
-    val consumerProperties = kafkaProperties.getConsumerProperties();
+    val topic = TOQ.getId();
+    val keyTypeClass = String.class;
+    val valueTypeClass = String.class;
+    val keyDecoderClass = StringDecoder.class;
+    val valueDecoderClass = StringDecoder.class;
+    val kafkaParams = kafkaProperties.getConsumerProperties();
+    val partitions = ImmutableMap.of(topic, 1);
+    val storageLevel = StorageLevel.MEMORY_AND_DISK_SER_2();
 
-    return KafkaUtils.createStream(streamingContext,
-        consumerProperties.get("zookeeper.connect"),
-        consumerProperties.get("group.id"),
-        partitions);
+    return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,
+        kafkaParams, partitions, storageLevel);
   }
 
 }

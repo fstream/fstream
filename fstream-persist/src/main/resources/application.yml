@@ -44,7 +44,7 @@ spark:
    # Virtual box
    # master: "spark://172.28.128.3:7077"
    master: local
-   workDir: /fstream
+   workDir: /tmp/fstream
    interval: 20
    properties:
      spark.default.parallelism: 1
