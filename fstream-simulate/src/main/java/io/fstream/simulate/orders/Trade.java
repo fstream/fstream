@@ -23,8 +23,8 @@ public class Trade {
   private DateTime ordertime;
   private int amount;
 
-  public Trade(String buyuser, String selluser, boolean activebuy,
-      float price, String symbol, DateTime datetime, int amount) {
+  public Trade(String buyuser, String selluser, boolean activebuy, float price, String symbol, DateTime datetime,
+      int amount) {
     this.buyuser = buyuser;
     this.selluser = selluser;
     this.price = price;
@@ -55,8 +55,7 @@ public class Trade {
 
   @Override
   public String toString() {
-    return String.format("%s,%s,%s,%s,%s", this.getBuyuser(),
-        this.getSelluser(), this.isActivebuy(), this.getAmount(),
+    return String.format("%s,%s,%s,%s,%s", this.getBuyuser(), this.getSelluser(), this.isActivebuy(), this.getAmount(),
         this.getPrice());
 
   }

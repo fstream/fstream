@@ -46,8 +46,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   @Override
   public int hashCode() {
-    return this.getBrokerId().hashCode() + this.getOid()
-        + this.getSentTime().hashCode();
+    return this.getBrokerId().hashCode() + this.getOid() + this.getSentTime().hashCode();
   }
 
   @Override
@@ -65,10 +64,8 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   @Override
   public String toString() {
-    return String.format("%s,%s,%s,%s,%s,%s,%s,%s", this.getSentTime(),
-        this.getProcessedTime(), this.getOid(), this.getUserId(),
-        this.getSymbol(), this.getPrice(), this.getAmount(),
-        this.getSide());
+    return String.format("%s,%s,%s,%s,%s,%s,%s,%s", this.getSentTime(), this.getProcessedTime(), this.getOid(),
+        this.getUserId(), this.getSymbol(), this.getPrice(), this.getAmount(), this.getSide());
   }
 
   @Override

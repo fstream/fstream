@@ -29,8 +29,7 @@ public class TradeBook extends UntypedActor {
   private static ArrayList<Trade> TRADES = new ArrayList<Trade>();
 
   private void addTrade(Trade trade) {
-    log.info(String.format("Trade register for %s at price %f",
-        trade.getAmount(), trade.getPrice()));
+    log.info(String.format("Trade register for %s at price %f", trade.getAmount(), trade.getPrice()));
     TRADES.add(trade);
   }
 

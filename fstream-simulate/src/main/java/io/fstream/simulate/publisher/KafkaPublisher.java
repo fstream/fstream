@@ -32,8 +32,7 @@ public class KafkaPublisher implements Publisher {
 
   @Autowired
   public KafkaPublisher(@NonNull KafkaProperties properties) {
-    this.producer = new Producer<>(
-        createConfig(properties.getProducerProperties()));
+    this.producer = new Producer<>(createConfig(properties.getProducerProperties()));
   }
 
   @Override
@@ -46,15 +45,13 @@ public class KafkaPublisher implements Publisher {
     producer.send(keyedMessage);
   }
 
-  private static ProducerConfig createConfig(
-      Map<String, String> producerProperties) {
+  private static ProducerConfig createConfig(Map<String, String> producerProperties) {
     val config = new ProducerConfig(createProperties(producerProperties));
 
     return config;
   }
 
-  private static Properties createProperties(
-      Map<String, String> producerProperties) {
+  private static Properties createProperties(Map<String, String> producerProperties) {
     val properties = new Properties();
     properties.putAll(producerProperties);
 
