@@ -36,6 +36,7 @@ dependencies {
   // Spark
   compile libraries.sparkSql
   compile libraries.sparkStreaming
+  compile libraries.sparkStreamingKafka
 
   // Hadoop
   compile(libraries.hadoopClient) {

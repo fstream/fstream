@@ -9,7 +9,9 @@
 
 package io.fstream.persist.service;
 
+import static io.fstream.core.model.topic.Topic.TOQ;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import io.fstream.persist.config.PersistProperties.KafkaProperties;
 
 import java.io.IOException;
 
@@ -24,10 +26,17 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import scala.Tuple2;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Service responsible for persisting to the long-term HDFS backing store.
@@ -39,6 +48,19 @@ import org.springframework.stereotype.Service;
 @Profile("spark")
 public class SparkService {
 
+  /**
+   * Configuration.
+   */
+  @Value("${spark.workDir}")
+  private String workDir;
+  @Value("${spark.interval}")
+  private long interval;
+  @Autowired
+  private KafkaProperties kafkaProperties;
+
+  /**
+   * Dependencies.
+   */
   @Autowired
   private JavaSparkContext sparkContext;
   @Autowired
@@ -46,28 +68,58 @@ public class SparkService {
 
   @PostConstruct
   public void run() throws IOException {
-    val workDir = "/fstream";
+    clean();
 
+    @Cleanup
+    val streamingContext = createStreamingContext();
+
+    prepare(streamingContext);
+    execute(streamingContext);
+  }
+
+  private void clean() throws IOException {
     log.info("Deleting work dir '{}'...", workDir);
     fileSystem.delete(new Path(workDir), true);
+  }
 
-    val interval = SECONDS.toMillis(30);
+  private void prepare(JavaStreamingContext streamingContext) {
+    val sqlContext = createSQLContext();
 
-    // Contexts
-    @Cleanup
-    val streamingContext = new JavaStreamingContext(sparkContext, new Duration(interval));
-    val sqlContext = new SQLContext(sparkContext);
-
-    val input = streamingContext.textFileStream(workDir);
-    input.foreachRDD((rdd, time) -> {
-      val schemaRdd = sqlContext.jsonRDD(rdd);
+    val kafkaStream = createKafkaStream(streamingContext);
+    kafkaStream.foreachRDD((rdd, time) -> {
+      val schemaRdd = sqlContext.jsonRDD(rdd.map(Tuple2::_2));
       schemaRdd.saveAsParquetFile(workDir + "/data-" + time.milliseconds());
 
       return null;
     });
+  }
 
+  private void execute(final org.apache.spark.streaming.api.java.JavaStreamingContext streamingContext) {
     streamingContext.start();
     streamingContext.awaitTermination();
+  }
+
+  private SQLContext createSQLContext() {
+    return new SQLContext(sparkContext);
+  }
+
+  private JavaStreamingContext createStreamingContext() {
+    val duration = new Duration(SECONDS.toMillis(interval));
+
+    return new JavaStreamingContext(sparkContext, duration);
+  }
+
+  /**
+   * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
+   */
+  private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
+    val partitions = ImmutableMap.of(TOQ.getId(), 1);
+    val consumerProperties = kafkaProperties.getConsumerProperties();
+
+    return KafkaUtils.createStream(streamingContext,
+        consumerProperties.get("zookeeper.connect"),
+        consumerProperties.get("group.id"),
+        partitions);
   }
 
 }

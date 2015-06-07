@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = PRIVATE)
 public enum Topic {
 
+  TOQ("toq"),
   RATES("rates"),
   ALERTS("alerts"),
   METRICS("metrics");
