@@ -11,7 +11,6 @@ import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Trade;
 import io.fstream.simulate.spring.SpringExtension;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,9 +51,9 @@ public class Exchange extends UntypedActor {
   @PostConstruct
   public void init() {
     activeinstruments = new ActiveInstruments();
-    activeinstruments.setActiveinstruments(Arrays.asList("RY", "BBM",
-        "BMO", "TD", "CIBC", "HUF"));
-    tradebook = context().actorOf(spring.props(TradeBook.class),
+    activeinstruments.setActiveinstruments(properties.getInstruments());
+    tradebook = context().actorOf(spring.
+        props(TradeBook.class),
         "tradebook");
     processors = new HashMap<String, ActorRef>();
   }
@@ -68,7 +67,7 @@ public class Exchange extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
-      message = (Order) message;
+      message = message;
       if (!activeinstruments.getActiveinstruments().contains(
           ((Order) message).getSymbol())) {
         log.error(String.format("order sent for inactive symbol %s",
@@ -90,7 +89,7 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof Trade) {
       tradebook.tell(message, self());
     } else if (message instanceof String) {
-      message = (String) message;
+      message = message;
       if (message.equals(Messages.PRINT_ORDER_BOOK)) {
         for (val processor : processors.entrySet()) {
           processor.getValue()
@@ -120,7 +119,7 @@ public class Exchange extends UntypedActor {
   }
 
   private ActorRef getProcessor(String instrument) {
-    final ActorRef maybeprocessor = (ActorRef) processors.get(instrument);
+    final ActorRef maybeprocessor = processors.get(instrument);
     if (maybeprocessor == null) {
       // final ActorRef processor =
       // context().actorOf(Props.create(OrderBook.class,instrument,self()),
