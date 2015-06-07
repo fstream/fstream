@@ -1,24 +1,24 @@
 package io.fstream.simulate.config;
 
-import io.fstream.simulate.core.Akka;
-import io.fstream.simulate.core.SomeOtherComponent;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import akka.actor.ActorSystem;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 @Configuration
 public class SimulateConfig {
 
-	@Bean
-	public Akka akka() {
-		return new Akka(); // Bogus class, but replace this with the main Akka abstraction once constructed.
-	}
-	
-	@Bean
-	public SomeOtherComponent other() {
-		return new SomeOtherComponent(akka()); // notice the chaining. Will not create another bean, but will reuse!
-	}
-	
-	// Add other singleton beans here.
-	
+  @Bean
+  public ActorSystem actorSystem() {
+    return ActorSystem.create("tradingApp", akkaConfiguration());
+  }
+
+  @Bean
+  public Config akkaConfiguration() {
+    return ConfigFactory.load();
+  }
+
 }
