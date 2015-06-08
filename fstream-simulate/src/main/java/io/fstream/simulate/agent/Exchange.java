@@ -86,7 +86,6 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof Trade) {
       tradebook.tell(message, self());
     } else if (message instanceof String) {
-      message = message;
       if (message.equals(Messages.PRINT_ORDER_BOOK)) {
         for (val processor : processors.entrySet()) {
           processor.getValue().tell(Messages.PRINT_ORDER_BOOK, self());
