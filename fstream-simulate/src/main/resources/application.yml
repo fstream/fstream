@@ -20,6 +20,27 @@ simulate:
       - TD
       - BBM
       - HUF
+   msgResponseTimeout: 1 # in seconds
+   instProp:
+      probBuy: 0.49
+      probMarket: 0.30
+      probBestPrice: 0.70
+      maxTradeSize: 5000
+      maxsleep: 2500 # in millis
+   retProp:
+      probBuy: 0.49
+      probMarket: 0.69
+      probBestPrice: 0.19
+      maxTradeSize: 1000
+      maxsleep: 5000 # in millis
+   hftProp:
+      probBuy: 0.49
+      probMarket: 0.69
+      probBestPrice: 0.19
+      maxTradeSize: 1000
+      maxsleep: 100 # in millis
+
+
       
 # Kafka
 kafka:
