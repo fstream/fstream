@@ -18,4 +18,32 @@ public class SimulateProperties {
 
   private List<String> instruments = newArrayList();
 
+  private int msgResponseTimeout;
+
+  private InstitutionalProperties instProp = new InstitutionalProperties();
+
+  private RetailProperties retProp = new RetailProperties();
+
+  @Data
+  public static class InstitutionalProperties {
+
+    private float probMarket;
+    private float probBuy;
+    private int maxTradeSize;
+    private float probBestPrice;
+    private int maxsleep; // in millis
+
+  }
+
+  @Data
+  public static class RetailProperties {
+
+    private float probMarket;
+    private float probBuy;
+    private int maxTradeSize;
+    private float probBestPrice;
+    private int maxsleep; // in millis
+
+  }
+
 }

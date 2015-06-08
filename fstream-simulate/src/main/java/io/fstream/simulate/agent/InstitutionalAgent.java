@@ -1,21 +1,26 @@
 package io.fstream.simulate.agent;
 
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.BbBo;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.State;
+import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Positions;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -24,30 +29,41 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
 import akka.pattern.Patterns;
+import akka.util.Timeout;
 
 @Slf4j
 @Getter
+@Setter
 @Component
 @Scope("prototype")
 public class InstitutionalAgent extends AgentActor {
 
+  @Autowired
+  private SimulateProperties properties;
+
   ActiveInstruments activeinstruments = new ActiveInstruments();
 
   Positions positions;
-
-  final float PROB_MARKET = 0.30f;
-  final float PROB_BUY = 0.49f;
-  final float PROB_BESTPRICE = 0.70f;
+  float probMarket;
+  float probBuy;
+  float probBestPrice;
 
   public InstitutionalAgent(String name, ActorRef exchange) {
     super(name, exchange);
   }
 
   @Override
-  protected void init() {
+  @PostConstruct
+  public void init() {
     super.init();
     positions = new Positions();
-    max_trade_size = 5000;
+    maxTradSize = properties.getInstProp().getMaxTradeSize();
+    sleep = random.nextInt(properties.getInstProp().getMaxsleep() + 1);
+    probMarket = properties.getInstProp().getProbMarket();
+    probBuy = properties.getInstProp().getProbBuy();
+    probBestPrice = properties.getInstProp().getProbBestPrice();
+    msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
+
   }
 
   @Override
@@ -59,7 +75,7 @@ public class InstitutionalAgent extends AgentActor {
   }
 
   private Order createOrder() {
-    int next = random.nextInt(max_trade_size);
+    int next = random.nextInt(maxTradSize);
     int amount = next + 1;
     OrderType type = OrderType.ADD;
     OrderSide side;
@@ -75,10 +91,10 @@ public class InstitutionalAgent extends AgentActor {
         activeinstruments.getActiveinstruments().get(random.nextInt(activeinstruments.getActiveinstruments().size()));
 
     BbBo bbbo = new BbBo(symbol);
-    Future<Object> futurestate = Patterns.ask(exchange, bbbo, bookquerytimeout);
+    Future<Object> futurestate = Patterns.ask(exchange, bbbo, msgResponseTimeout);
 
     try {
-      bbbo = (BbBo) Await.result(futurestate, bookquerytimeout.duration());
+      bbbo = (BbBo) Await.result(futurestate, msgResponseTimeout.duration());
     } catch (Exception e) {
       log.error("timeout awaiting state");
       return null;
@@ -87,9 +103,9 @@ public class InstitutionalAgent extends AgentActor {
     float bestbid = bbbo.getBestbid() != Float.MIN_VALUE ? bbbo.getBestbid() : 8;
     float bestask = bbbo.getBestoffer() != Float.MAX_VALUE ? bbbo.getBestoffer() : 10;
 
-    side = decideSide(1 - PROB_BUY, OrderSide.ASK);
+    side = decideSide(1 - probBuy, OrderSide.ASK);
 
-    type = decideOrderType(PROB_MARKET);
+    type = decideOrderType(probMarket);
 
     if (type == OrderType.MO) {
       if (side == OrderSide.ASK) {
@@ -99,9 +115,9 @@ public class InstitutionalAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestask, bestask + 5, bestask, PROB_BESTPRICE);
+        price = decidePrice(bestask, bestask + 5, bestask, probBestPrice);
       } else {
-        price = decidePrice(bestbid - 5, bestbid, bestask, PROB_BESTPRICE);
+        price = decidePrice(bestbid - 5, bestbid, bestask, probBestPrice);
       }
 
     }
@@ -121,7 +137,8 @@ public class InstitutionalAgent extends AgentActor {
         getContext()
             .system()
             .scheduler()
-            .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS), getSelf(), Messages.AGENT_EXECUTE_ACTION,
+            .scheduleOnce(Duration.create(random.nextInt(sleep) + 1, TimeUnit.SECONDS), getSelf(),
+                Messages.AGENT_EXECUTE_ACTION,
                 getContext().dispatcher(), null);
       }
     } else if (message instanceof ActiveInstruments) {

@@ -5,12 +5,12 @@ import io.fstream.simulate.orders.Order.OrderType;
 
 import java.util.Random;
 
-import scala.concurrent.duration.Duration;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.util.Timeout;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter
@@ -19,22 +19,20 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   Random random;
   String name;
   int sleep; // agent sleep time
-  int max_trade_size = 100;
-  Timeout bookquerytimeout;
+  int maxTradSize;
+  Timeout msgResponseTimeout;
   protected ActorRef exchange;
 
   public AgentActor(String name, ActorRef exchange) {
     this.name = name;
     this.exchange = exchange;
-    init();
   }
 
-  protected void init() {
+  public void init() {
     random = new Random();
-    this.sleep = random.nextInt(5) + 1;
-    bookquerytimeout = new Timeout(Duration.create(5, "seconds"));
   }
 
+  @Override
   abstract public void executeAction();
 
   /**
@@ -44,7 +42,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
    * @param side
    * @return
    */
-  protected OrderSide decideSide(float prob, OrderSide side) {
+  protected OrderSide decideSide(float prob, @NonNull OrderSide side) {
     if (random.nextFloat() <= prob) {
       return side;
     } else {
@@ -66,7 +64,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
    * @param probbest
    * @return
    */
-  protected float decidePrice(float min, float max, float best, float probbest) {
+  protected float decidePrice(@NonNull float min, float max, float best, float probbest) {
     if (random.nextFloat() <= probbest) {
       return best;
     } else {
