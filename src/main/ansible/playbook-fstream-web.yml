@@ -9,11 +9,10 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision Kafka hosts
-- hosts: kafka
-  gather_facts: True
+# This playbook will provision fstream-web hosts
+- hosts: fstream-web
   sudo: yes
-    
+  
   # Apply role
   roles: 
-    - { role: kafka, kafka_host_name: "{{ inventory_hostname }}", kafka_server_port: "{{ kafka_broker_port }}", kafka_zookeeper_connect: "{{ zookeeper_connect }}" }
+    - fstream_web

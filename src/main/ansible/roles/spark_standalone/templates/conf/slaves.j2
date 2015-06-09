@@ -1,0 +1,4 @@
+# Spark slaves list
+{% for host in groups['spark-worker'] %}
+{{ hostvars[host][default_ipv4_interface]['ipv4']['address'] }}
+{% endfor %}

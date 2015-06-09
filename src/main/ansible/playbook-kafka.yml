@@ -9,16 +9,10 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision fstream-rates hosts
-- hosts: fstream-rates
-  gather_facts: False
+# This single play playbook will provision Kafka hosts
+- hosts: kafka
   sudo: yes
     
-  vars_prompt:
-    - name: fstream_rates_password
-      prompt: OANDA FIX password
-      confirm: yes
-      
   # Apply role
   roles: 
-    - fstream_rates
+    - { role: kafka, kafka_host_name: "{{ inventory_hostname }}", kafka_server_port: "{{ kafka_broker_port }}", kafka_zookeeper_connect: "{{ zookeeper_connect }}" }

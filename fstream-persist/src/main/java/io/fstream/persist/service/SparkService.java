@@ -9,8 +9,8 @@
 
 package io.fstream.persist.service;
 
-import static io.fstream.core.model.topic.Topic.TOQ;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import io.fstream.core.model.topic.Topic;
 import io.fstream.persist.config.PersistProperties.KafkaProperties;
 
 import java.io.IOException;
@@ -59,6 +59,8 @@ public class SparkService {
   private String workDir;
   @Value("${spark.interval}")
   private long interval;
+  @Value("${spark.topic}")
+  private Topic topic;
   @Autowired
   private KafkaProperties kafkaProperties;
 
@@ -105,7 +107,7 @@ public class SparkService {
     });
   }
 
-  private void execute(final org.apache.spark.streaming.api.java.JavaStreamingContext streamingContext) {
+  private void execute(JavaStreamingContext streamingContext) {
     streamingContext.start();
     streamingContext.awaitTermination();
   }
@@ -124,13 +126,12 @@ public class SparkService {
    * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
    */
   private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
-    val topic = TOQ.getId();
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;
     val keyDecoderClass = StringDecoder.class;
     val valueDecoderClass = StringDecoder.class;
     val kafkaParams = kafkaProperties.getConsumerProperties();
-    val partitions = ImmutableMap.of(topic, 1);
+    val partitions = ImmutableMap.of(topic.getId(), 1);
     val storageLevel = StorageLevel.MEMORY_AND_DISK_SER_2();
 
     return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,

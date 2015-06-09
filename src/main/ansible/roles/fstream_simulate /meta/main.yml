@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+
+dependencies:
+  - role: fstream_common
+    fstream_module: 'fstream-simulate'
+    main_class: 'io.fstream.simulate.SimulateMain'
+    http_port: '8084'
+    priority: '10'

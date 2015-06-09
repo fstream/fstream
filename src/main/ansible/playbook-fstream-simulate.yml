@@ -9,11 +9,10 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision fstream-web hosts
-- hosts: fstream-web
-  gather_facts: False
+# This playbook will provision fstream-simulate hosts
+- hosts: fstream-simulate
   sudo: yes
-  
+      
   # Apply role
   roles: 
-    - fstream_web
+    - fstream_simulate

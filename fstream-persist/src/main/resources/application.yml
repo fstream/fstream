@@ -47,6 +47,7 @@ spark:
    master: local[3]
    workDir: /tmp/fstream
    interval: 20
+   topic: RATES
    properties:
      spark.default.parallelism: 1
    

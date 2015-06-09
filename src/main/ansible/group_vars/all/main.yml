@@ -70,3 +70,23 @@ logstash_outputs: |
   elasticsearch { 
     host => {{ ops_host }} 
   }
+  
+#########
+
+# From BDAS
+
+#########
+
+# Variables for all hosts
+
+master_ip: "{{ hostvars[groups['spark-master'][0]][default_ipv4_interface]['ipv4']['address'] }}"
+master_fqdn: "{{ hostvars[groups['spark-master'][0]]['ansible_fqdn'] }}"
+master_hostname: "{{ hostvars[groups['spark-master'][0]]['ansible_hostname'] }}"
+
+clusteruser: "hadoop"
+clusteruser_home: "/home/hadoop"
+
+bdas_container: "ampcamp-data"
+
+install_spark: true
+

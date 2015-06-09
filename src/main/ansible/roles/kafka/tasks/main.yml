@@ -1,9 +1,6 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-- name: Make sure kafka is not running under supervisord
-  supervisorctl: name=kafka state=stopped
-
 - include: dependencies.yml
 - include: user.yml
 - include: install.yml

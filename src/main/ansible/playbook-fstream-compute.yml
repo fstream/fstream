@@ -1,0 +1,18 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the master Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+# This playbook will provision fstream-compute hosts
+- hosts: fstream-compute
+  sudo: yes
+  
+  # Apply role
+  roles: 
+    - fstream_compute

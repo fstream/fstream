@@ -9,11 +9,10 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision InfluxDB hosts
-- hosts: influxdb
-  gather_facts: True
+# This playbook will provision fstream-persist hosts
+- hosts: fstream-persist
   sudo: yes
   
   # Apply role
   roles: 
-    - influxdb
+    - fstream_persist

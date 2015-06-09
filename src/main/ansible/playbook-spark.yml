@@ -1,0 +1,62 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the base Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+#
+# Spark / HDFS
+#
+- name: Create non-root clusteruser user
+  hosts: spark:hdfs
+  sudo: True
+  roles:
+    - clusteruser_common
+
+#
+# SSH - Clusteruser
+  
+- name: Setup passwordless SSH for clusteruser - donor key
+  hosts: spark-master
+  sudo: True
+  roles: 
+    - { role: sshkey_donor }
+  
+- name: Setup passwordless SSH for clusteruser - accept key
+  hosts: spark-worker
+  sudo: True
+  roles:
+    - { role: sshkey_acceptor }
+
+#
+# SSH - Root
+#
+
+- name: Setup passwordless SSH for user root - donor key
+  hosts: spark-master
+  sudo: True
+  roles:
+    - { role: sshkey_donor, clusteruser: root, clusteruser_home: '/root' }
+
+- name: Setup passwordless SSH for user root - accept key
+  hosts: spark-worker
+  sudo: True
+  roles:
+    - { role: sshkey_acceptor, clusteruser: root, clusteruser_home: '/root' }
+
+#
+# Setup
+#
+
+# Spark
+- hosts: spark
+  sudo: yes
+  roles:
+    - spark
+    - spark_standalone
+    

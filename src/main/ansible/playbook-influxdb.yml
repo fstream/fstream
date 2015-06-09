@@ -9,11 +9,10 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision fstream-compute hosts
-- hosts: fstream-compute
-  gather_facts: False
+# This single play playbook will provision InfluxDB hosts
+- hosts: influxdb
   sudo: yes
   
   # Apply role
   roles: 
-    - fstream_compute
+    - influxdb
