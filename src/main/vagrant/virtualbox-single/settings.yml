@@ -12,18 +12,30 @@ boxes:
    # fStream
    - name: fstream
      groups:
-        # Spark / HDFS
-        - master
-        - workers     
-     
+        # Operations
         - ops
         
+        # Persistence
+        - persistence
+        
+        # HDFS
+        - hdfs
+        - hdfs-namenode
+        - hdfs-datanode
+        
+        # Spark
+        - spark
+        - spark-master
+        - spark-worker
+        
+        # Main 
         - influxdb
         - zookeeper
         - kafka
         - storm-nimbus
         - storm-supervisor
         
+        # fstream 
         - fstream-persist
         - fstream-rates
         - fstream-compute

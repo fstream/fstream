@@ -64,7 +64,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
    * @param probbest
    * @return
    */
-  protected float decidePrice(@NonNull float min, float max, float best, float probbest) {
+  protected float decidePrice(float min, float max, float best, float probbest) {
     if (random.nextFloat() <= probbest) {
       return best;
     } else {

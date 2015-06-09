@@ -1,0 +1,19 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the base Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+# Provision the base setup
+# TODO: Uncomment: - include: playbook-base.yml
+
+# Transclude
+- include: playbook-hdfs.yml
+- include: playbook-spark.yml
+- include: playbook-zookeeper.yml
+- include: playbook-kafka.yml

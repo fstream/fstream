@@ -9,12 +9,16 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision HDFS and Spark
-- hosts: all
-  gather_facts: True
+# This playbook will provision HDFS
+
+# HDFS - Namenode
+- hosts: hdfs-namenode
   sudo: yes
   roles:
-    - base
     - { role: hdfs, hdfs_namenode: True }
-    - { role: hdfs, hdfs_namenode: False }
-    - spark
+
+# HDFS - Datanode    
+- hosts: hdfs-datanode
+  sudo: yes
+  roles:
+    - { role: hdfs, hdfs_namenode: True }

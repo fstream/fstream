@@ -11,7 +11,6 @@
 
 # This single play playbook will provision Kafka hosts
 - hosts: kafka
-  gather_facts: True
   sudo: yes
     
   # Apply role

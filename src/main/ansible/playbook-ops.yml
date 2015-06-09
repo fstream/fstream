@@ -11,7 +11,6 @@
 
 # This single play playbook will provision the operation host
 - hosts: ops
-  gather_facts: True
   sudo: yes
   roles:
     - elasticsearch
