@@ -21,4 +21,4 @@
 - hosts: hdfs-datanode
   sudo: yes
   roles:
-    - { role: hdfs, hdfs_namenode: True }
+    - { role: hdfs, hdfs_namenode: False }

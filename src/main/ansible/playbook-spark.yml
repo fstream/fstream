@@ -13,7 +13,7 @@
 # Spark / HDFS
 #
 - name: Create non-root clusteruser user
-  hosts: spark,hdfs
+  hosts: spark:hdfs
   sudo: True
   roles:
     - clusteruser_common
@@ -58,4 +58,5 @@
   sudo: yes
   roles:
     - spark
+    - spark_standalone
     
