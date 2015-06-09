@@ -11,8 +11,6 @@ import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
 import io.fstream.simulate.orders.Positions;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.PostConstruct;
 
 import lombok.Getter;
@@ -58,7 +56,8 @@ public class InstitutionalAgent extends AgentActor {
     super.init();
     positions = new Positions();
     maxTradSize = properties.getInstProp().getMaxTradeSize();
-    sleep = random.nextInt(properties.getInstProp().getMaxsleep() + 1);
+    maxsleep = properties.getRetProp().getMaxsleep();
+    minsleep = properties.getRetProp().getMinsleep();
     probMarket = properties.getInstProp().getProbMarket();
     probBuy = properties.getInstProp().getProbBuy();
     probBestPrice = properties.getInstProp().getProbBestPrice();
@@ -137,7 +136,7 @@ public class InstitutionalAgent extends AgentActor {
         getContext()
             .system()
             .scheduler()
-            .scheduleOnce(Duration.create(random.nextInt(sleep) + 1, TimeUnit.SECONDS), getSelf(),
+            .scheduleOnce(generateRandomDuration(), getSelf(),
                 Messages.AGENT_EXECUTE_ACTION,
                 getContext().dispatcher(), null);
       }
@@ -151,10 +150,12 @@ public class InstitutionalAgent extends AgentActor {
 
   @Override
   public void preStart() {
+
     getContext()
         .system()
         .scheduler()
-        .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS), getSelf(), Messages.AGENT_EXECUTE_ACTION,
+        .scheduleOnce(generateRandomDuration(), getSelf(),
+            Messages.AGENT_EXECUTE_ACTION,
             getContext().dispatcher(), null);
   }
 

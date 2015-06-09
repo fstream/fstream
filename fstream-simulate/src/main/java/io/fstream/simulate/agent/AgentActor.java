@@ -4,10 +4,13 @@ import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.util.Timeout;
@@ -18,7 +21,8 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   Random random;
   String name;
-  int sleep; // agent sleep time
+  int maxsleep; // agent sleep time
+  int minsleep;
   int maxTradSize;
   Timeout msgResponseTimeout;
   protected ActorRef exchange;
@@ -83,5 +87,16 @@ public abstract class AgentActor extends UntypedActor implements Agent {
     } else {
       return OrderType.ADD;
     }
+  }
+
+  /**
+   * generates a random duration between minsleeptime and maxsleeptime;
+   * @return
+   */
+  protected FiniteDuration generateRandomDuration() {
+    FiniteDuration duration = Duration.create(random.nextInt(maxsleep - minsleep) + 1, TimeUnit.MILLISECONDS);
+    duration.$plus(Duration.create(minsleep, TimeUnit.MILLISECONDS));
+    return duration;
+
   }
 }

@@ -32,6 +32,7 @@ public class SimulateProperties {
     private int maxTradeSize;
     private float probBestPrice;
     private int maxsleep; // in millis
+    private int minsleep; // in millis
 
   }
 
@@ -43,6 +44,7 @@ public class SimulateProperties {
     private int maxTradeSize;
     private float probBestPrice;
     private int maxsleep; // in millis
+    private int minsleep; // in millis
 
   }
 

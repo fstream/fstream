@@ -11,7 +11,6 @@ import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
 
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -60,7 +59,8 @@ public class RetailAgent extends AgentActor {
   public void init() {
     super.init();
     maxTradSize = properties.getRetProp().getMaxTradeSize();
-    sleep = random.nextInt(properties.getRetProp().getMaxsleep() + 1);
+    maxsleep = properties.getRetProp().getMaxsleep();
+    minsleep = properties.getRetProp().getMinsleep();
     probMarket = properties.getRetProp().getProbMarket();
     probBuy = properties.getRetProp().getProbBuy();
     probBestPrice = properties.getRetProp().getProbBestPrice();
@@ -143,7 +143,7 @@ public class RetailAgent extends AgentActor {
         getContext()
             .system()
             .scheduler()
-            .scheduleOnce(Duration.create(random.nextInt(sleep) + 1, TimeUnit.SECONDS), getSelf(),
+            .scheduleOnce(generateRandomDuration(), getSelf(),
                 Messages.AGENT_EXECUTE_ACTION,
                 getContext().dispatcher(), null);
       }
@@ -160,7 +160,7 @@ public class RetailAgent extends AgentActor {
     getContext()
         .system()
         .scheduler()
-        .scheduleOnce(Duration.create(sleep, TimeUnit.SECONDS), getSelf(), Messages.AGENT_EXECUTE_ACTION,
+        .scheduleOnce(generateRandomDuration(), getSelf(), Messages.AGENT_EXECUTE_ACTION,
             getContext().dispatcher(), null);
   }
 
