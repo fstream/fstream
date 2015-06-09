@@ -28,6 +28,7 @@ simulate:
       maxTradeSize: 5000
       maxsleep: 2500 # in millis
       minsleep: 1000 # in millis
+      numagents: 3000
    retProp:
       probBuy: 0.49
       probMarket: 0.69
@@ -35,6 +36,7 @@ simulate:
       maxTradeSize: 1000
       maxsleep: 10000 # in millis
       minsleep: 5000 # in millis
+      numAgents: 1500
    hftProp:
       probBuy: 0.49
       probMarket: 0.69
@@ -42,6 +44,7 @@ simulate:
       maxTradeSize: 1000
       maxsleep: 1000 # in millis
       minsleep: 100 # in millis
+      numAgents: 500
 
 
       

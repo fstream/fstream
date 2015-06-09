@@ -56,14 +56,14 @@ public class Simulator {
 
     agents = new HashMap<String, List<ActorRef>>();
     agents.put("retail", new ArrayList<ActorRef>());
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < properties.getRetProp().getNumAgents(); i++) {
       String name = "ret" + i;
       val retailAgent = tradingApp.actorOf(spring.props(RetailAgent.class, name, exchange), name);
 
       agents.get("retail").add(retailAgent);
     }
     agents.put("inst", new ArrayList<ActorRef>());
-    for (int i = 0; i < 3500; i++) {
+    for (int i = 0; i < properties.getInstProp().getNumAgents(); i++) {
       String name = "inst" + i;
       val institutionalAgent = tradingApp.actorOf(spring.props(InstitutionalAgent.class, name, exchange), name);
       agents.get("inst").add(institutionalAgent);
