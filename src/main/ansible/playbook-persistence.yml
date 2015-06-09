@@ -12,8 +12,12 @@
 # Provision the base setup
 # TODO: Uncomment: - include: playbook-base.yml
 
-# Transclude
+# Provision the infrastructure
 - include: playbook-hdfs.yml
 - include: playbook-spark.yml
 - include: playbook-zookeeper.yml
 - include: playbook-kafka.yml
+
+# Provision the application
+# - include: playbook-fstream-simulate.yml
+- include: playbook-fstream-rates.yml

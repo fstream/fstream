@@ -8,7 +8,6 @@
  */
 
 apply plugin: 'spring-boot'
-apply plugin: 'scala'
 
 build.dependsOn bootRepackage
 

@@ -9,7 +9,7 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision fstream-persist hosts
+# This playbook will provision fstream-persist hosts
 - hosts: fstream-persist
   sudo: yes
   

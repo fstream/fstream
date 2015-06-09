@@ -9,7 +9,7 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision fstream-compute hosts
+# This playbook will provision fstream-compute hosts
 - hosts: fstream-compute
   sudo: yes
   

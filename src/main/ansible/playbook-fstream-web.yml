@@ -9,7 +9,7 @@
 # See:
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
-# This single play playbook will provision fstream-web hosts
+# This playbook will provision fstream-web hosts
 - hosts: fstream-web
   sudo: yes
   

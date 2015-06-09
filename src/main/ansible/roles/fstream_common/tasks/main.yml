@@ -1,9 +1,6 @@
 ---
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
-#- name: Make sure {{ fstream_module }} is not running under supervisord
-#  supervisorctl: name={{ fstream_module }} state=stopped
-
 - include: user.yml
 - include: install.yml
 - include: supervise.yml
