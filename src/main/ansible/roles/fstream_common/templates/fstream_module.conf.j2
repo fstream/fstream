@@ -1,4 +1,5 @@
 [program:{{ fstream_module }}]
+environment=HADOOP_USER_NAME=hdfs
 command=java
    -cp /usr/local/{{ fstream_module }}-{{ fstream_version }}/conf:/usr/local/{{ fstream_module }}-{{ fstream_version }}/lib/{{ fstream_module }}-{{ fstream_version }}.jar 
    {{ main_class }} 

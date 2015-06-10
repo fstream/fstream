@@ -36,15 +36,15 @@ influxdb:
 hadoop:
    properties:
       # Virtual box
-      fs.defaultFS: hdfs://fstream
       # fs.defaultFS: file:///
+      fs.defaultFS: hdfs://fstream
       # parquet.block.size: 1048576
 
 # Spark
 spark:
    # Virtual box
-   master: "spark://fstream:7077"
    # master: local[3]
+   master: spark://fstream:7077
    workDir: /tmp/fstream
    interval: 20
    topic: RATES

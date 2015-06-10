@@ -10,7 +10,7 @@
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
 # Provision the base setup
-# TODO: Uncomment: - include: playbook-base.yml
+- include: playbook-base.yml
 
 # Provision the infrastructure
 - include: playbook-hdfs.yml

@@ -79,14 +79,10 @@ logstash_outputs: |
 
 # Variables for all hosts
 
-master_ip: "{{ hostvars[groups['spark-master'][0]][default_ipv4_interface]['ipv4']['address'] }}"
-master_fqdn: "{{ hostvars[groups['spark-master'][0]]['ansible_fqdn'] }}"
-master_hostname: "{{ hostvars[groups['spark-master'][0]]['ansible_hostname'] }}"
+hdfs_namenode_host: "{{ groups['hdfs-namenode'][0] }}"
+master_hostname: "{{ groups['spark-master'][0] }}"
+master_ip: "{{ hostvars[master_hostname][default_ipv4_interface]['ipv4']['address'] }}"
 
 clusteruser: "hadoop"
 clusteruser_home: "/home/hadoop"
-
-bdas_container: "ampcamp-data"
-
-install_spark: true
 
