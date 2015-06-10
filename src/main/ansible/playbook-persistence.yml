@@ -21,3 +21,4 @@
 # Provision the application
 # - include: playbook-fstream-simulate.yml
 - include: playbook-fstream-rates.yml
+- include: playbook-fstream-persist.yml
