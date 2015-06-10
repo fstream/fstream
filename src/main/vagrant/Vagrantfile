@@ -113,6 +113,11 @@ def virtualbox(vms, box)
             vms.vm.network :forwarded_port, guest: port['guest'], host: port['host']
           end
        end
+
+       # Set the timesync threshold to 10 seconds, instead of the default 20 minutes.
+       # If the clock gets more than 15 minutes out of sync (e.g. your laptop going
+       # to sleep), then some 3rd party services will reject requests.
+       v.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
     end
   end
 end
