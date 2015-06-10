@@ -83,7 +83,7 @@ public class OrderBook extends UntypedActor {
     ordercount += 1;
     order.setProcessedTime(DateTime.now());
     if (order.getType() == OrderType.MO) { // process market order
-      log.info(String.format("processing market order %s ", order.toString()));
+      log.debug(String.format("processing market order %s ", order.toString()));
       LimitOrder limitorder = (LimitOrder) order;
 
       if (order.getSide() == OrderSide.ASK) {
@@ -93,7 +93,7 @@ public class OrderBook extends UntypedActor {
       }
       this.processMarketOrder(limitorder);
     } else { // process limit order
-      log.info(String.format("processing limitorder %s ", order.toString()));
+      log.debug(String.format("processing limitorder %s ", order.toString()));
       this.processLimitOrder((LimitOrder) order);
     }
   }
@@ -109,13 +109,13 @@ public class OrderBook extends UntypedActor {
     TreeMap<Float, TreeSet<LimitOrder>> book;
     if (order.getSide() == OrderSide.ASK) {
       if (this.bids.isEmpty()) {
-        log.info(String.format("No depth. Order not filled %s", order.toString()));
+        log.debug(String.format("No depth. Order not filled %s", order.toString()));
         return order.getAmount();
       }
       book = this.bids;
     } else {
       if (this.asks.isEmpty()) {
-        log.info(String.format("No depth. Order not filled %s", order.toString()));
+        log.debug(String.format("No depth. Order not filled %s", order.toString()));
         return order.getAmount();
       }
       book = this.asks;
@@ -137,7 +137,7 @@ public class OrderBook extends UntypedActor {
         if (order.getSide() == OrderSide.ASK) { // limit price exists,
           // respect bounds
           if (order.getPrice() > passiveorder.getPrice()) {
-            log.info(String.format(
+            log.debug(String.format(
                 "breaking price crossed on active ASK (SELL) MO for %s orderprice=%s passiveorder=%s",
                 this.getSymbol(), order.getPrice(), passiveorder.getPrice()));
             this.updateDepth(order.getSide(), totalexecutedsize);
@@ -146,7 +146,7 @@ public class OrderBook extends UntypedActor {
           }
         } else {
           if (order.getPrice() < passiveorder.getPrice()) {
-            log.info(String.format(
+            log.debug(String.format(
                 "breaking price crossed on active BID (BUY) MO for %s orderprice=%s passiveorder=%s", this.getSymbol(),
                 order.getPrice(), passiveorder.getPrice()));
             this.updateDepth(order.getSide(), totalexecutedsize);
@@ -205,7 +205,7 @@ public class OrderBook extends UntypedActor {
     this.bestbid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestask != prevbestaks || this.bestbid != prevbestbid) {
       val quote = new Quote(DateTime.now(), this.getSymbol(), this.getBestask(), this.getBestbid());
-      log.info(quote.toString());
+      publisher.publish(quote.toString());
     }
   }
 
@@ -265,7 +265,7 @@ public class OrderBook extends UntypedActor {
     Trade trade = new Trade(DateTime.now(), active, passive, executedsize);
     exchange.tell(trade, self());
     if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
-      log.info(String.format("order took more than 5 seconds to be processed %s", active.toString()));
+      log.debug(String.format("order took more than 5 seconds to be processed %s", active.toString()));
     }
   }
 
@@ -367,7 +367,7 @@ public class OrderBook extends UntypedActor {
     }
     order.setProcessedTime(DateTime.now());
     if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
-      log.info(String.format("order took more than 5 seconds to be processed %s", order.toString()));
+      log.debug(String.format("order took more than 5 seconds to be processed %s", order.toString()));
     }
 
     // TODO: Add these to the right location

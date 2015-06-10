@@ -44,6 +44,7 @@ public class Exchange extends UntypedActor {
 
   private HashMap<String, ActorRef> processors;
   private ActorRef tradebook;
+
   ActiveInstruments activeinstruments;
 
   public ActorRef getOrderBook(String instrument) {
@@ -90,8 +91,6 @@ public class Exchange extends UntypedActor {
         for (val processor : processors.entrySet()) {
           processor.getValue().tell(Messages.PRINT_ORDER_BOOK, self());
         }
-      } else if (message.equals(Messages.PRINT_TRADE_BOOK)) {
-        tradebook.tell(Messages.PRINT_TRADE_BOOK, self());
       } else if (message.equals(Messages.PRINT_SUMMARY)) {
         for (val processor : processors.entrySet()) {
           processor.getValue().tell(Messages.PRINT_SUMMARY, self());
@@ -125,4 +124,5 @@ public class Exchange extends UntypedActor {
     }
     return maybeprocessor;
   }
+
 }
