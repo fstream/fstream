@@ -56,8 +56,8 @@ public class InstitutionalAgent extends AgentActor {
     super.init();
     positions = new Positions();
     maxTradSize = properties.getInstProp().getMaxTradeSize();
-    maxsleep = properties.getRetProp().getMaxsleep();
-    minsleep = properties.getRetProp().getMinsleep();
+    maxSleep = properties.getRetProp().getMaxSleep();
+    minSleep = properties.getRetProp().getMinSleep();
     probMarket = properties.getInstProp().getProbMarket();
     probBuy = properties.getInstProp().getProbBuy();
     probBestPrice = properties.getInstProp().getProbBestPrice();

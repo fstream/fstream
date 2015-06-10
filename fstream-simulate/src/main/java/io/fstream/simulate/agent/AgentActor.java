@@ -21,8 +21,8 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   Random random;
   String name;
-  int maxsleep; // agent sleep time
-  int minsleep;
+  int maxSleep; // agent sleep time
+  int minSleep;
   int maxTradSize;
   Timeout msgResponseTimeout;
   protected ActorRef exchange;
@@ -77,7 +77,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   }
 
   /**
-   * return a market order with a given probability otherwise limit
+   * Return a market order with a given probability otherwise limit
    * 
    * @param probmarket
    */
@@ -90,13 +90,12 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   }
 
   /**
-   * generates a random duration between minsleeptime and maxsleeptime;
+   * Generates a random duration between minsleeptime and maxsleeptime;
    * @return
    */
   protected FiniteDuration generateRandomDuration() {
-    FiniteDuration duration = Duration.create(random.nextInt(maxsleep - minsleep) + 1, TimeUnit.MILLISECONDS);
-    duration.$plus(Duration.create(minsleep, TimeUnit.MILLISECONDS));
-    return duration;
+    FiniteDuration duration = Duration.create(random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
+    return duration.$plus(Duration.create(minSleep, TimeUnit.MILLISECONDS));
 
   }
 }

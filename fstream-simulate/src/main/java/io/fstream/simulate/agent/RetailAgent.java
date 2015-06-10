@@ -59,8 +59,8 @@ public class RetailAgent extends AgentActor {
   public void init() {
     super.init();
     maxTradSize = properties.getRetProp().getMaxTradeSize();
-    maxsleep = properties.getRetProp().getMaxsleep();
-    minsleep = properties.getRetProp().getMinsleep();
+    maxSleep = properties.getRetProp().getMaxSleep();
+    minSleep = properties.getRetProp().getMinSleep();
     probMarket = properties.getRetProp().getProbMarket();
     probBuy = properties.getRetProp().getProbBuy();
     probBestPrice = properties.getRetProp().getProbBestPrice();
