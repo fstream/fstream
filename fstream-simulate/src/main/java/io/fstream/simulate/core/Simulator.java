@@ -68,13 +68,6 @@ public class Simulator {
       val institutionalAgent = tradingApp.actorOf(spring.props(InstitutionalAgent.class, name, exchange), name);
       agents.get("inst").add(institutionalAgent);
     }
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-
-      @Override
-      public void run() {
-        shutdown();
-      }
-    });
   }
 
   @PreDestroy

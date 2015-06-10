@@ -140,12 +140,7 @@ public class RetailAgent extends AgentActor {
     } else if (message instanceof String) {
       if (((String) message).equals(Messages.AGENT_EXECUTE_ACTION)) {
         this.executeAction();
-        getContext()
-            .system()
-            .scheduler()
-            .scheduleOnce(generateRandomDuration(), getSelf(),
-                Messages.AGENT_EXECUTE_ACTION,
-                getContext().dispatcher(), null);
+        this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
       }
     } else if (message instanceof ActiveInstruments) {
       this.activeinstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
@@ -157,11 +152,7 @@ public class RetailAgent extends AgentActor {
 
   @Override
   public void preStart() {
-    getContext()
-        .system()
-        .scheduler()
-        .scheduleOnce(generateRandomDuration(), getSelf(), Messages.AGENT_EXECUTE_ACTION,
-            getContext().dispatcher(), null);
+    this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
   }
 
   @Override
