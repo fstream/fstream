@@ -2,4 +2,4 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 dependencies:
-  - { role: fstream_common, fstream_module: 'fstream-persist', main_class: 'org.springframework.boot.loader.JarLauncher', http_port: '8084', priority: '10' }
+  - { role: fstream_common, fstream_module: 'fstream-persist', main_class: 'io.fstream.persist.PersistMain', http_port: '8084', priority: '10' }
