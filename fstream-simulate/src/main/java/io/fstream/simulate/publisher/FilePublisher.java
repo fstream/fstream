@@ -7,18 +7,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import javax.annotation.PreDestroy;
+
 import lombok.SneakyThrows;
 
-@RequiredArgsConstructor
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+@Component
+@Profile("file")
 public class FilePublisher implements Publisher, Closeable {
 
   private final PrintWriter writer;
 
   @SneakyThrows
-  public FilePublisher(@NonNull File file) {
-    this.writer = new PrintWriter(file);
+  public FilePublisher() {
+    this.writer = new PrintWriter(new File("/tmp/fstream-simulate.json"));
   }
 
   @Override
@@ -28,6 +32,7 @@ public class FilePublisher implements Publisher, Closeable {
   }
 
   @Override
+  @PreDestroy
   public void close() throws IOException {
     writer.close();
   }

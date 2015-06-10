@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Profile("!kafka")
+@Profile("log")
 public class LogPublisher implements Publisher {
 
   @Override
