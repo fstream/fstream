@@ -96,6 +96,9 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   protected FiniteDuration generateRandomDuration() {
     FiniteDuration duration = Duration.create(random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
     return duration.$plus(Duration.create(minSleep, TimeUnit.MILLISECONDS));
+  }
 
+  protected <T> void scheduleOnce(T message, FiniteDuration duration) {
+    getContext().system().scheduler().scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
   }
 }
