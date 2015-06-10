@@ -28,7 +28,7 @@ simulate:
       maxTradeSize: 5000
       maxSleep: 2500 # in millis
       minSleep: 1000 # in millis
-      numagents: 3000
+      numAgents: 3000
    retProp:
       probBuy: 0.49
       probMarket: 0.69
