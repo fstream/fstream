@@ -148,9 +148,4 @@ public class InstitutionalAgent extends AgentActor {
     this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
   }
 
-  @Override
-  public void postRestart(Throwable reason) {
-
-  }
-
 }

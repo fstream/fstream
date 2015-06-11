@@ -17,6 +17,7 @@ boxes:
         
         # Persistence
         - persistence
+        - zeppelin
         
         # HDFS
         - hdfs

@@ -1,0 +1,12 @@
+[program:zeppelin]
+command={{ zeppelin_dir }}/default/bin/zeppelin-daemon.sh start start-foreground 
+priority=1
+user={{ zeppelin_user }}
+autostart=true
+autorestart=true
+startsecs=10
+startretries=999
+redirect_stderr=true
+stdout_logfile=/var/log/zeppelin/zeppelin.log
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=10

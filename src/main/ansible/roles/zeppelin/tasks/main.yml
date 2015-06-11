@@ -1,0 +1,6 @@
+---
+- include: user.yml
+- include: build.yml
+- include: install.yml
+- include: config.yml
+- include: supervise.yml

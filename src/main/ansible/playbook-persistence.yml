@@ -15,6 +15,7 @@
 # Provision the infrastructure
 - include: playbook-hdfs.yml
 - include: playbook-spark.yml
+- include: playbook-zeppelin.yml
 - include: playbook-zookeeper.yml
 - include: playbook-kafka.yml
 

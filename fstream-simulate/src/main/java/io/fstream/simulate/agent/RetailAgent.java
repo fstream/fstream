@@ -147,17 +147,11 @@ public class RetailAgent extends AgentActor {
     } else {
       unhandled(message);
     }
-
   }
 
   @Override
   public void preStart() {
     this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
-  }
-
-  @Override
-  public void postRestart(Throwable reason) {
-
   }
 
 }

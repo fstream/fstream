@@ -1,0 +1,8 @@
+- name: mkdir_zeppelin_dir
+  file: path={{ zeppelin_src_dir }} state=directory recurse=yes
+- name: clone_zeppelin_src
+  git: repo={{ zeppelin_git_url }} dest={{ zeppelin_src_dir }}/{{ zeppelin_version }}
+- name: create_alternatives_link
+  alternatives: name=zeppelin_src path={{ zeppelin_src_dir }}/{{ zeppelin_version }} link={{ zeppelin_src_dir }}/default
+- name: compile_zeppelin
+  shell: /usr/local/maven/default/bin/mvn clean package -Dhadoop.version={{ zeppelin_hadoop_version }} {{ zeppelin_comiple_flag }} chdir={{ zeppelin_src_dir }}/default
