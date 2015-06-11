@@ -3,13 +3,15 @@
 zeppelin_dir: '/usr/local/zeppelin'
 zeppelin_log_dir: '/var/log/zeppelin'
 zeppelin_mem: '-Xmx2048m'
-zeppelin_java_home: "{{ jdk_home }}"
+zeppelin_java_home: /usr/local/java/jdk
 zeppelin_master: 'yarn-client'
 zeppelin_hadoop_conf_dir: '/etc/hadoop/conf'
 zeppelin_server_port: '8080'
 zeppelin_spark_executor_instances: '20'
 zeppelin_spark_executor_cores: '1'
 zeppelin_spark_executor_memory: '2g'
+
+zeppelin_user: zeppelin
 
 zeppelin_git_url: 'https://github.com/apache/incubator-zeppelin.git'
 zeppelin_src_dir: '/usr/src/zeppelin'
@@ -21,7 +23,7 @@ zeppelin_dir: '/usr/local/zeppelin'
 zeppelin_server_port: '8080'
 
 # You should configure the following parameters
-#zeppelin_package_base_url: 'http://example.com/zeppelin'
-#zeppelin_package_name: 'zeppelin-0.5.0-SNAPSHOT'
-#zeppelin_package_suffix: '.tar.gz'
-zeppelin_spark_home: "{{ spark_lib_dir }}"
+zeppelin_package_base_url: 'https://seqwaremaven.oicr.on.ca/artifactory/dcc-dependencies'
+zeppelin_package_name: 'zeppelin-0.5.0-incubating-SNAPSHOT'
+zeppelin_package_suffix: '.tar.gz'
+zeppelin_spark_home: /var/lib/spark
