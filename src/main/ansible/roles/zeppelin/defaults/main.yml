@@ -2,16 +2,16 @@
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
 # Configure
-zeppelin_dir: '/usr/local/zeppelin'
-zeppelin_log_dir: '/var/log/zeppelin'
+zeppelin_dir: /usr/local/zeppelin
+zeppelin_log_dir: /var/log/zeppelin
 zeppelin_server_port: '8090'
-zeppelin_mem: '-Xmx2048m
+zeppelin_mem: '-Xmx2048m'
 
 zeppelin_java_home: /usr/local/java/jdk
-zeppelin_hadoop_conf_dir: '/etc/hadoop/conf'
+zeppelin_hadoop_conf_dir: /etc/hadoop/conf
 
 # Spark
-zeppelin_master: 'spark://localhost:7077'
+zeppelin_master: spark://localhost:7077
 zeppelin_spark_executor_instances: '20'
 zeppelin_spark_executor_cores: '1'
 zeppelin_spark_executor_memory: '2g'

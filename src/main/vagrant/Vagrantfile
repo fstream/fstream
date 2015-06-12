@@ -34,7 +34,7 @@ provider = settings['provider']
 
 # Ansible config
 @ansible_path = "../../ansible"
-@playbook = @ansible_path + "/playbooks/" + (ENV['playbook'] || "site.yml")
+@playbook = @ansible_path + "/" + (ENV['playbook'] || "site.yml")
 @limit      = ENV['limit']      || ['all']
 @extra_vars = ENV['extra_vars'] || {}
 @verbose    = ENV['verbose']    || 'vv'

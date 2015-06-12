@@ -10,8 +10,8 @@
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
 # Enable this for debugging:
-#- hosts: all
-#  tasks:
+- hosts: all
+  tasks:
 #    - debug: var=default_ipv4_interface
 #    - debug: var=hostvars['influxdb']
 #    - debug: var=hostvars['influxdb'][default_ipv4_interface]

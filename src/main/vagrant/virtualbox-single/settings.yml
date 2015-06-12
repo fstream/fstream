@@ -56,6 +56,8 @@ boxes:
            # Zeppelin
            - guest: 8090
              host: 18090
+           - guest: 8091
+             host:  8091
 
            # Elasticsearch             
            - guest: 9200
