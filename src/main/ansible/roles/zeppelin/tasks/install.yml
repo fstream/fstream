@@ -1,3 +1,6 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
 - name: mkdir_zeppelin_dir
   file: path={{ zeppelin_dir }} owner=zeppelin group=zeppelin state=directory
 

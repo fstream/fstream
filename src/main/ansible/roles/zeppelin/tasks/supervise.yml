@@ -1,5 +1,5 @@
 ---
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Install the supervisord zeppelin script
   template: src=zeppelin.conf.j2 dest=/etc/supervisor.d/zeppelin.conf owner=root group=root mode=0644

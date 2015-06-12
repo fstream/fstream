@@ -1,0 +1,7 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# Description:
+#   Global variables for all hosts in all playbooks
+
+zeppelin_master: "spark://{{ groups['spark-master'][0] }}:7077"

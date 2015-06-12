@@ -45,17 +45,26 @@ boxes:
         memory: 8192
         cpus: 8
         forwarded_ports:
+           # fstream
            - guest: 8080
              host: 18080
            - guest: 8081
              host: 18081
            - guest: 8083
              host: 18083
+             
+           # Zeppelin
+           - guest: 8090
+             host: 18090
+
+           # Elasticsearch             
            - guest: 9200
              host: 19200
+           
+           # Kibana
            - guest: 5601
              host: 15601
            
-           # Spark master port
+           # Spark master
            - guest: 7077
              host: 17077

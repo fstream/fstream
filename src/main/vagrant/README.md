@@ -1,4 +1,4 @@
-fStream - Vagrant VirtualBox VM
+fStream - Vagrant AWS / VirtualBox
 ===
 
 Follow the directions outlined in this document to create, start, provision and export the fStream virtual machine (VM). Provisioning is configured in [`../ansible`](ansible) .
