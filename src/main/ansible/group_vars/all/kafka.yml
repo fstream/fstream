@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# Description:
+#   Global variables for all hosts in all playbooks
+
+kafka_broker_port: "9092"
+kafka_broker_servers: "{{ groups.kafka }}"
+kafka_broker_list: "{{ groups.kafka | join(':' + kafka_broker_port + ',') }}:{{ kafka_broker_port }}"

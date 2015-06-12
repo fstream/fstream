@@ -1,0 +1,48 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# Description:
+#   Global variables for all hosts in all playbooks
+
+# Logging inputs
+logstash_inputs: |
+  file {
+    type => "influxdb"
+    path => [ 
+      "/var/log/influxdb/*.log" 
+    ]
+  }
+  file {
+    type => "zookeeper"
+    path => [ 
+      "/var/log/zookeeper/*.log"
+    ]
+  }        
+  file {
+    type => "kafka"
+    path => [ 
+      "/var/log/kafka/*.log"
+    ]
+  }
+  file {
+    type => "storm"
+    path => [ 
+      "/var/log/storm/*.log"
+    ]
+  }
+  file {
+    type => "fstream"
+    path => [ 
+      "/var/log/fstream-*/*.log"
+    ]
+  }
+
+logstash_outputs: |
+  file {
+    path => "/tmp/fstream.log"
+  }
+  elasticsearch { 
+    host => {{ ops_host }} 
+  }
+
+

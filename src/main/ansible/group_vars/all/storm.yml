@@ -4,5 +4,4 @@
 # Description:
 #   Global variables for all hosts in all playbooks
 
-staging_dir: "/tmp"
-default_ipv4_interface: ansible_eth0
+storm_nimbus_host: "{{ groups['storm-nimbus'][0] }}"
