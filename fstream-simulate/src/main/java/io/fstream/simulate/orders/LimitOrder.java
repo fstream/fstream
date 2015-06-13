@@ -12,7 +12,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   OrderSide side;
   OrderType type;
-  DateTime sentTime;
+  DateTime time;
   int oid;
   String brokerId;
   String symbol;
@@ -25,7 +25,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
       float price, String userid) {
     this.side = side;
     this.type = type;
-    this.sentTime = time;
+    this.time = time;
     this.oid = oid;
     this.brokerId = brokerId;
     this.symbol = symbol;
@@ -70,7 +70,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   @Override
   public DateTime getSentTime() {
-    return sentTime;
+    return time;
   }
 
 }

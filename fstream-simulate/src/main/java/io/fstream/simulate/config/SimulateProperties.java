@@ -20,6 +20,8 @@ public class SimulateProperties {
 
   private int msgResponseTimeout;
 
+  private float minTickSize;
+
   private InstitutionalProperties instProp = new InstitutionalProperties();
 
   private RetailProperties retProp = new RetailProperties();
@@ -34,7 +36,7 @@ public class SimulateProperties {
     private int maxSleep; // in millis
     private int minSleep; // in millis
     private int numAgents;
-
+    private String quoteSubscriptionLevel;
   }
 
   @Data
@@ -47,7 +49,7 @@ public class SimulateProperties {
     private int maxSleep; // in millis
     private int minSleep; // in millis
     private int numAgents;
-
+    private String quoteSubscriptionLevel;
   }
 
 }

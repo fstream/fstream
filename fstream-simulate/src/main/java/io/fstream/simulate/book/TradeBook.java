@@ -21,6 +21,8 @@ import akka.actor.UntypedActor;
 @Slf4j
 @Getter
 @Setter
+// This class is useless as Exchange publishes trade. But keep for now.
+@Deprecated
 @Component
 @Scope("prototype")
 public class TradeBook extends UntypedActor {
@@ -29,7 +31,6 @@ public class TradeBook extends UntypedActor {
   private Publisher publisher;
 
   private void addTrade(Trade trade) {
-    publisher.publish(trade);
     log.debug(String.format("Trade register for %s at price %f", trade.getAmount(), trade.getPrice()));
   }
 

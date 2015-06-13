@@ -205,8 +205,20 @@ public class OrderBook extends UntypedActor {
     this.bestbid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestask != prevbestaks || this.bestbid != prevbestbid) {
       val quote = new Quote(DateTime.now(), this.getSymbol(), this.getBestask(), this.getBestbid());
+      if (!isValidQuote(this.bestbid, this.bestask)) {
+        log.error("invalid quote %s", quote.toString());
+        return;
+      }
+      exchange.tell(quote, self());
       publisher.publish(quote.toString());
     }
+  }
+
+  private boolean isValidQuote(float bid, float ask) {
+    if (ask <= bid) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -263,6 +275,7 @@ public class OrderBook extends UntypedActor {
   private void registerTrade(Order active, Order passive, int executedsize) {
     tradecount += 1;
     Trade trade = new Trade(DateTime.now(), active, passive, executedsize);
+    publisher.publish(trade);
     exchange.tell(trade, self());
     if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
       log.debug(String.format("order took more than 5 seconds to be processed %s", active.toString()));

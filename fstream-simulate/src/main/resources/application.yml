@@ -21,6 +21,7 @@ simulate:
       - BBM
       - HUF
    msgResponseTimeout: 1 # in seconds
+   minTickSize: 0.1
    instProp:
       probBuy: 0.49
       probMarket: 0.30
@@ -29,6 +30,7 @@ simulate:
       maxSleep: 2500 # in millis
       minSleep: 1000 # in millis
       numAgents: 3000
+      quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    retProp:
       probBuy: 0.49
       probMarket: 0.69
@@ -37,6 +39,7 @@ simulate:
       maxSleep: 10000 # in millis
       minSleep: 5000 # in millis
       numAgents: 1500
+      quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    hftProp:
       probBuy: 0.49
       probMarket: 0.69
@@ -45,6 +48,7 @@ simulate:
       maxSleep: 1000 # in millis
       minSleep: 100 # in millis
       numAgents: 500
+      quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
 
 
       

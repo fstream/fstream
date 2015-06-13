@@ -2,13 +2,14 @@ package io.fstream.simulate.agent;
 
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.message.BbBo;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.State;
+import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
+import io.fstream.simulate.orders.Quote;
 
 import java.util.HashMap;
 
@@ -23,11 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import scala.concurrent.Await;
-import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
-import akka.pattern.Patterns;
 import akka.util.Timeout;
 
 @Getter
@@ -65,7 +63,7 @@ public class RetailAgent extends AgentActor {
     probBuy = properties.getRetProp().getProbBuy();
     probBestPrice = properties.getRetProp().getProbBestPrice();
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
-
+    minTickSize = properties.getMinTickSize();
   }
 
   @Override
@@ -92,22 +90,13 @@ public class RetailAgent extends AgentActor {
     String symbol =
         activeinstruments.getActiveinstruments().get(random.nextInt(activeinstruments.getActiveinstruments().size()));
 
-    BbBo bbbo = new BbBo(symbol);
-    Future<Object> futurestate = Patterns.ask(exchange, bbbo, msgResponseTimeout);
-
-    try {
-      bbbo = (BbBo) Await.result(futurestate, msgResponseTimeout.duration());
-    } catch (Exception e) {
-      log.error("timeout awaiting state");
+    Quote quote = this.getLastValidQuote(symbol);
+    if (quote == null) {
+      log.warn("empty quote returned by agent %s", this.getName());
       return null;
     }
-
-    float bestbid = bbbo.getBestbid() != Float.MIN_VALUE ? bbbo.getBestbid() : 8;
-    float bestask = bbbo.getBestoffer() != Float.MAX_VALUE ? bbbo.getBestoffer() : 10;
-
-    // TODO: Use?
-    @SuppressWarnings("unused")
-    float mid = (bestask + bestbid) / 2;
+    float bestask = quote.getAskprice();
+    float bestbid = quote.getBidprice();
 
     side = decideSide(1 - probBuy, OrderSide.ASK);
 
@@ -121,9 +110,9 @@ public class RetailAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestask, bestask + 5, bestask, probBestPrice);
+        price = decidePrice(bestask, bestask + (minTickSize * 5), bestask, probBestPrice);
       } else {
-        price = decidePrice(bestbid - 5, bestbid, bestask, probBestPrice);
+        price = decidePrice(bestbid - (minTickSize * 5), bestbid, bestbid, probBestPrice);
       }
 
     }
@@ -144,6 +133,14 @@ public class RetailAgent extends AgentActor {
       }
     } else if (message instanceof ActiveInstruments) {
       this.activeinstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
+    }
+    else if (message instanceof SubscriptionQuote) {
+      log.debug("agent %s registered successfully to receive level %s quotes", this.getName(),
+          this.getQuoteSubscriptionLevel());
+      this.setQuoteSubscriptionSuccess(((SubscriptionQuote) message).isSuccess());
+    }
+    else if (message instanceof Quote) {
+      this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);
     } else {
       unhandled(message);
     }
