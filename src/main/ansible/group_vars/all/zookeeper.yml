@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# Description:
+#   Global variables for all hosts in all playbooks
+
+zookeeper_connect_port: "2181"
+zookeeper_connect_servers: "{{ groups.zookeeper }}"
+zookeeper_connect: "{{ groups.zookeeper | join(':' + zookeeper_connect_port + ',') }}:{{ zookeeper_connect_port }}"

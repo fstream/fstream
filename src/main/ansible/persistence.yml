@@ -10,15 +10,16 @@
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
 # Provision the base setup
-- include: playbook-base.yml
+- include: base.yml
 
 # Provision the infrastructure
-- include: playbook-hdfs.yml
-- include: playbook-spark.yml
-- include: playbook-zookeeper.yml
-- include: playbook-kafka.yml
+- include: hdfs.yml
+- include: spark.yml
+- include: zeppelin.yml
+- include: zookeeper.yml
+- include: kafka.yml
 
 # Provision the application
 # - include: playbook-fstream-simulate.yml
-- include: playbook-fstream-rates.yml
-- include: playbook-fstream-persist.yml
+- include: fstream-rates.yml
+- include: fstream-persist.yml

@@ -10,20 +10,20 @@
 #   - http://www.ansibleworks.com/docs/playbooks.html
 
 # Provision the base setup
-- include: playbook-base.yml
+- include: base.yml
 
 # Provision operations
-- include: playbook-ops.yml
+- include: ops.yml
 
 # Provision the infrastructure
-- include: playbook-influxdb.yml 
-- include: playbook-zookeeper.yml
-- include: playbook-kafka.yml
-- include: playbook-storm.yml
+- include: influxdb.yml 
+- include: zookeeper.yml
+- include: kafka.yml
+- include: storm.yml
 
 # Provision the application
-# - include: playbook-fstream-simulate.yml
-- include: playbook-fstream-rates.yml
-- include: playbook-fstream-compute.yml
-- include: playbook-fstream-persist.yml
-- include: playbook-fstream-web.yml
+# - include: fstream-simulate.yml
+- include: fstream-rates.yml
+- include: fstream-compute.yml
+- include: fstream-persist.yml
+- include: fstream-web.yml

@@ -4,5 +4,4 @@
 # Description:
 #   Global variables for all hosts in all playbooks
 
-staging_dir: "/tmp"
-default_ipv4_interface: ansible_eth0
+ops_host: "{{ groups['ops'][0] }}"

@@ -150,9 +150,4 @@ public class InstitutionalAgent extends AgentActor {
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 
-  @Override
-  public void postRestart(Throwable reason) {
-
-  }
-
 }
