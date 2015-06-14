@@ -30,4 +30,4 @@ zeppelin_hadoop_version: '2.6.0-cdh5.4.3'
 zeppelin_package_base_url: 'https://seqwaremaven.oicr.on.ca/artifactory/dcc-dependencies'
 zeppelin_package_name: 'zeppelin-0.5.0-incubating-SNAPSHOT'
 zeppelin_package_suffix: '.tar.gz'
-zeppelin_spark_home: /var/lib/spark
+zeppelin_spark_home: /usr/lib/spark

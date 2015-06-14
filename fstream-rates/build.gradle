@@ -35,8 +35,8 @@ dependencies {
   compile "org.apache.camel:camel-spring-boot:$camelVersion"
   compile "org.apache.camel:camel-quickfix:$camelVersion"
   compile "org.apache.camel:camel-kafka:$camelVersion"
-  compile 'org.scala-lang:scala-library:2.10.4'
-  
+  compile "org.apache.camel:camel-metrics:$camelVersion"
+  compile 'org.scala-lang:scala-library:2.10.4' // For camel-kafka
 
   // QuickFIX/J
   compile "quickfixj:quickfixj-all:$quickfixjVersion"

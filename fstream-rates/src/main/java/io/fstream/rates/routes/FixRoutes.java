@@ -51,6 +51,10 @@ public class FixRoutes extends AbstractFixRoutes {
           .to("bean:fixMessageLogger")
           .throwException(new RuntimeException("marketDataRequestReject"));
     
+    // Metrics
+    from("{{rates.uri}}")
+      .to("metrics:counter");
+    
     // For debugging
     from("stub:{{rates.uri}}")
       .to("bean:fixMessageLogger");

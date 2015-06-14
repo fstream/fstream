@@ -39,7 +39,8 @@ public class SimulatedRoutes extends RouteBuilder {
     
     from("timer://tick-event1?period=" + period * 1)
       .process(new RandomTickEventGenerator("EUR/USD", 1.2757f, 1.3990f))
-      .to("direct:sink");
+      .to("direct:sink")
+      .to("metrics:meter:eurusd"); 
     from("timer://tick-event2?period=" + period * 2)
       .process(new RandomTickEventGenerator("USD/JPY", 93.8675f, 105.4415f))
       .to("direct:sink");
@@ -71,6 +72,7 @@ public class SimulatedRoutes extends RouteBuilder {
       .log("${body}")
       .marshal(new CodecDataFormat())
       .to("{{fstream.broker.uri}}");
+    
   }
 
 }
