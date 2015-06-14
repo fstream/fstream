@@ -1,13 +1,13 @@
 package io.fstream.simulate.orders;
 
 import io.fstream.simulate.orders.Order.OrderSide;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import org.joda.time.DateTime;
 
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode
 public class Trade {
 
   public enum TradeSide {
@@ -53,11 +53,11 @@ public class Trade {
     }
   }
 
-  @Override
-  public String toString() {
-    return String.format("%s,%s,%s,%s,%s", this.getBuyuser(), this.getSelluser(), this.isActivebuy(), this.getAmount(),
-        this.getPrice());
-
-  }
+  // @Override
+  // public String toString() {
+  // return String.format("%s,%s,%s,%s,%s", this.getBuyuser(), this.getSelluser(), this.isActivebuy(), this.getAmount(),
+  // this.getPrice());
+  //
+  // }
 
 }

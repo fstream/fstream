@@ -10,6 +10,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Deprecated
+// redundant. remove!
 public class BbBo {
 
   String symbol;

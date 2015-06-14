@@ -1,22 +1,30 @@
 package io.fstream.simulate.agent;
 
+import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
+import io.fstream.simulate.orders.Quote;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import akka.pattern.Patterns;
 import akka.util.Timeout;
 
 @Getter
 @Setter
+@Slf4j
 public abstract class AgentActor extends UntypedActor implements Agent {
 
   Random random;
@@ -26,6 +34,10 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   int maxTradSize;
   Timeout msgResponseTimeout;
   protected ActorRef exchange;
+  String quoteSubscriptionLevel;
+  boolean quoteSubscriptionSuccess;
+  HashMap<String, Quote> bbboQuotes;
+  float minTickSize;
 
   public AgentActor(String name, ActorRef exchange) {
     this.name = name;
@@ -34,6 +46,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   public void init() {
     random = new Random();
+    bbboQuotes = new HashMap<String, Quote>();
   }
 
   @Override
@@ -72,7 +85,8 @@ public abstract class AgentActor extends UntypedActor implements Agent {
     if (random.nextFloat() <= probbest) {
       return best;
     } else {
-      return min + (random.nextFloat() * (max - min));
+      float price = min + (random.nextFloat() * (max - min));
+      return price;
     }
   }
 
@@ -101,4 +115,26 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   protected <T> void scheduleOnce(T message, FiniteDuration duration) {
     getContext().system().scheduler().scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
   }
+
+  /**
+   * If subscribed successfully read quote. If not received then get market open quote from exchange.
+   * @return
+   */
+  protected Quote getLastValidQuote(String symbol) {
+    Quote quote = null;
+
+    quote = this.bbboQuotes.get(symbol);
+
+    if (quote == null) {
+      Future<Object> futurestate = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
+      try {
+        quote = (Quote) (Await.result(futurestate, msgResponseTimeout.duration()));
+        bbboQuotes.put(symbol, quote);
+      } catch (Exception e) {
+        log.error("timeout awaiting state");
+      }
+    }
+    return quote;
+  }
+
 }
