@@ -87,7 +87,7 @@ public class Exchange extends UntypedActor {
     for (val symbol : activeinstruments.getActiveinstruments()) {
       float bid = minBid - (random.nextInt(5) * minTickSize);
       float ask = minAsk + (random.nextInt(5) * minTickSize);
-      lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid));
+      lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid, 0, 0));
     }
   }
 

@@ -17,12 +17,16 @@ public class Quote {
   float bidprice;
   DateTime time;
   String symbol;
+  int askdepth;
+  int biddepth;
 
-  public Quote(DateTime time, String symbol, float ask, float bid) {
+  public Quote(DateTime time, String symbol, float ask, float bid, int askdepth, int biddepth) {
     this.time = time;
     this.symbol = symbol;
     this.askprice = ask;
     this.bidprice = bid;
+    this.askdepth = askdepth;
+    this.biddepth = biddepth;
   }
 
 }
