@@ -204,7 +204,9 @@ public class OrderBook extends UntypedActor {
     this.bestask = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
     this.bestbid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestask != prevbestaks || this.bestbid != prevbestbid) {
-      val quote = new Quote(DateTime.now(), this.getSymbol(), this.getBestask(), this.getBestbid());
+      val quote =
+          new Quote(DateTime.now(), this.getSymbol(), this.getBestask(), this.getBestbid(), getDepthAtLevel(bestask,
+              OrderSide.ASK), getDepthAtLevel(bestbid, OrderSide.BID));
       if (!isValidQuote(this.bestbid, this.bestask)) {
         log.error("invalid quote %s", quote.toString());
         return;
@@ -212,6 +214,24 @@ public class OrderBook extends UntypedActor {
       exchange.tell(quote, self());
       publisher.publish(quote.toString());
     }
+  }
+
+  private int getDepthAtLevel(float price, OrderSide side) {
+    int depth = 0;
+
+    TreeSet<LimitOrder> book;
+    if (side == OrderSide.ASK) {
+      book = this.asks.get(price);
+    }
+    else {
+      book = this.bids.get(price);
+    }
+    if (book != null) {
+      for (val order : book) {
+        depth = depth + order.getAmount();
+      }
+    }
+    return depth;
   }
 
   private boolean isValidQuote(float bid, float ask) {
