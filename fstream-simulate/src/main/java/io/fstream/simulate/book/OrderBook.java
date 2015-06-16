@@ -212,7 +212,7 @@ public class OrderBook extends UntypedActor {
         return;
       }
       exchange.tell(quote, self());
-      publisher.publish(quote.toString());
+      publisher.publish(quote);
     }
   }
 
