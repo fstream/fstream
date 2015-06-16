@@ -4,10 +4,8 @@ import io.fstream.simulate.book.OrderBook;
 import io.fstream.simulate.book.TradeBook;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.message.BbBo;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.QuoteRequest;
-import io.fstream.simulate.message.State;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Quote;
@@ -105,17 +103,6 @@ public class Exchange extends UntypedActor {
       } else {
         dispatch((Order) message);
       }
-
-    } else if (message instanceof State) {
-      State state = (State) message;
-      ActorRef processor = getProcessor(state.getSymbol());
-      processor.tell(state, sender());
-
-    } else if (message instanceof BbBo) {
-      BbBo bbbo = (BbBo) message;
-      ActorRef processor = getProcessor(bbbo.getSymbol());
-      processor.tell(bbbo, sender());
-
     } else if (message instanceof Trade) {
       tradebook.tell(message, self());
     } else if (message instanceof String) {

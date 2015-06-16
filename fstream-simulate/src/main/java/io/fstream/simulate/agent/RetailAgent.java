@@ -3,7 +3,6 @@ package io.fstream.simulate.agent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
-import io.fstream.simulate.message.State;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Order;
@@ -28,6 +27,10 @@ import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
 import akka.util.Timeout;
 
+/**
+ * Simulates an retail participant. The participants trades in smaller sizes. Other behaviors such as propensity to
+ * buy/sell can be determined from configuration file
+ */
 @Getter
 @Setter
 @Slf4j
@@ -123,10 +126,7 @@ public class RetailAgent extends AgentActor {
   @Override
   public void onReceive(Object message) throws Exception {
     log.debug("agent message received by " + this.getName() + " " + message.toString());
-    if (message instanceof State) {
-      State state = (State) message;
-      log.info("State: {}", state);
-    } else if (message instanceof String) {
+    if (message instanceof String) {
       if (((String) message).equals(Messages.AGENT_EXECUTE_ACTION)) {
         this.executeAction();
         this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());

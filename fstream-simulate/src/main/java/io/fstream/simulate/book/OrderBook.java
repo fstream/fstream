@@ -1,8 +1,6 @@
 package io.fstream.simulate.book;
 
-import io.fstream.simulate.message.BbBo;
 import io.fstream.simulate.message.Messages;
-import io.fstream.simulate.message.State;
 import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Order.OrderSide;
@@ -506,20 +504,6 @@ public class OrderBook extends UntypedActor {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
       this.processOrder((Order) message);
-    } else if (message instanceof State) {
-      val state = new State(this.symbol);
-      state.setAskdepth(askdepth);
-      state.setBiddepth(biddepth);
-      state.setAsks(asks);
-      state.setBids(bids);
-      state.setBestask(bestask);
-      state.setBestbid(bestbid);
-      sender().tell(state, self());
-    } else if (message instanceof BbBo) {
-      val bbbo = new BbBo(this.symbol);
-      bbbo.setBestbid(this.getBestbid());
-      bbbo.setBestoffer(this.getBestask());
-      sender().tell(bbbo, self());
     } else if (message instanceof String) {
       if (message.equals(Messages.PRINT_ORDER_BOOK)) {
         this.printBook();
