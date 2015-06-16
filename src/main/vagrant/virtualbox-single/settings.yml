@@ -15,8 +15,7 @@ boxes:
         # Operations
         - ops
         
-        # Persistence
-        - persistence
+        # Web
         - zeppelin
         
         # HDFS
