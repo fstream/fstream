@@ -9,59 +9,57 @@
 provider: aws
 boxes:
 
-   # InfluxDB
-   - name: influxdb
-     groups:
-        - influxdb
-     aws:
-        instance_type: t2.micro
-
-   # ZooKeeper
-   - name: zookeeper
-     groups:
-        - zookeeper
-     aws:
-        instance_type: t2.micro
-        
    # Kafka
    - name: kafka
      groups:
         - kafka
+        - zookeeper
      aws:
-        instance_type: t2.small
+        instance_type: m3.large
         
-   # Storm
-   - name: storm
+   # Master
+   - name: master
      groups:
-        - storm-nimbus
-        - storm-supervisor
-     aws:
-        instance_type: t2.small
-
-   # Persist
-   - name: fstream-persist
-     groups:
+        - hdfs
+        - hdfs-namenode     
+        - spark
+        - spark-master
+        - fstream-simulate
         - fstream-persist
+        - zeppelin
      aws:
-        instance_type: t2.micro
+        instance_type: m3.large
         
-   # Rates
-   - name: fstream-rates
+   # Workers
+   - name: worker1
      groups:
-        - fstream-rates
+        - hdfs
+        - hdfs-datanode     
+        - spark
+        - spark-worker
      aws:
-        instance_type: t2.micro
-        
-   # Compute
-   - name: fstream-compute
+        instance_type: r3.large        
+   - name: worker2
      groups:
-        - fstream-compute
+        - hdfs
+        - hdfs-datanode     
+        - spark
+        - spark-worker
      aws:
-        instance_type: t2.micro
-        
-   # Web
-   - name: fstream-web
+        instance_type: r3.large        
+   - name: worker3
      groups:
-        - fstream-web
+        - hdfs
+        - hdfs-datanode     
+        - spark
+        - spark-worker
      aws:
-        instance_type: t2.micro    
+        instance_type: r3.large       
+   - name: worker4
+     groups:
+        - hdfs
+        - hdfs-datanode     
+        - spark
+        - spark-worker
+     aws:
+        instance_type: r3.large       

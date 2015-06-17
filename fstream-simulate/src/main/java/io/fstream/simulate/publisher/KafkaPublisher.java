@@ -1,5 +1,6 @@
 package io.fstream.simulate.publisher;
 
+import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 import io.fstream.simulate.config.KafkaProperties;
 
@@ -23,7 +24,7 @@ public class KafkaPublisher implements Publisher {
   /**
    * Constants.
    */
-  private static final String PUBLISH_TOPIC = "toq";
+  private static final Topic PUBLISH_TOPIC = Topic.TOQ;
 
   /**
    * Dependencies.
@@ -40,7 +41,7 @@ public class KafkaPublisher implements Publisher {
     val key = "1"; // TODO: this should probably be a symbol
     val value = Codec.encodeText(message);
 
-    val keyedMessage = new KeyedMessage<String, String>(PUBLISH_TOPIC, key, value);
+    val keyedMessage = new KeyedMessage<String, String>(PUBLISH_TOPIC.getId(), key, value);
 
     producer.send(keyedMessage);
   }

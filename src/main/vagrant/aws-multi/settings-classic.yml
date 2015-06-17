@@ -1,0 +1,67 @@
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Vagrant settings file
+#
+# Description: 
+#   The is the Vagrant setting file for provisioning the fStream stack using the 
+#   AWS provider across multiple EC2 instances.
+
+provider: aws
+boxes:
+
+   # InfluxDB
+   - name: influxdb
+     groups:
+        - influxdb
+     aws:
+        instance_type: t2.micro
+
+   # ZooKeeper
+   - name: zookeeper
+     groups:
+        - zookeeper
+     aws:
+        instance_type: t2.micro
+        
+   # Kafka
+   - name: kafka
+     groups:
+        - kafka
+     aws:
+        instance_type: t2.small
+        
+   # Storm
+   - name: storm
+     groups:
+        - storm-nimbus
+        - storm-supervisor
+     aws:
+        instance_type: t2.small
+
+   # Persist
+   - name: fstream-persist
+     groups:
+        - fstream-persist
+     aws:
+        instance_type: t2.micro
+        
+   # Rates
+   - name: fstream-rates
+     groups:
+        - fstream-rates
+     aws:
+        instance_type: t2.micro
+        
+   # Compute
+   - name: fstream-compute
+     groups:
+        - fstream-compute
+     aws:
+        instance_type: t2.micro
+        
+   # Web
+   - name: fstream-web
+     groups:
+        - fstream-web
+     aws:
+        instance_type: t2.micro    

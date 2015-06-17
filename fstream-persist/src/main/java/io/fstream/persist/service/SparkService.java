@@ -126,6 +126,7 @@ public class SparkService {
    * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
    */
   private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
+    log.info("Reading from topic: {}", topic.getId());
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;
     val keyDecoderClass = StringDecoder.class;
