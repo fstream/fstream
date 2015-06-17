@@ -32,15 +32,14 @@ public class SimulatedRoutes extends RouteBuilder {
   public void configure() throws Exception {
     
     //
-    // Sources (6 Majors)
+    // Sources
     //
     
     val period = 5000L;
     
     from("timer://tick-event1?period=" + period * 1)
       .process(new RandomTickEventGenerator("EUR/USD", 1.2757f, 1.3990f))
-      .to("direct:sink")
-      .to("metrics:meter:eurusd"); 
+      .to("direct:sink");
     from("timer://tick-event2?period=" + period * 2)
       .process(new RandomTickEventGenerator("USD/JPY", 93.8675f, 105.4415f))
       .to("direct:sink");
@@ -67,12 +66,15 @@ public class SimulatedRoutes extends RouteBuilder {
     // Sink
     //
     
+    // External
     from("direct:sink")
       .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
-      .log("${body}")
       .marshal(new CodecDataFormat())
+      .to("metrics:meter:rates")
       .to("{{fstream.broker.uri}}");
     
+    from("stub:direct:sink")
+      .log("${body}");
   }
 
 }

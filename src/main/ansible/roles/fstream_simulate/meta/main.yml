@@ -4,6 +4,6 @@
 dependencies:
   - role: fstream_common
     fstream_module: 'fstream-simulate'
-    main_class: 'io.fstream.simulate.SimulateMain'
+    main_class: 'org.springframework.boot.loader.JarLauncher'
     http_port: '8084'
     priority: '10'

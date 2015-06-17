@@ -9,7 +9,7 @@
 # Spring
 spring:
    profiles:
-      active: file
+      active: kafka
 
 # Application
 simulate:
@@ -49,8 +49,6 @@ simulate:
       minSleep: 100 # in millis
       numAgents: 500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
-
-
       
 # Kafka
 kafka:

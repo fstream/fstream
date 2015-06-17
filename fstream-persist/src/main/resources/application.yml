@@ -47,7 +47,7 @@ spark:
    master: spark://fstream:7077
    workDir: /tmp/fstream
    interval: 20
-   topic: RATES
+   topic: TOQ
    properties:
      spark.default.parallelism: 1
    
