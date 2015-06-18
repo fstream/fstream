@@ -11,7 +11,8 @@ command=java
    --storm.local=false 
    --storm.nimbus.host={{ storm_nimbus_host }} 
    --rates.password={{ fstream_rates_password }} 
-   start-foreground
+   --hadoop.properties.fs.defaultFS={{ hdfs_namenode_host }}  
+   --spark.master={{ spark_master_host }}
 priority={{ priority }}
 user={{ fstream_user }}
 autostart=true

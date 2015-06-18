@@ -5,8 +5,8 @@
 #   Global variables for all hosts in all playbooks
 
 hdfs_namenode_host: "{{ groups['hdfs-namenode'][0] }}"
-master_hostname: "{{ groups['spark-master'][0] }}"
-master_ip: "{{ hostvars[master_hostname][default_ipv4_interface]['ipv4']['address'] }}"
+spark_master_host: "{{ groups['spark-master'][0] }}"
+spark_master_ip: "{{ hostvars[spark_master_host][default_ipv4_interface]['ipv4']['address'] }}"
 
 clusteruser: "hadoop"
 clusteruser_home: "/home/hadoop"
