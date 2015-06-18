@@ -22,6 +22,7 @@ simulate:
       - HUF
    msgResponseTimeout: 1 # in seconds
    minTickSize: 0.1
+   nonPremiumQuoteDelay: 1000 # in milliseconds
    instProp:
       probBuy: 0.49
       probMarket: 0.30

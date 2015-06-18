@@ -22,6 +22,8 @@ public class SimulateProperties {
 
   private float minTickSize;
 
+  private int nonPremiumQuoteDelay;
+
   private InstitutionalProperties instProp = new InstitutionalProperties();
 
   private RetailProperties retProp = new RetailProperties();

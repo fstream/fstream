@@ -7,6 +7,7 @@ import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.message.SubscriptionQuote;
+import io.fstream.simulate.orders.DelayedQuote;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Quote;
 import io.fstream.simulate.orders.Trade;
@@ -15,6 +16,7 @@ import io.fstream.simulate.spring.SpringExtension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
@@ -54,6 +57,7 @@ public class Exchange extends UntypedActor {
   private ArrayList<ActorRef> premiumSubscribers;
   private HashMap<String, Quote> lastValidQuote;
   private float minTickSize;
+  private FiniteDuration quoteDelayDuration;
 
   ActiveInstruments activeinstruments;
 
@@ -71,6 +75,7 @@ public class Exchange extends UntypedActor {
     this.quoteAndOrdersSubscribers = new ArrayList<ActorRef>();
     this.premiumSubscribers = new ArrayList<ActorRef>();
     this.minTickSize = properties.getMinTickSize();
+    quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
     initializeMarketOnOpenQuotes();
   }
 
@@ -126,9 +131,21 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof SubscriptionQuote) {
       // TODO check to make sure AgentActor is requesting subscription
       sender().tell(subscribeForQuote(sender(), (SubscriptionQuote) message), self());
-    } else if (message instanceof Quote) {
+    } else if (message instanceof Quote && message.getClass() != DelayedQuote.class) {
       lastValidQuote.put(((Quote) message).getSymbol(), (Quote) message);
+      // notify premium subscribers immediately.
       notifyPremiumSubscribers((Quote) message);
+      // notify non-premium with latency. Schedule a DelayedQuote message to self
+      DelayedQuote dQuote =
+          new DelayedQuote(((Quote) message).getTime(), ((Quote) message).getSymbol(), ((Quote) message).getAskprice(),
+              ((Quote) message).getBidprice(), ((Quote) message).getAskdepth(), ((Quote) message).getBiddepth());
+      getContext()
+          .system()
+          .scheduler()
+          .scheduleOnce(quoteDelayDuration, getSelf(), dQuote, getContext().dispatcher(),
+              null);
+    }
+    else if (message instanceof DelayedQuote) {
       notifyQuoteAndOrderSubscribers((Quote) message);
       notifyQuoteSubscribers((Quote) message);
     }
@@ -166,9 +183,6 @@ public class Exchange extends UntypedActor {
   private ActorRef getProcessor(String instrument) {
     final ActorRef maybeprocessor = processors.get(instrument);
     if (maybeprocessor == null) {
-      // final ActorRef processor =
-      // context().actorOf(Props.create(OrderBook.class,instrument,self()),
-      // instrument);
       val processor = context().actorOf(spring.props(OrderBook.class, instrument, self()), instrument);
 
       processors.put(instrument, processor);
