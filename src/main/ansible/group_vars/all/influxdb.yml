@@ -4,4 +4,4 @@
 # Description:
 #   Global variables for all hosts in all playbooks
 
-influxdb_host: "{{ groups['influxdb'][0] }}"
+influxdb_host: "{{ groups['influxdb'][0] | default('localhost') }}"

@@ -4,4 +4,4 @@
 # Description:
 #   Global variables for all hosts in all playbooks
 
-storm_nimbus_host: "{{ groups['storm-nimbus'][0] }}"
+storm_nimbus_host: "{{ groups['storm-nimbus'][0] | default('localhost')}}"

@@ -3,7 +3,7 @@ spark_version: "1.3.1-bin-hadoop2.6"
 spark_download_url: "http://d3kbcqa49mib13.cloudfront.net/spark-{{ spark_version }}.tgz"
 
 spark_root: "/opt/spark"
-spark_master_host: "{{ master_hostname }}"
+spark_master_host: "{{ spark_master_host }}"
 spark_master_port: 7077
 
 # memory per executor, increase if see java out-of-memory exceptions in spark shell
