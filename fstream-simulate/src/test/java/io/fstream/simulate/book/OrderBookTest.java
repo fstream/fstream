@@ -5,7 +5,6 @@ import static io.fstream.simulate.orders.Order.OrderSide.BID;
 import static io.fstream.simulate.orders.Order.OrderType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 import io.fstream.simulate.agent.Exchange;
 import io.fstream.simulate.orders.LimitOrder;
 import io.fstream.simulate.publisher.ConsolePublisher;
@@ -53,10 +52,6 @@ public class OrderBookTest {
   @Before
   public void setUp() {
     this.actorSystem = ActorSystem.create("testTradingApp");
-
-    // Mock the call to Spring within Exchange to return a real actor
-    val tradeBookProps = Props.create(TradeBook.class);
-    when(spring.props(TradeBook.class)).thenReturn(tradeBookProps);
 
     // Create the exchange
     val exchangeProps = Props.create(Exchange.class);

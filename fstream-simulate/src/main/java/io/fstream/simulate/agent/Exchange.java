@@ -1,7 +1,6 @@
 package io.fstream.simulate.agent;
 
 import io.fstream.simulate.book.OrderBook;
-import io.fstream.simulate.book.TradeBook;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
@@ -10,7 +9,6 @@ import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.orders.DelayedQuote;
 import io.fstream.simulate.orders.Order;
 import io.fstream.simulate.orders.Quote;
-import io.fstream.simulate.orders.Trade;
 import io.fstream.simulate.spring.SpringExtension;
 
 import java.util.ArrayList;
@@ -69,7 +67,6 @@ public class Exchange extends UntypedActor {
   public void init() {
     activeinstruments = new ActiveInstruments();
     activeinstruments.setActiveinstruments(properties.getInstruments());
-    tradebook = context().actorOf(spring.props(TradeBook.class), "tradebook");
     processors = new HashMap<String, ActorRef>();
     this.quotesSubscribers = new ArrayList<ActorRef>();
     this.quoteAndOrdersSubscribers = new ArrayList<ActorRef>();
@@ -108,8 +105,6 @@ public class Exchange extends UntypedActor {
       } else {
         dispatch((Order) message);
       }
-    } else if (message instanceof Trade) {
-      tradebook.tell(message, self());
     } else if (message instanceof String) {
       if (message.equals(Messages.PRINT_ORDER_BOOK)) {
         for (val processor : processors.entrySet()) {
