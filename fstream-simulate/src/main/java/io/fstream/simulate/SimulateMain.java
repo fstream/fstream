@@ -8,8 +8,11 @@
  */
 package io.fstream.simulate;
 
+import io.fstream.simulate.core.Simulator;
+import lombok.val;
+
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
  * Application entry point.
@@ -18,7 +21,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class SimulateMain {
 
   public static void main(String... args) throws Exception {
-    new SpringApplicationBuilder().sources(SimulateMain.class).run(args);
+    val context = SpringApplication.run(SimulateMain.class, args);
+    val simulator = context.getBean(Simulator.class);
+
+    simulator.simulate();
   }
 
 }

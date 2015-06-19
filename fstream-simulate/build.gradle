@@ -32,7 +32,14 @@ dependencies {
 
   // Akka
   compile libraries.akkaActor
+  compile libraries.akkaCamel
   testCompile libraries.akkaTestkit
+  
+  // Camel
+  compile "org.apache.camel:camel-core:$camelVersion"
+  compile "org.apache.camel:camel-spring-boot:$camelVersion"
+  compile "org.apache.camel:camel-kafka:$camelVersion"
+  compile "org.apache.camel:camel-metrics:$camelVersion"
   
   // Kafak
   compile libraries.kafka

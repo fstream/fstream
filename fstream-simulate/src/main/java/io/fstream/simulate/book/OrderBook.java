@@ -7,7 +7,6 @@ import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
 import io.fstream.simulate.orders.Quote;
 import io.fstream.simulate.orders.Trade;
-import io.fstream.simulate.publisher.Publisher;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -59,13 +57,12 @@ public class OrderBook extends UntypedActor {
   private int tradecount = 0;
 
   ActorRef exchange;
+  ActorRef publisher;
 
-  @Autowired
-  private Publisher publisher;
-
-  public OrderBook(String symbol, ActorRef exchange) {
+  public OrderBook(String symbol, ActorRef exchange, ActorRef publisher) {
     this.symbol = symbol;
     this.exchange = exchange;
+    this.publisher = publisher;
     this.init();
   }
 
@@ -210,7 +207,7 @@ public class OrderBook extends UntypedActor {
         return;
       }
       exchange.tell(quote, self());
-      publisher.publish(quote);
+      publisher.tell(quote, self());
     }
   }
 
@@ -293,8 +290,8 @@ public class OrderBook extends UntypedActor {
   private void registerTrade(Order active, Order passive, int executedsize) {
     tradecount += 1;
     Trade trade = new Trade(DateTime.now(), active, passive, executedsize);
-    publisher.publish(trade);
     exchange.tell(trade, self());
+    publisher.tell(trade, self());
     if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
       log.debug(String.format("order took more than 5 seconds to be processed %s", active.toString()));
     }
@@ -402,7 +399,7 @@ public class OrderBook extends UntypedActor {
     }
 
     // TODO: Add these to the right location
-    publisher.publish(order);
+    publisher.tell(order, self());
   }
 
   /**

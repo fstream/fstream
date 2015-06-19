@@ -9,7 +9,7 @@
 # Spring
 spring:
    profiles:
-      active: kafka
+      active: file
 
 # Application
 simulate:

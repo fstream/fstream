@@ -6,8 +6,9 @@ import static io.fstream.simulate.orders.Order.OrderType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import io.fstream.simulate.agent.Exchange;
+import io.fstream.simulate.agent.Publisher;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.orders.LimitOrder;
-import io.fstream.simulate.publisher.ConsolePublisher;
 import io.fstream.simulate.spring.SpringExtension;
 import lombok.val;
 
@@ -53,22 +54,23 @@ public class OrderBookTest {
   public void setUp() {
     this.actorSystem = ActorSystem.create("testTradingApp");
 
+    val publisheProps = Props.create(Publisher.class, "log:info");
+    val publisherRef = TestActorRef.<Publisher> create(actorSystem, publisheProps, "testPublisher");
+
     // Create the exchange
-    val exchangeProps = Props.create(Exchange.class);
+    val exchangeProps = Props.create(Exchange.class, publisherRef);
     val exchangeRef = TestActorRef.<Exchange> create(actorSystem, exchangeProps, "testExchange");
     val exchange = exchangeRef.underlyingActor();
 
     // Manually initialize what Spring would have done in the running application
     exchange.setSpring(spring);
+    exchange.setProperties(new SimulateProperties());
     exchange.init();
 
     // Create the order book
-    val orderBookProps = Props.create(OrderBook.class, symbol, exchangeRef);
+    val orderBookProps = Props.create(OrderBook.class, symbol, exchangeRef, publisherRef);
     val orderBookRef = TestActorRef.<OrderBook> create(actorSystem, orderBookProps, "testOrderBook");
     this.orderBook = orderBookRef.underlyingActor();
-
-    // Manually initialize what Spring would have done in the running application
-    orderBook.setPublisher(new ConsolePublisher());
   }
 
   @After

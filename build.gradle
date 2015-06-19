@@ -64,6 +64,7 @@ buildscript {
 			sparkStreamingKafka: "org.apache.spark:spark-streaming-kafka_2.10:$sparkVersion",
 			
 			akkaActor:           "com.typesafe.akka:akka-actor_2.10:${akkaVersion}",
+			akkaCamel:           "com.typesafe.akka:akka-camel_2.10:${akkaVersion}",
 			akkaTestkit:         "com.typesafe.akka:akka-testkit_2.10:${akkaVersion}",
 			
 			influxdb:            "org.influxdb:influxdb-java:$influxdbVersion",

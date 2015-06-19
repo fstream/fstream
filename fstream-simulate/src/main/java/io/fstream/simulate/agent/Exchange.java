@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,8 @@ public class Exchange extends UntypedActor {
   @Autowired
   private SimulateProperties properties;
 
+  private ActorRef publisher;
+
   private HashMap<String, ActorRef> processors;
 
   private ArrayList<ActorRef> quotesSubscribers;
@@ -57,6 +60,10 @@ public class Exchange extends UntypedActor {
   private FiniteDuration quoteDelayDuration;
 
   ActiveInstruments activeinstruments;
+
+  public Exchange(@NonNull ActorRef publisher) {
+    this.publisher = publisher;
+  }
 
   public ActorRef getOrderBook(String instrument) {
     return processors.get(instrument);
@@ -178,7 +185,8 @@ public class Exchange extends UntypedActor {
   private ActorRef getProcessor(String instrument) {
     final ActorRef maybeprocessor = processors.get(instrument);
     if (maybeprocessor == null) {
-      val processor = context().actorOf(spring.props(OrderBook.class, instrument, self()), instrument);
+
+      val processor = context().actorOf(spring.props(OrderBook.class, instrument, self(), publisher), instrument);
 
       processors.put(instrument, processor);
       return processor;

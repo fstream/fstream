@@ -1,17 +1,18 @@
 package io.fstream.simulate.core;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import io.fstream.simulate.agent.Exchange;
 import io.fstream.simulate.agent.InstitutionalAgent;
+import io.fstream.simulate.agent.Publisher;
 import io.fstream.simulate.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.spring.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.Data;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Component;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.PoisonPill;
+
+import com.google.common.collect.ImmutableMap;
 
 @Slf4j
 @Data
@@ -45,46 +48,77 @@ public class Simulator {
   @Autowired
   private SpringExtension spring;
 
-  ActorRef exchange;
-  HashMap<String, List<ActorRef>> agents;
+  /**
+   * Actors.
+   */
+  private ActorRef exchange;
+  private ActorRef publisher;
+  private Map<String, List<ActorRef>> agents;
 
-  @PostConstruct
   public void simulate() {
     log.info("Simulating for {} seconds with instruments {}", properties.getSeconds(), properties.getInstruments());
+    publisher = createPublisher();
+    exchange = createExchange();
+    agents = createAgents();
+  }
 
-    exchange = tradingApp.actorOf(spring.props(Exchange.class), "exchange");
+  private ActorRef createExchange() {
+    val props = spring.props(Exchange.class, publisher);
+    return tradingApp.actorOf(props, "exchange");
+  }
 
-    agents = new HashMap<String, List<ActorRef>>();
-    agents.put("retail", new ArrayList<ActorRef>());
-    for (int i = 0; i < properties.getRetailProp().getNumAgents(); i++) {
-      String name = "retailAgent" + i;
-      val retailAgent = tradingApp.actorOf(spring.props(RetailAgent.class, name, exchange), name);
+  private ActorRef createPublisher() {
+    val props = spring.props(Publisher.class);
+    return tradingApp.actorOf(props, "publisher");
+  }
 
-      agents.get("retail").add(retailAgent);
-    }
-    agents.put("inst", new ArrayList<ActorRef>());
-    for (int i = 0; i < properties.getInstitutionalProp().getNumAgents(); i++) {
-      String name = "institutionalAgent" + i;
-      val institutionalAgent = tradingApp.actorOf(spring.props(InstitutionalAgent.class, name, exchange), name);
-      agents.get("inst").add(institutionalAgent);
-    }
+  private Map<String, List<ActorRef>> createAgents() {
+    return ImmutableMap.of("retail", createRetailAgents(), "inst", createInstitutionalAgents());
+  }
+
+  private List<ActorRef> createRetailAgents() {
+    val count = properties.getRetailProp().getNumAgents();
+    return range(0, count).mapToObj(this::createRetailAgent).collect(toList());
+  }
+
+  private ActorRef createRetailAgent(int i) {
+    val name = "retailAgent" + i;
+    val props = spring.props(RetailAgent.class, name, exchange);
+    return tradingApp.actorOf(props, name);
+  }
+
+  private List<ActorRef> createInstitutionalAgents() {
+    val count = properties.getInstitutionalProp().getNumAgents();
+    return range(0, count).mapToObj(this::createInstitutionalAgent).collect(toList());
+  }
+
+  private ActorRef createInstitutionalAgent(int i) {
+    val name = "institutionalAgent" + i;
+    val props = spring.props(InstitutionalAgent.class, name, exchange);
+    return tradingApp.actorOf(props, name);
   }
 
   @PreDestroy
   @SneakyThrows
   public void shutdown() {
-    log.info("shutting down actor system");
+    log.info("Shutting down actor system");
     for (val agentlist : agents.entrySet()) {
       for (val agent : agentlist.getValue()) {
         agent.tell(PoisonPill.getInstance(), ActorRef.noSender());
       }
     }
+
     Thread.sleep(5000);
     exchange.tell(Messages.PRINT_SUMMARY, ActorRef.noSender());
+
     Thread.sleep(5000);
     exchange.tell(PoisonPill.getInstance(), ActorRef.noSender());
     Thread.sleep(5000);
+    publisher.tell(PoisonPill.getInstance(), ActorRef.noSender());
+    Thread.sleep(5000);
+
     tradingApp.shutdown();
-    log.info("actor system shutdown complete");
+    log.info("Actor system shutdown complete");
   }
+
 }
