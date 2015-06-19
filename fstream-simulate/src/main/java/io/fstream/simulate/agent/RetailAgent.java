@@ -59,14 +59,15 @@ public class RetailAgent extends AgentActor {
   @PostConstruct
   public void init() {
     super.init();
-    maxTradSize = properties.getRetProp().getMaxTradeSize();
-    maxSleep = properties.getRetProp().getMaxSleep();
-    minSleep = properties.getRetProp().getMinSleep();
-    probMarket = properties.getRetProp().getProbMarket();
-    probBuy = properties.getRetProp().getProbBuy();
-    probBestPrice = properties.getRetProp().getProbBestPrice();
+    maxTradSize = properties.getRetailProp().getMaxTradeSize();
+    maxSleep = properties.getRetailProp().getMaxSleep();
+    minSleep = properties.getRetailProp().getMinSleep();
+    probMarket = properties.getRetailProp().getProbMarket();
+    probBuy = properties.getRetailProp().getProbBuy();
+    probBestPrice = properties.getRetailProp().getProbBestPrice();
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
+    quoteSubscriptionLevel = properties.getRetailProp().getQuoteSubscriptionLevel();
   }
 
   @Override
@@ -95,7 +96,7 @@ public class RetailAgent extends AgentActor {
 
     Quote quote = this.getLastValidQuote(symbol);
     if (quote == null) {
-      log.warn("empty quote returned by agent %s", this.getName());
+      log.warn("empty quote returned by agent {}", this.getName());
       return null;
     }
     float bestask = quote.getAskprice();
@@ -135,7 +136,7 @@ public class RetailAgent extends AgentActor {
       this.activeinstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
     }
     else if (message instanceof SubscriptionQuote) {
-      log.debug("agent %s registered successfully to receive level %s quotes", this.getName(),
+      log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),
           this.getQuoteSubscriptionLevel());
       this.setQuoteSubscriptionSuccess(((SubscriptionQuote) message).isSuccess());
     }
@@ -149,6 +150,7 @@ public class RetailAgent extends AgentActor {
   @Override
   public void preStart() {
     this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
+    exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 
 }

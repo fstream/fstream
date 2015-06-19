@@ -56,14 +56,15 @@ public class InstitutionalAgent extends AgentActor {
   public void init() {
     super.init();
     positions = new Positions();
-    maxTradSize = properties.getInstProp().getMaxTradeSize();
-    maxSleep = properties.getRetProp().getMaxSleep();
-    minSleep = properties.getRetProp().getMinSleep();
-    probMarket = properties.getInstProp().getProbMarket();
-    probBuy = properties.getInstProp().getProbBuy();
-    probBestPrice = properties.getInstProp().getProbBestPrice();
+    maxTradSize = properties.getInstitutionalProp().getMaxTradeSize();
+    maxSleep = properties.getInstitutionalProp().getMaxSleep();
+    minSleep = properties.getInstitutionalProp().getMinSleep();
+    probMarket = properties.getInstitutionalProp().getProbMarket();
+    probBuy = properties.getInstitutionalProp().getProbBuy();
+    probBestPrice = properties.getInstitutionalProp().getProbBestPrice();
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
+    quoteSubscriptionLevel = properties.getInstitutionalProp().getQuoteSubscriptionLevel();
 
   }
 
@@ -93,7 +94,7 @@ public class InstitutionalAgent extends AgentActor {
 
     Quote quote = this.getLastValidQuote(symbol);
     if (quote == null) {
-      log.warn("empty quote returned by agent %s", this.getName());
+      log.warn("empty quote returned by agent {}", this.getName());
       return null;
     }
     float bestask = quote.getAskprice();
@@ -110,9 +111,15 @@ public class InstitutionalAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestask, bestask + (minTickSize * 5), bestask, probBestPrice);
+        // TODO remove hardcoding.
+        // max ensures price stays in bounds.
+        price = decidePrice(bestask, Math.min(bestask + (minTickSize * 5), 15), bestask, probBestPrice);
       } else {
-        price = decidePrice(bestbid - (minTickSize * 5), bestbid, bestbid, probBestPrice);
+        // min ensures price doesn't go below some lower bound
+        price = decidePrice(Math.max(bestbid - (minTickSize * 5), 7), bestbid, bestbid, probBestPrice);
+      }
+      if (price < 0) {
+        log.error("invalid price generated {}", price);
       }
 
     }
@@ -131,7 +138,7 @@ public class InstitutionalAgent extends AgentActor {
       this.activeinstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
     }
     else if (message instanceof SubscriptionQuote) {
-      log.debug("agent %s registered successfully to receive level %s quotes", this.getName(),
+      log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),
           this.getQuoteSubscriptionLevel());
       this.setQuoteSubscriptionSuccess(((SubscriptionQuote) message).isSuccess());
     }

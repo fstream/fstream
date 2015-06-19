@@ -23,19 +23,10 @@ public class Trade {
   private DateTime ordertime;
   private int amount;
 
-  public Trade(String buyuser, String selluser, boolean activebuy, float price, String symbol, DateTime datetime,
-      int amount) {
-    this.buyuser = buyuser;
-    this.selluser = selluser;
-    this.price = price;
-    this.activebuy = activebuy;
-    this.time = datetime;
-    this.amount = amount;
-  }
-
+  // TODO ordertime needs to be initialized
   public Trade(DateTime tradetime, Order active, Order passive, int executedsize) {
     this.setPrice(passive.getPrice());
-    this.setSymbol(symbol);
+    this.setSymbol(active.getSymbol());
     this.setTime(tradetime);
 
     // use active orders timestamp as tradetime. Simplifying assumption

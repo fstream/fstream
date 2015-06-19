@@ -48,7 +48,6 @@ public class Exchange extends UntypedActor {
   private SimulateProperties properties;
 
   private HashMap<String, ActorRef> processors;
-  private ActorRef tradebook;
 
   private ArrayList<ActorRef> quotesSubscribers;
   private ArrayList<ActorRef> quoteAndOrdersSubscribers;
@@ -82,6 +81,7 @@ public class Exchange extends UntypedActor {
   private void initializeMarketOnOpenQuotes() {
     this.lastValidQuote = new HashMap<String, Quote>();
     Random random = new Random();
+    // TODO remove the hard coding.
     float minBid = 10;
     float minAsk = 12;
     for (val symbol : activeinstruments.getActiveinstruments()) {

@@ -23,7 +23,7 @@ simulate:
    msgResponseTimeout: 1 # in seconds
    minTickSize: 0.1
    nonPremiumQuoteDelay: 1000 # in milliseconds
-   instProp:
+   institutionalProp:
       probBuy: 0.49
       probMarket: 0.30
       probBestPrice: 0.70
@@ -32,7 +32,7 @@ simulate:
       minSleep: 1000 # in millis
       numAgents: 3000
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
-   retProp:
+   retailProp:
       probBuy: 0.49
       probMarket: 0.69
       probBestPrice: 0.19

@@ -24,9 +24,11 @@ public class SimulateProperties {
 
   private int nonPremiumQuoteDelay;
 
-  private InstitutionalProperties instProp = new InstitutionalProperties();
+  private InstitutionalProperties institutionalProp = new InstitutionalProperties();
 
-  private RetailProperties retProp = new RetailProperties();
+  private RetailProperties retailProp = new RetailProperties();
+
+  private HFTProperties hftProp = new HFTProperties();
 
   @Data
   public static class InstitutionalProperties {
@@ -43,6 +45,19 @@ public class SimulateProperties {
 
   @Data
   public static class RetailProperties {
+
+    private float probMarket;
+    private float probBuy;
+    private int maxTradeSize;
+    private float probBestPrice;
+    private int maxSleep; // in millis
+    private int minSleep; // in millis
+    private int numAgents;
+    private String quoteSubscriptionLevel;
+  }
+
+  @Data
+  public static class HFTProperties {
 
     private float probMarket;
     private float probBuy;

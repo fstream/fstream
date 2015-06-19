@@ -206,7 +206,7 @@ public class OrderBook extends UntypedActor {
           new Quote(DateTime.now(), this.getSymbol(), this.getBestask(), this.getBestbid(), getDepthAtLevel(bestask,
               OrderSide.ASK), getDepthAtLevel(bestbid, OrderSide.BID));
       if (!isValidQuote(this.bestbid, this.bestask)) {
-        log.error("invalid quote %s", quote.toString());
+        log.info("invalid quote %s", quote.toString());
         return;
       }
       exchange.tell(quote, self());
