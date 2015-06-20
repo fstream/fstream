@@ -9,7 +9,7 @@
 # Spring
 spring:
    profiles:
-      active: file
+      active: file,log
 
 ###############################################################################
 # Default profile
@@ -55,61 +55,6 @@ simulate:
       numAgents: 500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
       
----
-
-###############################################################################
-# File profile
-###############################################################################
-
-# Spring
-spring:
-   profiles: file
-
-# Simulate
-simulate:
-   publish:
-      uri: file:build?fileName=fstream-simulation.json
-
----
-
-###############################################################################
-# Log profile
-###############################################################################
-
-# Spring
-spring:
-   profiles: log
-
-# Simulate
-simulate:
-   publish:
-      uri: log:toq?showExchangePattern=false&showBodyType=false
-
----
-
-###############################################################################
-# Console profile
-###############################################################################
-
-# Spring
-spring:
-   profiles: console
-
-# Simulate
-simulate:
-   publish:
-      uri: stream:out
-
----
-
-###############################################################################
-# Kafka profile
-###############################################################################
-
-# Spring
-spring:
-   profiles: kafka
-
 # ZooKeeper
 zk:
    connect: localhost:21812
@@ -121,9 +66,9 @@ kafka:
       partitioner.class: kafka.producer.DefaultPartitioner
       serializer.class: kafka.serializer.StringEncoder
       
-# Simulate
-simulate:
-   publish:
+# Camel
+camel:
+   kafka:
       uri:
         "kafka:\
         ${kafka.producerProperties.metadata.broker.list}?\

@@ -28,7 +28,7 @@ public class Publisher extends UntypedProducerActor {
    * The endpoint to publish to.
    */
   @NonNull
-  private String endpointUrl = PublishRoutes.PRODUCER_ENDPOINT;
+  private String endpointUrl = PublishRoutes.PUBLISH_ENDPOINT;
 
   @Override
   public String getEndpointUri() {
