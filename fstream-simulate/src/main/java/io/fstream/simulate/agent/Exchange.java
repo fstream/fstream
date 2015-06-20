@@ -13,6 +13,8 @@ import io.fstream.simulate.spring.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -35,35 +38,38 @@ import akka.actor.UntypedActor;
 
 @Slf4j
 @Lazy
-// This is required otherwise Akka will complain it was created outside of a
-// factory
 @Component
 @Setter
+@RequiredArgsConstructor
 public class Exchange extends UntypedActor {
 
-  private static AtomicInteger OID = new AtomicInteger(0);
+  /**
+   * Dependencies.
+   */
+  @NonNull
+  private final ActorRef publisher;
 
   @Autowired
   private SpringExtension spring;
   @Autowired
   private SimulateProperties properties;
 
-  private ActorRef publisher;
-
-  private HashMap<String, ActorRef> processors;
-
-  private ArrayList<ActorRef> quotesSubscribers;
-  private ArrayList<ActorRef> quoteAndOrdersSubscribers;
-  private ArrayList<ActorRef> premiumSubscribers;
-  private HashMap<String, Quote> lastValidQuote;
+  /**
+   * Configuration.
+   */
   private float minTickSize;
+  private ActiveInstruments activeinstruments = new ActiveInstruments();
   private FiniteDuration quoteDelayDuration;
 
-  ActiveInstruments activeinstruments;
-
-  public Exchange(@NonNull ActorRef publisher) {
-    this.publisher = publisher;
-  }
+  /**
+   * State.
+   */
+  private static AtomicInteger OID = new AtomicInteger(0);
+  private Map<String, ActorRef> processors = new HashMap<String, ActorRef>();
+  private List<ActorRef> premiumSubscribers = new ArrayList<>();
+  private List<ActorRef> quotesSubscribers = new ArrayList<>();
+  private List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
+  private Map<String, Quote> lastValidQuote;
 
   public ActorRef getOrderBook(String instrument) {
     return processors.get(instrument);
@@ -71,14 +77,10 @@ public class Exchange extends UntypedActor {
 
   @PostConstruct
   public void init() {
-    activeinstruments = new ActiveInstruments();
     activeinstruments.setActiveinstruments(properties.getInstruments());
-    processors = new HashMap<String, ActorRef>();
-    this.quotesSubscribers = new ArrayList<ActorRef>();
-    this.quoteAndOrdersSubscribers = new ArrayList<ActorRef>();
-    this.premiumSubscribers = new ArrayList<ActorRef>();
-    this.minTickSize = properties.getMinTickSize();
+    minTickSize = properties.getMinTickSize();
     quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
+
     initializeMarketOnOpenQuotes();
   }
 

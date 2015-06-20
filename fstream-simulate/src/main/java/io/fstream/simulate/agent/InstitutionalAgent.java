@@ -1,6 +1,5 @@
 package io.fstream.simulate.agent;
 
-import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.SubscriptionQuote;
@@ -14,11 +13,10 @@ import io.fstream.simulate.orders.Quote;
 import javax.annotation.PostConstruct;
 
 import lombok.Getter;
-import lombok.Setter;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -32,45 +30,45 @@ import akka.util.Timeout;
  */
 @Slf4j
 @Getter
-@Setter
 @Component
 @Scope("prototype")
 public class InstitutionalAgent extends AgentActor {
 
-  @Autowired
-  private SimulateProperties properties;
-
+  /**
+   * Configuration.
+   */
   ActiveInstruments activeinstruments = new ActiveInstruments();
-
-  Positions positions;
   float probMarket;
   float probBuy;
   float probBestPrice;
+
+  /**
+   * State.
+   */
+  Positions positions = new Positions();
 
   public InstitutionalAgent(String name, ActorRef exchange) {
     super(name, exchange);
   }
 
-  @Override
   @PostConstruct
   public void init() {
-    super.init();
-    positions = new Positions();
     maxTradSize = properties.getInstitutionalProp().getMaxTradeSize();
     maxSleep = properties.getInstitutionalProp().getMaxSleep();
     minSleep = properties.getInstitutionalProp().getMinSleep();
+
     probMarket = properties.getInstitutionalProp().getProbMarket();
     probBuy = properties.getInstitutionalProp().getProbBuy();
     probBestPrice = properties.getInstitutionalProp().getProbBestPrice();
+
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
     quoteSubscriptionLevel = properties.getInstitutionalProp().getQuoteSubscriptionLevel();
-
   }
 
   @Override
   public void executeAction() {
-    Order order = createOrder();
+    val order = createOrder();
     if (order != null) {
       exchange.tell(order, self());
     }

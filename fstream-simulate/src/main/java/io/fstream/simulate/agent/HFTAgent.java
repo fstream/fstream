@@ -1,16 +1,9 @@
 package io.fstream.simulate.agent;
 
-import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.SubscriptionQuote;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import akka.actor.ActorRef;
 
 public class HFTAgent extends AgentActor {
-
-  @Autowired
-  private SimulateProperties properties;
 
   public HFTAgent(String name, ActorRef exchange) {
     super(name, exchange);
@@ -19,20 +12,17 @@ public class HFTAgent extends AgentActor {
 
   @Override
   public void executeAction() {
-
+    // No-op
   }
 
-  /*
-   * 
-   */
   @Override
   public void onReceive(Object message) throws Exception {
-
+    // No-op
   }
 
   @Override
   public void preStart() {
-    // register to recieve quotes
+    // Register to receive quotes
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 

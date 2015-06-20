@@ -1,6 +1,5 @@
 package io.fstream.simulate.agent;
 
-import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.SubscriptionQuote;
@@ -15,11 +14,10 @@ import java.util.HashMap;
 import javax.annotation.PostConstruct;
 
 import lombok.Getter;
-import lombok.Setter;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -31,34 +29,31 @@ import akka.util.Timeout;
  * Simulates an retail participant. The participants trades in smaller sizes. Other behaviors such as propensity to
  * buy/sell can be determined from configuration file
  */
-@Getter
-@Setter
 @Slf4j
+@Getter
 @Component
 @Scope("prototype")
 public class RetailAgent extends AgentActor {
 
   /**
-   * data structures s
+   * Configuration
    */
-  HashMap<String, Integer> positions;
-  ActiveInstruments activeinstruments = new ActiveInstruments();
-
-  @Autowired
-  private SimulateProperties properties;
-
   float probMarket;
   float probBuy;
   float probBestPrice;
+
+  /**
+   * State
+   */
+  HashMap<String, Integer> positions;
+  ActiveInstruments activeinstruments = new ActiveInstruments();
 
   public RetailAgent(String name, ActorRef exchange) {
     super(name, exchange);
   }
 
-  @Override
   @PostConstruct
   public void init() {
-    super.init();
     maxTradSize = properties.getRetailProp().getMaxTradeSize();
     maxSleep = properties.getRetailProp().getMaxSleep();
     minSleep = properties.getRetailProp().getMinSleep();
@@ -72,7 +67,7 @@ public class RetailAgent extends AgentActor {
 
   @Override
   public void executeAction() {
-    Order order = createOrder();
+    val order = createOrder();
     if (order != null) {
       exchange.tell(order, self());
     }

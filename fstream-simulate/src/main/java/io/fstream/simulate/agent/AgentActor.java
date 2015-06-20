@@ -1,20 +1,25 @@
 package io.fstream.simulate.agent;
 
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
 import io.fstream.simulate.orders.Quote;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import scala.concurrent.Await;
-import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
@@ -22,31 +27,41 @@ import akka.actor.UntypedActor;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 
+@Slf4j
 @Getter
 @Setter
-@Slf4j
 public abstract class AgentActor extends UntypedActor implements Agent {
 
-  Random random;
-  String name;
-  int maxSleep; // agent sleep time
+  /**
+   * Dependencies.
+   */
+  final ActorRef exchange;
+  @Autowired
+  SimulateProperties properties;
+
+  /**
+   * Configuration.
+   */
+  final String name;
+
+  int maxSleep; // Agent sleep time
   int minSleep;
   int maxTradSize;
+  float minTickSize;
   Timeout msgResponseTimeout;
-  protected ActorRef exchange;
+
   String quoteSubscriptionLevel;
   boolean quoteSubscriptionSuccess;
-  HashMap<String, Quote> bbboQuotes;
-  float minTickSize;
+
+  /**
+   * State.
+   */
+  Random random = new Random();
+  Map<String, Quote> bbboQuotes = new HashMap<>();
 
   public AgentActor(String name, ActorRef exchange) {
     this.name = name;
     this.exchange = exchange;
-  }
-
-  public void init() {
-    random = new Random();
-    bbboQuotes = new HashMap<String, Quote>();
   }
 
   @Override
@@ -54,10 +69,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   /**
    * Return orderside preferred with the given probability. E.g. prob=0.7, side=BUY returns BUY 70% of the time
-   * 
-   * @param prob
-   * @param side
-   * @return
    */
   protected OrderSide decideSide(float prob, @NonNull OrderSide side) {
     if (random.nextFloat() <= prob) {
@@ -74,12 +85,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   /**
    * With a given probbest will simply return the best price. Otherwise will return a random price within the min/max
    * bounds
-   * 
-   * @param min
-   * @param max
-   * @param best
-   * @param probbest
-   * @return
    */
   protected float decidePrice(float min, float max, float best, float probbest) {
     if (random.nextFloat() <= probbest) {
@@ -92,8 +97,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   /**
    * Return a market order with a given probability otherwise limit
-   * 
-   * @param probmarket
    */
   protected OrderType decideOrderType(float probmarket) {
     if (random.nextFloat() <= probmarket) {
@@ -105,7 +108,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   /**
    * Generates a random duration between minsleeptime and maxsleeptime;
-   * @return
    */
   protected FiniteDuration generateRandomDuration() {
     FiniteDuration duration = Duration.create(random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
@@ -118,15 +120,11 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   /**
    * If subscribed successfully read quote. If not received then get market open quote from exchange.
-   * @return
    */
   protected Quote getLastValidQuote(String symbol) {
-    Quote quote = null;
-
-    quote = this.bbboQuotes.get(symbol);
-
+    Quote quote = this.bbboQuotes.get(symbol);
     if (quote == null) {
-      Future<Object> futurestate = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
+      val futurestate = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
       try {
         quote = (Quote) (Await.result(futurestate, msgResponseTimeout.duration()));
         bbboQuotes.put(symbol, quote);
@@ -134,6 +132,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
         log.error("timeout awaiting state");
       }
     }
+
     return quote;
   }
 

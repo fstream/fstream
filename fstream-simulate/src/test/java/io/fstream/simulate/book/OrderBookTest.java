@@ -92,23 +92,23 @@ public class OrderBookTest {
 
     orderBook.processOrder(ask1);
     assertTrue(orderBook.getAsks().size() == 1);
-    assertTrue(orderBook.getAskdepth() == 1000);
-    assertTrue(orderBook.getBestask() == 25f);
+    assertTrue(orderBook.getAskDepth() == 1000);
+    assertTrue(orderBook.getBestAsk() == 25f);
 
     orderBook.processOrder(ask2);
     assertTrue(orderBook.getAsks().size() == 2);
-    assertTrue(orderBook.getAskdepth() == 2000);
-    assertTrue(orderBook.getBestask() == 25f);
+    assertTrue(orderBook.getAskDepth() == 2000);
+    assertTrue(orderBook.getBestAsk() == 25f);
 
     orderBook.processOrder(ask3);
     assertTrue(orderBook.getAsks().size() == 3);
-    assertTrue(orderBook.getAskdepth() == 3000);
-    assertTrue(orderBook.getBestask() == 24f);
+    assertTrue(orderBook.getAskDepth() == 3000);
+    assertTrue(orderBook.getBestAsk() == 24f);
 
     orderBook.processOrder(ask4);
     assertTrue(orderBook.getAsks().size() == 3);
-    assertTrue(orderBook.getAskdepth() == 4000);
-    assertTrue(orderBook.getBestask() == 24f);
+    assertTrue(orderBook.getAskDepth() == 4000);
+    assertTrue(orderBook.getBestAsk() == 24f);
     assertTrue(orderBook.getAsks().get(24f).size() == 2);
     LimitOrder[] orderlist = orderBook.getAsks().get(24f).toArray(new LimitOrder[0]);
     assertTrue(orderlist.length == 2);
