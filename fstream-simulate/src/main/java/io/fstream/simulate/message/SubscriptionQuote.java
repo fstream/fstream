@@ -9,23 +9,18 @@
 
 package io.fstream.simulate.message;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 /**
- * 
+ * Message for subscribing to quotes.
+ * <p>
+ * Success flag is set to true on success by exchange a sent back to sender.
  */
-@Getter
-@Setter
-@NoArgsConstructor
-/**
- * Message for subscribing to quotes. Success flag is set to true on success by exchange a sent back to sender.
- */
+@Data
 public class SubscriptionQuote {
 
-  private String level;
-  private boolean success;
+  String level;
+  boolean success;
 
   public SubscriptionQuote(String level) {
     this.level = level;

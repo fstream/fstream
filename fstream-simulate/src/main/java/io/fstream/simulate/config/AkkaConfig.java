@@ -2,6 +2,7 @@ package io.fstream.simulate.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import akka.actor.ActorSystem;
 
@@ -9,6 +10,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 @Configuration
+@Profile("toq")
 public class AkkaConfig {
 
   @Bean

@@ -10,39 +10,27 @@
 
 package io.fstream.simulate.routes;
 
-import static java.util.Collections.disjoint;
 import io.fstream.simulate.util.CodecDataFormat;
 
-import java.util.List;
-
-import lombok.NonNull;
-import lombok.val;
-
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.builder.ValueBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableList;
-
+/**
+ * Publication of TOQ.
+ */
 @Component
-public class PublishRoutes extends RouteBuilder {
+@Profile("toq")
+public class ToqRoutes extends AbstractRoutes {
 
   /**
    * @see http://camel.apache.org/direct-vm.html
    */
-  public static final String PUBLISH_ENDPOINT = "direct-vm:publish";
-  
-  /**
-   * Configuration.
-   */
-  @Value("#{environment.getActiveProfiles()}")
-  List<String> activeProfiles;
+  public static final String TOQ_ENDPOINT = "direct-vm:toq";
   
   @Override
   public void configure() throws Exception {
-    from(PUBLISH_ENDPOINT)
+    from(TOQ_ENDPOINT)
       .marshal(new CodecDataFormat())
       .choice()
         .when(profilesActive("console", "file"))
@@ -54,7 +42,7 @@ public class PublishRoutes extends RouteBuilder {
       .end()
       .choice()
         .when(profilesActive("file"))
-          .to("file:build?fileName=fstream-simulation.json")
+          .to("file:build?fileName=fstream-simulate-toq.json")
       .end()
       .choice()
         .when(profilesActive("log"))
@@ -63,16 +51,9 @@ public class PublishRoutes extends RouteBuilder {
       .choice()
         .when(profilesActive("kafka"))
           .setHeader(KafkaConstants.PARTITION_KEY, constant("part-0")) // Single partition for now
-          .to("{{simulate.kafka.uri}}")
+          .to("{{simulate.toq.uri}}")
       .end()
       .to("metrics:meter:toq"); // Record metrics
-  }
-  
-  @NonNull
-  private ValueBuilder profilesActive(String... profiles) {
-    val active = !disjoint(activeProfiles, ImmutableList.copyOf(profiles));
-   
-    return constant(active);
   }
 
 }

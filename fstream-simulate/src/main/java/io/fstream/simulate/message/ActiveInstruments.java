@@ -2,13 +2,11 @@ package io.fstream.simulate.message;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class ActiveInstruments {
 
-  List<String> activeinstruments;
+  List<String> instruments;
 
 }

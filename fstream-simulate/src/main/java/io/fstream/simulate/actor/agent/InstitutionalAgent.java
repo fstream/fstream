@@ -65,20 +65,20 @@ public class InstitutionalAgent extends AgentActor {
     OrderSide side;
     float price;
 
-    if (activeInstruments.getActiveinstruments() == null) {
-      // send a message to exchange and then return null and wait for next
-      // decision iteration
+    if (activeInstruments.getInstruments() == null) {
+      // Send a message to exchange and then return null and wait for next decision iteration
       exchange.tell(activeInstruments, self());
       return null;
     }
-    String symbol =
-        activeInstruments.getActiveinstruments().get(random.nextInt(activeInstruments.getActiveinstruments().size()));
 
-    Quote quote = this.getLastValidQuote(symbol);
+    val symbol = activeInstruments.getInstruments().get(random.nextInt(activeInstruments.getInstruments().size()));
+
+    val quote = this.getLastValidQuote(symbol);
     if (quote == null) {
-      log.warn("empty quote returned by agent {}", this.getName());
+      log.warn("Empty quote returned by agent {}", this.getName());
       return null;
     }
+
     float bestask = quote.getAskprice();
     float bestbid = quote.getBidprice();
     side = decideSide(1 - probBuy, OrderSide.ASK);
@@ -101,41 +101,39 @@ public class InstitutionalAgent extends AgentActor {
         price = decidePrice(Math.max(bestbid - (minTickSize * 5), 7), bestbid, bestbid, probBestPrice);
       }
       if (price < 0) {
-        log.error("invalid price generated {}", price);
+        log.error("Invalid price generated {}", price);
       }
-
     }
+
     return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), "xx", symbol, amount, price, name);
   }
 
   @Override
   public void onReceive(Object message) throws Exception {
-    log.debug("agent message received by " + this.getName() + " " + message.toString());
+    log.debug("Agent message received by {}: {}", this.getName(), message);
     if (message instanceof String) {
       if (((String) message).equals(Messages.AGENT_EXECUTE_ACTION)) {
         this.executeAction();
         this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
       }
     } else if (message instanceof ActiveInstruments) {
-      this.activeInstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
-    }
-    else if (message instanceof SubscriptionQuote) {
+      this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
+    } else if (message instanceof SubscriptionQuote) {
       log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),
           this.getQuoteSubscriptionLevel());
       this.quoteSubscriptionSuccess = ((SubscriptionQuote) message).isSuccess();
-    }
-    else if (message instanceof Quote) {
+    } else if (message instanceof Quote) {
       this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);
     } else {
       unhandled(message);
     }
-
   }
 
   @Override
   public void preStart() {
     this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
-    // register to recieve quotes
+
+    // Register to recieve quotes
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 

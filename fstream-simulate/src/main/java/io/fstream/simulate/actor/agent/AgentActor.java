@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,14 +30,8 @@ import akka.util.Timeout;
 
 @Slf4j
 @Getter
+@RequiredArgsConstructor
 public abstract class AgentActor extends UntypedActor implements Agent {
-
-  /**
-   * Dependencies.
-   */
-  final ActorRef exchange;
-  @Autowired
-  SimulateProperties properties;
 
   /**
    * Configuration.
@@ -57,17 +52,22 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   boolean quoteSubscriptionSuccess;
 
   /**
+   * Dependencies.
+   */
+  final ActorRef exchange;
+  @Autowired
+  SimulateProperties properties;
+
+  /**
    * State.
    */
   ActiveInstruments activeInstruments = new ActiveInstruments();
   Random random = new Random();
   Map<String, Quote> bbboQuotes = new HashMap<>();
 
-  public AgentActor(String name, ActorRef exchange) {
-    this.name = name;
-    this.exchange = exchange;
-  }
-
+  /**
+   * Template method.
+   */
   @Override
   abstract public void executeAction();
 
@@ -114,12 +114,14 @@ public abstract class AgentActor extends UntypedActor implements Agent {
    * Generates a random duration between minsleeptime and maxsleeptime;
    */
   protected FiniteDuration generateRandomDuration() {
-    FiniteDuration duration = Duration.create(random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
+    val duration = Duration.create(random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
     return duration.$plus(Duration.create(minSleep, TimeUnit.MILLISECONDS));
   }
 
+  @NonNull
   protected <T> void scheduleOnce(T message, FiniteDuration duration) {
-    getContext().system().scheduler().scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
+    val scheduler = getContext().system().scheduler();
+    scheduler.scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
   }
 
   /**
@@ -128,12 +130,12 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   protected Quote getLastValidQuote(String symbol) {
     Quote quote = this.bbboQuotes.get(symbol);
     if (quote == null) {
-      val futurestate = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
+      val futureState = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
       try {
-        quote = (Quote) (Await.result(futurestate, msgResponseTimeout.duration()));
+        quote = (Quote) (Await.result(futureState, msgResponseTimeout.duration()));
         bbboQuotes.put(symbol, quote);
       } catch (Exception e) {
-        log.error("timeout awaiting state");
+        log.error("Timeout awaiting state: {}", e.getMessage());
       }
     }
 

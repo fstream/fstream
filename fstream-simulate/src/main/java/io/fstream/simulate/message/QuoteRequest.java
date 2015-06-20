@@ -9,20 +9,11 @@
 
 package io.fstream.simulate.message;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 
-/**
- * 
- */
-@Getter
-@Setter
+@Value
 public class QuoteRequest {
 
   String symbol;
-
-  public QuoteRequest(String symbol) {
-    this.symbol = symbol;
-  }
 
 }

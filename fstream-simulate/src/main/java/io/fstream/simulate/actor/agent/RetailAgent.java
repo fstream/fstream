@@ -65,14 +65,14 @@ public class RetailAgent extends AgentActor {
     OrderType type = OrderType.ADD;
     float price;
 
-    if (activeInstruments.getActiveinstruments() == null) {
+    if (activeInstruments.getInstruments() == null) {
       // send a message to exchange and then return null and wait for next
       // decision iteration
       exchange.tell(activeInstruments, self());
       return null;
     }
     String symbol =
-        activeInstruments.getActiveinstruments().get(random.nextInt(activeInstruments.getActiveinstruments().size()));
+        activeInstruments.getInstruments().get(random.nextInt(activeInstruments.getInstruments().size()));
 
     Quote quote = this.getLastValidQuote(symbol);
     if (quote == null) {
@@ -113,7 +113,7 @@ public class RetailAgent extends AgentActor {
         this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
       }
     } else if (message instanceof ActiveInstruments) {
-      this.activeInstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
+      this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
     }
     else if (message instanceof SubscriptionQuote) {
       log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),

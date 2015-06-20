@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.handler;
+package io.fstream.simulate.util;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.fstream.core.model.event.TickEvent;

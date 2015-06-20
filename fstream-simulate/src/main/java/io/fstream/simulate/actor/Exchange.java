@@ -72,7 +72,7 @@ public class Exchange extends UntypedActor {
 
   @PostConstruct
   public void init() {
-    activeInstruments.setActiveinstruments(properties.getInstruments());
+    activeInstruments.setInstruments(properties.getInstruments());
     minTickSize = properties.getMinTickSize();
     quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
 
@@ -84,11 +84,13 @@ public class Exchange extends UntypedActor {
    */
   private void initializeMarketOnOpenQuotes() {
     this.lastValidQuote = new HashMap<String, Quote>();
-    Random random = new Random();
+
+    val random = new Random();
     // TODO remove the hard coding.
     float minBid = 10;
     float minAsk = 12;
-    for (val symbol : activeInstruments.getActiveinstruments()) {
+
+    for (val symbol : activeInstruments.getInstruments()) {
       float bid = minBid - (random.nextInt(5) * minTickSize);
       float ask = minAsk + (random.nextInt(5) * minTickSize);
       lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid, 0, 0));
@@ -104,7 +106,7 @@ public class Exchange extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
-      if (!activeInstruments.getActiveinstruments().contains(((Order) message).getSymbol())) {
+      if (!activeInstruments.getInstruments().contains(((Order) message).getSymbol())) {
         log.error("Order sent for inactive symbol {}", ((Order) message).getSymbol());
       } else {
         dispatch((Order) message);
@@ -125,7 +127,7 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof ActiveInstruments) {
       // TODO implement clone method
       ActiveInstruments activeinstrument = new ActiveInstruments();
-      activeinstrument.setActiveinstruments(this.activeInstruments.getActiveinstruments());
+      activeinstrument.setInstruments(this.activeInstruments.getInstruments());
       sender().tell(activeinstrument, self());
     } else if (message instanceof SubscriptionQuote) {
       // TODO check to make sure AgentActor is requesting subscription
@@ -143,12 +145,10 @@ public class Exchange extends UntypedActor {
           .scheduler()
           .scheduleOnce(quoteDelayDuration, getSelf(), dQuote, getContext().dispatcher(),
               null);
-    }
-    else if (message instanceof DelayedQuote) {
+    } else if (message instanceof DelayedQuote) {
       notifyQuoteAndOrderSubscribers((Quote) message);
       notifyQuoteSubscribers((Quote) message);
-    }
-    else if (message instanceof QuoteRequest) {
+    } else if (message instanceof QuoteRequest) {
       Quote quote = lastValidQuote.get(((QuoteRequest) message).getSymbol());
       sender().tell(quote, self());
     } else {
@@ -175,33 +175,32 @@ public class Exchange extends UntypedActor {
   }
 
   private void dispatch(Order order) {
-    final ActorRef processor = getProcessor(order.getSymbol());
+    val processor = getProcessor(order.getSymbol());
     processor.tell(order, self());
   }
 
   private ActorRef getProcessor(String instrument) {
-    final ActorRef maybeprocessor = processors.get(instrument);
-    if (maybeprocessor == null) {
-
+    final ActorRef maybeProcessor = processors.get(instrument);
+    if (maybeProcessor == null) {
       val processor = context().actorOf(spring.props(OrderBook.class, instrument, self(), publisher), instrument);
 
       processors.put(instrument, processor);
       return processor;
     }
-    return maybeprocessor;
+
+    return maybeProcessor;
   }
 
   public SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
     message.setSuccess(false);
     if (message.getLevel() == Messages.SUBSCRIBE_QUOTES) {
       message.setSuccess(this.quotesSubscribers.add(agent));
-    }
-    else if (message.getLevel() == Messages.SUBSCRIBE_QUOTES_ORDERS) {
+    } else if (message.getLevel() == Messages.SUBSCRIBE_QUOTES_ORDERS) {
+      message.setSuccess(this.quotesSubscribers.add(agent));
+    } else if (message.getLevel() == Messages.SUBSCRIBE_QUOTES_PREMIUM) {
       message.setSuccess(this.quotesSubscribers.add(agent));
     }
-    else if (message.getLevel() == Messages.SUBSCRIBE_QUOTES_PREMIUM) {
-      message.setSuccess(this.quotesSubscribers.add(agent));
-    }
+
     return message;
   }
 

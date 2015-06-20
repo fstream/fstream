@@ -32,7 +32,7 @@ public class FixRoutes extends AbstractFixRoutes {
       .handled(true);
     
     from("{{rates.uri}}")
-      .to("metrics:meter:rates")
+      .to("metrics:meter:rates") // Record metrics 
       .choice()
         .when(logon())
           .to("bean:logonHandler")

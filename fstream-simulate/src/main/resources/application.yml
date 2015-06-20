@@ -6,11 +6,21 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
 
+
+# Available simulation profiles:
+# - toq
+# - rates
+
+# Available output profiles:
+# - console
+# - log
+# - file
+# - kafka
+
 # Spring
 spring:
    profiles:
-      # Comma separated list of one or more of: kafka,file,console,log
-      active: console,file 
+      active: toq,rates,console 
 
 # ZooKeeper
 zk:
@@ -23,16 +33,19 @@ kafka:
       partitioner.class: kafka.producer.DefaultPartitioner
       serializer.class: kafka.serializer.StringEncoder
 
-# Application
+# Simulation
 simulate:
    kafka:
       uri:
         "kafka:\
         ${kafka.producerProperties.metadata.broker.list}?\
-        topic=toq&\
         zookeeperConnect=${zk.connect}&\
         partitioner=${kafka.producerProperties.partitioner.class}&\
-        serializerClass=${kafka.producerProperties.serializer.class}"
+        serializerClass=${kafka.producerProperties.serializer.class}"      
+   toq:
+      uri: ${simulate.kafka.uri}&topic=toq
+   rates:
+      uri: ${simulate.kafka.uri}&topic=rates
    instruments:
       - RY
       - BMO
@@ -69,5 +82,3 @@ simulate:
       minSleep: 100 # in millis
       numAgents: 500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
-
-      

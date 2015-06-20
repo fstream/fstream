@@ -76,7 +76,7 @@ public class OrderBook extends UntypedActor {
     orderCount += 1;
     order.setProcessedTime(DateTime.now());
     if (order.getType() == OrderType.MO) { // process market order
-      log.debug(String.format("processing market order %s ", order.toString()));
+      log.debug("Processing market order: {}", order);
       LimitOrder limitorder = (LimitOrder) order;
 
       if (order.getSide() == OrderSide.ASK) {
@@ -86,7 +86,7 @@ public class OrderBook extends UntypedActor {
       }
       this.processMarketOrder(limitorder);
     } else { // process limit order
-      log.debug(String.format("processing limitorder %s ", order.toString()));
+      log.debug("Processing limitorder: {}", order);
       this.processLimitOrder((LimitOrder) order);
     }
   }
@@ -102,13 +102,13 @@ public class OrderBook extends UntypedActor {
     NavigableMap<Float, NavigableSet<LimitOrder>> book;
     if (order.getSide() == OrderSide.ASK) {
       if (this.bids.isEmpty()) {
-        log.debug(String.format("No depth. Order not filled %s", order.toString()));
+        log.debug("No depth. Order not filled {}", order);
         return order.getAmount();
       }
       book = this.bids;
     } else {
       if (this.asks.isEmpty()) {
-        log.debug(String.format("No depth. Order not filled %s", order.toString()));
+        log.debug("No depth. Order not filled {}", order);
         return order.getAmount();
       }
       book = this.asks;
@@ -130,18 +130,16 @@ public class OrderBook extends UntypedActor {
         if (order.getSide() == OrderSide.ASK) { // limit price exists,
           // respect bounds
           if (order.getPrice() > passiveorder.getPrice()) {
-            log.debug(String.format(
-                "breaking price crossed on active ASK (SELL) MO for %s orderprice=%s passiveorder=%s",
-                this.getSymbol(), order.getPrice(), passiveorder.getPrice()));
+            log.debug("Breaking price crossed on active ASK (SELL) MO for {} orderprice={} passiveorder={}",
+                this.getSymbol(), order.getPrice(), passiveorder.getPrice());
             this.updateDepth(order.getSide(), totalexecutedsize);
             this.updateBestPrices();
             return unfilledsize; // price has crossed
           }
         } else {
           if (order.getPrice() < passiveorder.getPrice()) {
-            log.debug(String.format(
-                "breaking price crossed on active BID (BUY) MO for %s orderprice=%s passiveorder=%s", this.getSymbol(),
-                order.getPrice(), passiveorder.getPrice()));
+            log.debug("breaking price crossed on active BID (BUY) MO for {} orderprice={} passiveorder={}",
+                this.getSymbol(), order.getPrice(), passiveorder.getPrice());
             this.updateDepth(order.getSide(), totalexecutedsize);
             this.updateBestPrices();
             return unfilledsize; // price has crossed
@@ -201,7 +199,7 @@ public class OrderBook extends UntypedActor {
           new Quote(DateTime.now(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(bestAsk,
               OrderSide.ASK), getDepthAtLevel(bestBid, OrderSide.BID));
       if (!isValidQuote(this.bestBid, this.bestAsk)) {
-        log.info("invalid quote %s", quote.toString());
+        log.info("Invalid quote {}", quote);
         return;
       }
       exchange.tell(quote, self());
@@ -262,7 +260,7 @@ public class OrderBook extends UntypedActor {
       }
     }
     if (biddepth != this.bidDepth) {
-      log.error(String.format("bid depth does not add up record = %s actual = %s", this.bidDepth, biddepth));
+      log.error("Bid depth does not add up record = {} actual = {}", this.bidDepth, biddepth);
       return false;
     }
     int askdepth = 0;
@@ -272,7 +270,7 @@ public class OrderBook extends UntypedActor {
       }
     }
     if (askdepth != this.askDepth) {
-      log.error(String.format("aks depth does not add up record = %s actual = %s", this.askDepth, askdepth));
+      log.error("Ask depth does not add up record = {} actual = {}", this.askDepth, askdepth);
       return false;
     }
     return true;
@@ -280,18 +278,14 @@ public class OrderBook extends UntypedActor {
 
   /**
    * Registers a Trade
-   * 
-   * @param active
-   * @param passive
-   * @param executedsize
    */
   private void registerTrade(Order active, Order passive, int executedsize) {
     tradeCount += 1;
-    Trade trade = new Trade(DateTime.now(), active, passive, executedsize);
+    val trade = new Trade(DateTime.now(), active, passive, executedsize);
     exchange.tell(trade, self());
     publisher.tell(trade, self());
     if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
-      log.debug(String.format("order took more than 5 seconds to be processed %s", active.toString()));
+      log.debug("Order took more than 5 seconds to be processed {}", active);
     }
   }
 
@@ -393,7 +387,7 @@ public class OrderBook extends UntypedActor {
     }
     order.setProcessedTime(DateTime.now());
     if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
-      log.debug(String.format("order took more than 5 seconds to be processed %s", order.toString()));
+      log.debug("Rrder took more than 5 seconds to be processed: {}", order);
     }
 
     // TODO: Add these to the right location
@@ -464,37 +458,37 @@ public class OrderBook extends UntypedActor {
   };
 
   public void printBook() {
-    log.info(String.format("BOOK = %s", this.getSymbol()));
-    String book = new String(String.format("BOOK = %s\n", this.getSymbol()));
-    book = book + "------ ASKS -------\n";
+    log.info("BOOK = {}", this.getSymbol());
+
+    String text = String.format("BOOK = %s\n", this.getSymbol());
+    text = text + "------ ASKS -------\n";
     for (val ask : asks.entrySet()) {
-      book = book + String.format("%s -> ", ask.getKey());
+      text = text + String.format("%s -> ", ask.getKey());
       for (val firstnode : ask.getValue()) {
-        book =
-            book
+        text =
+            text
                 + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
                     firstnode.getAmount());
       }
-      book = book + "\n";
+      text = text + "\n";
     }
-    book = book + "------ BIDS -------\n";
+    text = text + "------ BIDS -------\n";
     for (val bid : bids.entrySet()) {
-      book = book + String.format("%s -> ", bid.getKey());
+      text = text + String.format("%s -> ", bid.getKey());
       for (val firstnode : bid.getValue()) {
-        book =
-            book
-                + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
-                    firstnode.getAmount());
+        text = text
+            + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
+                firstnode.getAmount());
       }
-      book = book + "\n";
+      text = text + "\n";
     }
-    book = book + String.format("bid depth = %s, ask depth = %s\n", this.bidDepth, this.askDepth);
-    book =
-        book
+    text = text + String.format("bid depth = %s, ask depth = %s\n", this.bidDepth, this.askDepth);
+    text =
+        text
             + String.format("best ask = %s, best bid =%s, spread = %s\n", this.bestAsk, this.bestBid, this.bestAsk
                 - this.bestBid);
-    book = book + "----- END -----\n";
-    log.info(book);
+    text = text + "----- END -----\n";
+    log.info(text);
   }
 
   @Override
@@ -507,9 +501,9 @@ public class OrderBook extends UntypedActor {
         this.printBook();
         sender().tell(true, self());
       } else if (message.equals(Messages.PRINT_SUMMARY)) {
-        log.info(String.format(
-            "%s orders processed=%s, trades processed=%s, biddepth=%s, askdepth=%s bestask=%s bestbid=%s spread=%s",
-            symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, bestAsk - bestBid));
+        log.info(
+            "{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
+            symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, bestAsk - bestBid);
       }
     } else {
       unhandled(message);

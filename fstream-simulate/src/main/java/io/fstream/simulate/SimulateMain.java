@@ -8,9 +8,9 @@
  */
 package io.fstream.simulate;
 
-import static com.google.common.base.Strings.repeat;
+import static java.lang.System.out;
 import io.fstream.simulate.core.Simulator;
-import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -20,11 +20,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Application entry point.
  */
-@Slf4j
 @SpringBootApplication
 public class SimulateMain implements CommandLineRunner {
 
-  @Autowired
+  @Autowired(required = false)
   Simulator simulator;
 
   public static void main(String... args) throws Exception {
@@ -33,11 +32,12 @@ public class SimulateMain implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-    log.info(repeat("-", 100));
-    log.info("Running simulation");
-    log.info(repeat("-", 100));
+    out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
 
-    simulator.simulate();
+    val toq = simulator != null;
+    if (toq) {
+      simulator.simulate();
+    }
   }
 
 }
