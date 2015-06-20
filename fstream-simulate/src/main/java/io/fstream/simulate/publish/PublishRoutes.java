@@ -10,28 +10,68 @@
 
 package io.fstream.simulate.publish;
 
-import lombok.Setter;
-
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Setter
 @Component
 public class PublishRoutes extends RouteBuilder {
 
   /**
-   * Sends to a camel context identified by the queue name 'publish'.
+   * @see http://camel.apache.org/direct-vm.html
    */
   public static final String PRODUCER_ENDPOINT = "direct-vm:publish";
   
+  /**
+   * @see http://camel.apache.org/direct.html
+   */
+  private static final String PROFILE_ENDPOINT = "direct:profile";
+
   @Override
   public void configure() throws Exception {
-    from("direct-vm:publish")
-      .setHeader(KafkaConstants.PARTITION_KEY, constant("0"))
-      .marshal(new CodecDataFormat())    
-      .to("{{simulate.publish.uri}}")
-      .to("metrics:meter:toq");
+    from(PRODUCER_ENDPOINT)
+      .marshal(new CodecDataFormat())
+      .to(PROFILE_ENDPOINT) // Delegate to profile specific routes
+      .to("metrics:meter:toq"); // Record metrics
+  }
+
+  @Component
+  @Profile("kafka")
+  public static class KafkaRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+      from(PROFILE_ENDPOINT)
+        .setHeader(KafkaConstants.PARTITION_KEY, constant("0")) // Single partition
+        .to("{{simulate.publish.uri}}"); // Publish
+    }
+    
+  }
+  
+  @Component
+  @Profile("log")
+  public static class NoopRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+      from(PROFILE_ENDPOINT)
+        .to("{{simulate.publish.uri}}"); // Publish
+    }
+    
+  }
+  
+  @Component
+  @Profile({"file", "console"})
+  public static class AddNewlineRoute extends RouteBuilder {
+    
+    @Override
+    public void configure() throws Exception {
+      from(PROFILE_ENDPOINT)
+        .transform().simple("${bodyAs(String)}\n") // Add newline for output
+        .to("{{simulate.publish.uri}}"); // Publish
+    }
+    
   }
 
 }
