@@ -50,25 +50,27 @@ public class Exchange extends UntypedActor {
   private final ActorRef publisher;
 
   @Autowired
-  private SpringExtension spring;
-  @Autowired
   private SimulateProperties properties;
+  @Autowired
+  private SpringExtension spring;
 
   /**
    * Configuration.
    */
   private float minTickSize;
-  private ActiveInstruments activeinstruments = new ActiveInstruments();
+  private ActiveInstruments activeInstruments = new ActiveInstruments();
   private FiniteDuration quoteDelayDuration;
 
   /**
    * State.
    */
-  private static AtomicInteger OID = new AtomicInteger(0);
+  private static AtomicInteger currentOrderId = new AtomicInteger(0);
+
   private Map<String, ActorRef> processors = new HashMap<String, ActorRef>();
   private List<ActorRef> premiumSubscribers = new ArrayList<>();
   private List<ActorRef> quotesSubscribers = new ArrayList<>();
   private List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
+
   private Map<String, Quote> lastValidQuote;
 
   public ActorRef getOrderBook(String instrument) {
@@ -77,7 +79,7 @@ public class Exchange extends UntypedActor {
 
   @PostConstruct
   public void init() {
-    activeinstruments.setActiveinstruments(properties.getInstruments());
+    activeInstruments.setActiveinstruments(properties.getInstruments());
     minTickSize = properties.getMinTickSize();
     quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
 
@@ -93,15 +95,15 @@ public class Exchange extends UntypedActor {
     // TODO remove the hard coding.
     float minBid = 10;
     float minAsk = 12;
-    for (val symbol : activeinstruments.getActiveinstruments()) {
+    for (val symbol : activeInstruments.getActiveinstruments()) {
       float bid = minBid - (random.nextInt(5) * minTickSize);
       float ask = minAsk + (random.nextInt(5) * minTickSize);
       lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid, 0, 0));
     }
   }
 
-  public synchronized static int getOID() {
-    return OID.incrementAndGet();
+  public static int nextOrderId() {
+    return currentOrderId.incrementAndGet();
   }
 
   @Override
@@ -109,7 +111,7 @@ public class Exchange extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
-      if (!activeinstruments.getActiveinstruments().contains(((Order) message).getSymbol())) {
+      if (!activeInstruments.getActiveinstruments().contains(((Order) message).getSymbol())) {
         log.error(String.format("order sent for inactive symbol %s", ((Order) message).getSymbol()));
       } else {
         dispatch((Order) message);
@@ -130,7 +132,7 @@ public class Exchange extends UntypedActor {
     } else if (message instanceof ActiveInstruments) {
       // TODO implement clone method
       ActiveInstruments activeinstrument = new ActiveInstruments();
-      activeinstrument.setActiveinstruments(this.activeinstruments.getActiveinstruments());
+      activeinstrument.setActiveinstruments(this.activeInstruments.getActiveinstruments());
       sender().tell(activeinstrument, self());
     } else if (message instanceof SubscriptionQuote) {
       // TODO check to make sure AgentActor is requesting subscription

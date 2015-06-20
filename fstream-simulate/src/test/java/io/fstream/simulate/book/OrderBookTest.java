@@ -6,9 +6,9 @@ import static io.fstream.simulate.orders.Order.OrderType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import io.fstream.simulate.agent.Exchange;
-import io.fstream.simulate.agent.Publisher;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.orders.LimitOrder;
+import io.fstream.simulate.publish.Publisher;
 import io.fstream.simulate.spring.SpringExtension;
 import lombok.val;
 

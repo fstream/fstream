@@ -10,12 +10,11 @@ import lombok.val;
 
 /**
  * Class providing accounting services to trading agents for position tracking
- * 
- * @author bdevani
- *
  */
 @Getter
 @Setter
+@Deprecated
+// TODO: Remove?
 public class Positions {
 
   private HashMap<String, List<Order>> positions;

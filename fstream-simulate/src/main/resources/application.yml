@@ -9,7 +9,7 @@
 # Spring
 spring:
    profiles:
-      active: file
+      active: log
 
 # Application
 simulate:
@@ -51,10 +51,64 @@ simulate:
       numAgents: 500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
       
+---
+
+# Spring
+spring:
+   profiles: file
+
+# Simulate
+simulate:
+   publish:
+      uri: file:build?fileName=fstream-simulation.json
+
+---
+
+# Spring
+spring:
+   profiles: log
+
+# Simulate
+simulate:
+   publish:
+      uri: log:toq?showExchangePattern=false&showBodyType=false
+
+---
+
+# Spring
+spring:
+   profiles: console
+
+# Simulate
+simulate:
+   publish:
+      uri: stream:out
+
+---
+
+# Spring
+spring:
+   profiles: kafka
+
+# ZooKeeper
+zk:
+   connect: localhost:21812
+
 # Kafka
 kafka:
    producerProperties:
       metadata.broker.list: ${kafka.broker.list:localhost:6667}
       partitioner.class: kafka.producer.DefaultPartitioner
       serializer.class: kafka.serializer.StringEncoder
+      
+# Simulate
+simulate:
+   publish:
+      uri:
+        "kafka:\
+        ${kafka.producerProperties.metadata.broker.list}?\
+        topic=toq&\
+        zookeeperConnect=${zk.connect}&\
+        partitioner=${kafka.producerProperties.partitioner.class}&\
+        serializerClass=${kafka.producerProperties.serializer.class}"
       

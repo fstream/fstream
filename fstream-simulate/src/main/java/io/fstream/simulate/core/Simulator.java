@@ -1,17 +1,19 @@
 package io.fstream.simulate.core;
 
+import static com.google.common.base.Stopwatch.createStarted;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import io.fstream.simulate.agent.Exchange;
 import io.fstream.simulate.agent.InstitutionalAgent;
-import io.fstream.simulate.agent.Publisher;
 import io.fstream.simulate.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.publish.Publisher;
 import io.fstream.simulate.spring.SpringExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 import javax.annotation.PreDestroy;
 
@@ -27,6 +29,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.PoisonPill;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 
 @Slf4j
@@ -49,27 +52,32 @@ public class Simulator {
   private SpringExtension spring;
 
   /**
-   * Actors.
+   * State.
    */
   private ActorRef exchange;
   private ActorRef publisher;
   private Map<String, List<ActorRef>> agents;
 
+  private Stopwatch watch;
+
   public void simulate() {
     log.info("Simulating for {} seconds with instruments {}", properties.getSeconds(), properties.getInstruments());
+    watch = createStarted();
     publisher = createPublisher();
     exchange = createExchange();
     agents = createAgents();
   }
 
-  private ActorRef createExchange() {
-    val props = spring.props(Exchange.class, publisher);
-    return tradingApp.actorOf(props, "exchange");
+  private ActorRef createPublisher() {
+    val name = "publisher";
+    val props = spring.props(Publisher.class);
+    return tradingApp.actorOf(props, name);
   }
 
-  private ActorRef createPublisher() {
-    val props = spring.props(Publisher.class);
-    return tradingApp.actorOf(props, "publisher");
+  private ActorRef createExchange() {
+    val name = "exchange";
+    val props = spring.props(Exchange.class, publisher);
+    return tradingApp.actorOf(props, name);
   }
 
   private Map<String, List<ActorRef>> createAgents() {
@@ -77,8 +85,7 @@ public class Simulator {
   }
 
   private List<ActorRef> createRetailAgents() {
-    val count = properties.getRetailProp().getNumAgents();
-    return range(0, count).mapToObj(this::createRetailAgent).collect(toList());
+    return createActors(properties.getRetailProp().getNumAgents(), this::createRetailAgent);
   }
 
   private ActorRef createRetailAgent(int i) {
@@ -88,8 +95,7 @@ public class Simulator {
   }
 
   private List<ActorRef> createInstitutionalAgents() {
-    val count = properties.getInstitutionalProp().getNumAgents();
-    return range(0, count).mapToObj(this::createInstitutionalAgent).collect(toList());
+    return createActors(properties.getInstitutionalProp().getNumAgents(), this::createInstitutionalAgent);
   }
 
   private ActorRef createInstitutionalAgent(int i) {
@@ -98,10 +104,15 @@ public class Simulator {
     return tradingApp.actorOf(props, name);
   }
 
+  private static List<ActorRef> createActors(int count, IntFunction<ActorRef> factory) {
+    return range(0, count).mapToObj(factory).collect(toList());
+  }
+
   @PreDestroy
   @SneakyThrows
   public void shutdown() {
-    log.info("Shutting down actor system");
+    val shutdownWatch = createStarted();
+    log.info("Shutting down actor system after simulating for {}", watch);
     for (val agentlist : agents.entrySet()) {
       for (val agent : agentlist.getValue()) {
         agent.tell(PoisonPill.getInstance(), ActorRef.noSender());
@@ -118,7 +129,7 @@ public class Simulator {
     Thread.sleep(5000);
 
     tradingApp.shutdown();
-    log.info("Actor system shutdown complete");
+    log.info("Actor system shutdown complete in {}", shutdownWatch);
   }
 
 }

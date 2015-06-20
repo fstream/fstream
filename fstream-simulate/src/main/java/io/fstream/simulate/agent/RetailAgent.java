@@ -9,8 +9,6 @@ import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
 import io.fstream.simulate.orders.Quote;
 
-import java.util.HashMap;
-
 import javax.annotation.PostConstruct;
 
 import lombok.Getter;
@@ -35,19 +33,6 @@ import akka.util.Timeout;
 @Scope("prototype")
 public class RetailAgent extends AgentActor {
 
-  /**
-   * Configuration
-   */
-  float probMarket;
-  float probBuy;
-  float probBestPrice;
-
-  /**
-   * State
-   */
-  HashMap<String, Integer> positions;
-  ActiveInstruments activeinstruments = new ActiveInstruments();
-
   public RetailAgent(String name, ActorRef exchange) {
     super(name, exchange);
   }
@@ -57,12 +42,15 @@ public class RetailAgent extends AgentActor {
     maxTradSize = properties.getRetailProp().getMaxTradeSize();
     maxSleep = properties.getRetailProp().getMaxSleep();
     minSleep = properties.getRetailProp().getMinSleep();
+
     probMarket = properties.getRetailProp().getProbMarket();
     probBuy = properties.getRetailProp().getProbBuy();
     probBestPrice = properties.getRetailProp().getProbBestPrice();
+
+    quoteSubscriptionLevel = properties.getRetailProp().getQuoteSubscriptionLevel();
+
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
-    quoteSubscriptionLevel = properties.getRetailProp().getQuoteSubscriptionLevel();
   }
 
   @Override
@@ -80,14 +68,14 @@ public class RetailAgent extends AgentActor {
     OrderType type = OrderType.ADD;
     float price;
 
-    if (activeinstruments.getActiveinstruments() == null) {
+    if (activeInstruments.getActiveinstruments() == null) {
       // send a message to exchange and then return null and wait for next
       // decision iteration
-      exchange.tell(activeinstruments, self());
+      exchange.tell(activeInstruments, self());
       return null;
     }
     String symbol =
-        activeinstruments.getActiveinstruments().get(random.nextInt(activeinstruments.getActiveinstruments().size()));
+        activeInstruments.getActiveinstruments().get(random.nextInt(activeInstruments.getActiveinstruments().size()));
 
     Quote quote = this.getLastValidQuote(symbol);
     if (quote == null) {
@@ -116,7 +104,7 @@ public class RetailAgent extends AgentActor {
 
     }
 
-    return new LimitOrder(side, type, DateTime.now(), Exchange.getOID(), "xx", symbol, amount, price, name);
+    return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), "xx", symbol, amount, price, name);
   }
 
   @Override
@@ -128,7 +116,7 @@ public class RetailAgent extends AgentActor {
         this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
       }
     } else if (message instanceof ActiveInstruments) {
-      this.activeinstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
+      this.activeInstruments.setActiveinstruments(((ActiveInstruments) message).getActiveinstruments());
     }
     else if (message instanceof SubscriptionQuote) {
       log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),

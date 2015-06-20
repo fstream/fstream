@@ -1,6 +1,7 @@
 package io.fstream.simulate.agent;
 
 import io.fstream.simulate.config.SimulateProperties;
+import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.orders.Order.OrderSide;
 import io.fstream.simulate.orders.Order.OrderType;
@@ -50,12 +51,17 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   float minTickSize;
   Timeout msgResponseTimeout;
 
+  float probMarket;
+  float probBuy;
+  float probBestPrice;
+
   String quoteSubscriptionLevel;
   boolean quoteSubscriptionSuccess;
 
   /**
    * State.
    */
+  ActiveInstruments activeInstruments = new ActiveInstruments();
   Random random = new Random();
   Map<String, Quote> bbboQuotes = new HashMap<>();
 

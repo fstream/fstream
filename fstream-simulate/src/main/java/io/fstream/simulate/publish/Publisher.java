@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.simulate.agent;
+package io.fstream.simulate.publish;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -25,15 +25,10 @@ import akka.camel.javaapi.UntypedProducerActor;
 public class Publisher extends UntypedProducerActor {
 
   /**
-   * Sends to a camel context identified by the queue name 'publish'.
-   */
-  private static final String DEFAULT_PRODUCER_ENDPOINT = "direct-vm:publish";
-
-  /**
    * The endpoint to publish to.
    */
   @NonNull
-  private String endpointUrl = DEFAULT_PRODUCER_ENDPOINT;
+  private String endpointUrl = PublishRoutes.PRODUCER_ENDPOINT;
 
   @Override
   public String getEndpointUri() {
