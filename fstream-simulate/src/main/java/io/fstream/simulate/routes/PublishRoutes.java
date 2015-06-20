@@ -63,7 +63,7 @@ public class PublishRoutes extends RouteBuilder {
       .choice()
         .when(profilesActive("kafka"))
           .setHeader(KafkaConstants.PARTITION_KEY, constant("part-0")) // Single partition for now
-          .to("{{camel.kafka.uri}}")
+          .to("{{simulate.kafka.uri}}")
       .end()
       .to("metrics:meter:toq"); // Record metrics
   }

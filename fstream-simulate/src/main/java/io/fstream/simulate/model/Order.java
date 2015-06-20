@@ -5,32 +5,32 @@ import org.joda.time.DateTime;
 // TODO: bring back MarketOrder. LimitOrder (has price) extend MarketOrder ?
 public interface Order {
 
-  public enum OrderSide {
+  enum OrderSide {
     BID, ASK
   }; // ASK(OFFER)/BID
 
-  public enum OrderType {
+  enum OrderType {
     MO, ADD, AMEND, CANCEL
   } // Market Order, Limit Order (add, amend, cancel)
 
-  public OrderType getType();
+  OrderType getType();
 
-  public OrderSide getSide();
+  OrderSide getSide();
 
-  public DateTime getSentTime();
+  DateTime getSentTime();
 
-  public int getOid();
+  int getOid();
 
-  public String getBrokerId();
+  String getBrokerId();
 
-  public int getAmount();
+  int getAmount();
 
-  public String getSymbol();
+  String getSymbol();
 
-  public float getPrice();
+  float getPrice();
 
-  public String getUserId();
+  String getUserId();
 
-  public void setProcessedTime(DateTime datetime);
+  void setProcessedTime(DateTime datetime);
 
 }

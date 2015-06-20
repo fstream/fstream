@@ -3,6 +3,7 @@ package io.fstream.simulate.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,11 +18,7 @@ import lombok.val;
 // TODO: Remove?
 public class Positions {
 
-  private HashMap<String, List<Order>> positions;
-
-  public Positions() {
-    positions = new HashMap<String, List<Order>>();
-  }
+  private Map<String, List<Order>> positions = new HashMap<>();
 
   public List<Order> getPositions(String symbol) {
     return positions.get(symbol);

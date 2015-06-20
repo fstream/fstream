@@ -8,6 +8,7 @@ import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.DelayedQuote;
 import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.util.SingletonActor;
 import io.fstream.simulate.util.SpringExtension;
 
 import java.util.ArrayList;
@@ -28,17 +29,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 @Slf4j
-@Lazy
-@Component
 @Setter
+@SingletonActor
 @RequiredArgsConstructor
 public class Exchange extends UntypedActor {
 
@@ -71,10 +69,6 @@ public class Exchange extends UntypedActor {
   private List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
 
   private Map<String, Quote> lastValidQuote;
-
-  public ActorRef getOrderBook(String instrument) {
-    return processors.get(instrument);
-  }
 
   @PostConstruct
   public void init() {
@@ -210,4 +204,5 @@ public class Exchange extends UntypedActor {
     }
     return message;
   }
+
 }

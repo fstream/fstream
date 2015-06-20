@@ -50,7 +50,7 @@ public class OrderBookTest {
 
   @Before
   public void setUp() {
-    this.actorSystem = ActorSystem.create("testTradingApp");
+    this.actorSystem = ActorSystem.create("fstream-simulate-test");
 
     val publisheProps = Props.create(Publisher.class, "log:info");
     val publisherRef = TestActorRef.<Publisher> create(actorSystem, publisheProps, "testPublisher");

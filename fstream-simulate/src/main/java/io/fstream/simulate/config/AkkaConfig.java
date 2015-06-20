@@ -13,7 +13,7 @@ public class AkkaConfig {
 
   @Bean
   public ActorSystem actorSystem() {
-    return ActorSystem.create("tradingApp", akkaConfiguration());
+    return ActorSystem.create("fstream-simulate", akkaConfiguration());
   }
 
   @Bean

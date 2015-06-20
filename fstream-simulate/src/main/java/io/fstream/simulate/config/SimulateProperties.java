@@ -14,21 +14,15 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("simulate")
 public class SimulateProperties {
 
-  private int seconds;
-
   private List<String> instruments = newArrayList();
 
   private int msgResponseTimeout;
-
   private float minTickSize;
-
   private int nonPremiumQuoteDelay;
 
-  private InstitutionalProperties institutionalProp = new InstitutionalProperties();
-
-  private RetailProperties retailProp = new RetailProperties();
-
-  private HFTProperties hftProp = new HFTProperties();
+  private InstitutionalProperties institutional = new InstitutionalProperties();
+  private RetailProperties retail = new RetailProperties();
+  private HFTProperties hft = new HFTProperties();
 
   @Data
   public static class InstitutionalProperties {
@@ -41,6 +35,7 @@ public class SimulateProperties {
     private int minSleep; // in millis
     private int numAgents;
     private String quoteSubscriptionLevel;
+
   }
 
   @Data
@@ -54,6 +49,7 @@ public class SimulateProperties {
     private int minSleep; // in millis
     private int numAgents;
     private String quoteSubscriptionLevel;
+
   }
 
   @Data
@@ -67,6 +63,7 @@ public class SimulateProperties {
     private int minSleep; // in millis
     private int numAgents;
     private String quoteSubscriptionLevel;
+
   }
 
 }

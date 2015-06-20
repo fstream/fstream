@@ -6,19 +6,17 @@ import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order;
-import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.util.PrototypeActor;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Getter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
@@ -29,9 +27,7 @@ import akka.util.Timeout;
  * to buy/sell can be determined from configuration file
  */
 @Slf4j
-@Getter
-@Component
-@Scope("prototype")
+@PrototypeActor
 public class InstitutionalAgent extends AgentActor {
 
   public InstitutionalAgent(String name, ActorRef exchange) {
@@ -40,15 +36,15 @@ public class InstitutionalAgent extends AgentActor {
 
   @PostConstruct
   public void init() {
-    maxTradSize = properties.getInstitutionalProp().getMaxTradeSize();
-    maxSleep = properties.getInstitutionalProp().getMaxSleep();
-    minSleep = properties.getInstitutionalProp().getMinSleep();
+    maxTradSize = properties.getInstitutional().getMaxTradeSize();
+    maxSleep = properties.getInstitutional().getMaxSleep();
+    minSleep = properties.getInstitutional().getMinSleep();
 
-    probMarket = properties.getInstitutionalProp().getProbMarket();
-    probBuy = properties.getInstitutionalProp().getProbBuy();
-    probBestPrice = properties.getInstitutionalProp().getProbBestPrice();
+    probMarket = properties.getInstitutional().getProbMarket();
+    probBuy = properties.getInstitutional().getProbBuy();
+    probBestPrice = properties.getInstitutional().getProbBestPrice();
 
-    quoteSubscriptionLevel = properties.getInstitutionalProp().getQuoteSubscriptionLevel();
+    quoteSubscriptionLevel = properties.getInstitutional().getQuoteSubscriptionLevel();
 
     minTickSize = properties.getMinTickSize();
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
@@ -126,7 +122,7 @@ public class InstitutionalAgent extends AgentActor {
     else if (message instanceof SubscriptionQuote) {
       log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),
           this.getQuoteSubscriptionLevel());
-      this.setQuoteSubscriptionSuccess(((SubscriptionQuote) message).isSuccess());
+      this.quoteSubscriptionSuccess = ((SubscriptionQuote) message).isSuccess();
     }
     else if (message instanceof Quote) {
       this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);

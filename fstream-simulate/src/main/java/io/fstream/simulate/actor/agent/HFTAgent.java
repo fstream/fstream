@@ -1,13 +1,19 @@
 package io.fstream.simulate.actor.agent;
 
 import io.fstream.simulate.message.SubscriptionQuote;
+import io.fstream.simulate.util.PrototypeActor;
+
+import org.springframework.context.annotation.Profile;
+
 import akka.actor.ActorRef;
 
+@Profile("hft")
+@PrototypeActor
 public class HFTAgent extends AgentActor {
 
   public HFTAgent(String name, ActorRef exchange) {
     super(name, exchange);
-    quoteSubscriptionLevel = properties.getHftProp().getQuoteSubscriptionLevel();
+    quoteSubscriptionLevel = properties.getHft().getQuoteSubscriptionLevel();
   }
 
   @Override

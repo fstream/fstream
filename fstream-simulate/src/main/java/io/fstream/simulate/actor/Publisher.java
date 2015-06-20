@@ -10,17 +10,13 @@
 package io.fstream.simulate.actor;
 
 import io.fstream.simulate.routes.PublishRoutes;
+import io.fstream.simulate.util.SingletonActor;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
 import akka.camel.javaapi.UntypedProducerActor;
 
-@Lazy
-@Component
+@SingletonActor
 @NoArgsConstructor
 @AllArgsConstructor
 public class Publisher extends UntypedProducerActor {

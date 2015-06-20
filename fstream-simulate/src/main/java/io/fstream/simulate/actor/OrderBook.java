@@ -4,10 +4,11 @@ import static java.util.Collections.reverseOrder;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order;
-import io.fstream.simulate.model.Quote;
-import io.fstream.simulate.model.Trade;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.model.Trade;
+import io.fstream.simulate.util.PrototypeActor;
 
 import java.util.Comparator;
 import java.util.NavigableMap;
@@ -23,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
@@ -36,9 +35,8 @@ import akka.actor.UntypedActor;
  */
 @Slf4j
 @Getter
-@Component
 @RequiredArgsConstructor
-@Scope("prototype")
+@PrototypeActor
 public class OrderBook extends UntypedActor {
 
   /**
@@ -501,7 +499,7 @@ public class OrderBook extends UntypedActor {
 
   @Override
   public void onReceive(Object message) throws Exception {
-    log.debug("exchange message received " + message.toString());
+    log.debug("exchange message received {}", message);
     if (message instanceof Order) {
       this.processOrder((Order) message);
     } else if (message instanceof String) {

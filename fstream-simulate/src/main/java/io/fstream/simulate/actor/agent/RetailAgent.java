@@ -6,19 +6,17 @@ import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order;
-import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.util.PrototypeActor;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Getter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
@@ -29,9 +27,7 @@ import akka.util.Timeout;
  * buy/sell can be determined from configuration file
  */
 @Slf4j
-@Getter
-@Component
-@Scope("prototype")
+@PrototypeActor
 public class RetailAgent extends AgentActor {
 
   public RetailAgent(String name, ActorRef exchange) {
@@ -40,15 +36,15 @@ public class RetailAgent extends AgentActor {
 
   @PostConstruct
   public void init() {
-    maxTradSize = properties.getRetailProp().getMaxTradeSize();
-    maxSleep = properties.getRetailProp().getMaxSleep();
-    minSleep = properties.getRetailProp().getMinSleep();
+    maxTradSize = properties.getRetail().getMaxTradeSize();
+    maxSleep = properties.getRetail().getMaxSleep();
+    minSleep = properties.getRetail().getMinSleep();
 
-    probMarket = properties.getRetailProp().getProbMarket();
-    probBuy = properties.getRetailProp().getProbBuy();
-    probBestPrice = properties.getRetailProp().getProbBestPrice();
+    probMarket = properties.getRetail().getProbMarket();
+    probBuy = properties.getRetail().getProbBuy();
+    probBestPrice = properties.getRetail().getProbBestPrice();
 
-    quoteSubscriptionLevel = properties.getRetailProp().getQuoteSubscriptionLevel();
+    quoteSubscriptionLevel = properties.getRetail().getQuoteSubscriptionLevel();
 
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
@@ -122,7 +118,7 @@ public class RetailAgent extends AgentActor {
     else if (message instanceof SubscriptionQuote) {
       log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),
           this.getQuoteSubscriptionLevel());
-      this.setQuoteSubscriptionSuccess(((SubscriptionQuote) message).isSuccess());
+      this.quoteSubscriptionSuccess = ((SubscriptionQuote) message).isSuccess();
     }
     else if (message instanceof Quote) {
       this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);

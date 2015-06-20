@@ -61,7 +61,7 @@ public class Simulator {
   private Stopwatch watch;
 
   public void simulate() {
-    log.info("Simulating for {} seconds with instruments {}", properties.getSeconds(), properties.getInstruments());
+    log.info("Simulating continuosly with instruments {}", properties.getInstruments());
     watch = createStarted();
     publisher = createPublisher();
     exchange = createExchange();
@@ -85,7 +85,7 @@ public class Simulator {
   }
 
   private List<ActorRef> createRetailAgents() {
-    return createActors(properties.getRetailProp().getNumAgents(), this::createRetailAgent);
+    return createActors(properties.getRetail().getNumAgents(), this::createRetailAgent);
   }
 
   private ActorRef createRetailAgent(int i) {
@@ -95,7 +95,7 @@ public class Simulator {
   }
 
   private List<ActorRef> createInstitutionalAgents() {
-    return createActors(properties.getInstitutionalProp().getNumAgents(), this::createInstitutionalAgent);
+    return createActors(properties.getInstitutional().getNumAgents(), this::createInstitutionalAgent);
   }
 
   private ActorRef createInstitutionalAgent(int i) {

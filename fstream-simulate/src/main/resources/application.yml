@@ -9,52 +9,9 @@
 # Spring
 spring:
    profiles:
-      active: file,log
+      # Comma separated list of one or more of: kafka,file,console,log
+      active: console,file 
 
-###############################################################################
-# Default profile
-###############################################################################
-
-# Application
-simulate:
-   seconds: 60
-   instruments:
-      - RY
-      - BMO
-      - TD
-      - BBM
-      - HUF
-   msgResponseTimeout: 1 # in seconds
-   minTickSize: 0.1
-   nonPremiumQuoteDelay: 1000 # in milliseconds
-   institutionalProp:
-      probBuy: 0.49
-      probMarket: 0.30
-      probBestPrice: 0.70
-      maxTradeSize: 5000
-      maxSleep: 2500 # in millis
-      minSleep: 1000 # in millis
-      numAgents: 3000
-      quoteSubscriptionLevel: SUBSCRIBE_QUOTES
-   retailProp:
-      probBuy: 0.49
-      probMarket: 0.69
-      probBestPrice: 0.19
-      maxTradeSize: 1000
-      maxSleep: 10000 # in millis
-      minSleep: 5000 # in millis
-      numAgents: 1500
-      quoteSubscriptionLevel: SUBSCRIBE_QUOTES
-   hftProp:
-      probBuy: 0.49
-      probMarket: 0.69
-      probBestPrice: 0.19
-      maxTradeSize: 1000
-      maxSleep: 1000 # in millis
-      minSleep: 100 # in millis
-      numAgents: 500
-      quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
-      
 # ZooKeeper
 zk:
    connect: localhost:21812
@@ -65,9 +22,9 @@ kafka:
       metadata.broker.list: ${kafka.broker.list:localhost:6667}
       partitioner.class: kafka.producer.DefaultPartitioner
       serializer.class: kafka.serializer.StringEncoder
-      
-# Camel
-camel:
+
+# Application
+simulate:
    kafka:
       uri:
         "kafka:\
@@ -76,4 +33,41 @@ camel:
         zookeeperConnect=${zk.connect}&\
         partitioner=${kafka.producerProperties.partitioner.class}&\
         serializerClass=${kafka.producerProperties.serializer.class}"
+   instruments:
+      - RY
+      - BMO
+      - TD
+      - BBM
+      - HUF
+   msgResponseTimeout: 1 # in seconds
+   minTickSize: 0.1
+   nonPremiumQuoteDelay: 1000 # in milliseconds
+   institutional:
+      probBuy: 0.49
+      probMarket: 0.30
+      probBestPrice: 0.70
+      maxTradeSize: 5000
+      maxSleep: 2500 # in millis
+      minSleep: 1000 # in millis
+      numAgents: 3000
+      quoteSubscriptionLevel: SUBSCRIBE_QUOTES
+   retail:
+      probBuy: 0.49
+      probMarket: 0.69
+      probBestPrice: 0.19
+      maxTradeSize: 1000
+      maxSleep: 10000 # in millis
+      minSleep: 5000 # in millis
+      numAgents: 1500
+      quoteSubscriptionLevel: SUBSCRIBE_QUOTES
+   hft:
+      probBuy: 0.49
+      probMarket: 0.69
+      probBestPrice: 0.19
+      maxTradeSize: 1000
+      maxSleep: 1000 # in millis
+      minSleep: 100 # in millis
+      numAgents: 500
+      quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
+
       

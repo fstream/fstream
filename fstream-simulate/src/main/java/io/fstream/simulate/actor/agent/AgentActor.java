@@ -3,9 +3,9 @@ package io.fstream.simulate.actor.agent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.QuoteRequest;
-import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
+import io.fstream.simulate.model.Quote;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +29,6 @@ import akka.util.Timeout;
 
 @Slf4j
 @Getter
-@Setter
 public abstract class AgentActor extends UntypedActor implements Agent {
 
   /**

@@ -12,7 +12,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 
 @Configuration
-public class SimulateConfig {
+public class MetricsConfig {
 
   /**
    * Override the {@link MetricRegistry} installed by Spring Boot's actuator auto-config.
