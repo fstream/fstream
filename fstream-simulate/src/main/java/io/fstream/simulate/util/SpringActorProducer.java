@@ -1,4 +1,4 @@
-package io.fstream.simulate.spring;
+package io.fstream.simulate.util;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

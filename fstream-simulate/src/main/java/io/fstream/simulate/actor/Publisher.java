@@ -7,8 +7,9 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.simulate.publish;
+package io.fstream.simulate.actor;
 
+import io.fstream.simulate.routes.PublishRoutes;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -28,11 +29,11 @@ public class Publisher extends UntypedProducerActor {
    * The endpoint to publish to.
    */
   @NonNull
-  private String endpointUrl = PublishRoutes.PUBLISH_ENDPOINT;
+  private String endpointUri = PublishRoutes.PUBLISH_ENDPOINT;
 
   @Override
   public String getEndpointUri() {
-    return endpointUrl;
+    return endpointUri;
   }
 
 }

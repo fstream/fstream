@@ -10,8 +10,8 @@
 
 package io.fstream.rates.routes;
 
-import io.fstream.rates.camel.CodecDataFormat;
 import io.fstream.rates.handler.RandomTickEventGenerator;
+import io.fstream.rates.util.CodecDataFormat;
 import lombok.Setter;
 import lombok.val;
 

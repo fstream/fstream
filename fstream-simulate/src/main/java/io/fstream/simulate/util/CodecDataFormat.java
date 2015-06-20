@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.simulate.publish;
+package io.fstream.simulate.util;
 
 import io.fstream.core.model.event.TickEvent;
 import io.fstream.core.util.Codec;

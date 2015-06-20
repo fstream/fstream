@@ -8,9 +8,10 @@
  */
 // @formatter:off
 
-package io.fstream.simulate.publish;
+package io.fstream.simulate.routes;
 
 import static java.util.Collections.disjoint;
+import io.fstream.simulate.util.CodecDataFormat;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package io.fstream.simulate.agent;
+package io.fstream.simulate.actor.agent;
 
 import io.fstream.simulate.message.SubscriptionQuote;
 import akka.actor.ActorRef;

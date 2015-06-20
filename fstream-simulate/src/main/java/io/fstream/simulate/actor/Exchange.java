@@ -1,15 +1,14 @@
-package io.fstream.simulate.agent;
+package io.fstream.simulate.actor;
 
-import io.fstream.simulate.book.OrderBook;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.message.SubscriptionQuote;
-import io.fstream.simulate.orders.DelayedQuote;
-import io.fstream.simulate.orders.Order;
-import io.fstream.simulate.orders.Quote;
-import io.fstream.simulate.spring.SpringExtension;
+import io.fstream.simulate.model.DelayedQuote;
+import io.fstream.simulate.model.Order;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.util.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,7 +111,7 @@ public class Exchange extends UntypedActor {
     log.debug("exchange message received " + message.toString());
     if (message instanceof Order) {
       if (!activeInstruments.getActiveinstruments().contains(((Order) message).getSymbol())) {
-        log.error(String.format("order sent for inactive symbol %s", ((Order) message).getSymbol()));
+        log.error("Order sent for inactive symbol {}", ((Order) message).getSymbol());
       } else {
         dispatch((Order) message);
       }

@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.rates.camel;
+package io.fstream.rates.util;
 
 import io.fstream.core.model.event.TickEvent;
 import lombok.SneakyThrows;

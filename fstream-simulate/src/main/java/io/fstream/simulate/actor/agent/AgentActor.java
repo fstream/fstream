@@ -1,11 +1,11 @@
-package io.fstream.simulate.agent;
+package io.fstream.simulate.actor.agent;
 
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.QuoteRequest;
-import io.fstream.simulate.orders.Order.OrderSide;
-import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.Quote;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.model.Order.OrderSide;
+import io.fstream.simulate.model.Order.OrderType;
 
 import java.util.HashMap;
 import java.util.Map;

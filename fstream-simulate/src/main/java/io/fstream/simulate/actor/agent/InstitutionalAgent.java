@@ -1,13 +1,14 @@
-package io.fstream.simulate.agent;
+package io.fstream.simulate.actor.agent;
 
+import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.SubscriptionQuote;
-import io.fstream.simulate.orders.LimitOrder;
-import io.fstream.simulate.orders.Order;
-import io.fstream.simulate.orders.Order.OrderSide;
-import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.Quote;
+import io.fstream.simulate.model.LimitOrder;
+import io.fstream.simulate.model.Order;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.model.Order.OrderSide;
+import io.fstream.simulate.model.Order.OrderType;
 
 import javax.annotation.PostConstruct;
 
@@ -24,33 +25,33 @@ import akka.actor.ActorRef;
 import akka.util.Timeout;
 
 /**
- * Simulates an retail participant. The participants trades in smaller sizes. Other behaviors such as propensity to
- * buy/sell can be determined from configuration file
+ * Simulates an institutional participant. The participants trades in larger sizes. Other behaviors such as propensity
+ * to buy/sell can be determined from configuration file
  */
 @Slf4j
 @Getter
 @Component
 @Scope("prototype")
-public class RetailAgent extends AgentActor {
+public class InstitutionalAgent extends AgentActor {
 
-  public RetailAgent(String name, ActorRef exchange) {
+  public InstitutionalAgent(String name, ActorRef exchange) {
     super(name, exchange);
   }
 
   @PostConstruct
   public void init() {
-    maxTradSize = properties.getRetailProp().getMaxTradeSize();
-    maxSleep = properties.getRetailProp().getMaxSleep();
-    minSleep = properties.getRetailProp().getMinSleep();
+    maxTradSize = properties.getInstitutionalProp().getMaxTradeSize();
+    maxSleep = properties.getInstitutionalProp().getMaxSleep();
+    minSleep = properties.getInstitutionalProp().getMinSleep();
 
-    probMarket = properties.getRetailProp().getProbMarket();
-    probBuy = properties.getRetailProp().getProbBuy();
-    probBestPrice = properties.getRetailProp().getProbBestPrice();
+    probMarket = properties.getInstitutionalProp().getProbMarket();
+    probBuy = properties.getInstitutionalProp().getProbBuy();
+    probBestPrice = properties.getInstitutionalProp().getProbBestPrice();
 
-    quoteSubscriptionLevel = properties.getRetailProp().getQuoteSubscriptionLevel();
+    quoteSubscriptionLevel = properties.getInstitutionalProp().getQuoteSubscriptionLevel();
 
-    msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
+    msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
   }
 
   @Override
@@ -64,8 +65,8 @@ public class RetailAgent extends AgentActor {
   private Order createOrder() {
     int next = random.nextInt(maxTradSize);
     int amount = next + 1;
-    OrderSide side;
     OrderType type = OrderType.ADD;
+    OrderSide side;
     float price;
 
     if (activeInstruments.getActiveinstruments() == null) {
@@ -84,7 +85,6 @@ public class RetailAgent extends AgentActor {
     }
     float bestask = quote.getAskprice();
     float bestbid = quote.getBidprice();
-
     side = decideSide(1 - probBuy, OrderSide.ASK);
 
     type = decideOrderType(probMarket);
@@ -97,13 +97,18 @@ public class RetailAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestask, bestask + (minTickSize * 5), bestask, probBestPrice);
+        // TODO remove hardcoding.
+        // max ensures price stays in bounds.
+        price = decidePrice(bestask, Math.min(bestask + (minTickSize * 5), 15), bestask, probBestPrice);
       } else {
-        price = decidePrice(bestbid - (minTickSize * 5), bestbid, bestbid, probBestPrice);
+        // min ensures price doesn't go below some lower bound
+        price = decidePrice(Math.max(bestbid - (minTickSize * 5), 7), bestbid, bestbid, probBestPrice);
+      }
+      if (price < 0) {
+        log.error("invalid price generated {}", price);
       }
 
     }
-
     return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), "xx", symbol, amount, price, name);
   }
 
@@ -128,11 +133,13 @@ public class RetailAgent extends AgentActor {
     } else {
       unhandled(message);
     }
+
   }
 
   @Override
   public void preStart() {
     this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
+    // register to recieve quotes
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 

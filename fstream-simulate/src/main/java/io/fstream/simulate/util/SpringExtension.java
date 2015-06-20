@@ -1,4 +1,4 @@
-package io.fstream.simulate.spring;
+package io.fstream.simulate.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

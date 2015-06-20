@@ -1,13 +1,13 @@
-package io.fstream.simulate.book;
+package io.fstream.simulate.actor;
 
 import static java.util.Collections.reverseOrder;
 import io.fstream.simulate.message.Messages;
-import io.fstream.simulate.orders.LimitOrder;
-import io.fstream.simulate.orders.Order;
-import io.fstream.simulate.orders.Order.OrderSide;
-import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.Quote;
-import io.fstream.simulate.orders.Trade;
+import io.fstream.simulate.model.LimitOrder;
+import io.fstream.simulate.model.Order;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.model.Trade;
+import io.fstream.simulate.model.Order.OrderSide;
+import io.fstream.simulate.model.Order.OrderType;
 
 import java.util.Comparator;
 import java.util.NavigableMap;

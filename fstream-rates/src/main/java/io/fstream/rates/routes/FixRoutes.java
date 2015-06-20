@@ -12,7 +12,7 @@ package io.fstream.rates.routes;
 
 import static org.apache.camel.LoggingLevel.DEBUG;
 import io.fstream.core.model.event.TickEvent;
-import io.fstream.rates.camel.CodecDataFormat;
+import io.fstream.rates.util.CodecDataFormat;
 
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.springframework.context.annotation.Profile;

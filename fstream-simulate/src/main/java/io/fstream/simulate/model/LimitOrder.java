@@ -1,13 +1,15 @@
-package io.fstream.simulate.orders;
+package io.fstream.simulate.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.val;
 
 import org.joda.time.DateTime;
 
 @Getter
 @Setter
+@ToString
 public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   OrderSide side;
@@ -18,7 +20,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
   String symbol;
   int amount;
   float price;
-  String userid;
+  String userId;
   DateTime processedTime;
 
   public LimitOrder(OrderSide side, OrderType type, DateTime time, int oid, String brokerId, String symbol, int amount,
@@ -31,7 +33,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
     this.symbol = symbol;
     this.amount = amount;
     this.price = price;
-    this.userid = userid;
+    this.userId = userid;
   }
 
   @Override
@@ -59,13 +61,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   @Override
   public String getUserId() {
-    return this.userid;
-  }
-
-  @Override
-  public String toString() {
-    return String.format("%s,%s,%s,%s,%s,%s,%s,%s", this.getSentTime(), this.getProcessedTime(), this.getOid(),
-        this.getUserId(), this.getSymbol(), this.getPrice(), this.getAmount(), this.getSide());
+    return this.userId;
   }
 
   @Override

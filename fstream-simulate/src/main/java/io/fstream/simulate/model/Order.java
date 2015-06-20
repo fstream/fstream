@@ -1,4 +1,4 @@
-package io.fstream.simulate.orders;
+package io.fstream.simulate.model;
 
 import org.joda.time.DateTime;
 

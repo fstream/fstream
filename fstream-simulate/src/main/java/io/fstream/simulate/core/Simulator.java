@@ -3,13 +3,13 @@ package io.fstream.simulate.core;
 import static com.google.common.base.Stopwatch.createStarted;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
-import io.fstream.simulate.agent.Exchange;
-import io.fstream.simulate.agent.InstitutionalAgent;
-import io.fstream.simulate.agent.RetailAgent;
+import io.fstream.simulate.actor.Exchange;
+import io.fstream.simulate.actor.Publisher;
+import io.fstream.simulate.actor.agent.InstitutionalAgent;
+import io.fstream.simulate.actor.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Messages;
-import io.fstream.simulate.publish.Publisher;
-import io.fstream.simulate.spring.SpringExtension;
+import io.fstream.simulate.util.SpringExtension;
 
 import java.util.List;
 import java.util.Map;

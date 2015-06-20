@@ -1,6 +1,6 @@
-package io.fstream.simulate.orders;
+package io.fstream.simulate.model;
 
-import io.fstream.simulate.orders.Order.OrderSide;
+import io.fstream.simulate.model.Order.OrderSide;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -43,12 +43,5 @@ public class Trade {
       this.buyuser = active.getUserId();
     }
   }
-
-  // @Override
-  // public String toString() {
-  // return String.format("%s,%s,%s,%s,%s", this.getBuyuser(), this.getSelluser(), this.isActivebuy(), this.getAmount(),
-  // this.getPrice());
-  //
-  // }
 
 }

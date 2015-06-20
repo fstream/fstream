@@ -1,13 +1,14 @@
-package io.fstream.simulate.agent;
+package io.fstream.simulate.actor.agent;
 
+import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Messages;
 import io.fstream.simulate.message.SubscriptionQuote;
-import io.fstream.simulate.orders.LimitOrder;
-import io.fstream.simulate.orders.Order;
-import io.fstream.simulate.orders.Order.OrderSide;
-import io.fstream.simulate.orders.Order.OrderType;
-import io.fstream.simulate.orders.Quote;
+import io.fstream.simulate.model.LimitOrder;
+import io.fstream.simulate.model.Order;
+import io.fstream.simulate.model.Quote;
+import io.fstream.simulate.model.Order.OrderSide;
+import io.fstream.simulate.model.Order.OrderType;
 
 import javax.annotation.PostConstruct;
 
@@ -24,33 +25,33 @@ import akka.actor.ActorRef;
 import akka.util.Timeout;
 
 /**
- * Simulates an institutional participant. The participants trades in larger sizes. Other behaviors such as propensity
- * to buy/sell can be determined from configuration file
+ * Simulates an retail participant. The participants trades in smaller sizes. Other behaviors such as propensity to
+ * buy/sell can be determined from configuration file
  */
 @Slf4j
 @Getter
 @Component
 @Scope("prototype")
-public class InstitutionalAgent extends AgentActor {
+public class RetailAgent extends AgentActor {
 
-  public InstitutionalAgent(String name, ActorRef exchange) {
+  public RetailAgent(String name, ActorRef exchange) {
     super(name, exchange);
   }
 
   @PostConstruct
   public void init() {
-    maxTradSize = properties.getInstitutionalProp().getMaxTradeSize();
-    maxSleep = properties.getInstitutionalProp().getMaxSleep();
-    minSleep = properties.getInstitutionalProp().getMinSleep();
+    maxTradSize = properties.getRetailProp().getMaxTradeSize();
+    maxSleep = properties.getRetailProp().getMaxSleep();
+    minSleep = properties.getRetailProp().getMinSleep();
 
-    probMarket = properties.getInstitutionalProp().getProbMarket();
-    probBuy = properties.getInstitutionalProp().getProbBuy();
-    probBestPrice = properties.getInstitutionalProp().getProbBestPrice();
+    probMarket = properties.getRetailProp().getProbMarket();
+    probBuy = properties.getRetailProp().getProbBuy();
+    probBestPrice = properties.getRetailProp().getProbBestPrice();
 
-    quoteSubscriptionLevel = properties.getInstitutionalProp().getQuoteSubscriptionLevel();
+    quoteSubscriptionLevel = properties.getRetailProp().getQuoteSubscriptionLevel();
 
-    minTickSize = properties.getMinTickSize();
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
+    minTickSize = properties.getMinTickSize();
   }
 
   @Override
@@ -64,8 +65,8 @@ public class InstitutionalAgent extends AgentActor {
   private Order createOrder() {
     int next = random.nextInt(maxTradSize);
     int amount = next + 1;
-    OrderType type = OrderType.ADD;
     OrderSide side;
+    OrderType type = OrderType.ADD;
     float price;
 
     if (activeInstruments.getActiveinstruments() == null) {
@@ -84,6 +85,7 @@ public class InstitutionalAgent extends AgentActor {
     }
     float bestask = quote.getAskprice();
     float bestbid = quote.getBidprice();
+
     side = decideSide(1 - probBuy, OrderSide.ASK);
 
     type = decideOrderType(probMarket);
@@ -96,18 +98,13 @@ public class InstitutionalAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        // TODO remove hardcoding.
-        // max ensures price stays in bounds.
-        price = decidePrice(bestask, Math.min(bestask + (minTickSize * 5), 15), bestask, probBestPrice);
+        price = decidePrice(bestask, bestask + (minTickSize * 5), bestask, probBestPrice);
       } else {
-        // min ensures price doesn't go below some lower bound
-        price = decidePrice(Math.max(bestbid - (minTickSize * 5), 7), bestbid, bestbid, probBestPrice);
-      }
-      if (price < 0) {
-        log.error("invalid price generated {}", price);
+        price = decidePrice(bestbid - (minTickSize * 5), bestbid, bestbid, probBestPrice);
       }
 
     }
+
     return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), "xx", symbol, amount, price, name);
   }
 
@@ -132,13 +129,11 @@ public class InstitutionalAgent extends AgentActor {
     } else {
       unhandled(message);
     }
-
   }
 
   @Override
   public void preStart() {
     this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
-    // register to recieve quotes
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 

@@ -10,7 +10,7 @@
 package io.fstream.rates.config;
 
 import io.fstream.core.model.event.TickEvent;
-import io.fstream.rates.camel.TickEventTypeConverter;
+import io.fstream.rates.util.TickEventTypeConverter;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spring.boot.CamelContextConfiguration;
