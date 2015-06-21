@@ -24,6 +24,9 @@ distTar {
 }
 
 dependencies {
+  // fStream
+  compile project(':fstream-core')
+  
   // Spring
   compile libraries.springBoot
   compile libraries.springCloudServer

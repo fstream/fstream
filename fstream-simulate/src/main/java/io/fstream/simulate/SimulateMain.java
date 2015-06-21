@@ -9,18 +9,18 @@
 package io.fstream.simulate;
 
 import static java.lang.System.out;
+import io.fstream.core.config.Main;
 import io.fstream.simulate.core.Simulator;
 import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Application entry point.
  */
-@SpringBootApplication
+@Main
 public class SimulateMain implements CommandLineRunner {
 
   @Autowired(required = false)

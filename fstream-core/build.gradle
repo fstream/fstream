@@ -10,6 +10,7 @@
 dependencies {
   // Spring
   compile libraries.springBoot
+  compile libraries.springBootAutoconfigure
 
   // Zookeeper
   compile libraries.curator

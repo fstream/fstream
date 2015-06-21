@@ -31,17 +31,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 @Slf4j
 @Configuration
-@EnableAutoConfiguration
-@EnableConfigurationProperties
 public class TestConfig extends CoreConfig {
 
   /**

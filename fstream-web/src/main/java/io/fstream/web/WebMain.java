@@ -9,19 +9,18 @@
 package io.fstream.web;
 
 import static java.lang.System.out;
-import io.fstream.web.config.WebConfig;
+import io.fstream.core.config.Main;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
 
 /**
  * Application entry point.
  */
+@Main
 public class WebMain {
 
   public static void main(String... args) throws Exception {
-    new SpringApplicationBuilder()
-        .sources(WebConfig.class)
-        .run(args);
+    SpringApplication.run(WebMain.class, args);
 
     out.println("\n\n*** Running web. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);

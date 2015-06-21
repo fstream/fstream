@@ -27,8 +27,8 @@ import org.springframework.context.annotation.Profile;
 
 import com.google.common.net.HostAndPort;
 
-@Profile("hbase")
 @Configuration
+@Profile("hbase")
 public class HBaseConfig {
 
   @Value("${zk.connect}")

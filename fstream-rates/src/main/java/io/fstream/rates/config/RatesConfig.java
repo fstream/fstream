@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.val;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,8 +23,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 
 @Configuration
-@EnableAutoConfiguration
-@EnableConfigurationProperties
 public class RatesConfig extends CoreConfig {
 
   /**

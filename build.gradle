@@ -45,36 +45,37 @@ buildscript {
 		//
 	
 		libraries = [
-			springBoot:          "org.springframework.boot:spring-boot:$springBootVersion",
-			springBootActuator:  "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
-			springBootWeb:       "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
-			springCloudClient:   "org.springframework.cloud:spring-cloud-config-client:$springCloudVersion",
-			springCloudServer:   "org.springframework.cloud:spring-cloud-config-server:$springCloudVersion",
-			
-			jacksonDatabind:     "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-			jacksonAnnotations:  "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
-			jacksonJoda:         "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
-			
-			kafka:               "org.apache.kafka:kafka_2.10:$kafkaVersion",
-			storm:               "org.apache.storm:storm-core:${stormVersion}",
-			stormKafka:          "org.apache.storm:storm-kafka:${stormVersion}",
-			
-			sparkSql:            "org.apache.spark:spark-sql_2.10:$sparkVersion",
-			sparkStreaming:      "org.apache.spark:spark-streaming_2.10:$sparkVersion",
-			sparkStreamingKafka: "org.apache.spark:spark-streaming-kafka_2.10:$sparkVersion",
-			
-			akkaActor:           "com.typesafe.akka:akka-actor_2.10:${akkaVersion}",
-			akkaCamel:           "com.typesafe.akka:akka-camel_2.10:${akkaVersion}",
-			akkaTestkit:         "com.typesafe.akka:akka-testkit_2.10:${akkaVersion}",
-			
-			influxdb:            "org.influxdb:influxdb-java:$influxdbVersion",
-			hadoopClient:        "org.apache.hadoop:hadoop-client:$hadoopVersion",
-			hadoopMiniCluster:   "org.apache.hadoop:hadoop-minicluster:$hadoopVersion",
-			hbaseClient:         "org.apache.hbase:hbase-client:$hbaseVersion",
-			esper:               "com.espertech:esper:${esperVersion}",
-			guava:               "com.google.guava:guava:$guavaVersion",
-			curator:             "org.apache.curator:curator-recipes:$curatorVersion",
-			curatorTest:         "org.apache.curator:curator-test:$curatorVersion"
+			springBoot:              "org.springframework.boot:spring-boot:$springBootVersion",
+			springBootWeb:           "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
+			springBootActuator:      "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
+			springBootAutoconfigure: "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion",
+			springCloudClient:       "org.springframework.cloud:spring-cloud-config-client:$springCloudVersion",
+			springCloudServer:       "org.springframework.cloud:spring-cloud-config-server:$springCloudVersion",
+			                         
+			jacksonDatabind:         "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+			jacksonAnnotations:      "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
+			jacksonJoda:             "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
+			                         
+			kafka:                   "org.apache.kafka:kafka_2.10:$kafkaVersion",
+			storm:                   "org.apache.storm:storm-core:${stormVersion}",
+			stormKafka:              "org.apache.storm:storm-kafka:${stormVersion}",
+			                         
+			sparkSql:                "org.apache.spark:spark-sql_2.10:$sparkVersion",
+			sparkStreaming:          "org.apache.spark:spark-streaming_2.10:$sparkVersion",
+			sparkStreamingKafka:     "org.apache.spark:spark-streaming-kafka_2.10:$sparkVersion",
+			                         
+			akkaActor:               "com.typesafe.akka:akka-actor_2.10:${akkaVersion}",
+			akkaCamel:               "com.typesafe.akka:akka-camel_2.10:${akkaVersion}",
+			akkaTestkit:             "com.typesafe.akka:akka-testkit_2.10:${akkaVersion}",
+			                         
+			influxdb:                "org.influxdb:influxdb-java:$influxdbVersion",
+			hadoopClient:            "org.apache.hadoop:hadoop-client:$hadoopVersion",
+			hadoopMiniCluster:       "org.apache.hadoop:hadoop-minicluster:$hadoopVersion",
+			hbaseClient:             "org.apache.hbase:hbase-client:$hbaseVersion",
+			esper:                   "com.espertech:esper:${esperVersion}",
+			guava:                   "com.google.guava:guava:$guavaVersion",
+			curator:                 "org.apache.curator:curator-recipes:$curatorVersion",
+			curatorTest:             "org.apache.curator:curator-test:$curatorVersion"
 		]
 	}
 

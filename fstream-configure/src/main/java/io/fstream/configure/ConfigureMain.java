@@ -9,19 +9,18 @@
 package io.fstream.configure;
 
 import static java.lang.System.out;
-import io.fstream.configure.config.ConfigureConfig;
+import io.fstream.core.config.Main;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
 
 /**
  * Application entry point.
  */
+@Main
 public class ConfigureMain {
 
   public static void main(String... args) throws Exception {
-    new SpringApplicationBuilder()
-        .sources(ConfigureConfig.class)
-        .run(args);
+    SpringApplication.run(ConfigureMain.class, args);
 
     out.println("\n\n*** Running configure. Press CTLR+C to shutdown\n\n");
   }

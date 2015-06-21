@@ -9,19 +9,18 @@
 package io.fstream.test;
 
 import static java.lang.System.out;
-import io.fstream.test.config.TestConfig;
+import io.fstream.core.config.Main;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
 
 /**
  * Application entry point.
  */
+@Main
 public class TestMain {
 
   public static void main(String... args) throws Exception {
-    new SpringApplicationBuilder()
-        .sources(TestConfig.class)
-        .run(args);
+    SpringApplication.run(TestMain.class, args);
 
     out.println("\n\n*** Running test. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);

@@ -9,20 +9,18 @@
 package io.fstream.persist;
 
 import static java.lang.System.out;
+import io.fstream.core.config.Main;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
 
 /**
  * Application entry point.
  */
-@SpringBootApplication
+@Main
 public class PersistMain {
 
   public static void main(String[] args) throws Exception {
-    new SpringApplicationBuilder()
-        .sources(PersistMain.class)
-        .run(args);
+    SpringApplication.run(PersistMain.class, args);
 
     out.println("\n\n*** Running persist. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);

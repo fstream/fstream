@@ -9,19 +9,18 @@
 package io.fstream.rates;
 
 import static java.lang.System.out;
-import io.fstream.rates.config.RatesConfig;
+import io.fstream.core.config.Main;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
 
 /**
  * Application entry point.
  */
+@Main
 public class RatesMain {
 
   public static void main(String... args) throws Exception {
-    new SpringApplicationBuilder()
-        .sources(RatesConfig.class)
-        .run(args);
+    SpringApplication.run(RatesMain.class, args);
 
     out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
     Thread.sleep(Long.MAX_VALUE);
