@@ -9,8 +9,11 @@
 # Spring
 spring:
    profiles:
-      active: spark
-      # active: influxdb,spark
+      active: spark,development
+
+###############################################################################
+# Common
+###############################################################################
 
 # ZooKeeper
 zk:
@@ -21,7 +24,7 @@ kafka:
    consumerProperties:
       zookeeper.connect: ${zk.connect}
       zookeeper.connection.timeout.ms: 1000000
-      group.id: 2
+      group.id: fstream-persist
 
 # InfluxDB
 influxdb:
@@ -31,7 +34,22 @@ influxdb:
    host: localhost
    database: fstream-events
    url: http://${influxdb.host}:${influxdb.port}
-   
+
+# Spark
+spark:
+   workDir: /tmp/fstream
+   interval: 20
+   topic: TOQ
+
+---
+
+###############################################################################
+# Production
+###############################################################################
+
+# Profile
+spring:profiles: development
+
 # Hadoop
 hadoop:
    properties:
@@ -42,12 +60,26 @@ hadoop:
 
 # Spark
 spark:
-   # Virtual box
-   # master: local[3]
-   master: spark://fstream:7077
-   workDir: /tmp/fstream
-   interval: 20
-   topic: TOQ
+   master: spark://localhost:7077
+   properties:
+     
+---
+
+###############################################################################
+# Development
+###############################################################################
+
+# Profile
+spring:profiles: development
+
+# Hadoop
+hadoop:
+   properties:
+      fs.defaultFS: file:///
+
+# Spark
+spark:
+   master: local[3]
    properties:
      spark.default.parallelism: 1
    

@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,9 @@ public class EmbeddedKafka {
   /**
    * Configuration.
    */
+  @NonNull
   private final String zkConnect;
+  @NonNull
   private final File logDir;
 
   /**

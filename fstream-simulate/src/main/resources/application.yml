@@ -20,7 +20,7 @@
 # Spring
 spring:
    profiles:
-      active: toq,rates,console 
+      active: rates,kafka 
 
 # ZooKeeper
 zk:
