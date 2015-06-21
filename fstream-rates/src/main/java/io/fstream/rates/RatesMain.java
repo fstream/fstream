@@ -23,6 +23,8 @@ public class RatesMain {
     SpringApplication.run(RatesMain.class, args);
 
     out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
+
+    // TODO: daemonize
     Thread.sleep(Long.MAX_VALUE);
   }
 

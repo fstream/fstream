@@ -23,6 +23,8 @@ public class PersistMain {
     SpringApplication.run(PersistMain.class, args);
 
     out.println("\n\n*** Running persist. Press CTLR+C to shutdown\n\n");
+
+    // TODO: daemonize
     Thread.sleep(Long.MAX_VALUE);
   }
 

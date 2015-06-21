@@ -23,7 +23,6 @@ public class WebMain {
     SpringApplication.run(WebMain.class, args);
 
     out.println("\n\n*** Running web. Press CTLR+C to shutdown\n\n");
-    Thread.sleep(Long.MAX_VALUE);
   }
 
 }

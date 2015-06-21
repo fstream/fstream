@@ -23,6 +23,8 @@ public class TestMain {
     SpringApplication.run(TestMain.class, args);
 
     out.println("\n\n*** Running test. Press CTLR+C to shutdown\n\n");
+    
+    // TODO: daemonize
     Thread.sleep(Long.MAX_VALUE);
   }
 

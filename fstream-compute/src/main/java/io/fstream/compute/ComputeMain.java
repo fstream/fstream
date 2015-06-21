@@ -23,6 +23,8 @@ public class ComputeMain {
     SpringApplication.run(ComputeMain.class, args);
 
     out.println("\n\n*** Running compute. Press CTLR+C to shutdown\n\n");
+
+    // TODO: daemonize
     Thread.sleep(Long.MAX_VALUE);
   }
 

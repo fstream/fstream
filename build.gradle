@@ -18,8 +18,8 @@ buildscript {
 	//
 	
 	ext {
-		springBootVersion  = "1.2.4.RELEASE"
-		springCloudVersion = "1.0.0.M2"
+		springBootVersion  = "1.3.0.M1"
+		springCloudVersion = "1.0.1.RELEASE"
 		
 		kafkaVersion       = '0.8.2.0'
 		stormVersion       = '0.9.4'
@@ -146,8 +146,8 @@ subprojects {
 
 		// Logging
 		compile 'ch.qos.logback:logback-classic:1.1.3'
-		compile 'org.slf4j:jcl-over-slf4j:1.7.6'
-		compile 'org.slf4j:log4j-over-slf4j:1.7.6'
+		compile 'org.slf4j:jcl-over-slf4j:1.7.12'
+		compile 'org.slf4j:log4j-over-slf4j:1.7.12'
 
 		// Test
 		testCompile 'junit:junit:4.11'

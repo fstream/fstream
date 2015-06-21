@@ -21,6 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * Common route definitions.
+ */
 public abstract class AbstractRoutes extends RouteBuilder {
 
   /**
