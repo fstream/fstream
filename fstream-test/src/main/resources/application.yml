@@ -17,13 +17,7 @@ spring.profiles.active:
 # Profile - common
 ###############################################################################
 
-# ZooKeeper
-zk:
-   connect: localhost:21812
-
 # Kafka
 kafka:
    consumerProperties:
-      zookeeper.connect: ${zk.connect}
-      zookeeper.connection.timeout.ms: 1000000
       group.id: fstream-test

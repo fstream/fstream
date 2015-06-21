@@ -21,22 +21,11 @@
 # - kafka
 
 # Profiles
-spring.profiles.active: rates,kafka 
+spring.profiles.active: rates,file 
 
 ###############################################################################
 # Profile - Common
 ###############################################################################
-
-# ZooKeeper
-zk:
-   connect: localhost:21812
-
-# Kafka
-kafka:
-   producerProperties:
-      metadata.broker.list: ${kafka.broker.list:localhost:6667}
-      partitioner.class: kafka.producer.DefaultPartitioner
-      serializer.class: kafka.serializer.StringEncoder
 
 # Simulation
 simulate:

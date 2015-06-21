@@ -17,17 +17,6 @@ spring.profiles.active:
 # Profile - common
 ###############################################################################
 
-# ZooKeeper
-zk:
-   connect: localhost:21812
-
-# Kafka
-kafka:
-   producerProperties:
-      metadata.broker.list: ${kafka.broker.list:localhost:6667}
-      partitioner.class: kafka.producer.DefaultPartitioner
-      serializer.class: kafka.serializer.StringEncoder
-
 # fStream
 fstream:
    broker:

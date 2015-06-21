@@ -17,28 +17,13 @@ spring.profiles.active: spark,development,rates
 # Profile - common
 ###############################################################################
 
-# ZooKeeper
-zk:
-   connect: localhost:21812
-
 # Kafka
 kafka:
    topics: 
       - RATES
       - TOQ
    consumerProperties:
-      zookeeper.connect: ${zk.connect}
-      zookeeper.connection.timeout.ms: 1000000
       group.id: fstream-persist
-
-# InfluxDB
-influxdb:
-   username: root
-   password: root
-   port: 8086
-   host: localhost
-   database: fstream-events
-   url: http://${influxdb.host}:${influxdb.port}
 
 # Spark
 spark:

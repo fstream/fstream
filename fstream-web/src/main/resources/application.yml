@@ -17,22 +17,7 @@ spring.profiles.active:
 # Profile - common
 ###############################################################################
 
-# ZooKeeper
-zk:
-   connect: localhost:21812
-
 # Kafka
 kafka:
    consumerProperties:
-      zookeeper.connect: ${zk.connect}
-      zookeeper.connection.timeout.ms: 1000000
       group.id: fstream-web
-
-# InfluxDB
-influxdb:
-   username: root
-   password: root
-   port: 8086
-   host: localhost
-   database: fstream-events
-   url: http://${influxdb.host}:${influxdb.port}

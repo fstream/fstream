@@ -17,6 +17,30 @@ spring.profiles.active:
 # Profile - common
 ###############################################################################
 
+# ZooKeeper
+zk:
+   connect: localhost:21812
+
+# Kafka
+kafka:
+   producerProperties:
+      metadata.broker.list: ${kafka.broker.list:localhost:6667}
+      request.required.acks: 1
+      serializer.class: kafka.serializer.StringEncoder
+      partitioner.class: kafka.producer.DefaultPartitioner
+   consumerProperties:
+      zookeeper.connect: ${zk.connect}
+      zookeeper.connection.timeout.ms: 1000000
+      
+# InfluxDB
+influxdb:
+   username: root
+   password: root
+   port: 8086
+   host: localhost
+   database: fstream-events
+   url: http://${influxdb.host}:${influxdb.port}
+
 # State     
 state:
 
