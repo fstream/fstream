@@ -17,6 +17,7 @@
   
    <!-- ZooKeeper -->
   <logger name="org.apache.zookeeper" level="WARN"/>
+  <logger name="backtype.storm.daemon.nimbus" level="INFO"/>
   
   <root level="INFO">
     <appender-ref ref="STDOUT" />

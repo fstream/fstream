@@ -17,9 +17,12 @@
  */
 package io.fstream.persist.config;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import io.fstream.core.model.topic.Topic;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
@@ -58,6 +61,7 @@ public class PersistProperties {
   @Data
   public static class KafkaProperties {
 
+    private List<Topic> topics = newArrayList();
     private Map<String, String> consumerProperties = newHashMap();
 
   }

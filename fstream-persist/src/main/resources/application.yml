@@ -1,18 +1,20 @@
 ---
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# Copyright (c) 2015 fStream. All Rights Reserved.
 # 
 # Project and contact information: https://bitbucket.org/fstream/fstream
 # 
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
 
-# Spring
-spring:
-   profiles:
-      active: spark,development
+###############################################################################
+# Profile Activation
+###############################################################################
+
+# Profiles
+spring.profiles.active: spark,development,rates
 
 ###############################################################################
-# Common
+# Profile - common
 ###############################################################################
 
 # ZooKeeper
@@ -21,6 +23,9 @@ zk:
 
 # Kafka
 kafka:
+   topics: 
+      - RATES
+      - TOQ
    consumerProperties:
       zookeeper.connect: ${zk.connect}
       zookeeper.connection.timeout.ms: 1000000
@@ -39,38 +44,33 @@ influxdb:
 spark:
    workDir: /tmp/fstream
    interval: 20
-   topic: TOQ
 
 ---
 
 ###############################################################################
-# Production
+# Profile - "production"
 ###############################################################################
 
 # Profile
-spring:profiles: development
+spring.profiles: production
 
 # Hadoop
 hadoop:
    properties:
-      # Virtual box
-      # fs.defaultFS: file:///
-      fs.defaultFS: hdfs://fstream
       # parquet.block.size: 1048576
 
 # Spark
 spark:
-   master: spark://localhost:7077
    properties:
      
 ---
 
 ###############################################################################
-# Development
+# Profile - "development"
 ###############################################################################
 
 # Profile
-spring:profiles: development
+spring.profiles: development
 
 # Hadoop
 hadoop:
@@ -82,4 +82,31 @@ spark:
    master: local[3]
    properties:
      spark.default.parallelism: 1
-   
+     
+---
+
+###############################################################################
+# Profile - "rates"
+###############################################################################
+
+# Profile
+spring.profiles: rates
+
+# Kafka
+kafka:
+   topics: 
+      - RATES
+     
+---
+ 
+###############################################################################
+# Profile - "toq"
+###############################################################################
+
+# Profile
+spring.profiles: toq
+
+# Kafka
+kafka:
+   topics: 
+      - TOQ

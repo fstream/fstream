@@ -1,10 +1,21 @@
 ---
-# Copyright (c) 2014 fStream. All Rights Reserved.
+# Copyright (c) 2015 fStream. All Rights Reserved.
 # 
 # Project and contact information: https://bitbucket.org/fstream/fstream
 # 
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
+
+###############################################################################
+# Profile Activation
+###############################################################################
+
+# Profiles
+spring.profiles.active: development
+
+###############################################################################
+# Profile - common
+###############################################################################
 
 # ZooKeeper
 zk:
@@ -19,11 +30,33 @@ kafka:
       
 # Storm
 storm:
-   local: true
-   debug: true
    properties:
       nimbus.host: ${storm.nimbus.host:localhost} 
 
-# https://groups.google.com/forum/#!topic/storm-user/yOtE3Em50bA
-# https://translate.google.ca/translate?hl=en&sl=zh-CN&tl=en&u=http%3A%2F%2Fm.blog.csdn.net%2Fblog%2Fpan051%2F16805373
-logging.level.backtype.storm.daemon.nimbus: INFO
+---
+
+###############################################################################
+# Profile - "production"
+###############################################################################
+
+# Profile
+spring.profiles: production
+
+# Storm
+storm:
+   local: false
+   debug: false
+
+---
+
+###############################################################################
+# Profile - "development"
+###############################################################################
+
+# Profile
+spring.profiles: development
+
+# Storm
+storm:
+   local: true
+   debug: true

@@ -6,6 +6,9 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited.
 # Proprietary and confidential.
 
+###############################################################################
+# Activation
+###############################################################################
 
 # Available simulation profiles:
 # - toq
@@ -17,10 +20,12 @@
 # - file
 # - kafka
 
-# Spring
-spring:
-   profiles:
-      active: rates,kafka 
+# Profiles
+spring.profiles.active: rates,kafka 
+
+###############################################################################
+# Profile - Common
+###############################################################################
 
 # ZooKeeper
 zk:

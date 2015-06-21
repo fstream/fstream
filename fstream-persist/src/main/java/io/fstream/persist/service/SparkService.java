@@ -59,8 +59,6 @@ public class SparkService {
   private String workDir;
   @Value("${spark.interval}")
   private long interval;
-  @Value("${spark.topic}")
-  private Topic topic;
   @Autowired
   private KafkaProperties kafkaProperties;
 
@@ -76,11 +74,15 @@ public class SparkService {
   public void run() throws IOException {
     clean();
 
+    // TODO: Add support for multiple topics by running in parallel
+
     @Cleanup
     val streamingContext = createStreamingContext();
 
-    prepare(streamingContext);
-    execute(streamingContext);
+    for (val topic : kafkaProperties.getTopics()) {
+      prepare(topic, streamingContext);
+      execute(streamingContext);
+    }
   }
 
   private void clean() throws IOException {
@@ -88,10 +90,10 @@ public class SparkService {
     fileSystem.delete(new Path(workDir), true);
   }
 
-  private void prepare(JavaStreamingContext streamingContext) {
+  private void prepare(Topic topic, JavaStreamingContext streamingContext) {
     val sqlContext = createSQLContext();
 
-    val kafkaStream = createKafkaStream(streamingContext);
+    val kafkaStream = createKafkaStream(topic, streamingContext);
     kafkaStream.foreachRDD((rdd, time) -> {
       JavaRDD<String> messages = rdd.map(Tuple2::_2);
       log.info("Partition count: {}", messages.partitions().size());
@@ -125,7 +127,8 @@ public class SparkService {
   /**
    * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
    */
-  private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
+  private JavaPairReceiverInputDStream<String, String> createKafkaStream(Topic topic,
+      JavaStreamingContext streamingContext) {
     log.info("Reading from topic: {}", topic.getId());
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;

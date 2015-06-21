@@ -13,6 +13,7 @@
   
   <logger name="akka" level="info" additivity="false"/>
   <logger name="org.eclipse.jetty" level="info" additivity="false"/>
+  <logger name="parquet.hadoop" level="warn" additivity="false"/>
   <logger name="org.apache.spark" level="info" additivity="false"/>
   <logger name="org.apache.hadoop.mapred.FileInputFormat" level="info" additivity="false"/>
   <logger name="org.apache.hadoop.net.NetworkTopology" level="info" additivity="false"/>
