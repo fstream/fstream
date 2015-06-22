@@ -13,5 +13,6 @@
 - hosts: ops
   sudo: yes
   roles:
+    - ansible
     - elasticsearch
     - kibana
