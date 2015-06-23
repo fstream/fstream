@@ -13,7 +13,7 @@
 # Spark / HDFS
 #
 - name: Create non-root clusteruser user
-  hosts: spark:hdfs
+  hosts: spark
   sudo: True
   roles:
     - clusteruser_common
@@ -32,22 +32,6 @@
   sudo: True
   roles:
     - { role: sshkey_acceptor }
-
-#
-# SSH - Root
-#
-
-- name: Setup passwordless SSH for user root - donor key
-  hosts: spark-master
-  sudo: True
-  roles:
-    - { role: sshkey_donor, clusteruser: root, clusteruser_home: '/root' }
-
-- name: Setup passwordless SSH for user root - accept key
-  hosts: spark-worker
-  sudo: True
-  roles:
-    - { role: sshkey_acceptor, clusteruser: root, clusteruser_home: '/root' }
 
 #
 # Setup

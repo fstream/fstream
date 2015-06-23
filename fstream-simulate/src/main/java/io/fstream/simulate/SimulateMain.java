@@ -34,7 +34,7 @@ public class SimulateMain {
   }
 
   @EventListener
-  public void start(ApplicationReadyEvent event) {
+  public void start(ApplicationReadyEvent ready) {
     val toq = simulator != null;
     if (toq) {
       simulator.simulate();

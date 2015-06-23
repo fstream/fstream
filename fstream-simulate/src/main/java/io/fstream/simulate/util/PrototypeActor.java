@@ -18,8 +18,14 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * Semantic.
+ */
 @Component
 @Scope("prototype")
+/**
+ * Meta.
+ */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

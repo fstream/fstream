@@ -18,8 +18,15 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+/**
+ * Semantic.
+ */
 @Component
 @Lazy
+// Needs to be lazy so that gets created inside Akka
+/**
+ * Meta.
+ */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
