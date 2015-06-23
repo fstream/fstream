@@ -9,9 +9,11 @@
 
 package io.fstream.persist.service;
 
+import static com.google.common.base.Strings.repeat;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.topic.Topic;
-import io.fstream.persist.config.PersistProperties.KafkaProperties;
+import io.fstream.persist.config.PersistProperties;
 
 import java.io.IOException;
 
@@ -24,12 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
@@ -59,6 +61,9 @@ public class SparkService {
   private String workDir;
   @Value("${spark.interval}")
   private long interval;
+
+  @Autowired
+  private PersistProperties persistProperties;
   @Autowired
   private KafkaProperties kafkaProperties;
 
@@ -74,15 +79,14 @@ public class SparkService {
   public void run() throws IOException {
     clean();
 
-    // TODO: Add support for multiple topics by running in parallel
-
     @Cleanup
     val streamingContext = createStreamingContext();
 
-    for (val topic : kafkaProperties.getTopics()) {
-      prepare(topic, streamingContext);
-      execute(streamingContext);
+    for (val topic : persistProperties.getTopics()) {
+      create(topic, streamingContext);
     }
+
+    start(streamingContext);
   }
 
   private void clean() throws IOException {
@@ -90,27 +94,37 @@ public class SparkService {
     fileSystem.delete(new Path(workDir), true);
   }
 
-  private void prepare(Topic topic, JavaStreamingContext streamingContext) {
+  private void create(Topic topic, JavaStreamingContext streamingContext) {
+    log.info(repeat("-", 100));
+    log.info("Creating DStream for topic '{}'...", topic);
+    log.info(repeat("-", 100));
+
     val sqlContext = createSQLContext();
-
     val kafkaStream = createKafkaStream(topic, streamingContext);
+
     kafkaStream.foreachRDD((rdd, time) -> {
-      JavaRDD<String> messages = rdd.map(Tuple2::_2);
-      log.info("Partition count: {}", messages.partitions().size());
-      log.info("Message count: {}", messages.count());
-
-      JavaRDD<String> combined = messages.coalesce(1);
-
-      DataFrame schemaRdd = sqlContext.jsonRDD(combined);
-      String parquetFile = workDir + "/data-" + time.milliseconds();
-      schemaRdd.saveAsParquetFile(parquetFile);
-
+      persist(topic, sqlContext, rdd, time);
       return null;
     });
   }
 
-  private void execute(JavaStreamingContext streamingContext) {
+  private void persist(Topic topic, SQLContext sqlContext, JavaPairRDD<String, String> rdd, Time time) {
+    val messages = rdd.map(Tuple2::_2);
+    log.info("[{}] Partition count: {}", topic, messages.partitions().size());
+    log.info("[{}] Message count: {}", topic, messages.count());
+
+    val combined = messages.coalesce(1); // Combine into single partition
+
+    val schemaRdd = sqlContext.jsonRDD(combined);
+    val parquetFile = getParquetFileName(topic, time);
+    schemaRdd.saveAsParquetFile(parquetFile);
+  }
+
+  private void start(JavaStreamingContext streamingContext) {
+    log.info("Starting streams...");
     streamingContext.start();
+
+    log.info("Awaiting shutdown...");
     streamingContext.awaitTermination();
   }
 
@@ -140,6 +154,10 @@ public class SparkService {
 
     return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,
         kafkaParams, partitions, storageLevel);
+  }
+
+  private String getParquetFileName(Topic topic, Time time) {
+    return workDir + "/" + topic.getId() + "/" + topic.getId() + "-" + time.milliseconds();
   }
 
 }

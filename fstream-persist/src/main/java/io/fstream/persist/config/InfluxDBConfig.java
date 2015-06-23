@@ -9,33 +9,33 @@
 
 package io.fstream.persist.config;
 
+import io.fstream.core.config.InfluxDBProperties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Slf4j
-@Profile("influxdb")
 @Configuration
+@Profile("influxdb")
 public class InfluxDBConfig {
 
-  @Value("${influxdb.url}")
-  private String url;
-  @Value("${influxdb.username}")
-  private String username;
-  @Value("${influxdb.password}")
-  private String password;
+  @Autowired
+  InfluxDBProperties influxdbProperties;
 
   @Bean
   @SneakyThrows
   public InfluxDB influxDb() {
-    log.info("Connection to '{}' as user '{}'", url, username);
-    return InfluxDBFactory.connect(url, username, password);
+    log.info("Connection to '{}'", influxdbProperties.getUrl());
+    return InfluxDBFactory.connect(
+        influxdbProperties.getUrl(),
+        influxdbProperties.getUsername(),
+        influxdbProperties.getPassword());
   }
 
 }

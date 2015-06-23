@@ -18,8 +18,8 @@
 package io.fstream.persist.config;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.topic.Topic;
 
 import java.util.List;
@@ -31,8 +31,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Data
 @Configuration
+@ConfigurationProperties(prefix = "persist")
 public class PersistProperties {
+
+  private List<Topic> topics = newArrayList();
 
   @Bean
   @ConfigurationProperties(prefix = "kafka")
@@ -56,14 +60,6 @@ public class PersistProperties {
   @ConfigurationProperties(prefix = "spark")
   public SparkProperties sparkProperties() {
     return new SparkProperties();
-  }
-
-  @Data
-  public static class KafkaProperties {
-
-    private List<Topic> topics = newArrayList();
-    private Map<String, String> consumerProperties = newHashMap();
-
   }
 
   @Data

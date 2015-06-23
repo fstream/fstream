@@ -7,11 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.config;
-
-import static com.google.common.collect.Maps.newHashMap;
-
-import java.util.Map;
+package io.fstream.core.config;
 
 import lombok.Data;
 
@@ -19,18 +15,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Kafka specific configuration properties.
+ * InfluxDB specific configuration properties.
  */
 @Data
 @Component
-@ConfigurationProperties("kafka")
-public class KafkaProperties {
+@ConfigurationProperties("influxdb")
+public class InfluxDBProperties {
 
-  /**
-   * Kafka properties that effect producer behavior.
-   * 
-   * @see http://kafka.apache.org/07/configuration.html
-   */
-  private Map<String, String> producerProperties = newHashMap();
+  private String url;
+  private String username;
+  private String password;
 
 }

@@ -17,11 +17,14 @@ spring.profiles.active: spark,development,rates
 # Profile - common
 ###############################################################################
 
-# Kafka
-kafka:
+# Persist
+persist:
    topics: 
       - RATES
       - TOQ
+      
+# Kafka
+kafka:
    consumerProperties:
       group.id: fstream-persist
 
