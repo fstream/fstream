@@ -21,7 +21,7 @@
 # - kafka
 
 # Profiles
-spring.profiles.active: rates,file 
+spring.profiles.active: toq,file 
 
 ###############################################################################
 # Profile - Common

@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+
+- name: Remove hosts
+  file: path=/etc/ansible/hosts state=absent
+  when: ansible_environment is defined
+
+- name: Copy ansible.cfg
+  template: src=ansible.cfg.j2 dest=/etc/ansible/ansible.cfg

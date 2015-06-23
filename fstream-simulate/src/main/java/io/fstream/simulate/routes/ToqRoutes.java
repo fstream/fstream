@@ -42,7 +42,7 @@ public class ToqRoutes extends AbstractRoutes {
       .end()
       .choice()
         .when(profilesActive("file"))
-          .to("file:build?fileName=fstream-simulate-toq.json")
+          .to("stream:file?fileName=build/fstream-simulate-toq.json")
       .end()
       .choice()
         .when(profilesActive("log"))
