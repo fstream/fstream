@@ -193,12 +193,15 @@ public class Exchange extends UntypedActor {
 
   public SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
     message.setSuccess(false);
-    if (message.getLevel() == Messages.SUBSCRIBE_QUOTES) {
+    if (message.getLevel().equals(Messages.SUBSCRIBE_QUOTES)) {
       message.setSuccess(this.quotesSubscribers.add(agent));
-    } else if (message.getLevel() == Messages.SUBSCRIBE_QUOTES_ORDERS) {
-      message.setSuccess(this.quotesSubscribers.add(agent));
-    } else if (message.getLevel() == Messages.SUBSCRIBE_QUOTES_PREMIUM) {
-      message.setSuccess(this.quotesSubscribers.add(agent));
+    } else if (message.getLevel().equals(Messages.SUBSCRIBE_QUOTES_ORDERS)) {
+      message.setSuccess(this.quoteAndOrdersSubscribers.add(agent));
+    } else if (message.getLevel().equals(Messages.SUBSCRIBE_QUOTES_PREMIUM)) {
+      message.setSuccess(this.premiumSubscribers.add(agent));
+    }
+    else {
+      log.error("subscription request not recognized");
     }
 
     return message;

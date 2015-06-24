@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.actor.Publisher;
+import io.fstream.simulate.actor.agent.HFTAgent;
 import io.fstream.simulate.actor.agent.InstitutionalAgent;
 import io.fstream.simulate.actor.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
@@ -106,7 +107,8 @@ public class Simulator {
   }
 
   private List<ActorRef> createAgents() {
-    return ImmutableList.<ActorRef> builder().addAll(createRetailAgents()).addAll(createInstitutionalAgents()).build();
+    return ImmutableList.<ActorRef> builder().addAll(createRetailAgents()).addAll(createInstitutionalAgents())
+        .addAll(createHftAgents()).build();
   }
 
   private List<ActorRef> createRetailAgents() {
@@ -126,6 +128,16 @@ public class Simulator {
   private ActorRef createInstitutionalAgent(int i) {
     val name = "institutionalAgent-" + i;
     val props = spring.props(InstitutionalAgent.class, name, exchange);
+    return actorSystem.actorOf(props, name);
+  }
+
+  private List<ActorRef> createHftAgents() {
+    return createActors(properties.getHft().getNumAgents(), this::createHftAgent);
+  }
+
+  private ActorRef createHftAgent(int i) {
+    val name = "HFTAgent-" + i;
+    val props = spring.props(HFTAgent.class, name, exchange);
     return actorSystem.actorOf(props, name);
   }
 

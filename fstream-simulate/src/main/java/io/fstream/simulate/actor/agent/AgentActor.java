@@ -133,7 +133,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
       val futureState = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
       try {
         quote = (Quote) (Await.result(futureState, msgResponseTimeout.duration()));
-        bbboQuotes.put(symbol, quote);
       } catch (Exception e) {
         log.error("Timeout awaiting state: {}", e.getMessage());
       }

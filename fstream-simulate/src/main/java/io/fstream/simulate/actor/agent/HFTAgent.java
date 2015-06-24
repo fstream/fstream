@@ -9,34 +9,38 @@ import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.util.PrototypeActor;
+
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 
 import akka.actor.ActorRef;
 
-@Profile("hft")
 @PrototypeActor
 @Slf4j
 public class HFTAgent extends AgentActor {
 
   @Autowired
   private SimulateProperties properties;
+  // TODO don't really need this. Action is always Quote driven
+  ActiveInstruments activeinstruments;
   float probBuy;
 
   public HFTAgent(String name, ActorRef exchange) {
     super(name, exchange);
+  }
+
+  @PostConstruct
+  public void init() {
     quoteSubscriptionLevel = properties.getHft().getQuoteSubscriptionLevel();
     probBuy = properties.getHft().getProbBuy();
     activeinstruments = new ActiveInstruments();
   }
-
-  // TODO don't really need this. Action is always Quote driven
-  ActiveInstruments activeinstruments;
 
   @Override
   public void executeAction() {
@@ -47,7 +51,7 @@ public class HFTAgent extends AgentActor {
   public void onReceive(Object message) throws Exception {
     if (message instanceof Quote) {
       this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);
-      executeAction();
+      decideActionOnQuote((Quote) message);
     }
     else if (message instanceof ActiveInstruments) {
       this.activeinstruments.setInstruments(((ActiveInstruments) message).getInstruments());
@@ -57,13 +61,15 @@ public class HFTAgent extends AgentActor {
   private void decideActionOnQuote(Quote quote) {
     float spread = quote.getAskprice() - quote.getBidprice();
     Imbalance imbalance = getImbalance(quote);
+    @NonNull
+    LimitOrder order;
     if (imbalance.getRatio() < 2 && spread > minTickSize) { // no stress period, so provide liquidity at better price
-      @NonNull
-      LimitOrder order = createLiquidityNormal(quote, imbalance);
+      order = createLiquidityNormal(quote, imbalance);
       exchange.tell(order, self());
     }
     else {
-
+      order = createLiquidityAtStress(quote, imbalance);
+      exchange.tell(order, self());
     }
 
   }
@@ -73,16 +79,16 @@ public class HFTAgent extends AgentActor {
     float bestbid = quote.getBiddepth() != 0 ? quote.getBidprice() : 10;
     float price;
     if (imbalance.getSide() == OrderSide.ASK) { // ask imbalance
-      price = bestask - minTickSize / 2;
+      price = Math.max(bestbid + minTickSize, bestask - minTickSize / 2);
       if ((price - bestbid) < minTickSize) {
-        log.error("invalid spread/price ask = {}, bid = {}, spread = {}. rejecting", price, bestbid, price - bestbid);
+        log.error("invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestbid, price - bestbid);
         price = bestask;
       }
     }
     else { // bid imbalance
-      price = bestbid + minTickSize / 2;
-      if ((bestask - price) > minTickSize) {
-        log.error("invalid spread/price ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
+      price = Math.min(bestask - minTickSize, bestbid + minTickSize / 2);
+      if ((bestask - price) < minTickSize) {
+        log.error("invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
         price = bestask;
       }
     }
@@ -101,13 +107,13 @@ public class HFTAgent extends AgentActor {
     if (quote.getAskdepth() > quote.getBiddepth()) {
       imbalanceAmount = quote.getAskdepth() - quote.getBiddepth();
       imbalanceSide = OrderSide.BID;
-      imbalanceRatio = quote.getBidprice() != 0 ? quote.getAskdepth() / quote.getBiddepth() : 0;
+      imbalanceRatio = quote.getBiddepth() != 0 ? quote.getAskdepth() / quote.getBiddepth() : 0;
     }
     // TODO if both sides are 0, then this will bias creation of ASK liquidity. Not a big deal now, but fix later.
     else {
       imbalanceAmount = quote.getBiddepth() - quote.getAskdepth();
       imbalanceSide = OrderSide.ASK;
-      imbalanceRatio = quote.getAskprice() != 0 ? quote.getBiddepth() / quote.getAskdepth() : 0;
+      imbalanceRatio = quote.getAskdepth() != 0 ? quote.getBiddepth() / quote.getAskdepth() : 0;
     }
     return new Imbalance(imbalanceSide, imbalanceAmount, imbalanceRatio);
   }
