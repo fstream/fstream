@@ -6,6 +6,7 @@
 
 - name: Extract Spark archive
   unarchive: copy=no src="/tmp/spark-{{ spark_version }}.tgz" dest=/opt/
+  sudo_user: "{{ clusteruser }}"
   tags:
     - install
 
@@ -33,10 +34,13 @@
   tags:
     - configure
 
+#
+# This needs to happen on a user who's key is present on all spark hosts. Currently, this is {{ clusteruser }} 
+#
 - name: Attempt to start Spark cluster  
   shell: "{{ spark_root }}/sbin/start-all.sh"
+  sudo_user: "{{ clusteruser }}"
   when: ansible_hostname == "{{ spark_master_host }}"
-  # TODO: This needs hadoop user to own the installation dir (logs / work): sudo_user: "{{ clusteruser }}"
   ignore_errors: true
   tags:
     - configure
