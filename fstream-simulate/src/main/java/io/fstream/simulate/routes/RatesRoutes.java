@@ -73,7 +73,7 @@ public class RatesRoutes extends AbstractRoutes {
       .end()
       .choice()
         .when(profilesActive("file"))
-          .to("fstream:file?fileName=build/fstream-simulate-rates.json")
+          .to("stream:file?fileName=build/fstream-simulate-rates.json")
       .end()
       .choice()
         .when(profilesActive("log"))
