@@ -31,6 +31,9 @@ public class SimulateMain {
     SpringApplication.run(SimulateMain.class, args);
 
     out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
+    // TODO: daemonize
+    Thread.sleep(Long.MAX_VALUE);
+
   }
 
   @EventListener

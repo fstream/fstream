@@ -75,7 +75,7 @@ public class InstitutionalAgent extends AgentActor {
 
     val quote = this.getLastValidQuote(symbol);
     if (quote == null) {
-      log.warn("Empty quote returned by agent {}", this.getName());
+      log.warn("Empty quote returned by agent {} for symbol {}", this.getName(), symbol);
       return null;
     }
 
