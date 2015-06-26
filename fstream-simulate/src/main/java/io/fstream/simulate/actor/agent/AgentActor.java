@@ -3,6 +3,8 @@ package io.fstream.simulate.actor.agent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.QuoteRequest;
+import io.fstream.simulate.model.OpenOrders;
+import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
@@ -64,6 +66,8 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   ActiveInstruments activeInstruments = new ActiveInstruments();
   Random random = new Random();
   Map<String, Quote> bbboQuotes = new HashMap<>();
+  @Autowired
+  OpenOrders openOrderBook;
 
   /**
    * Template method.
@@ -139,6 +143,19 @@ public abstract class AgentActor extends UntypedActor implements Agent {
     }
 
     return quote;
+  }
+
+  /**
+   * cancels all open orders for the given symbol
+   * @param symbol
+   */
+  protected void cancelAllOpenOrders(String symbol) {
+    val openorders = openOrderBook.getOrders().get(symbol);
+    for (Order openorder : openorders) {
+      openorder.setType(OrderType.CANCEL);
+      exchange.tell(openorder, self());
+    }
+    openOrderBook.getOrders().removeAll(symbol);
   }
 
 }

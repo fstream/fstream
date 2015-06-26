@@ -1,12 +1,9 @@
 package io.fstream.simulate.actor.agent;
 
 import io.fstream.simulate.actor.Exchange;
-import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.LimitOrder;
-import io.fstream.simulate.model.OpenOrders;
-import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
@@ -15,23 +12,15 @@ import io.fstream.simulate.util.PrototypeActor;
 import javax.annotation.PostConstruct;
 
 import lombok.Data;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import akka.actor.ActorRef;
 
 @PrototypeActor
 @Slf4j
 public class HFTAgent extends AgentActor {
-
-  @Autowired
-  private SimulateProperties properties;
-
-  @Autowired
-  private OpenOrders openOrderBook;
 
   public HFTAgent(String name, ActorRef exchange) {
     super(name, exchange);
@@ -70,20 +59,10 @@ public class HFTAgent extends AgentActor {
       order = createLiquidityAtStress(quote, imbalance);
     }
     // cancel any existing orders in the book
-    cancelOpenOrders(order.getSymbol());
+    cancelAllOpenOrders(order.getSymbol());
     // TODO for now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
     exchange.tell(order, self());
     openOrderBook.addOpenOrder(order);
-
-  }
-
-  private void cancelOpenOrders(String symbol) {
-    val openorders = openOrderBook.getOrders().get(symbol);
-    for (Order openorder : openorders) {
-      openorder.setType(OrderType.CANCEL);
-      exchange.tell(openorder, self());
-    }
-    openOrderBook.getOrders().removeAll(symbol);
 
   }
 
