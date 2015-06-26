@@ -48,13 +48,17 @@ public class InstitutionalAgent extends AgentActor {
 
     minTickSize = properties.getMinTickSize();
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
+    broker = properties.getBrokers().get(random.nextInt(properties.getBrokers().size()));
   }
 
   @Override
   public void executeAction() {
     val order = createOrder();
     if (order != null) {
+      // cancel all openorders
+      cancelAllOpenOrders(order.getSymbol());
       exchange.tell(order, self());
+      openOrderBook.addOpenOrder(order);
     }
   }
 
@@ -105,7 +109,7 @@ public class InstitutionalAgent extends AgentActor {
       }
     }
 
-    return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), "xx", symbol, amount, price, name);
+    return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
   }
 
   @Override

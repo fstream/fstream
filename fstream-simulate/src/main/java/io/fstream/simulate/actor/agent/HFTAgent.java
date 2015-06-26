@@ -30,6 +30,7 @@ public class HFTAgent extends AgentActor {
   public void init() {
     quoteSubscriptionLevel = properties.getHft().getQuoteSubscriptionLevel();
     probBuy = properties.getHft().getProbBuy();
+    broker = properties.getBrokers().get(random.nextInt(properties.getBrokers().size()));
   }
 
   @Override
@@ -84,7 +85,7 @@ public class HFTAgent extends AgentActor {
         price = bestask;
       }
     }
-    return new LimitOrder(imbalance.getSide(), OrderType.ADD, DateTime.now(), Exchange.nextOrderId(), "yy",
+    return new LimitOrder(imbalance.getSide(), OrderType.ADD, DateTime.now(), Exchange.nextOrderId(), broker,
         quote.getSymbol(),
         imbalance.getAmount(), price,
         name);
@@ -122,12 +123,8 @@ public class HFTAgent extends AgentActor {
     }
     else { // bid imbalance
       price = bestbid - (getMinTickSize() * imbalance.getRatio());
-      // if ((bestask - price) > minTickSize) {
-      // log.error("invalid spread/price ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
-      // price = bestask;
-      // }
     }
-    return new LimitOrder(imbalance.getSide(), OrderType.ADD, DateTime.now(), Exchange.nextOrderId(), "yy",
+    return new LimitOrder(imbalance.getSide(), OrderType.ADD, DateTime.now(), Exchange.nextOrderId(), broker,
         quote.getSymbol(),
         imbalance.getAmount(), price,
         name);

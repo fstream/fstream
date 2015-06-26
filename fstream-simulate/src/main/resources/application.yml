@@ -27,7 +27,7 @@ spring.profiles.active: toq,file
 # Profile - Common
 ###############################################################################
 
-# Simulation
+# Simulationguava
 simulate:
    kafka:
       uri:
@@ -46,6 +46,12 @@ simulate:
       - TD
       - BBM
       - HUF
+   brokers:
+      - xxx
+      - yyy
+      - zzz
+      - ddd
+      - aaa
    msgResponseTimeout: 5 # in seconds
    minTickSize: 0.1
    nonPremiumQuoteDelay: 1000 # in milliseconds
@@ -56,7 +62,7 @@ simulate:
       maxTradeSize: 5000
       maxSleep: 2500 # in millis
       minSleep: 1000 # in millis
-      numAgents: 3000
+      numAgents: 3000 #3000
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    retail:
       probBuy: 0.49
@@ -65,7 +71,7 @@ simulate:
       maxTradeSize: 1000
       maxSleep: 10000 # in millis
       minSleep: 5000 # in millis
-      numAgents: 1500
+      numAgents: 1500 #1500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    hft:
       probBuy: 0.49
@@ -74,5 +80,5 @@ simulate:
       maxTradeSize: 1000
       maxSleep: 1000 # in millis
       minSleep: 100 # in millis
-      numAgents: 500
+      numAgents: 500 #500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM

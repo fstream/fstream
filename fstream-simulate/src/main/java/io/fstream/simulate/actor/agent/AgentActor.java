@@ -52,6 +52,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   String quoteSubscriptionLevel;
   boolean quoteSubscriptionSuccess;
+  String broker;
 
   /**
    * Dependencies.

@@ -48,13 +48,16 @@ public class RetailAgent extends AgentActor {
 
     msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     minTickSize = properties.getMinTickSize();
+    broker = properties.getBrokers().get(random.nextInt(properties.getBrokers().size()));
   }
 
   @Override
   public void executeAction() {
     val order = createOrder();
     if (order != null) {
+      cancelAllOpenOrders(order.getSymbol());
       exchange.tell(order, self());
+      openOrderBook.addOpenOrder(order);
     }
   }
 
@@ -101,7 +104,7 @@ public class RetailAgent extends AgentActor {
 
     }
 
-    return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), "xx", symbol, amount, price, name);
+    return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
   }
 
   @Override

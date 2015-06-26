@@ -19,6 +19,7 @@ public class SimulateProperties {
   private int msgResponseTimeout;
   private float minTickSize;
   private int nonPremiumQuoteDelay;
+  private List<String> brokers = newArrayList();
 
   private InstitutionalProperties institutional = new InstitutionalProperties();
   private RetailProperties retail = new RetailProperties();
