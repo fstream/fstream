@@ -33,4 +33,6 @@ public interface Order {
 
   void setProcessedTime(DateTime datetime);
 
+  void setType(OrderType type);
+
 }

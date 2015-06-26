@@ -11,9 +11,9 @@ public class Quote {
 
   DateTime time;
   String symbol;
-  float askprice;
-  float bidprice;
-  int askdepth;
-  int biddepth;
+  float askPrice;
+  float bidPrice;
+  int askDepth;
+  int bidDepth;
 
 }

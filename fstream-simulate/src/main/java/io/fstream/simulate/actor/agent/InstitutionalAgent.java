@@ -79,8 +79,8 @@ public class InstitutionalAgent extends AgentActor {
       return null;
     }
 
-    float bestask = quote.getAskprice();
-    float bestbid = quote.getBidprice();
+    float bestask = quote.getAskPrice();
+    float bestbid = quote.getBidPrice();
     side = decideSide(1 - probBuy, OrderSide.ASK);
 
     type = decideOrderType(probMarket);

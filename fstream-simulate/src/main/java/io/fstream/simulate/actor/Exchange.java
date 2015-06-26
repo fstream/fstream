@@ -138,8 +138,8 @@ public class Exchange extends UntypedActor {
       notifyPremiumSubscribers((Quote) message);
       // notify non-premium with latency. Schedule a DelayedQuote message to self
       DelayedQuote dQuote =
-          new DelayedQuote(((Quote) message).getTime(), ((Quote) message).getSymbol(), ((Quote) message).getAskprice(),
-              ((Quote) message).getBidprice(), ((Quote) message).getAskdepth(), ((Quote) message).getBiddepth());
+          new DelayedQuote(((Quote) message).getTime(), ((Quote) message).getSymbol(), ((Quote) message).getAskPrice(),
+              ((Quote) message).getBidPrice(), ((Quote) message).getAskDepth(), ((Quote) message).getBidDepth());
       getContext()
           .system()
           .scheduler()

@@ -5,6 +5,8 @@ import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.LimitOrder;
+import io.fstream.simulate.model.OpenOrders;
+import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
@@ -13,7 +15,7 @@ import io.fstream.simulate.util.PrototypeActor;
 import javax.annotation.PostConstruct;
 
 import lombok.Data;
-import lombok.NonNull;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
@@ -27,9 +29,9 @@ public class HFTAgent extends AgentActor {
 
   @Autowired
   private SimulateProperties properties;
-  // TODO don't really need this. Action is always Quote driven
-  ActiveInstruments activeinstruments;
-  float probBuy;
+
+  @Autowired
+  private OpenOrders openOrderBook;
 
   public HFTAgent(String name, ActorRef exchange) {
     super(name, exchange);
@@ -39,7 +41,6 @@ public class HFTAgent extends AgentActor {
   public void init() {
     quoteSubscriptionLevel = properties.getHft().getQuoteSubscriptionLevel();
     probBuy = properties.getHft().getProbBuy();
-    activeinstruments = new ActiveInstruments();
   }
 
   @Override
@@ -54,29 +55,41 @@ public class HFTAgent extends AgentActor {
       decideActionOnQuote((Quote) message);
     }
     else if (message instanceof ActiveInstruments) {
-      this.activeinstruments.setInstruments(((ActiveInstruments) message).getInstruments());
+      this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
     }
   }
 
   private void decideActionOnQuote(Quote quote) {
-    float spread = quote.getAskprice() - quote.getBidprice();
+    float spread = quote.getAskPrice() - quote.getBidPrice();
     Imbalance imbalance = getImbalance(quote);
-    @NonNull
     LimitOrder order;
     if (imbalance.getRatio() < 2 && spread > minTickSize) { // no stress period, so provide liquidity at better price
       order = createLiquidityNormal(quote, imbalance);
-      exchange.tell(order, self());
     }
     else {
       order = createLiquidityAtStress(quote, imbalance);
-      exchange.tell(order, self());
     }
+    // cancel any existing orders in the book
+    cancelOpenOrders(order.getSymbol());
+    // TODO for now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
+    exchange.tell(order, self());
+    openOrderBook.addOpenOrder(order);
+
+  }
+
+  private void cancelOpenOrders(String symbol) {
+    val openorders = openOrderBook.getOrders().get(symbol);
+    for (Order openorder : openorders) {
+      openorder.setType(OrderType.CANCEL);
+      exchange.tell(openorder, self());
+    }
+    openOrderBook.getOrders().removeAll(symbol);
 
   }
 
   private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {
-    float bestask = quote.getAskdepth() != 0 ? quote.getAskprice() : 12;
-    float bestbid = quote.getBiddepth() != 0 ? quote.getBidprice() : 10;
+    float bestask = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
+    float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
     if (imbalance.getSide() == OrderSide.ASK) { // ask imbalance
       price = Math.max(bestbid + minTickSize, bestask - minTickSize / 2);
@@ -104,16 +117,16 @@ public class HFTAgent extends AgentActor {
     int imbalanceAmount;
     OrderSide imbalanceSide;
     float imbalanceRatio;
-    if (quote.getAskdepth() > quote.getBiddepth()) {
-      imbalanceAmount = quote.getAskdepth() - quote.getBiddepth();
+    if (quote.getAskDepth() > quote.getBidDepth()) {
+      imbalanceAmount = quote.getAskDepth() - quote.getBidDepth();
       imbalanceSide = OrderSide.BID;
-      imbalanceRatio = quote.getBiddepth() != 0 ? quote.getAskdepth() / quote.getBiddepth() : 0;
+      imbalanceRatio = quote.getBidDepth() != 0 ? quote.getAskDepth() / quote.getBidDepth() : 0;
     }
     // TODO if both sides are 0, then this will bias creation of ASK liquidity. Not a big deal now, but fix later.
     else {
-      imbalanceAmount = quote.getBiddepth() - quote.getAskdepth();
+      imbalanceAmount = quote.getBidDepth() - quote.getAskDepth();
       imbalanceSide = OrderSide.ASK;
-      imbalanceRatio = quote.getAskdepth() != 0 ? quote.getBiddepth() / quote.getAskdepth() : 0;
+      imbalanceRatio = quote.getAskDepth() != 0 ? quote.getBidDepth() / quote.getAskDepth() : 0;
     }
     return new Imbalance(imbalanceSide, imbalanceAmount, imbalanceRatio);
   }
@@ -122,8 +135,8 @@ public class HFTAgent extends AgentActor {
    * creates liqduity at stressfull time e.g. when no liquidity exist on a side or book is unbalanced above a threshold
    */
   private LimitOrder createLiquidityAtStress(Quote quote, Imbalance imbalance) {
-    float bestask = quote.getAskdepth() != 0 ? quote.getAskprice() : 12;
-    float bestbid = quote.getBiddepth() != 0 ? quote.getBidprice() : 10;
+    float bestask = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
+    float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
     if (imbalance.getSide() == OrderSide.ASK) { // ask imbalance
       price = bestask + (getMinTickSize() * imbalance.getRatio());

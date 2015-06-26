@@ -79,8 +79,8 @@ public class RetailAgent extends AgentActor {
       log.warn("empty quote returned by agent {}", this.getName());
       return null;
     }
-    float bestask = quote.getAskprice();
-    float bestbid = quote.getBidprice();
+    float bestask = quote.getAskPrice();
+    float bestbid = quote.getBidPrice();
 
     side = decideSide(1 - probBuy, OrderSide.ASK);
 

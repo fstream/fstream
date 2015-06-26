@@ -199,7 +199,7 @@ public class OrderBook extends UntypedActor {
           new Quote(DateTime.now(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(bestAsk,
               OrderSide.ASK), getDepthAtLevel(bestBid, OrderSide.BID));
       if (!isValidQuote(this.bestBid, this.bestAsk)) {
-        log.info("Invalid quote {}", quote);
+        log.error("Invalid quote {}", quote);
         return;
       }
       exchange.tell(quote, self());
@@ -290,16 +290,18 @@ public class OrderBook extends UntypedActor {
   }
 
   private void processLimitOrder(LimitOrder order) {
-    switch (order.getType()) {
-    case AMEND:
+    if (order.getType() == OrderType.AMEND) {
       System.out.println("order amended");
-    case CANCEL:
-      System.out.println("order canceled");
-    case ADD:
+    }
+    else if (order.getType() == OrderType.CANCEL) {
+      log.debug("cancelling order {}", order);
+      this.deleteOrder(order);
+    }
+    else if (order.getType() == OrderType.ADD) {
       addLimitOrder(order);
-    default:
+    }
+    else {
       // TODO: Handle?
-      break;
     }
   }
 
@@ -309,6 +311,7 @@ public class OrderBook extends UntypedActor {
    * @param order
    */
   private void addLimitOrder(LimitOrder order) {
+
     int availabledepth = 0;
     if (order.getSide() == OrderSide.ASK) {
       // executing against bid side of the book.
@@ -334,16 +337,12 @@ public class OrderBook extends UntypedActor {
       insertOrder(order);
     }
 
-    if (!assertBookDepth()) {
-      try {
-        throw new Exception("book in invalid state");
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        this.printBook();
-        e.printStackTrace();
+    if (log.isDebugEnabled()) {
+      if (!assertBookDepth()) {
         System.exit(1);
       }
     }
+
   }
 
   /**
@@ -390,8 +389,9 @@ public class OrderBook extends UntypedActor {
       log.debug("Rrder took more than 5 seconds to be processed: {}", order);
     }
 
-    // TODO: Add these to the right location
+    // publish to tape
     publisher.tell(order, self());
+
   }
 
   /**
@@ -419,9 +419,27 @@ public class OrderBook extends UntypedActor {
    * 
    * @param order
    */
-  @SuppressWarnings("unused")
   private boolean deleteOrder(LimitOrder order) {
-    return getBook(order).get(order.getPrice()).remove(order);
+    NavigableMap<Float, NavigableSet<LimitOrder>> book = getBook(order);
+    NavigableSet<LimitOrder> orders = book.get(order.getPrice());
+    boolean removed = false;
+    if (orders != null) {
+      removed = orders.remove(order);
+      if (order.getSide() == OrderSide.ASK) {
+        this.askDepth = removed ? this.askDepth - order.getAmount() : this.askDepth;
+      }
+      else {
+        this.bidDepth = removed ? this.bidDepth - order.getAmount() : this.bidDepth;
+      }
+      publisher.tell(order, self());
+    }
+    if (log.isDebugEnabled()) {
+      if (!assertBookDepth()) {
+        System.exit(1);
+      }
+    }
+
+    return removed;
   }
 
   private NavigableMap<Float, NavigableSet<LimitOrder>> getBook(LimitOrder order) {
