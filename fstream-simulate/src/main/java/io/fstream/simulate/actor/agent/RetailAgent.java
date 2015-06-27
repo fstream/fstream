@@ -36,7 +36,7 @@ public class RetailAgent extends AgentActor {
 
   @PostConstruct
   public void init() {
-    maxTradSize = properties.getRetail().getMaxTradeSize();
+    maxTradeSize = properties.getRetail().getMaxTradeSize();
     maxSleep = properties.getRetail().getMaxSleep();
     minSleep = properties.getRetail().getMinSleep();
 
@@ -62,7 +62,7 @@ public class RetailAgent extends AgentActor {
   }
 
   private Order createOrder() {
-    int next = random.nextInt(maxTradSize);
+    int next = random.nextInt(maxTradeSize);
     int amount = next + 1;
     OrderSide side;
     OrderType type = OrderType.ADD;

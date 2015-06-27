@@ -42,7 +42,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   int maxSleep; // Agent sleep time
   int minSleep;
-  int maxTradSize;
+  int maxTradeSize;
   float minTickSize;
   Timeout msgResponseTimeout;
 

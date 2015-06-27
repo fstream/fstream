@@ -9,8 +9,8 @@
 
 package io.fstream.simulate.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Scope;
@@ -19,23 +19,20 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-/**
- * 
- */
+@Slf4j
+@Value
 @Component
 @Scope("prototype")
-@NoArgsConstructor
-@Slf4j
-@Getter
 public class OpenOrders {
 
   final Multimap<String, Order> orders = HashMultimap.create();
 
-  public boolean addOpenOrder(Order order) {
+  public boolean addOpenOrder(@NonNull Order order) {
     if (orders.get(order.getSymbol()).contains(order)) {
-      log.warn("order already present in open orders {}", order.toString());
+      log.warn("Order already present in open orders {}", order);
       return false;
     }
+
     return orders.put(order.getSymbol(), order);
   }
 

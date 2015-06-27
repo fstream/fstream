@@ -13,12 +13,12 @@ import org.joda.time.DateTime;
 
 /**
  * Represents a delayed quote message. Same as in all respects but elicit different behaviour from the consumer of
- * message
+ * message.
  */
 public class DelayedQuote extends Quote {
 
-  public DelayedQuote(DateTime time, String symbol, float ask, float bid, int askdepth, int biddepth) {
-    super(time, symbol, ask, bid, askdepth, biddepth);
+  public DelayedQuote(DateTime time, String symbol, float ask, float bid, int askDepth, int bidDepth) {
+    super(time, symbol, ask, bid, askDepth, bidDepth);
   }
 
 }

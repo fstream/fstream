@@ -36,7 +36,7 @@ public class InstitutionalAgent extends AgentActor {
 
   @PostConstruct
   public void init() {
-    maxTradSize = properties.getInstitutional().getMaxTradeSize();
+    maxTradeSize = properties.getInstitutional().getMaxTradeSize();
     maxSleep = properties.getInstitutional().getMaxSleep();
     minSleep = properties.getInstitutional().getMinSleep();
 
@@ -63,7 +63,7 @@ public class InstitutionalAgent extends AgentActor {
   }
 
   private Order createOrder() {
-    int next = random.nextInt(maxTradSize);
+    int next = random.nextInt(maxTradeSize);
     int amount = next + 1;
     OrderType type = OrderType.ADD;
     OrderSide side;

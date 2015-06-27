@@ -11,8 +11,10 @@ public class Quote {
 
   DateTime time;
   String symbol;
+
   float askPrice;
   float bidPrice;
+
   int askDepth;
   int bidDepth;
 

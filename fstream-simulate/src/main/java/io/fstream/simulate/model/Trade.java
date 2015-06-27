@@ -14,33 +14,33 @@ public class Trade {
     ACTIVE, PASSIVE
   };
 
-  private String buyuser;
-  private String selluser;
+  private String buyUser;
+  private String sellUser;
   private float price;
-  private boolean activebuy;
+  private boolean activeBuy;
   private String symbol;
   private DateTime time;
-  private DateTime ordertime;
+  private DateTime orderTime;
   private int amount;
 
   // TODO ordertime needs to be initialized
-  public Trade(DateTime tradetime, Order active, Order passive, int executedsize) {
+  public Trade(DateTime tradeTime, Order active, Order passive, int executedSize) {
     this.setPrice(passive.getPrice());
     this.setSymbol(active.getSymbol());
-    this.setTime(tradetime);
+    this.setTime(tradeTime);
 
     // use active orders timestamp as tradetime. Simplifying assumption
-    this.setAmount(executedsize);
+    this.setAmount(executedSize);
     if (active.getSide() == OrderSide.ASK) {
       // active seller
-      this.selluser = active.getUserId();
-      this.activebuy = false;
-      this.buyuser = passive.getUserId();
+      this.sellUser = active.getUserId();
+      this.activeBuy = false;
+      this.buyUser = passive.getUserId();
     } else {
       // active buy
-      this.selluser = passive.getUserId();
-      this.activebuy = true;
-      this.buyuser = active.getUserId();
+      this.sellUser = passive.getUserId();
+      this.activeBuy = true;
+      this.buyUser = active.getUserId();
     }
   }
 

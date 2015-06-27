@@ -18,8 +18,8 @@ import org.joda.time.DateTime;
 
 import akka.actor.ActorRef;
 
-@PrototypeActor
 @Slf4j
+@PrototypeActor
 public class HFTAgent extends AgentActor {
 
   public HFTAgent(String name, ActorRef exchange) {
