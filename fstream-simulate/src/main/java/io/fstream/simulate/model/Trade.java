@@ -23,21 +23,21 @@ public class Trade {
   private DateTime orderTime;
   private int amount;
 
-  // TODO ordertime needs to be initialized
-  public Trade(DateTime tradeTime, Order active, Order passive, int executedSize) {
+  public Trade(DateTime tradetime, Order active, Order passive, int executedSize) {
     this.setPrice(passive.getPrice());
     this.setSymbol(active.getSymbol());
-    this.setTime(tradeTime);
+    this.setTime(tradetime);
+    this.setOrderTime(active.getSentTime());
 
-    // use active orders timestamp as tradetime. Simplifying assumption
+    // Use active orders timestamp as tradetime. Simplifying assumption
     this.setAmount(executedSize);
     if (active.getSide() == OrderSide.ASK) {
-      // active seller
+      // Active seller
       this.sellUser = active.getUserId();
       this.activeBuy = false;
       this.buyUser = passive.getUserId();
     } else {
-      // active buy
+      // Active buy
       this.sellUser = passive.getUserId();
       this.activeBuy = true;
       this.buyUser = active.getUserId();
