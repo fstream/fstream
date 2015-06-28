@@ -104,7 +104,7 @@ public class Exchange extends UntypedActor {
   @Override
   // TODO a more elegant message parser rather than a giant if statement
   public void onReceive(Object message) throws Exception {
-    log.debug("exchange message received " + message.toString());
+    log.debug("Exchange message received {}", message);
     if (message instanceof Order) {
       if (!activeInstruments.getInstruments().contains(((Order) message).getSymbol())) {
         log.error("Order sent for inactive symbol {}", ((Order) message).getSymbol());

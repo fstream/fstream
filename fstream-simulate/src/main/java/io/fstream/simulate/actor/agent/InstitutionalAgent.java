@@ -123,7 +123,7 @@ public class InstitutionalAgent extends AgentActor {
     } else if (message instanceof ActiveInstruments) {
       this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
     } else if (message instanceof SubscriptionQuote) {
-      log.debug("agent {} registered successfully to receive level {} quotes", this.getName(),
+      log.debug("Agent {} registered successfully to receive level {} quotes", this.getName(),
           this.getQuoteSubscriptionLevel());
       this.quoteSubscriptionSuccess = ((SubscriptionQuote) message).isSuccess();
     } else if (message instanceof Quote) {

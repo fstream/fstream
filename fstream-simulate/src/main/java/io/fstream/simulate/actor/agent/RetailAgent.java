@@ -74,16 +74,17 @@ public class RetailAgent extends AgentActor {
       exchange.tell(activeInstruments, self());
       return null;
     }
-    String symbol =
+    val symbol =
         activeInstruments.getInstruments().get(random.nextInt(activeInstruments.getInstruments().size()));
 
-    Quote quote = this.getLastValidQuote(symbol);
+    val quote = this.getLastValidQuote(symbol);
     if (quote == null) {
-      log.warn("empty quote returned by agent {}", this.getName());
+      log.warn("Empty quote returned by agent {}", this.getName());
       return null;
     }
-    float bestask = quote.getAskPrice();
-    float bestbid = quote.getBidPrice();
+
+    float bestAsk = quote.getAskPrice();
+    float bestBid = quote.getBidPrice();
 
     side = decideSide(1 - probBuy, OrderSide.ASK);
 
@@ -97,9 +98,9 @@ public class RetailAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestask, bestask + (minTickSize * 5), bestask, probBestPrice);
+        price = decidePrice(bestAsk, bestAsk + (minTickSize * 5), bestAsk, probBestPrice);
       } else {
-        price = decidePrice(bestbid - (minTickSize * 5), bestbid, bestbid, probBestPrice);
+        price = decidePrice(bestBid - (minTickSize * 5), bestBid, bestBid, probBestPrice);
       }
 
     }
@@ -109,7 +110,7 @@ public class RetailAgent extends AgentActor {
 
   @Override
   public void onReceive(Object message) throws Exception {
-    log.debug("agent message received by " + this.getName() + " " + message.toString());
+    log.debug("agent message received by {}: {}", this.getName(), message);
     if (message instanceof String) {
       if (((String) message).equals(Messages.AGENT_EXECUTE_ACTION)) {
         this.executeAction();

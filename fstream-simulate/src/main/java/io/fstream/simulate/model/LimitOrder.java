@@ -21,6 +21,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
   int amount;
   float price;
   String userId;
+
   DateTime processedTime;
 
   public LimitOrder(OrderSide side, OrderType type, DateTime time, int oid, String brokerId, String symbol, int amount,
@@ -34,6 +35,16 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
     this.amount = amount;
     this.price = price;
     this.userId = userId;
+  }
+
+  @Override
+  public String getUserId() {
+    return this.userId;
+  }
+
+  @Override
+  public DateTime getSentTime() {
+    return time;
   }
 
   @Override
@@ -57,16 +68,6 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
       return 1;
     }
     return 0;
-  }
-
-  @Override
-  public String getUserId() {
-    return this.userId;
-  }
-
-  @Override
-  public DateTime getSentTime() {
-    return time;
   }
 
 }
