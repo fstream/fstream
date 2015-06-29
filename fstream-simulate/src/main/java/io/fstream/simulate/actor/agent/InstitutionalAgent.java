@@ -83,8 +83,8 @@ public class InstitutionalAgent extends AgentActor {
       return null;
     }
 
-    float bestask = quote.getAskPrice();
-    float bestbid = quote.getBidPrice();
+    float bestAsk = quote.getAskPrice();
+    float bestBid = quote.getBidPrice();
     side = decideSide(1 - probBuy, OrderSide.ASK);
 
     type = decideOrderType(probMarket);
@@ -99,10 +99,10 @@ public class InstitutionalAgent extends AgentActor {
       if (side == OrderSide.ASK) {
         // TODO remove hardcoding.
         // max ensures price stays in bounds.
-        price = decidePrice(bestask, Math.min(bestask + (minTickSize * 5), 15), bestask, probBestPrice);
+        price = decidePrice(bestAsk, Math.min(bestAsk + (minTickSize * 5), bestAsk), bestAsk, probBestPrice);
       } else {
         // min ensures price doesn't go below some lower bound
-        price = decidePrice(Math.max(bestbid - (minTickSize * 5), 7), bestbid, bestbid, probBestPrice);
+        price = decidePrice(Math.max(bestBid - (minTickSize * 5), bestBid), bestBid, bestBid, probBestPrice);
       }
       if (price < 0) {
         log.error("Invalid price generated {}", price);

@@ -98,9 +98,9 @@ public class RetailAgent extends AgentActor {
       }
     } else {
       if (side == OrderSide.ASK) {
-        price = decidePrice(bestAsk, bestAsk + (minTickSize * 5), bestAsk, probBestPrice);
+        price = decidePrice(bestAsk, Math.min(bestAsk + (minTickSize * 5), bestAsk), bestAsk, probBestPrice);
       } else {
-        price = decidePrice(bestBid - (minTickSize * 5), bestBid, bestBid, probBestPrice);
+        price = decidePrice(Math.max(bestBid - (minTickSize * 5), bestBid), bestBid, bestBid, probBestPrice);
       }
 
     }
