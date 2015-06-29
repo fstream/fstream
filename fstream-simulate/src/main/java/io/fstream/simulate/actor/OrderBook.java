@@ -374,12 +374,12 @@ public class OrderBook extends UntypedActor {
     }
     // set best price and depth attributes
     if (isBid) {
-      if (this.bestBid == 0 || order.getPrice() > this.bestBid) {
+      if (this.bidDepth == 0 || order.getPrice() > this.bestBid) {
         this.bestBid = order.getPrice();
       }
       this.bidDepth = this.bidDepth + order.getAmount();
     } else {
-      if (this.bestAsk == 0 || order.getPrice() < this.bestAsk) {
+      if (this.askDepth == 0 || order.getPrice() < this.bestAsk) {
         this.bestAsk = order.getPrice();
       }
       this.askDepth = this.askDepth + order.getAmount();
