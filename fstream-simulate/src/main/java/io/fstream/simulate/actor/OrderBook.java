@@ -10,11 +10,10 @@ import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Trade;
 import io.fstream.simulate.util.PrototypeActor;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.NavigableMap;
-import java.util.NavigableSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,8 +55,8 @@ public class OrderBook extends UntypedActor {
   /**
    * State.
    */
-  NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder());
-  NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
+  NavigableMap<Float, ArrayList<LimitOrder>> bids = new TreeMap<>(reverseOrder());
+  NavigableMap<Float, ArrayList<LimitOrder>> asks = new TreeMap<>();
 
   /**
    * Aggregates.
@@ -99,7 +98,7 @@ public class OrderBook extends UntypedActor {
    * @return
    */
   private int processMarketOrder(LimitOrder order) {
-    NavigableMap<Float, NavigableSet<LimitOrder>> book;
+    NavigableMap<Float, ArrayList<LimitOrder>> book;
     if (order.getSide() == OrderSide.ASK) {
       if (this.bids.isEmpty()) {
         log.debug("No depth. Order not filled {}", order);
@@ -210,7 +209,7 @@ public class OrderBook extends UntypedActor {
   private int getDepthAtLevel(float price, OrderSide side) {
     int depth = 0;
 
-    NavigableSet<LimitOrder> book;
+    ArrayList<LimitOrder> book;
     if (side == OrderSide.ASK) {
       book = this.asks.get(price);
     }
@@ -352,7 +351,7 @@ public class OrderBook extends UntypedActor {
    */
   private void insertOrder(LimitOrder order) {
     boolean isBid;
-    NavigableMap<Float, NavigableSet<LimitOrder>> sidebook;
+    NavigableMap<Float, ArrayList<LimitOrder>> sidebook;
     if (order.getSide() == OrderSide.ASK) {
       isBid = false;
       sidebook = this.asks;
@@ -363,7 +362,7 @@ public class OrderBook extends UntypedActor {
 
     if (sidebook.isEmpty() || sidebook.get(order.getPrice()) == null) {
       // add order to order book
-      TreeSet<LimitOrder> orderlist = new TreeSet<LimitOrder>(orderTimeComparator);
+      ArrayList<LimitOrder> orderlist = new ArrayList<LimitOrder>();
       orderlist.add(order);
       sidebook.put(order.getPrice(), orderlist);
 
@@ -420,8 +419,8 @@ public class OrderBook extends UntypedActor {
    * @param order
    */
   private boolean deleteOrder(LimitOrder order) {
-    NavigableMap<Float, NavigableSet<LimitOrder>> book = getBook(order);
-    NavigableSet<LimitOrder> orders = book.get(order.getPrice());
+    NavigableMap<Float, ArrayList<LimitOrder>> book = getBook(order);
+    ArrayList<LimitOrder> orders = book.get(order.getPrice());
     boolean removed = false;
     if (orders != null) {
       removed = orders.remove(order);
@@ -442,8 +441,8 @@ public class OrderBook extends UntypedActor {
     return removed;
   }
 
-  private NavigableMap<Float, NavigableSet<LimitOrder>> getBook(LimitOrder order) {
-    NavigableMap<Float, NavigableSet<LimitOrder>> book;
+  private NavigableMap<Float, ArrayList<LimitOrder>> getBook(LimitOrder order) {
+    NavigableMap<Float, ArrayList<LimitOrder>> book;
     if (order.getSide() == OrderSide.ASK) {
       book = this.bids;
     } else {
