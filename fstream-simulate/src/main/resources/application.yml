@@ -20,11 +20,14 @@
 # - file
 # - kafka
 
+# Available config profiles:
+# - simple
+
 # Profiles
-spring.profiles.active: toq,file 
+spring.profiles.active: toq,file
 
 ###############################################################################
-# Profile - Common
+# Profile - common
 ###############################################################################
 
 # Simulation
@@ -36,7 +39,7 @@ simulate:
         ${kafka.producerProperties.metadata.broker.list}?\
         zookeeperConnect=${zk.connect}&\
         partitioner=${kafka.producerProperties.partitioner.class}&\
-        serializerClass=${kafka.producerProperties.serializer.class}"      
+        serializerClass=${kafka.producerProperties.serializer.class}"
    toq:
       uri: ${simulate.kafka.uri}&topic=toq
    rates:
@@ -49,7 +52,6 @@ simulate:
       - TD
       - BBM
       - HUF
-      
       
    # Active brokers
    brokers:
@@ -70,8 +72,8 @@ simulate:
       probMarket: 0.30
       probBestPrice: 0.70
       maxTradeSize: 5000
-      maxSleep: 2500 # in millis
       minSleep: 1000 # in millis
+      maxSleep: 2500 # in millis
       numAgents: 3000 #3000
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    retail:
@@ -92,3 +94,26 @@ simulate:
       minSleep: 100 # in millis
       numAgents: 500 #500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
+
+---
+
+###############################################################################
+# Profile - "simple"
+###############################################################################
+
+# Profile
+spring.profiles: simple
+
+# Simulation
+simulate:
+   # Agents - Types
+   institutional:
+      maxSleep: 2
+      minSleep: 1
+      numAgents: 1
+   retail:
+      maxSleep: 2
+      minSleep: 1
+      numAgents: 1
+   hft:
+      numAgents: 0

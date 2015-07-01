@@ -108,11 +108,14 @@ public class Simulator {
   }
 
   private List<ActorRef> createAgents() {
-    return ImmutableList.<ActorRef> builder().addAll(createRetailAgents()).addAll(createInstitutionalAgents())
+    return ImmutableList.<ActorRef> builder()
+        .addAll(createRetailAgents())
+        .addAll(createInstitutionalAgents())
         .addAll(createHftAgents()).build();
   }
 
   private List<ActorRef> createRetailAgents() {
+    log.info("Creating {} retail agents...", properties.getRetail().getNumAgents());
     return createActors(properties.getRetail().getNumAgents(), this::createRetailAgent);
   }
 
@@ -123,6 +126,7 @@ public class Simulator {
   }
 
   private List<ActorRef> createInstitutionalAgents() {
+    log.info("Creating {} institutional agents...", properties.getInstitutional().getNumAgents());
     return createActors(properties.getInstitutional().getNumAgents(), this::createInstitutionalAgent);
   }
 
@@ -133,6 +137,7 @@ public class Simulator {
   }
 
   private List<ActorRef> createHftAgents() {
+    log.info("Creating {} hft agents...", properties.getHft().getNumAgents());
     return createActors(properties.getHft().getNumAgents(), this::createHftAgent);
   }
 

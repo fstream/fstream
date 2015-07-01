@@ -12,6 +12,7 @@
   </appender>
   
   <logger name="akka" level="INFO" />
+  <logger name="io.fstream" level="INFO" />
   
   <root level="INFO">
     <appender-ref ref="STDOUT" />

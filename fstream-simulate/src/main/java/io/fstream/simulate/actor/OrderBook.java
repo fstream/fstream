@@ -1,5 +1,6 @@
 package io.fstream.simulate.actor;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.reverseOrder;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.model.LimitOrder;
@@ -71,13 +72,26 @@ public class OrderBook extends UntypedActor {
   int orderCount = 0;
   int tradeCount = 0;
 
-  public void processOrder(Order order) {
-    assert (order.getSymbol() == this.symbol);
+  @Override
+  public void onReceive(Object message) throws Exception {
+    log.debug("Exchange message received {}", message);
+    if (message instanceof Order) {
+      onReceiveOrder((Order) message);
+    } else if (message instanceof Command) {
+      onReceiveCommand((Command) message);
+    } else {
+      unhandled(message);
+    }
+  }
+
+  private void onReceiveOrder(Order order) {
+    checkState(order.getSymbol() == this.symbol);
+
     orderCount += 1;
     order.setProcessedTime(DateTime.now());
     if (order.getType() == OrderType.MO) { // process market order
       log.debug("Processing market order: {}", order);
-      LimitOrder limitorder = (LimitOrder) order;
+      val limitorder = (LimitOrder) order;
 
       if (order.getSide() == OrderSide.ASK) {
         limitorder.setPrice(Float.MIN_VALUE);
@@ -88,6 +102,17 @@ public class OrderBook extends UntypedActor {
     } else { // process limit order
       log.debug("Processing limitorder: {}", order);
       this.processLimitOrder((LimitOrder) order);
+    }
+  }
+
+  private void onReceiveCommand(Command command) {
+    if (command == Command.PRINT_ORDER_BOOK) {
+      this.printBook();
+      sender().tell(true, self());
+    } else if (command == Command.PRINT_SUMMARY) {
+      log.info(
+          "{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
+          symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, bestAsk - bestBid);
     }
   }
 
@@ -507,25 +532,6 @@ public class OrderBook extends UntypedActor {
                 - this.bestBid);
     text = text + "----- END -----\n";
     log.info(text);
-  }
-
-  @Override
-  public void onReceive(Object message) throws Exception {
-    log.debug("exchange message received {}", message);
-    if (message instanceof Order) {
-      this.processOrder((Order) message);
-    } else if (message instanceof Command) {
-      if (message.equals(Command.PRINT_ORDER_BOOK)) {
-        this.printBook();
-        sender().tell(true, self());
-      } else if (message.equals(Command.PRINT_SUMMARY)) {
-        log.info(
-            "{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
-            symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, bestAsk - bestBid);
-      }
-    } else {
-      unhandled(message);
-    }
   }
 
 }

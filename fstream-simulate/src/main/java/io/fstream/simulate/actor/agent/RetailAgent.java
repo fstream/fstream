@@ -112,7 +112,7 @@ public class RetailAgent extends AgentActor {
     if (message instanceof Command) {
       if (message.equals(Command.AGENT_EXECUTE_ACTION)) {
         this.executeAction();
-        this.scheduleOnce(Command.AGENT_EXECUTE_ACTION);
+        this.scheduleOnceRandom(Command.AGENT_EXECUTE_ACTION);
       }
     } else if (message instanceof ActiveInstruments) {
       this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
@@ -131,7 +131,7 @@ public class RetailAgent extends AgentActor {
 
   @Override
   public void preStart() {
-    this.scheduleOnce(Command.AGENT_EXECUTE_ACTION);
+    this.scheduleOnceRandom(Command.AGENT_EXECUTE_ACTION);
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 

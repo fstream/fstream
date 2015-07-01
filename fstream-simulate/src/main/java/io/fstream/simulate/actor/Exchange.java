@@ -1,6 +1,5 @@
 package io.fstream.simulate.actor;
 
-import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.QuoteRequest;
@@ -9,7 +8,6 @@ import io.fstream.simulate.model.DelayedQuote;
 import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.util.SingletonActor;
-import io.fstream.simulate.util.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,28 +26,21 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
 
 @Slf4j
 @Setter
 @SingletonActor
 @RequiredArgsConstructor
-public class Exchange extends UntypedActor {
+public class Exchange extends BaseActor {
 
   /**
    * Dependencies.
    */
   @NonNull
   private final ActorRef publisher;
-
-  @Autowired
-  private SimulateProperties properties;
-  @Autowired
-  private SpringExtension spring;
 
   /**
    * Configuration.
@@ -63,7 +54,7 @@ public class Exchange extends UntypedActor {
    */
   private static AtomicInteger currentOrderId = new AtomicInteger(0);
 
-  private Map<String, ActorRef> processors = new HashMap<String, ActorRef>();
+  private Map<String, ActorRef> processors = new HashMap<>();
   private List<ActorRef> premiumSubscribers = new ArrayList<>();
   private List<ActorRef> quotesSubscribers = new ArrayList<>();
   private List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
@@ -79,65 +70,93 @@ public class Exchange extends UntypedActor {
     initializeMarketOnOpenQuotes();
   }
 
+  /**
+   * Global order ID generator.
+   */
+  // TODO: Prevents distributed actors
   public static int nextOrderId() {
     return currentOrderId.incrementAndGet();
   }
 
   @Override
-  // TODO a more elegant message parser rather than a giant if statement
   public void onReceive(Object message) throws Exception {
     log.debug("Exchange message received {}", message);
     if (message instanceof Order) {
-      if (!activeInstruments.getInstruments().contains(((Order) message).getSymbol())) {
-        log.error("Order sent for inactive symbol {}", ((Order) message).getSymbol());
-      } else {
-        dispatch((Order) message);
-      }
+      onReceiveOrder((Order) message);
     } else if (message instanceof Command) {
-      if (message.equals(Command.PRINT_ORDER_BOOK)) {
-        for (val processor : processors.entrySet()) {
-          processor.getValue().tell(Command.PRINT_ORDER_BOOK, self());
-        }
-      } else if (message.equals(Command.PRINT_SUMMARY)) {
-        for (val processor : processors.entrySet()) {
-          processor.getValue().tell(Command.PRINT_SUMMARY, self());
-        }
-      } else if (message.equals(Command.GET_MARKET_OPEN_QUOTE)) {
-        sender().tell(lastValidQuote.get(((QuoteRequest) message).getSymbol()), self());
-      }
-    } else if (message instanceof ActiveInstruments) {
-      // TODO implement clone method
-      ActiveInstruments activeinstrument = new ActiveInstruments();
-      activeinstrument.setInstruments(this.activeInstruments.getInstruments());
-      sender().tell(activeinstrument, self());
-    } else if (message instanceof SubscriptionQuote) {
-      // TODO check to make sure AgentActor is requesting subscription
-      sender().tell(subscribeForQuote(sender(), (SubscriptionQuote) message), self());
-    } else if (message instanceof Quote && message.getClass() != DelayedQuote.class) {
-      lastValidQuote.put(((Quote) message).getSymbol(), (Quote) message);
-      // notify premium subscribers immediately.
-      notifyPremiumSubscribers((Quote) message);
-      // notify non-premium with latency. Schedule a DelayedQuote message to self
-      DelayedQuote dQuote =
-          new DelayedQuote(((Quote) message).getTime(), ((Quote) message).getSymbol(), ((Quote) message).getAskPrice(),
-              ((Quote) message).getBidPrice(), ((Quote) message).getAskDepth(), ((Quote) message).getBidDepth());
-      getContext()
-          .system()
-          .scheduler()
-          .scheduleOnce(quoteDelayDuration, getSelf(), dQuote, getContext().dispatcher(),
-              null);
-    } else if (message instanceof DelayedQuote) {
-      notifyQuoteAndOrderSubscribers((Quote) message);
-      notifyQuoteSubscribers((Quote) message);
+      onReceiveCommand((Command) message);
     } else if (message instanceof QuoteRequest) {
-      Quote quote = lastValidQuote.get(((QuoteRequest) message).getSymbol());
-      sender().tell(quote, self());
+      onReceiveQuoteRequest((QuoteRequest) message);
+    } else if (message instanceof ActiveInstruments) {
+      onActiveInstruments();
+    } else if (message instanceof SubscriptionQuote) {
+      onReceiveSubscriptionQuote((SubscriptionQuote) message);
+    } else if (message instanceof Quote) {
+      onReceiveQuote((Quote) message);
     } else {
       unhandled(message);
     }
   }
 
-  public SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
+  private void onReceiveOrder(Order order) {
+    if (!activeInstruments.getInstruments().contains(order.getSymbol())) {
+      log.error("Order sent for inactive symbol {}", order.getSymbol());
+    }
+
+    val processor = getProcessor(order.getSymbol());
+    processor.tell(order, self());
+  }
+
+  private void onReceiveQuote(Quote quote) {
+    if (quote instanceof DelayedQuote) {
+      notifyQuoteAndOrderSubscribers(quote);
+      notifyQuoteSubscribers(quote);
+    } else {
+      lastValidQuote.put(quote.getSymbol(), quote);
+
+      // Notify premium subscribers immediately.
+      notifyPremiumSubscribers(quote);
+
+      // Notify non-premium with latency.
+      val delayedQuote = new DelayedQuote(quote.getTime(), quote.getSymbol(),
+          quote.getAskPrice(), quote.getBidPrice(), quote.getAskDepth(),
+          quote.getBidDepth());
+
+      // Schedule a DelayedQuote message to self
+      scheduleOnce(delayedQuote, quoteDelayDuration);
+    }
+  }
+
+  private void onReceiveSubscriptionQuote(SubscriptionQuote subscriptionQuote) {
+    // TODO: Check to make sure AgentActor is requesting subscription
+    val subscription = subscribeForQuote(sender(), subscriptionQuote);
+    sender().tell(subscription, self());
+  }
+
+  private void onActiveInstruments() {
+    val activeInstruments = new ActiveInstruments(this.activeInstruments.getInstruments());
+
+    sender().tell(activeInstruments, self());
+  }
+
+  private void onReceiveQuoteRequest(QuoteRequest quoteRequest) {
+    val quote = lastValidQuote.get(quoteRequest.getSymbol());
+    sender().tell(quote, self());
+  }
+
+  private void onReceiveCommand(Command command) {
+    if (command == Command.PRINT_ORDER_BOOK) {
+      for (val processor : processors.entrySet()) {
+        processor.getValue().tell(Command.PRINT_ORDER_BOOK, self());
+      }
+    } else if (command == Command.PRINT_SUMMARY) {
+      for (val processor : processors.entrySet()) {
+        processor.getValue().tell(Command.PRINT_SUMMARY, self());
+      }
+    }
+  }
+
+  private SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
     val level = message.getLevel();
 
     message.setSuccess(false);
@@ -169,7 +188,9 @@ public class Exchange extends UntypedActor {
     for (val symbol : activeInstruments.getInstruments()) {
       float bid = minBid - (random.nextInt(5) * minTickSize);
       float ask = minAsk + (random.nextInt(5) * minTickSize);
-      lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid, 0, 0));
+      val quote = new Quote(DateTime.now(), symbol, ask, bid, 0, 0);
+
+      lastValidQuote.put(symbol, quote);
     }
   }
 
@@ -191,21 +212,16 @@ public class Exchange extends UntypedActor {
     }
   }
 
-  private void dispatch(Order order) {
-    val processor = getProcessor(order.getSymbol());
-    processor.tell(order, self());
-  }
-
   private ActorRef getProcessor(String instrument) {
-    final ActorRef maybeProcessor = processors.get(instrument);
-    if (maybeProcessor == null) {
-      val processor = context().actorOf(spring.props(OrderBook.class, instrument, self(), publisher), instrument);
-
-      processors.put(instrument, processor);
-      return processor;
+    val maybeProcessor = processors.get(instrument);
+    if (maybeProcessor != null) {
+      return maybeProcessor;
     }
 
-    return maybeProcessor;
+    val processor = context().actorOf(spring.props(OrderBook.class, instrument, self(), publisher), instrument);
+    processors.put(instrument, processor);
+
+    return processor;
   }
 
 }

@@ -43,14 +43,15 @@ public class HFTAgent extends AgentActor {
   @Override
   public void onReceive(Object message) throws Exception {
     if (message instanceof Quote) {
-      this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);
-      decideActionOnQuote((Quote) message);
+      onReceiveQuote(((Quote) message));
     } else if (message instanceof ActiveInstruments) {
-      this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
+      onReceiveActiveInstruments((ActiveInstruments) message);
     }
   }
 
-  private void decideActionOnQuote(Quote quote) {
+  private void onReceiveQuote(Quote quote) {
+    this.getBbboQuotes().put(quote.getSymbol(), quote);
+
     float spread = quote.getAskPrice() - quote.getBidPrice();
     Imbalance imbalance = getImbalance(quote);
     LimitOrder order;
@@ -61,12 +62,16 @@ public class HFTAgent extends AgentActor {
       order = createLiquidityAtStress(quote, imbalance);
     }
 
-    // cancel any existing orders in the book
+    // Cancel any existing orders in the book
     cancelAllOpenOrders(order.getSymbol());
-    // TODO for now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
+
+    // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
     exchange.tell(order, self());
     openOrderBook.addOpenOrder(order);
+  }
 
+  private void onReceiveActiveInstruments(ActiveInstruments activeInstruments) {
+    this.activeInstruments.setInstruments(activeInstruments.getInstruments());
   }
 
   private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {
@@ -74,13 +79,15 @@ public class HFTAgent extends AgentActor {
     float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
 
-    if (imbalance.getSide() == OrderSide.ASK) { // ask imbalance
+    if (imbalance.getSide() == OrderSide.ASK) {
+      // ask imbalance
       price = Math.max(bestbid + minTickSize, bestask - minTickSize / 2);
       if ((price - bestbid) < minTickSize) {
         log.error("invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestbid, price - bestbid);
         price = bestask;
       }
-    } else { // bid imbalance
+    } else {
+      // bid imbalance
       price = Math.min(bestask - minTickSize, bestbid + minTickSize / 2);
       if ((bestask - price) < minTickSize) {
         log.error("invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
@@ -104,11 +111,12 @@ public class HFTAgent extends AgentActor {
       imbalanceSide = OrderSide.BID;
       imbalanceRatio = quote.getBidDepth() != 0 ? quote.getAskDepth() / quote.getBidDepth() : 0;
     } else {
-      // TODO if both sides are 0, then this will bias creation of ASK liquidity. Not a big deal now, but fix later.
+      // TODO: If both sides are 0, then this will bias creation of ASK liquidity. Not a big deal now, but fix later.
       imbalanceAmount = quote.getBidDepth() - quote.getAskDepth();
       imbalanceSide = OrderSide.ASK;
       imbalanceRatio = quote.getAskDepth() != 0 ? quote.getBidDepth() / quote.getAskDepth() : 0;
     }
+
     return new Imbalance(imbalanceSide, imbalanceAmount, imbalanceRatio);
   }
 
@@ -119,10 +127,12 @@ public class HFTAgent extends AgentActor {
     float bestask = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
     float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
-    if (imbalance.getSide() == OrderSide.ASK) { // ask imbalance
+
+    if (imbalance.getSide() == OrderSide.ASK) {
+      // ask imbalance
       price = bestask + (getMinTickSize() * imbalance.getRatio());
-    }
-    else { // bid imbalance
+    } else {
+      // bid imbalance
       price = bestbid - (getMinTickSize() * imbalance.getRatio());
     }
 

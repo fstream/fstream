@@ -1,6 +1,6 @@
 package io.fstream.simulate.actor.agent;
 
-import io.fstream.simulate.config.SimulateProperties;
+import io.fstream.simulate.actor.BaseActor;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.model.OpenOrders;
@@ -19,21 +19,17 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 
 @Slf4j
 @Getter
 @RequiredArgsConstructor
-public abstract class AgentActor extends UntypedActor implements Agent {
+public abstract class AgentActor extends BaseActor implements Agent {
 
   /**
    * Configuration.
@@ -58,8 +54,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
    * Dependencies.
    */
   final ActorRef exchange;
-  @Autowired
-  SimulateProperties properties;
 
   /**
    * State.
@@ -130,13 +124,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   }
 
   @NonNull
-  protected <T> void scheduleOnce(T message, FiniteDuration duration) {
-    val scheduler = getContext().system().scheduler();
-    scheduler.scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
-  }
-
-  @NonNull
-  protected <T> void scheduleOnce(T message) {
+  protected <T> void scheduleOnceRandom(T message) {
     scheduleOnce(message, generateRandomDuration());
   }
 
@@ -158,7 +146,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   }
 
   /**
-   * cancels all open orders for the given symbol
+   * Cancels all open orders for the given symbol
    */
   protected void cancelAllOpenOrders(String symbol) {
     val openorders = openOrderBook.getOrders().get(symbol);
