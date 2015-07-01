@@ -23,11 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
 
 /**
  * A price,time ordered implementation of a central limit order book. The principle data structure is a List of
@@ -38,7 +36,7 @@ import akka.actor.UntypedActor;
 @Getter
 @RequiredArgsConstructor
 @PrototypeActor
-public class OrderBook extends UntypedActor {
+public class OrderBook extends BaseActor {
 
   /**
    * Configuration.
@@ -57,7 +55,7 @@ public class OrderBook extends UntypedActor {
   /**
    * State.
    */
-  NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder());
+  NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder()); // Non-natural
   NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
 
   /**
@@ -88,7 +86,7 @@ public class OrderBook extends UntypedActor {
     checkState(order.getSymbol() == this.symbol);
 
     orderCount += 1;
-    order.setProcessedTime(DateTime.now());
+    order.setProcessedTime(getSimulationTime());
     if (order.getType() == OrderType.MO) { // process market order
       log.debug("Processing market order: {}", order);
       val limitorder = (LimitOrder) order;
@@ -119,9 +117,6 @@ public class OrderBook extends UntypedActor {
   /**
    * Accepts IOrder and executes it against available depth. Returns unfilled amount TODO currently MarketOrders are
    * mimicked via LimitOrders where trigger price is best ask/bid. Need to add marketable order implementation
-   * 
-   * @param order
-   * @return
    */
   private int processMarketOrder(LimitOrder order) {
     NavigableMap<Float, NavigableSet<LimitOrder>> book;
@@ -221,12 +216,13 @@ public class OrderBook extends UntypedActor {
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestAsk != prevbestaks || this.bestBid != prevbestbid) {
       val quote =
-          new Quote(DateTime.now(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(bestAsk,
+          new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(bestAsk,
               OrderSide.ASK), getDepthAtLevel(bestBid, OrderSide.BID));
       if (!isValidQuote(this.bestBid, this.bestAsk)) {
         log.error("Invalid quote {}", quote);
         return;
       }
+
       exchange.tell(quote, self());
       publisher.tell(quote, self());
     }
@@ -238,10 +234,10 @@ public class OrderBook extends UntypedActor {
     NavigableSet<LimitOrder> book;
     if (side == OrderSide.ASK) {
       book = this.asks.get(price);
-    }
-    else {
+    } else {
       book = this.bids.get(price);
     }
+
     if (book != null) {
       for (val order : book) {
         depth = depth + order.getAmount();
@@ -251,17 +247,11 @@ public class OrderBook extends UntypedActor {
   }
 
   private boolean isValidQuote(float bid, float ask) {
-    if (ask <= bid) {
-      return false;
-    }
-    return true;
+    return ask > bid;
   }
 
   /**
-   * updates biddepth/askdepth based on executed size
-   * 
-   * @param orderside
-   * @param executedsize
+   * Updates bid depth / ask depth based on executed size
    */
   private void updateDepth(OrderSide orderside, int executedsize) {
     if (orderside == OrderSide.ASK) {
@@ -274,8 +264,6 @@ public class OrderBook extends UntypedActor {
   /**
    * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained
    * biddepth/askdepth variables
-   * 
-   * @return
    */
   private boolean assertBookDepth() {
     int biddepth = 0;
@@ -306,7 +294,7 @@ public class OrderBook extends UntypedActor {
    */
   private void registerTrade(Order active, Order passive, int executedsize) {
     tradeCount += 1;
-    val trade = new Trade(DateTime.now(), active, passive, executedsize);
+    val trade = new Trade(getSimulationTime(), active, passive, executedsize);
     exchange.tell(trade, self());
     publisher.tell(trade, self());
     if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
@@ -331,9 +319,7 @@ public class OrderBook extends UntypedActor {
   }
 
   /**
-   * Adds LimitOrder to the orderbook
-   * 
-   * @param order
+   * Adds LimitOrder to the order book
    */
   private void addLimitOrder(LimitOrder order) {
 
@@ -371,9 +357,7 @@ public class OrderBook extends UntypedActor {
   }
 
   /**
-   * inserts limit order in the TreeMap<Float,TreeSet<LimitOrder>> data strucuture
-   * 
-   * @param order
+   * Inserts limit order in the TreeMap<Float,TreeSet<LimitOrder>> data strucuture
    */
   private void insertOrder(LimitOrder order) {
     boolean isBid;
@@ -388,7 +372,7 @@ public class OrderBook extends UntypedActor {
 
     if (sidebook.isEmpty() || sidebook.get(order.getPrice()) == null) {
       // add order to order book
-      TreeSet<LimitOrder> orderlist = new TreeSet<LimitOrder>(orderTimeComparator);
+      TreeSet<LimitOrder> orderlist = new TreeSet<LimitOrder>(ORDER_TIME_COMPARATOR);
       orderlist.add(order);
       sidebook.put(order.getPrice(), orderlist);
 
@@ -409,7 +393,7 @@ public class OrderBook extends UntypedActor {
       }
       this.askDepth = this.askDepth + order.getAmount();
     }
-    order.setProcessedTime(DateTime.now());
+    order.setProcessedTime(getSimulationTime());
     if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
       log.debug("Rrder took more than 5 seconds to be processed: {}", order);
     }
@@ -420,11 +404,8 @@ public class OrderBook extends UntypedActor {
   }
 
   /**
-   * Determines if a limitorder crosses the spread i.e. LimitBuy is better priced than bestask or LimitSell is better
-   * priced than bestbid
-   * 
-   * @param order
-   * @return
+   * Determines if a limit order crosses the spread i.e. LimitBuy is better priced than bestask or LimitSell is better
+   * priced than best bid
    */
   private boolean crossesSpread(LimitOrder order) {
     if (order.getSide() == OrderSide.ASK) {
@@ -440,24 +421,25 @@ public class OrderBook extends UntypedActor {
   }
 
   /**
-   * deletes an order from orderbook TODO untested method.
-   * 
-   * @param order
+   * Deletes an order from orde rbook
    */
+  // TODO: Untested method.
   private boolean deleteOrder(LimitOrder order) {
-    NavigableMap<Float, NavigableSet<LimitOrder>> book = getBook(order);
-    NavigableSet<LimitOrder> orders = book.get(order.getPrice());
+    val book = getBook(order);
+    val orders = book.get(order.getPrice());
     boolean removed = false;
     if (orders != null) {
       removed = orders.remove(order);
+
       if (order.getSide() == OrderSide.ASK) {
         this.askDepth = removed ? this.askDepth - order.getAmount() : this.askDepth;
-      }
-      else {
+      } else {
         this.bidDepth = removed ? this.bidDepth - order.getAmount() : this.bidDepth;
       }
+
       publisher.tell(order, self());
     }
+
     if (log.isDebugEnabled()) {
       if (!assertBookDepth()) {
         System.exit(1);
@@ -478,9 +460,11 @@ public class OrderBook extends UntypedActor {
   }
 
   /**
-   * orders limitorders in time priority in the orderbook treeset (Price -> {ordert1, ordert2, ...}
+   * Sorts limit orders in time priority in the order book TreeSet
+   * <p>
+   * (Price -> {ordert1, ordert2, ...}
    */
-  public static Comparator<LimitOrder> orderTimeComparator = new Comparator<LimitOrder>() {
+  public static final Comparator<LimitOrder> ORDER_TIME_COMPARATOR = new Comparator<LimitOrder>() {
 
     @Override
     public int compare(LimitOrder order1, LimitOrder order2) {
@@ -495,7 +479,6 @@ public class OrderBook extends UntypedActor {
         return -1; // TODO this is a hack so orders at same time are not
         // ignored. need a better data structure for orders
       }
-
     }
 
   };
@@ -504,33 +487,33 @@ public class OrderBook extends UntypedActor {
     log.info("BOOK = {}", this.getSymbol());
 
     String text = String.format("BOOK = %s\n", this.getSymbol());
-    text = text + "------ ASKS -------\n";
+
+    text += "------ ASKS -------\n";
     for (val ask : asks.entrySet()) {
-      text = text + String.format("%s -> ", ask.getKey());
+      text += String.format("%s -> ", ask.getKey());
       for (val firstnode : ask.getValue()) {
-        text =
-            text
-                + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
-                    firstnode.getAmount());
+        text += String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
+            firstnode.getAmount());
       }
-      text = text + "\n";
+      text += "\n";
     }
-    text = text + "------ BIDS -------\n";
+
+    text += "------ BIDS -------\n";
     for (val bid : bids.entrySet()) {
-      text = text + String.format("%s -> ", bid.getKey());
+      text += String.format("%s -> ", bid.getKey());
       for (val firstnode : bid.getValue()) {
-        text = text
-            + String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
-                firstnode.getAmount());
+        text += String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
+            firstnode.getAmount());
       }
       text = text + "\n";
     }
-    text = text + String.format("bid depth = %s, ask depth = %s\n", this.bidDepth, this.askDepth);
-    text =
-        text
-            + String.format("best ask = %s, best bid =%s, spread = %s\n", this.bestAsk, this.bestBid, this.bestAsk
-                - this.bestBid);
-    text = text + "----- END -----\n";
+
+    text += String.format("bid depth = %s, ask depth = %s\n", this.bidDepth, this.askDepth);
+    text += String.format("best ask = %s, best bid =%s, spread = %s\n", this.bestAsk, this.bestBid, this.bestAsk
+        - this.bestBid);
+
+    text += "----- END -----\n";
+
     log.info(text);
   }
 

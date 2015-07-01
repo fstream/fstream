@@ -32,4 +32,10 @@ public class Publisher extends UntypedProducerActor {
     return endpointUri;
   }
 
+  @Override
+  public Object onTransformOutgoingMessage(Object message) {
+    // Return a new object or modify the supplied object as needed before it gets dispatched
+    return message;
+  }
+
 }

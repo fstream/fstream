@@ -4,4 +4,10 @@ public interface Agent {
 
   void executeAction();
 
+  enum AgentType {
+    RETAIL,
+    INSTITUTIONAL,
+    HFT;
+  }
+
 }

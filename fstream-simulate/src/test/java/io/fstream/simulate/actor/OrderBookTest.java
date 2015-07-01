@@ -49,21 +49,21 @@ public class OrderBookTest {
   final String brokerId = "tsx";
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     this.actorSystem = ActorSystem.create("fstream-simulate-test");
 
     val publisheProps = Props.create(Publisher.class, "log:info");
     val publisherRef = TestActorRef.<Publisher> create(actorSystem, publisheProps, "testPublisher");
 
     // Create the exchange
-    val exchangeProps = Props.create(Exchange.class, publisherRef);
-    val exchangeRef = TestActorRef.<Exchange> create(actorSystem, exchangeProps, "testExchange");
-    val exchange = exchangeRef.underlyingActor();
+    val exchangeProps = Props.create(Exchange.class, () -> {
+      Exchange exchange = new Exchange(publisherRef);
+      exchange.setSpring(spring);
+      exchange.setProperties(new SimulateProperties());
+      return exchange;
+    });
 
-    // Manually initialize what Spring would have done in the running application
-    exchange.setSpring(spring);
-    exchange.setProperties(new SimulateProperties());
-    exchange.init();
+    val exchangeRef = TestActorRef.<Exchange> create(actorSystem, exchangeProps, "testExchange");
 
     // Create the order book
     val orderBookProps = Props.create(OrderBook.class, symbol, exchangeRef, publisherRef);

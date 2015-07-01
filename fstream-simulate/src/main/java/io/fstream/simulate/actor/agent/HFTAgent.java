@@ -1,22 +1,17 @@
 package io.fstream.simulate.actor.agent;
 
+import static io.fstream.simulate.actor.agent.Agent.AgentType.HFT;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.util.PrototypeActor;
-
-import javax.annotation.PostConstruct;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
-import org.joda.time.DateTime;
-
 import akka.actor.ActorRef;
 
 @Slf4j
@@ -24,20 +19,12 @@ import akka.actor.ActorRef;
 public class HFTAgent extends AgentActor {
 
   public HFTAgent(String name, ActorRef exchange) {
-    super(name, exchange);
-  }
-
-  @PostConstruct
-  public void init() {
-    quoteSubscriptionLevel = properties.getHft().getQuoteSubscriptionLevel();
-    probBuy = properties.getHft().getProbBuy();
-
-    broker = generateBroker();
+    super(HFT, name, exchange);
   }
 
   @Override
   public void executeAction() {
-    // No-op
+    // No-op since the agent is internally passive
   }
 
   @Override
@@ -49,11 +36,12 @@ public class HFTAgent extends AgentActor {
     }
   }
 
-  private void onReceiveQuote(Quote quote) {
-    this.getBbboQuotes().put(quote.getSymbol(), quote);
+  @Override
+  protected void onReceiveQuote(Quote quote) {
+    super.onReceiveQuote(quote);
 
     float spread = quote.getAskPrice() - quote.getBidPrice();
-    Imbalance imbalance = getImbalance(quote);
+    val imbalance = getImbalance(quote);
     LimitOrder order;
 
     if (imbalance.getRatio() < 2 && spread > minTickSize) { // no stress period, so provide liquidity at better price
@@ -68,10 +56,6 @@ public class HFTAgent extends AgentActor {
     // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
     exchange.tell(order, self());
     openOrderBook.addOpenOrder(order);
-  }
-
-  private void onReceiveActiveInstruments(ActiveInstruments activeInstruments) {
-    this.activeInstruments.setInstruments(activeInstruments.getInstruments());
   }
 
   private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {
@@ -95,7 +79,7 @@ public class HFTAgent extends AgentActor {
       }
     }
 
-    return new LimitOrder(imbalance.getSide(), OrderType.ADD, DateTime.now(), Exchange.nextOrderId(), broker,
+    return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(),
         imbalance.getAmount(), price,
         name);
@@ -121,31 +105,24 @@ public class HFTAgent extends AgentActor {
   }
 
   /**
-   * Creates liquidity at stressfull time e.g. when no liquidity exist on a side or book is unbalanced above a threshold
+   * Creates liquidity at stressful time e.g. when no liquidity exist on a side or book is unbalanced above a threshold
    */
   private LimitOrder createLiquidityAtStress(Quote quote, Imbalance imbalance) {
-    float bestask = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
-    float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
+    // TODO: 12 and 10?
+    val bestAsk = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
+    val bestBid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // ask imbalance
-      price = bestask + (getMinTickSize() * imbalance.getRatio());
+      price = bestAsk + (getMinTickSize() * imbalance.getRatio());
     } else {
       // bid imbalance
-      price = bestbid - (getMinTickSize() * imbalance.getRatio());
+      price = bestBid - (getMinTickSize() * imbalance.getRatio());
     }
 
-    return new LimitOrder(imbalance.getSide(), OrderType.ADD, DateTime.now(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(),
-        imbalance.getAmount(), price,
-        name);
-  }
-
-  @Override
-  public void preStart() {
-    // Register to receive quotes
-    exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
+    return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
+        quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
   @Data

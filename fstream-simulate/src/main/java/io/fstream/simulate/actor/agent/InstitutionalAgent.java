@@ -1,5 +1,6 @@
 package io.fstream.simulate.actor.agent;
 
+import static io.fstream.simulate.actor.agent.Agent.AgentType.INSTITUTIONAL;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
@@ -10,14 +11,8 @@ import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.util.PrototypeActor;
-
-import javax.annotation.PostConstruct;
-
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
-import org.joda.time.DateTime;
-
 import akka.actor.ActorRef;
 
 /**
@@ -29,40 +24,45 @@ import akka.actor.ActorRef;
 public class InstitutionalAgent extends AgentActor {
 
   public InstitutionalAgent(String name, ActorRef exchange) {
-    super(name, exchange);
+    super(INSTITUTIONAL, name, exchange);
   }
 
-  @PostConstruct
-  public void init() {
-    maxTradeSize = properties.getInstitutional().getMaxTradeSize();
-    maxSleep = properties.getInstitutional().getMaxSleep();
-    minSleep = properties.getInstitutional().getMinSleep();
+  @Override
+  public void preStart() {
+    super.preStart();
 
-    probMarket = properties.getInstitutional().getProbMarket();
-    probBuy = properties.getInstitutional().getProbBuy();
-    probBestPrice = properties.getInstitutional().getProbBestPrice();
-
-    quoteSubscriptionLevel = properties.getInstitutional().getQuoteSubscriptionLevel();
-
-    minTickSize = properties.getMinTickSize();
-    msgResponseTimeout = generateMsgResponseTimeout();
-    broker = generateBroker();
+    scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
   }
 
   @Override
   public void executeAction() {
     val order = createOrder();
     if (order != null) {
-      // cancel all openorders
+      // Cancel all open orders
       cancelAllOpenOrders(order.getSymbol());
       exchange.tell(order, self());
       openOrderBook.addOpenOrder(order);
     }
   }
 
+  @Override
+  public void onReceive(Object message) throws Exception {
+    log.debug("Agent message received by {}: {}", name, message);
+    if (message instanceof Command) {
+      onReceiveCommand((Command) message);
+    } else if (message instanceof ActiveInstruments) {
+      onReceiveActiveInstruments((ActiveInstruments) message);
+    } else if (message instanceof SubscriptionQuote) {
+      onReceiveSubscriptionQuote((SubscriptionQuote) message);
+    } else if (message instanceof Quote) {
+      onReceiveQuote((Quote) message);
+    } else {
+      unhandled(message);
+    }
+  }
+
   private Order createOrder() {
-    int next = random.nextInt(maxTradeSize);
-    int amount = next + 1;
+    val amount = decideAmount();
     OrderType type = OrderType.ADD;
     OrderSide side;
     float price;
@@ -73,7 +73,7 @@ public class InstitutionalAgent extends AgentActor {
       return null;
     }
 
-    val symbol = activeInstruments.getInstruments().get(random.nextInt(activeInstruments.getInstruments().size()));
+    val symbol = decideSymbol();
 
     val quote = this.getLastValidQuote(symbol);
     if (quote == null) {
@@ -83,8 +83,8 @@ public class InstitutionalAgent extends AgentActor {
 
     float bestAsk = quote.getAskPrice();
     float bestBid = quote.getBidPrice();
-    side = decideSide(1 - probBuy, OrderSide.ASK);
 
+    side = decideSide(1 - probBuy, OrderSide.ASK);
     type = decideOrderType(probMarket);
 
     if (type == OrderType.MO) {
@@ -107,36 +107,7 @@ public class InstitutionalAgent extends AgentActor {
       }
     }
 
-    return new LimitOrder(side, type, DateTime.now(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
-  }
-
-  @Override
-  public void onReceive(Object message) throws Exception {
-    log.debug("Agent message received by {}: {}", this.getName(), message);
-    if (message instanceof Command) {
-      if (message.equals(Command.AGENT_EXECUTE_ACTION)) {
-        this.executeAction();
-        this.scheduleOnceRandom(Command.AGENT_EXECUTE_ACTION);
-      }
-    } else if (message instanceof ActiveInstruments) {
-      this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
-    } else if (message instanceof SubscriptionQuote) {
-      log.debug("Agent {} registered successfully to receive level {} quotes", this.getName(),
-          this.getQuoteSubscriptionLevel());
-      this.quoteSubscriptionSuccess = ((SubscriptionQuote) message).isSuccess();
-    } else if (message instanceof Quote) {
-      this.getBbboQuotes().put(((Quote) message).getSymbol(), (Quote) message);
-    } else {
-      unhandled(message);
-    }
-  }
-
-  @Override
-  public void preStart() {
-    this.scheduleOnceRandom(Command.AGENT_EXECUTE_ACTION);
-
-    // Register to recieve quotes
-    exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
+    return new LimitOrder(side, type, getSimulationTime(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
   }
 
 }

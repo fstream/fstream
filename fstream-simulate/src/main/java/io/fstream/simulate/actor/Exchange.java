@@ -17,16 +17,11 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.PostConstruct;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
-import org.joda.time.DateTime;
-
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
 
@@ -46,7 +41,6 @@ public class Exchange extends BaseActor {
    * Configuration.
    */
   private float minTickSize;
-  private ActiveInstruments activeInstruments = new ActiveInstruments();
   private FiniteDuration quoteDelayDuration;
 
   /**
@@ -61,21 +55,21 @@ public class Exchange extends BaseActor {
 
   private Map<String, Quote> lastValidQuote;
 
-  @PostConstruct
-  public void init() {
-    activeInstruments.setInstruments(properties.getInstruments());
-    minTickSize = properties.getMinTickSize();
-    quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
-
-    initializeMarketOnOpenQuotes();
-  }
-
   /**
    * Global order ID generator.
    */
   // TODO: Prevents distributed actors
   public static int nextOrderId() {
     return currentOrderId.incrementAndGet();
+  }
+
+  @Override
+  public void preStart() throws Exception {
+    activeInstruments.setInstruments(properties.getInstruments());
+    minTickSize = properties.getMinTickSize();
+    quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
+
+    initializeMarketOnOpenQuotes();
   }
 
   @Override
@@ -117,13 +111,12 @@ public class Exchange extends BaseActor {
       // Notify premium subscribers immediately.
       notifyPremiumSubscribers(quote);
 
-      // Notify non-premium with latency.
+      // Notify non-premium with latency
       val delayedQuote = new DelayedQuote(quote.getTime(), quote.getSymbol(),
           quote.getAskPrice(), quote.getBidPrice(), quote.getAskDepth(),
           quote.getBidDepth());
 
-      // Schedule a DelayedQuote message to self
-      scheduleOnce(delayedQuote, quoteDelayDuration);
+      scheduleSelfOnce(delayedQuote, quoteDelayDuration);
     }
   }
 
@@ -168,7 +161,7 @@ public class Exchange extends BaseActor {
     } else if (level.equals(Command.SUBSCRIBE_QUOTES_PREMIUM.name())) {
       message.setSuccess(this.premiumSubscribers.add(agent));
     } else {
-      log.error("subscription request not recognized");
+      log.error("Subscription request not recognized");
     }
 
     return message;
@@ -180,6 +173,7 @@ public class Exchange extends BaseActor {
   private void initializeMarketOnOpenQuotes() {
     this.lastValidQuote = new HashMap<String, Quote>();
 
+    // TODO: Can we reused the random field instead?
     val random = new Random();
     // TODO remove the hard coding.
     float minBid = 10;
@@ -188,7 +182,7 @@ public class Exchange extends BaseActor {
     for (val symbol : activeInstruments.getInstruments()) {
       float bid = minBid - (random.nextInt(5) * minTickSize);
       float ask = minAsk + (random.nextInt(5) * minTickSize);
-      val quote = new Quote(DateTime.now(), symbol, ask, bid, 0, 0);
+      val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
 
       lastValidQuote.put(symbol, quote);
     }
