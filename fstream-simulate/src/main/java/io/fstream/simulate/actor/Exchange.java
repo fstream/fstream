@@ -2,7 +2,7 @@ package io.fstream.simulate.actor;
 
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.DelayedQuote;
@@ -79,24 +79,6 @@ public class Exchange extends UntypedActor {
     initializeMarketOnOpenQuotes();
   }
 
-  /**
-   * On market open, initialize quotes to random numbers.
-   */
-  private void initializeMarketOnOpenQuotes() {
-    this.lastValidQuote = new HashMap<String, Quote>();
-
-    val random = new Random();
-    // TODO remove the hard coding.
-    float minBid = 10;
-    float minAsk = 12;
-
-    for (val symbol : activeInstruments.getInstruments()) {
-      float bid = minBid - (random.nextInt(5) * minTickSize);
-      float ask = minAsk + (random.nextInt(5) * minTickSize);
-      lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid, 0, 0));
-    }
-  }
-
   public static int nextOrderId() {
     return currentOrderId.incrementAndGet();
   }
@@ -111,17 +93,16 @@ public class Exchange extends UntypedActor {
       } else {
         dispatch((Order) message);
       }
-    } else if (message instanceof String) {
-      if (message.equals(Messages.PRINT_ORDER_BOOK)) {
+    } else if (message instanceof Command) {
+      if (message.equals(Command.PRINT_ORDER_BOOK)) {
         for (val processor : processors.entrySet()) {
-          processor.getValue().tell(Messages.PRINT_ORDER_BOOK, self());
+          processor.getValue().tell(Command.PRINT_ORDER_BOOK, self());
         }
-      } else if (message.equals(Messages.PRINT_SUMMARY)) {
+      } else if (message.equals(Command.PRINT_SUMMARY)) {
         for (val processor : processors.entrySet()) {
-          processor.getValue().tell(Messages.PRINT_SUMMARY, self());
+          processor.getValue().tell(Command.PRINT_SUMMARY, self());
         }
-      }
-      else if (message.equals(Messages.GET_MARKET_OPEN_QUOTE)) {
+      } else if (message.equals(Command.GET_MARKET_OPEN_QUOTE)) {
         sender().tell(lastValidQuote.get(((QuoteRequest) message).getSymbol()), self());
       }
     } else if (message instanceof ActiveInstruments) {
@@ -153,6 +134,42 @@ public class Exchange extends UntypedActor {
       sender().tell(quote, self());
     } else {
       unhandled(message);
+    }
+  }
+
+  public SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
+    val level = message.getLevel();
+
+    message.setSuccess(false);
+
+    if (level.equals(Command.SUBSCRIBE_QUOTES.name())) {
+      message.setSuccess(this.quotesSubscribers.add(agent));
+    } else if (level.equals(Command.SUBSCRIBE_QUOTES_ORDERS.name())) {
+      message.setSuccess(this.quoteAndOrdersSubscribers.add(agent));
+    } else if (level.equals(Command.SUBSCRIBE_QUOTES_PREMIUM.name())) {
+      message.setSuccess(this.premiumSubscribers.add(agent));
+    } else {
+      log.error("subscription request not recognized");
+    }
+
+    return message;
+  }
+
+  /**
+   * On market open, initialize quotes to random numbers.
+   */
+  private void initializeMarketOnOpenQuotes() {
+    this.lastValidQuote = new HashMap<String, Quote>();
+
+    val random = new Random();
+    // TODO remove the hard coding.
+    float minBid = 10;
+    float minAsk = 12;
+
+    for (val symbol : activeInstruments.getInstruments()) {
+      float bid = minBid - (random.nextInt(5) * minTickSize);
+      float ask = minAsk + (random.nextInt(5) * minTickSize);
+      lastValidQuote.put(symbol, new Quote(DateTime.now(), symbol, ask, bid, 0, 0));
     }
   }
 
@@ -189,22 +206,6 @@ public class Exchange extends UntypedActor {
     }
 
     return maybeProcessor;
-  }
-
-  public SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
-    message.setSuccess(false);
-    if (message.getLevel().equals(Messages.SUBSCRIBE_QUOTES)) {
-      message.setSuccess(this.quotesSubscribers.add(agent));
-    } else if (message.getLevel().equals(Messages.SUBSCRIBE_QUOTES_ORDERS)) {
-      message.setSuccess(this.quoteAndOrdersSubscribers.add(agent));
-    } else if (message.getLevel().equals(Messages.SUBSCRIBE_QUOTES_PREMIUM)) {
-      message.setSuccess(this.premiumSubscribers.add(agent));
-    }
-    else {
-      log.error("subscription request not recognized");
-    }
-
-    return message;
   }
 
 }

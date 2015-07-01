@@ -12,8 +12,9 @@ package io.fstream.simulate.model;
 import org.joda.time.DateTime;
 
 /**
- * Represents a delayed quote message. Same as in all respects but elicit different behaviour from the consumer of
- * message.
+ * Represents a delayed quote message.
+ * <p>
+ * Same as in all respects but elicit different behavior from the consumer of message.
  */
 public class DelayedQuote extends Quote {
 

@@ -9,6 +9,11 @@ import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
+/**
+ * Akka configuration.
+ * <p>
+ * Currently "toq" is the only profile that makes use of Akka.
+ */
 @Configuration
 @Profile("toq")
 public class AkkaConfig {

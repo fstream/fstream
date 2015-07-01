@@ -29,7 +29,7 @@ public class Trade {
     this.setTime(tradetime);
     this.setOrderTime(active.getSentTime());
 
-    // Use active orders timestamp as tradetime. Simplifying assumption
+    // Use active orders timestamp as trade time as a simplifying assumption
     this.setAmount(executedSize);
     if (active.getSide() == OrderSide.ASK) {
       // Active seller

@@ -2,7 +2,7 @@ package io.fstream.simulate.actor.agent;
 
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order;
@@ -18,9 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 
-import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
-import akka.util.Timeout;
 
 /**
  * Simulates an institutional participant. The participants trades in larger sizes. Other behaviors such as propensity
@@ -47,8 +45,8 @@ public class InstitutionalAgent extends AgentActor {
     quoteSubscriptionLevel = properties.getInstitutional().getQuoteSubscriptionLevel();
 
     minTickSize = properties.getMinTickSize();
-    msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
-    broker = properties.getBrokers().get(random.nextInt(properties.getBrokers().size()));
+    msgResponseTimeout = generateMsgResponseTimeout();
+    broker = generateBroker();
   }
 
   @Override
@@ -115,10 +113,10 @@ public class InstitutionalAgent extends AgentActor {
   @Override
   public void onReceive(Object message) throws Exception {
     log.debug("Agent message received by {}: {}", this.getName(), message);
-    if (message instanceof String) {
-      if (((String) message).equals(Messages.AGENT_EXECUTE_ACTION)) {
+    if (message instanceof Command) {
+      if (message.equals(Command.AGENT_EXECUTE_ACTION)) {
         this.executeAction();
-        this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
+        this.scheduleOnce(Command.AGENT_EXECUTE_ACTION);
       }
     } else if (message instanceof ActiveInstruments) {
       this.activeInstruments.setInstruments(((ActiveInstruments) message).getInstruments());
@@ -135,7 +133,7 @@ public class InstitutionalAgent extends AgentActor {
 
   @Override
   public void preStart() {
-    this.scheduleOnce(Messages.AGENT_EXECUTE_ACTION, generateRandomDuration());
+    this.scheduleOnce(Command.AGENT_EXECUTE_ACTION);
 
     // Register to recieve quotes
     exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());

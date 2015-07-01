@@ -7,7 +7,7 @@
 # Proprietary and confidential.
 
 ###############################################################################
-# Activation
+# Profile Activation
 ###############################################################################
 
 # Available simulation profiles:
@@ -27,8 +27,9 @@ spring.profiles.active: toq,file
 # Profile - Common
 ###############################################################################
 
-# Simulationguava
+# Simulation
 simulate:
+   # Camel
    kafka:
       uri:
         "kafka:\
@@ -40,21 +41,30 @@ simulate:
       uri: ${simulate.kafka.uri}&topic=toq
    rates:
       uri: ${simulate.kafka.uri}&topic=rates
+
+   # Active instruments
    instruments:
       - RY
       - BMO
       - TD
       - BBM
       - HUF
+      
+      
+   # Active brokers
    brokers:
       - xxx
       - yyy
       - zzz
       - ddd
       - aaa
+
+   # Agents - Common
    msgResponseTimeout: 5 # in seconds
    minTickSize: 0.1
    nonPremiumQuoteDelay: 1000 # in milliseconds
+   
+   # Agents - Types
    institutional:
       probBuy: 0.49
       probMarket: 0.30

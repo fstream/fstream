@@ -2,16 +2,20 @@ package io.fstream.simulate.model;
 
 import org.joda.time.DateTime;
 
-// TODO: bring back MarketOrder. LimitOrder (has price) extend MarketOrder ?
+// TODO: Bring back MarketOrder. LimitOrder (has price) extend MarketOrder?
 public interface Order {
 
   enum OrderSide {
-    BID, ASK
-  }; // ASK(OFFER)/BID
+    BID,
+    ASK // Offer
+  };
 
   enum OrderType {
-    MO, ADD, AMEND, CANCEL
-  } // Market Order, Limit Order (add, amend, cancel)
+    MO, // Market Order
+    ADD, // Limit Order - Add
+    AMEND, // Limit Order - Amend
+    CANCEL // Limit Order - Cancel
+  }
 
   OrderType getType();
 

@@ -1,7 +1,7 @@
 package io.fstream.simulate.actor;
 
 import static java.util.Collections.reverseOrder;
-import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.message.Command;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Order.OrderSide;
@@ -514,11 +514,11 @@ public class OrderBook extends UntypedActor {
     log.debug("exchange message received {}", message);
     if (message instanceof Order) {
       this.processOrder((Order) message);
-    } else if (message instanceof String) {
-      if (message.equals(Messages.PRINT_ORDER_BOOK)) {
+    } else if (message instanceof Command) {
+      if (message.equals(Command.PRINT_ORDER_BOOK)) {
         this.printBook();
         sender().tell(true, self());
-      } else if (message.equals(Messages.PRINT_SUMMARY)) {
+      } else if (message.equals(Command.PRINT_SUMMARY)) {
         log.info(
             "{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
             symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, bestAsk - bestBid);
@@ -526,7 +526,6 @@ public class OrderBook extends UntypedActor {
     } else {
       unhandled(message);
     }
-
   }
 
 }

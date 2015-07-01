@@ -67,6 +67,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
     if (this.getOid() == o.getOid() && this.brokerId == o.getBrokerId()) {
       return 1;
     }
+
     return 0;
   }
 

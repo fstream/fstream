@@ -64,17 +64,24 @@ public abstract class AgentActor extends UntypedActor implements Agent {
   /**
    * State.
    */
-  ActiveInstruments activeInstruments = new ActiveInstruments();
-  Random random = new Random();
-  Map<String, Quote> bbboQuotes = new HashMap<>();
-  @Autowired
-  OpenOrders openOrderBook;
+  final ActiveInstruments activeInstruments = new ActiveInstruments();
+  final Random random = new Random();
+  final Map<String, Quote> bbboQuotes = new HashMap<>();
+  final OpenOrders openOrderBook = new OpenOrders();
 
   /**
    * Template method.
    */
   @Override
   abstract public void executeAction();
+
+  protected String generateBroker() {
+    return properties.getBrokers().get(random.nextInt(properties.getBrokers().size()));
+  }
+
+  protected Timeout generateMsgResponseTimeout() {
+    return new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
+  }
 
   /**
    * Return orderside preferred with the given probability. E.g. prob=0.7, side=BUY returns BUY 70% of the time
@@ -119,14 +126,18 @@ public abstract class AgentActor extends UntypedActor implements Agent {
    * Generates a random duration between minsleeptime and maxsleeptime;
    */
   protected FiniteDuration generateRandomDuration() {
-    val duration = Duration.create(random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
-    return duration.$plus(Duration.create(minSleep, TimeUnit.MILLISECONDS));
+    return Duration.create(minSleep + random.nextInt(maxSleep - minSleep) + 1, TimeUnit.MILLISECONDS);
   }
 
   @NonNull
   protected <T> void scheduleOnce(T message, FiniteDuration duration) {
     val scheduler = getContext().system().scheduler();
     scheduler.scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
+  }
+
+  @NonNull
+  protected <T> void scheduleOnce(T message) {
+    scheduleOnce(message, generateRandomDuration());
   }
 
   /**
@@ -148,7 +159,6 @@ public abstract class AgentActor extends UntypedActor implements Agent {
 
   /**
    * cancels all open orders for the given symbol
-   * @param symbol
    */
   protected void cancelAllOpenOrders(String symbol) {
     val openorders = openOrderBook.getOrders().get(symbol);
@@ -156,6 +166,7 @@ public abstract class AgentActor extends UntypedActor implements Agent {
       openorder.setType(OrderType.CANCEL);
       exchange.tell(openorder, self());
     }
+
     openOrderBook.getOrders().removeAll(symbol);
   }
 

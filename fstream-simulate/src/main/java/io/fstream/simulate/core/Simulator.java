@@ -10,7 +10,7 @@ import io.fstream.simulate.actor.agent.HFTAgent;
 import io.fstream.simulate.actor.agent.InstitutionalAgent;
 import io.fstream.simulate.actor.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
-import io.fstream.simulate.message.Messages;
+import io.fstream.simulate.message.Command;
 import io.fstream.simulate.util.SpringExtension;
 
 import java.util.List;
@@ -21,6 +21,7 @@ import javax.annotation.PreDestroy;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,7 +71,7 @@ public class Simulator {
   }
 
   @PreDestroy
-  public void shutdown() throws InterruptedException {
+  public void shutdown() {
     val shutdownWatch = createStarted();
     log.info("Shutting down actor system after simulating for {}", watch);
 
@@ -81,7 +82,7 @@ public class Simulator {
     pause();
 
     // Exchange
-    exchange.tell(Messages.PRINT_SUMMARY, noSender());
+    exchange.tell(Command.PRINT_SUMMARY, noSender());
     shutdown(exchange);
     pause();
 
@@ -136,7 +137,7 @@ public class Simulator {
   }
 
   private ActorRef createHftAgent(int i) {
-    val name = "HFTAgent-" + i;
+    val name = "hftAgent-" + i;
     val props = spring.props(HFTAgent.class, name, exchange);
     return actorSystem.actorOf(props, name);
   }
@@ -145,7 +146,8 @@ public class Simulator {
     return range(0, count).mapToObj(factory).collect(toList());
   }
 
-  private static void pause() throws InterruptedException {
+  @SneakyThrows
+  private static void pause() {
     Thread.sleep(5000);
   }
 

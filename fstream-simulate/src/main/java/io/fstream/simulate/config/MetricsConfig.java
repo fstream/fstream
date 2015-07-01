@@ -1,7 +1,7 @@
 package io.fstream.simulate.config;
 
-import java.util.concurrent.TimeUnit;
-
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import lombok.val;
 
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 
+/**
+ * Metrics configuration.
+ */
 @Configuration
 public class MetricsConfig {
 
@@ -22,11 +25,11 @@ public class MetricsConfig {
     val registry = new MetricRegistry();
     val reporter = Slf4jReporter.forRegistry(registry)
         .outputTo(LoggerFactory.getLogger("metrics"))
-        .convertRatesTo(TimeUnit.SECONDS)
-        .convertDurationsTo(TimeUnit.MILLISECONDS)
+        .convertRatesTo(SECONDS)
+        .convertDurationsTo(MILLISECONDS)
         .build();
 
-    reporter.start(10, TimeUnit.SECONDS);
+    reporter.start(10, SECONDS);
 
     return registry;
   }
