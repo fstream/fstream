@@ -28,9 +28,9 @@ public class Trade {
     this.setSymbol(active.getSymbol());
     this.setTime(tradetime);
     this.setOrderTime(active.getSentTime());
+    this.setAmount(executedSize);
 
     // Use active orders timestamp as trade time as a simplifying assumption
-    this.setAmount(executedSize);
     if (active.getSide() == OrderSide.ASK) {
       // Active seller
       this.sellUser = active.getUserId();

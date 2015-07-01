@@ -50,7 +50,7 @@ public class OrderBookTest {
 
     // Create the exchange
     val exchangeProps = Props.create(Exchange.class, properties);
-    TestActorRef.<Exchange> create(actorSystem, exchangeProps, "exchange");
+    TestActorRef.<BaseActor> create(actorSystem, exchangeProps, "exchange");
 
     // Create the order book
     val orderBookProps = Props.create(OrderBook.class, properties, symbol);

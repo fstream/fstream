@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.actor.Publisher;
+import io.fstream.simulate.actor.agent.Agent;
 import io.fstream.simulate.actor.agent.HFTAgent;
 import io.fstream.simulate.actor.agent.InstitutionalAgent;
 import io.fstream.simulate.actor.agent.RetailAgent;
@@ -117,21 +118,9 @@ public class Simulator {
     return createActors(properties.getRetail().getNumAgents(), this::createRetailAgent);
   }
 
-  private ActorRef createRetailAgent(int i) {
-    val name = "retailAgent-" + i;
-    val props = Props.create(RetailAgent.class, properties, name);
-    return actorSystem.actorOf(props, name);
-  }
-
   private List<ActorRef> createInstitutionalAgents() {
     log.info("Creating {} institutional agents...", properties.getInstitutional().getNumAgents());
     return createActors(properties.getInstitutional().getNumAgents(), this::createInstitutionalAgent);
-  }
-
-  private ActorRef createInstitutionalAgent(int i) {
-    val name = "institutionalAgent-" + i;
-    val props = Props.create(InstitutionalAgent.class, properties, name);
-    return actorSystem.actorOf(props, name);
   }
 
   private List<ActorRef> createHftAgents() {
@@ -139,14 +128,25 @@ public class Simulator {
     return createActors(properties.getHft().getNumAgents(), this::createHftAgent);
   }
 
-  private ActorRef createHftAgent(int i) {
-    val name = "hftAgent-" + i;
-    val props = Props.create(HFTAgent.class, properties, name);
-    return actorSystem.actorOf(props, name);
-  }
-
   private static List<ActorRef> createActors(int count, IntFunction<ActorRef> factory) {
     return range(0, count).mapToObj(factory).collect(toList());
+  }
+
+  private ActorRef createRetailAgent(int i) {
+    return createAgent(RetailAgent.class, "retail-agent-" + i);
+  }
+
+  private ActorRef createInstitutionalAgent(int i) {
+    return createAgent(InstitutionalAgent.class, "institutional-agent-" + i);
+  }
+
+  private ActorRef createHftAgent(int i) {
+    return createAgent(HFTAgent.class, "hft-agent-" + i);
+  }
+
+  private ActorRef createAgent(Class<? extends Agent> agentClass, String name) {
+    val props = Props.create(agentClass, properties, name);
+    return actorSystem.actorOf(props, name);
   }
 
   @SneakyThrows

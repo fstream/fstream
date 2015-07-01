@@ -10,9 +10,9 @@ import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Trade;
+import io.fstream.simulate.util.LimitOrderTimeComparator;
 import io.fstream.simulate.util.OrderBookFormatter;
 
-import java.util.Comparator;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -43,8 +43,8 @@ public class OrderBook extends BaseActor {
   /**
    * State.
    */
-  NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder()); // Non-natural
-  NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
+  final NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder()); // Non-natural
+  final NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
 
   /**
    * Aggregates.
@@ -65,7 +65,8 @@ public class OrderBook extends BaseActor {
 
   @Override
   public void onReceive(Object message) throws Exception {
-    log.debug("Exchange message received {}", message);
+    log.debug("Order book message received {}", message);
+
     if (message instanceof Order) {
       onReceiveOrder((Order) message);
     } else if (message instanceof Command) {
@@ -203,7 +204,7 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * updates best ask/bid
+   * Updates best ask/bid
    */
   private void updateBestPrices() {
     val prevbestaks = this.bestAsk;
@@ -319,29 +320,26 @@ public class OrderBook extends BaseActor {
    * Adds LimitOrder to the order book
    */
   private void addLimitOrder(LimitOrder order) {
-
     int availabledepth = 0;
     if (order.getSide() == OrderSide.ASK) {
-      // executing against bid side of the book.
+      // Executing against bid side of the book.
       availabledepth = this.bidDepth;
     } else {
       availabledepth = this.askDepth;
     }
+
     int unfilledsize;
     if (crossesSpread(order) && availabledepth > 0) { // if limitprice
-      // crosses spread,
-      // treat as
-      // marketorder
-
+      // Crosses spread, treat as market order
       unfilledsize = processMarketOrder(order);
-      order.setAmount(unfilledsize); // any unfilled amount added to
-      // orderbook
+      order.setAmount(unfilledsize);
+
+      // Any unfilled amount added to order book
       if (unfilledsize > 0) {
         insertOrder(order);
       }
-
-    } else { // not crossing spread or no depth available. So add to limit
-      // book
+    } else {
+      // Mot crossing spread or no depth available. So add to limit book
       insertOrder(order);
     }
 
@@ -350,7 +348,6 @@ public class OrderBook extends BaseActor {
         System.exit(1);
       }
     }
-
   }
 
   /**
@@ -368,17 +365,18 @@ public class OrderBook extends BaseActor {
     }
 
     if (sidebook.isEmpty() || sidebook.get(order.getPrice()) == null) {
-      // add order to order book
-      TreeSet<LimitOrder> orderlist = new TreeSet<LimitOrder>(ORDER_TIME_COMPARATOR);
-      orderlist.add(order);
-      sidebook.put(order.getPrice(), orderlist);
-
-    } else { // order at same price exists, queue it by time
-      val orderlist = sidebook.get(order.getPrice());
-      orderlist.add(order);
-      sidebook.put(order.getPrice(), orderlist);
+      // Add order to order book
+      val orderList = new TreeSet<LimitOrder>(LimitOrderTimeComparator.INSTANCE);
+      orderList.add(order);
+      sidebook.put(order.getPrice(), orderList);
+    } else {
+      // Order at same price exists, queue it by time
+      val orderList = sidebook.get(order.getPrice());
+      orderList.add(order);
+      sidebook.put(order.getPrice(), orderList);
     }
-    // set best price and depth attributes
+
+    // Set best price and depth attributes
     if (isBid) {
       if (this.bidDepth == 0 || order.getPrice() > this.bestBid) {
         this.bestBid = order.getPrice();
@@ -419,12 +417,13 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * Deletes an order from orde rbook
+   * Deletes an order from this order book.
    */
   // TODO: Untested method.
   private boolean deleteOrder(LimitOrder order) {
     val book = getBook(order);
     val orders = book.get(order.getPrice());
+
     boolean removed = false;
     if (orders != null) {
       removed = orders.remove(order);
@@ -454,30 +453,6 @@ public class OrderBook extends BaseActor {
       return this.asks;
     }
   }
-
-  /**
-   * Sorts limit orders in time priority in the order book TreeSet
-   * <p>
-   * (Price -> {ordert1, ordert2, ...}
-   */
-  public static final Comparator<LimitOrder> ORDER_TIME_COMPARATOR = new Comparator<LimitOrder>() {
-
-    @Override
-    public int compare(LimitOrder order1, LimitOrder order2) {
-      if (order1.equals(order2)) {
-        return 0;
-      }
-      if (order1.getSentTime().getMillis() < order2.getSentTime().getMillis()) {
-        return -1;
-      } else if (order1.getSentTime().getMillis() > order2.getSentTime().getMillis()) {
-        return 1;
-      } else {
-        return -1; // TODO this is a hack so orders at same time are not
-        // ignored. need a better data structure for orders
-      }
-    }
-
-  };
 
   public void printBook() {
     log.info(OrderBookFormatter.formatOrderBook(this));

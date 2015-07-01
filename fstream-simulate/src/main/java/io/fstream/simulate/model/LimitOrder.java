@@ -34,11 +34,6 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
   }
 
   @Override
-  public String getUserId() {
-    return this.userId;
-  }
-
-  @Override
   public DateTime getSentTime() {
     return time;
   }

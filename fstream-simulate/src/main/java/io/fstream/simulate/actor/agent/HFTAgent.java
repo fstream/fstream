@@ -1,6 +1,6 @@
 package io.fstream.simulate.actor.agent;
 
-import static io.fstream.simulate.actor.agent.Agent.AgentType.HFT;
+import static io.fstream.simulate.actor.agent.AgentType.HFT;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
@@ -8,13 +8,15 @@ import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * High frequency trader agent.
+ */
 @Slf4j
-public class HFTAgent extends AgentActor {
+public class HFTAgent extends Agent {
 
   public HFTAgent(SimulateProperties properties, String name) {
     super(properties, HFT, name);
@@ -28,7 +30,7 @@ public class HFTAgent extends AgentActor {
   @Override
   public void onReceive(Object message) throws Exception {
     if (message instanceof Quote) {
-      onReceiveQuote(((Quote) message));
+      onReceiveQuote((Quote) message);
     } else if (message instanceof ActiveInstruments) {
       onReceiveActiveInstruments((ActiveInstruments) message);
     }
@@ -38,15 +40,10 @@ public class HFTAgent extends AgentActor {
   protected void onReceiveQuote(Quote quote) {
     super.onReceiveQuote(quote);
 
-    float spread = quote.getAskPrice() - quote.getBidPrice();
     val imbalance = getImbalance(quote);
-    LimitOrder order;
-
-    if (imbalance.getRatio() < 2 && spread > minTickSize) { // no stress period, so provide liquidity at better price
-      order = createLiquidityNormal(quote, imbalance);
-    } else {
-      order = createLiquidityAtStress(quote, imbalance);
-    }
+    val order = isNormal(quote, imbalance) ?
+        createLiquidityNormal(quote, imbalance) :
+        createLiquidityAtStress(quote, imbalance);
 
     // Cancel any existing orders in the book
     cancelAllOpenOrders(order.getSymbol());
@@ -56,31 +53,36 @@ public class HFTAgent extends AgentActor {
     openOrders.addOpenOrder(order);
   }
 
+  private boolean isNormal(Quote quote, Imbalance imbalance) {
+    val spread = quote.getAskPrice() - quote.getBidPrice();
+
+    return imbalance.getRatio() < 2 && spread > minTickSize;
+  }
+
   private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {
+    // No stress period, so provide liquidity at better price
     float bestask = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
     float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
 
     if (imbalance.getSide() == OrderSide.ASK) {
-      // ask imbalance
+      // Ask imbalance
       price = Math.max(bestbid + minTickSize, bestask - minTickSize / 2);
       if ((price - bestbid) < minTickSize) {
-        log.error("invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestbid, price - bestbid);
+        log.error("Invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestbid, price - bestbid);
         price = bestask;
       }
     } else {
-      // bid imbalance
+      // Bid imbalance
       price = Math.min(bestask - minTickSize, bestbid + minTickSize / 2);
       if ((bestask - price) < minTickSize) {
-        log.error("invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
+        log.error("Invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
         price = bestask;
       }
     }
 
     return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(),
-        imbalance.getAmount(), price,
-        name);
+        quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
   private Imbalance getImbalance(Quote quote) {
@@ -113,18 +115,17 @@ public class HFTAgent extends AgentActor {
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // ask imbalance
-      price = bestAsk + (getMinTickSize() * imbalance.getRatio());
+      price = bestAsk + (minTickSize * imbalance.getRatio());
     } else {
       // bid imbalance
-      price = bestBid - (getMinTickSize() * imbalance.getRatio());
+      price = bestBid - (minTickSize * imbalance.getRatio());
     }
 
     return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
-  @Data
-  @AllArgsConstructor
+  @Value
   private class Imbalance {
 
     /**

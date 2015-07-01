@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
  * <p>
  * Same as in all respects but elicit different behavior from the consumer of message.
  */
+// TODO: Can this class be removed if we can simulate the delay in the producer?
 public class DelayedQuote extends Quote {
 
   public DelayedQuote(DateTime time, String symbol, float ask, float bid, int askDepth, int bidDepth) {

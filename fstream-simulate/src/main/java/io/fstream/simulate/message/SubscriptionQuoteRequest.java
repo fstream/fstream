@@ -17,12 +17,12 @@ import lombok.Data;
  * Success flag is set to true on success by exchange a sent back to sender.
  */
 @Data
-public class SubscriptionQuote {
+public class SubscriptionQuoteRequest {
 
   String level;
   boolean success;
 
-  public SubscriptionQuote(String level) {
+  public SubscriptionQuoteRequest(String level) {
     this.level = level;
     this.success = false;
   }

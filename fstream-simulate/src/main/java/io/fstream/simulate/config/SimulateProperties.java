@@ -31,10 +31,10 @@ public class SimulateProperties {
   @Data
   public static class AgentProperties {
 
-    private float probMarket;
-    private float probBuy;
-    private int maxTradeSize;
     private float probBestPrice;
+    private float probBuy;
+    private float probMarket;
+    private int maxTradeSize;
     private int maxSleep; // in millis
     private int minSleep; // in millis
     private int numAgents;

@@ -4,7 +4,7 @@ import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.QuoteRequest;
-import io.fstream.simulate.message.SubscriptionQuote;
+import io.fstream.simulate.message.SubscriptionQuoteRequest;
 import io.fstream.simulate.model.DelayedQuote;
 import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Quote;
@@ -31,20 +31,20 @@ public class Exchange extends BaseActor {
   /**
    * Configuration.
    */
-  private float minTickSize;
-  private FiniteDuration quoteDelayDuration;
+  final float minTickSize;
+  final FiniteDuration quoteDelayDuration;
 
   /**
    * State.
    */
-  private static AtomicInteger currentOrderId = new AtomicInteger(0);
+  static final AtomicInteger currentOrderId = new AtomicInteger(0);
 
-  private Map<String, ActorRef> orderBooks = new HashMap<>();
-  private Map<String, Quote> lastValidQuote = new HashMap<>();
+  final Map<String, ActorRef> orderBooks = new HashMap<>();
+  final Map<String, Quote> lastValidQuote = new HashMap<>();
 
-  private List<ActorRef> premiumSubscribers = new ArrayList<>();
-  private List<ActorRef> quotesSubscribers = new ArrayList<>();
-  private List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
+  final List<ActorRef> premiumSubscribers = new ArrayList<>();
+  final List<ActorRef> quotesSubscribers = new ArrayList<>();
+  final List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
 
   /**
    * Global order ID generator.
@@ -56,20 +56,33 @@ public class Exchange extends BaseActor {
 
   public Exchange(SimulateProperties properties) {
     super(properties);
+    this.activeInstruments.setInstruments(properties.getInstruments());
+    this.minTickSize = properties.getMinTickSize();
+    this.quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
   }
 
   @Override
   public void preStart() throws Exception {
-    activeInstruments.setInstruments(properties.getInstruments());
-    minTickSize = properties.getMinTickSize();
-    quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
+    // On market open, initialize quotes to random numbers.
 
-    initializeMarketOnOpenQuotes();
+    // TODO remove the hard coding.
+    val random = new Random();
+    val minBid = 10;
+    val minAsk = 12;
+
+    for (val symbol : activeInstruments.getInstruments()) {
+      val bid = minBid - (random.nextInt(5) * minTickSize);
+      val ask = minAsk + (random.nextInt(5) * minTickSize);
+      val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
+
+      lastValidQuote.put(symbol, quote);
+    }
   }
 
   @Override
   public void onReceive(Object message) throws Exception {
     log.debug("Exchange message received {}", message);
+
     if (message instanceof Order) {
       onReceiveOrder((Order) message);
     } else if (message instanceof Command) {
@@ -78,8 +91,8 @@ public class Exchange extends BaseActor {
       onReceiveQuoteRequest((QuoteRequest) message);
     } else if (message instanceof ActiveInstruments) {
       onReceiveActiveInstruments();
-    } else if (message instanceof SubscriptionQuote) {
-      onReceiveSubscriptionQuote((SubscriptionQuote) message);
+    } else if (message instanceof SubscriptionQuoteRequest) {
+      onReceiveSubscriptionQuoteRequest((SubscriptionQuoteRequest) message);
     } else if (message instanceof Quote) {
       onReceiveQuote((Quote) message);
     } else {
@@ -88,11 +101,12 @@ public class Exchange extends BaseActor {
   }
 
   private void onReceiveOrder(Order order) {
-    if (!activeInstruments.getInstruments().contains(order.getSymbol())) {
-      log.error("Order sent for inactive symbol {}", order.getSymbol());
+    val symbol = order.getSymbol();
+    if (!isActiveInstrument(symbol)) {
+      log.error("Order sent for inactive symbol {}", symbol);
     }
 
-    val orderBook = resolveOrderBook(order.getSymbol());
+    val orderBook = resolveOrderBook(symbol);
     orderBook.tell(order, self());
   }
 
@@ -115,8 +129,8 @@ public class Exchange extends BaseActor {
     }
   }
 
-  private void onReceiveSubscriptionQuote(SubscriptionQuote subscriptionQuote) {
-    // TODO: Check to make sure AgentActor is requesting subscription
+  private void onReceiveSubscriptionQuoteRequest(SubscriptionQuoteRequest subscriptionQuote) {
+    // TODO: Check to make sure Agent is requesting subscription
     val subscription = subscribeForQuote(sender(), subscriptionQuote);
     sender().tell(subscription, self());
   }
@@ -133,22 +147,16 @@ public class Exchange extends BaseActor {
   }
 
   private void onReceiveCommand(Command command) {
-    if (command == Command.PRINT_ORDER_BOOK) {
+    val recognized = command == Command.PRINT_ORDER_BOOK || command == Command.PRINT_SUMMARY;
+    if (recognized) {
       for (val orderBook : orderBooks.values()) {
-        orderBook.tell(Command.PRINT_ORDER_BOOK, self());
-      }
-    } else if (command == Command.PRINT_SUMMARY) {
-      for (val orderBook : orderBooks.values()) {
-        orderBook.tell(Command.PRINT_SUMMARY, self());
+        orderBook.tell(command, self());
       }
     }
   }
 
-  private SubscriptionQuote subscribeForQuote(ActorRef agent, SubscriptionQuote message) {
+  private SubscriptionQuoteRequest subscribeForQuote(ActorRef agent, SubscriptionQuoteRequest message) {
     val level = message.getLevel();
-
-    message.setSuccess(false);
-
     if (level.equals(Command.SUBSCRIBE_QUOTES.name())) {
       message.setSuccess(this.quotesSubscribers.add(agent));
     } else if (level.equals(Command.SUBSCRIBE_QUOTES_ORDERS.name())) {
@@ -156,53 +164,34 @@ public class Exchange extends BaseActor {
     } else if (level.equals(Command.SUBSCRIBE_QUOTES_PREMIUM.name())) {
       message.setSuccess(this.premiumSubscribers.add(agent));
     } else {
+      message.setSuccess(false);
       log.error("Subscription request not recognized");
     }
 
     return message;
   }
 
-  /**
-   * On market open, initialize quotes to random numbers.
-   */
-  private void initializeMarketOnOpenQuotes() {
-    // TODO: Can we reused the random field instead?
-    val random = new Random();
-
-    // TODO remove the hard coding.
-    float minBid = 10;
-    float minAsk = 12;
-
-    for (val symbol : activeInstruments.getInstruments()) {
-      float bid = minBid - (random.nextInt(5) * minTickSize);
-      float ask = minAsk + (random.nextInt(5) * minTickSize);
-      val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
-
-      lastValidQuote.put(symbol, quote);
-    }
-  }
-
   private void notifyQuoteSubscribers(Quote quote) {
-    for (val agent : quotesSubscribers) {
-      agent.tell(quote, self());
-    }
+    notifyAgents(quote, quotesSubscribers);
   }
 
   private void notifyQuoteAndOrderSubscribers(Quote quote) {
-    for (val agent : quoteAndOrdersSubscribers) {
-      agent.tell(quote, self());
-    }
+    notifyAgents(quote, quoteAndOrdersSubscribers);
   }
 
   private void notifyPremiumSubscribers(Quote quote) {
-    for (val agent : premiumSubscribers) {
-      agent.tell(quote, self());
-    }
+    notifyAgents(quote, premiumSubscribers);
+  }
+
+  private void notifyAgents(Quote quote, List<ActorRef> agents) {
+    agents.stream().forEach(agent -> agent.tell(quote, self()));
   }
 
   private ActorRef resolveOrderBook(String symbol) {
+    // Create book on demand, as needed
     return orderBooks.computeIfAbsent(symbol, (name) -> {
-      return context().actorOf(Props.create(OrderBook.class, properties, symbol), name);
+      Props props = Props.create(OrderBook.class, properties, symbol);
+      return context().actorOf(props, name);
     });
   }
 

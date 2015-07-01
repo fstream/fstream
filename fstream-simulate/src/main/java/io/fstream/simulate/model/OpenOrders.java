@@ -13,16 +13,11 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 @Slf4j
 @Value
-@Component
-@Scope("prototype")
 public class OpenOrders {
 
   final Multimap<String, Order> orders = HashMultimap.create();

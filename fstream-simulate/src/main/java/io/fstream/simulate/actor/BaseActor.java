@@ -22,12 +22,17 @@ import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorSelection;
 import akka.actor.UntypedActor;
 
+/**
+ * Base class for all simulation actors.
+ * <p>
+ * Contains a number of common fields and convenience methods.
+ */
 @Setter
 @RequiredArgsConstructor
 public abstract class BaseActor extends UntypedActor {
 
   /**
-   * Dependencies.
+   * Configuration.
    */
   @NonNull
   protected final SimulateProperties properties;
@@ -53,6 +58,11 @@ public abstract class BaseActor extends UntypedActor {
   protected <T> void scheduleSelfOnce(T message, FiniteDuration duration) {
     val scheduler = getContext().system().scheduler();
     scheduler.scheduleOnce(duration, getSelf(), message, getContext().dispatcher(), null);
+  }
+
+  protected boolean isActiveInstrument(String symbol) {
+    val instruments = activeInstruments.getInstruments();
+    return instruments != null && instruments.contains(symbol);
   }
 
 }
