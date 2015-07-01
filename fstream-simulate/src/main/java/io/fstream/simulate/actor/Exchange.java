@@ -48,17 +48,17 @@ public class Exchange extends BaseActor {
    */
   private static AtomicInteger currentOrderId = new AtomicInteger(0);
 
-  private Map<String, ActorRef> processors = new HashMap<>();
+  private Map<String, ActorRef> orderBooks = new HashMap<>();
+  private Map<String, Quote> lastValidQuote = new HashMap<>();
+
   private List<ActorRef> premiumSubscribers = new ArrayList<>();
   private List<ActorRef> quotesSubscribers = new ArrayList<>();
   private List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
 
-  private Map<String, Quote> lastValidQuote;
-
   /**
    * Global order ID generator.
    */
-  // TODO: Prevents distributed actors
+  // TODO: Static method prevents distributed actors across JVMs.
   public static int nextOrderId() {
     return currentOrderId.incrementAndGet();
   }
@@ -82,7 +82,7 @@ public class Exchange extends BaseActor {
     } else if (message instanceof QuoteRequest) {
       onReceiveQuoteRequest((QuoteRequest) message);
     } else if (message instanceof ActiveInstruments) {
-      onActiveInstruments();
+      onReceiveActiveInstruments();
     } else if (message instanceof SubscriptionQuote) {
       onReceiveSubscriptionQuote((SubscriptionQuote) message);
     } else if (message instanceof Quote) {
@@ -97,8 +97,8 @@ public class Exchange extends BaseActor {
       log.error("Order sent for inactive symbol {}", order.getSymbol());
     }
 
-    val processor = getProcessor(order.getSymbol());
-    processor.tell(order, self());
+    val orderBook = resolveOrderBook(order.getSymbol());
+    orderBook.tell(order, self());
   }
 
   private void onReceiveQuote(Quote quote) {
@@ -126,7 +126,7 @@ public class Exchange extends BaseActor {
     sender().tell(subscription, self());
   }
 
-  private void onActiveInstruments() {
+  private void onReceiveActiveInstruments() {
     val activeInstruments = new ActiveInstruments(this.activeInstruments.getInstruments());
 
     sender().tell(activeInstruments, self());
@@ -139,12 +139,12 @@ public class Exchange extends BaseActor {
 
   private void onReceiveCommand(Command command) {
     if (command == Command.PRINT_ORDER_BOOK) {
-      for (val processor : processors.entrySet()) {
-        processor.getValue().tell(Command.PRINT_ORDER_BOOK, self());
+      for (val orderBook : orderBooks.values()) {
+        orderBook.tell(Command.PRINT_ORDER_BOOK, self());
       }
     } else if (command == Command.PRINT_SUMMARY) {
-      for (val processor : processors.entrySet()) {
-        processor.getValue().tell(Command.PRINT_SUMMARY, self());
+      for (val orderBook : orderBooks.values()) {
+        orderBook.tell(Command.PRINT_SUMMARY, self());
       }
     }
   }
@@ -171,10 +171,9 @@ public class Exchange extends BaseActor {
    * On market open, initialize quotes to random numbers.
    */
   private void initializeMarketOnOpenQuotes() {
-    this.lastValidQuote = new HashMap<String, Quote>();
-
     // TODO: Can we reused the random field instead?
     val random = new Random();
+
     // TODO remove the hard coding.
     float minBid = 10;
     float minAsk = 12;
@@ -206,16 +205,10 @@ public class Exchange extends BaseActor {
     }
   }
 
-  private ActorRef getProcessor(String instrument) {
-    val maybeProcessor = processors.get(instrument);
-    if (maybeProcessor != null) {
-      return maybeProcessor;
-    }
-
-    val processor = context().actorOf(spring.props(OrderBook.class, instrument, self(), publisher), instrument);
-    processors.put(instrument, processor);
-
-    return processor;
+  private ActorRef resolveOrderBook(String symbol) {
+    return orderBooks.computeIfAbsent(symbol, (name) -> {
+      return context().actorOf(spring.props(OrderBook.class, symbol, self(), publisher), name);
+    });
   }
 
 }

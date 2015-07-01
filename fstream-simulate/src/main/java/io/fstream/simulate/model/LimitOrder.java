@@ -1,15 +1,11 @@
 package io.fstream.simulate.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import lombok.val;
 
 import org.joda.time.DateTime;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   OrderSide side;

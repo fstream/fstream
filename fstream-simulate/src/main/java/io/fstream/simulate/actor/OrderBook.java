@@ -9,6 +9,7 @@ import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Trade;
+import io.fstream.simulate.util.OrderBookFormatter;
 import io.fstream.simulate.util.PrototypeActor;
 
 import java.util.Comparator;
@@ -216,7 +217,8 @@ public class OrderBook extends BaseActor {
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestAsk != prevbestaks || this.bestBid != prevbestbid) {
       val quote =
-          new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(bestAsk,
+          new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(
+              bestAsk,
               OrderSide.ASK), getDepthAtLevel(bestBid, OrderSide.BID));
       if (!isValidQuote(this.bestBid, this.bestAsk)) {
         log.error("Invalid quote {}", quote);
@@ -484,37 +486,7 @@ public class OrderBook extends BaseActor {
   };
 
   public void printBook() {
-    log.info("BOOK = {}", this.getSymbol());
-
-    String text = String.format("BOOK = %s\n", this.getSymbol());
-
-    text += "------ ASKS -------\n";
-    for (val ask : asks.entrySet()) {
-      text += String.format("%s -> ", ask.getKey());
-      for (val firstnode : ask.getValue()) {
-        text += String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
-            firstnode.getAmount());
-      }
-      text += "\n";
-    }
-
-    text += "------ BIDS -------\n";
-    for (val bid : bids.entrySet()) {
-      text += String.format("%s -> ", bid.getKey());
-      for (val firstnode : bid.getValue()) {
-        text += String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
-            firstnode.getAmount());
-      }
-      text = text + "\n";
-    }
-
-    text += String.format("bid depth = %s, ask depth = %s\n", this.bidDepth, this.askDepth);
-    text += String.format("best ask = %s, best bid =%s, spread = %s\n", this.bestAsk, this.bestBid, this.bestAsk
-        - this.bestBid);
-
-    text += "----- END -----\n";
-
-    log.info(text);
+    log.info(OrderBookFormatter.formatOrderBook(this));
   }
 
 }
