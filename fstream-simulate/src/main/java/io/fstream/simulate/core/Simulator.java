@@ -11,7 +11,6 @@ import io.fstream.simulate.actor.agent.InstitutionalAgent;
 import io.fstream.simulate.actor.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
-import io.fstream.simulate.util.SpringExtension;
 
 import java.util.List;
 import java.util.function.IntFunction;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Component;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.PoisonPill;
+import akka.actor.Props;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
@@ -50,8 +50,6 @@ public class Simulator {
   private final ActorSystem actorSystem;
   @NonNull
   private final SimulateProperties properties;
-  @NonNull
-  private final SpringExtension spring;
 
   /**
    * State.
@@ -97,13 +95,13 @@ public class Simulator {
 
   private ActorRef createPublisher() {
     val name = "publisher";
-    val props = spring.props(Publisher.class);
+    val props = Props.create(Publisher.class);
     return actorSystem.actorOf(props, name);
   }
 
   private ActorRef createExchange() {
     val name = "exchange";
-    val props = spring.props(Exchange.class, publisher);
+    val props = Props.create(Exchange.class, properties);
     return actorSystem.actorOf(props, name);
   }
 
@@ -121,7 +119,7 @@ public class Simulator {
 
   private ActorRef createRetailAgent(int i) {
     val name = "retailAgent-" + i;
-    val props = spring.props(RetailAgent.class, name, exchange);
+    val props = Props.create(RetailAgent.class, properties, name);
     return actorSystem.actorOf(props, name);
   }
 
@@ -132,7 +130,7 @@ public class Simulator {
 
   private ActorRef createInstitutionalAgent(int i) {
     val name = "institutionalAgent-" + i;
-    val props = spring.props(InstitutionalAgent.class, name, exchange);
+    val props = Props.create(InstitutionalAgent.class, properties, name);
     return actorSystem.actorOf(props, name);
   }
 
@@ -143,7 +141,7 @@ public class Simulator {
 
   private ActorRef createHftAgent(int i) {
     val name = "hftAgent-" + i;
-    val props = spring.props(HFTAgent.class, name, exchange);
+    val props = Props.create(HFTAgent.class, properties, name);
     return actorSystem.actorOf(props, name);
   }
 

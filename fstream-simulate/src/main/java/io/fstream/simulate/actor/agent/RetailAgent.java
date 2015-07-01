@@ -2,6 +2,7 @@ package io.fstream.simulate.actor.agent;
 
 import static io.fstream.simulate.actor.agent.Agent.AgentType.RETAIL;
 import io.fstream.simulate.actor.Exchange;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.SubscriptionQuote;
@@ -10,30 +11,24 @@ import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
-import io.fstream.simulate.util.PrototypeActor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-
-import akka.actor.ActorRef;
 
 /**
  * Simulates an retail participant. The participants trades in smaller sizes. Other behaviors such as propensity to
  * buy/sell can be determined from configuration file
  */
 @Slf4j
-@PrototypeActor
 public class RetailAgent extends AgentActor {
 
-  public RetailAgent(String name, ActorRef exchange) {
-    super(RETAIL, name, exchange);
+  public RetailAgent(SimulateProperties properties, String name) {
+    super(properties, RETAIL, name);
   }
 
   @Override
   public void preStart() {
-    super.preStart();
-
     scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
   }
 
@@ -42,8 +37,8 @@ public class RetailAgent extends AgentActor {
     val order = createOrder();
     if (order != null) {
       cancelAllOpenOrders(order.getSymbol());
-      exchange.tell(order, self());
-      openOrderBook.addOpenOrder(order);
+      exchange().tell(order, self());
+      openOrders.addOpenOrder(order);
     }
   }
 
@@ -72,7 +67,7 @@ public class RetailAgent extends AgentActor {
     if (activeInstruments.getInstruments() == null) {
       // send a message to exchange and then return null and wait for next
       // decision iteration
-      exchange.tell(activeInstruments, self());
+      exchange().tell(activeInstruments, self());
       return null;
     }
     val symbol = decideSymbol();

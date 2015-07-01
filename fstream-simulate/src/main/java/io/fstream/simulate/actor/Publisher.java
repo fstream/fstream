@@ -10,13 +10,11 @@
 package io.fstream.simulate.actor;
 
 import static io.fstream.simulate.routes.ToqRoutes.TOQ_ENDPOINT;
-import io.fstream.simulate.util.SingletonActor;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import akka.camel.javaapi.UntypedProducerActor;
 
-@SingletonActor
 @NoArgsConstructor
 @AllArgsConstructor
 public class Publisher extends UntypedProducerActor {

@@ -11,32 +11,39 @@ package io.fstream.simulate.actor;
 
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.util.SpringExtension;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import scala.concurrent.duration.FiniteDuration;
+import akka.actor.ActorSelection;
 import akka.actor.UntypedActor;
 
 @Setter
+@RequiredArgsConstructor
 public abstract class BaseActor extends UntypedActor {
 
   /**
    * Dependencies.
    */
-  @Autowired
-  protected SimulateProperties properties;
-  @Autowired
-  protected SpringExtension spring;
+  @NonNull
+  protected final SimulateProperties properties;
 
   /**
    * State.
    */
   protected ActiveInstruments activeInstruments = new ActiveInstruments();
+
+  protected ActorSelection exchange() {
+    return context().actorSelection("/user/exchange");
+  }
+
+  protected ActorSelection publisher() {
+    return context().actorSelection("/user/publisher");
+  }
 
   protected static DateTime getSimulationTime() {
     return DateTime.now();

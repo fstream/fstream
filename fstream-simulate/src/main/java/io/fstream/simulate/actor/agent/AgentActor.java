@@ -2,6 +2,7 @@ package io.fstream.simulate.actor.agent;
 
 import static com.google.common.base.Preconditions.checkState;
 import io.fstream.simulate.actor.BaseActor;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.config.SimulateProperties.AgentProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
@@ -19,31 +20,32 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import akka.actor.ActorRef;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 
 @Slf4j
 @Getter
-@RequiredArgsConstructor
 public abstract class AgentActor extends BaseActor implements Agent {
 
   /**
    * Configuration.
    */
+  @NonNull
   final AgentType type;
+  @NonNull
   final String name;
 
-  int maxSleep; // Agent sleep time
+  int maxSleep;
   int minSleep;
+
   int maxTradeSize;
   float minTickSize;
+
   Timeout msgResponseTimeout;
 
   float probMarket;
@@ -52,40 +54,43 @@ public abstract class AgentActor extends BaseActor implements Agent {
 
   String quoteSubscriptionLevel;
   boolean quoteSubscriptionSuccess;
-  String broker;
 
-  /**
-   * Dependencies.
-   */
-  final ActorRef exchange;
+  String broker;
 
   /**
    * State.
    */
   final Random random = new Random();
   final Map<String, Quote> bbboQuotes = new HashMap<>();
-  final OpenOrders openOrderBook = new OpenOrders();
+  final OpenOrders openOrders = new OpenOrders();
+
+  public AgentActor(SimulateProperties properties, AgentType type, String name) {
+    super(properties);
+
+    this.type = type;
+    this.name = name;
+
+    // Set agent specific properties
+    val agentProperties = resolveAgentProperties();
+    this.maxTradeSize = agentProperties.getMaxTradeSize();
+    this.maxSleep = agentProperties.getMaxSleep();
+    this.minSleep = agentProperties.getMinSleep();
+
+    this.probMarket = agentProperties.getProbMarket();
+    this.probBuy = agentProperties.getProbBuy();
+    this.probBestPrice = agentProperties.getProbBestPrice();
+
+    this.quoteSubscriptionLevel = agentProperties.getQuoteSubscriptionLevel();
+
+    this.minTickSize = properties.getMinTickSize();
+    this.msgResponseTimeout = generateMsgResponseTimeout();
+    this.broker = generateBroker();
+  }
 
   @Override
   public void preStart() {
-    val agentProperties = resolveAgentProperties();
-
-    maxTradeSize = agentProperties.getMaxTradeSize();
-    maxSleep = agentProperties.getMaxSleep();
-    minSleep = agentProperties.getMinSleep();
-
-    probMarket = agentProperties.getProbMarket();
-    probBuy = agentProperties.getProbBuy();
-    probBestPrice = agentProperties.getProbBestPrice();
-
-    quoteSubscriptionLevel = agentProperties.getQuoteSubscriptionLevel();
-
-    minTickSize = properties.getMinTickSize();
-    msgResponseTimeout = generateMsgResponseTimeout();
-    broker = generateBroker();
-
     // Register to receive quotes
-    exchange.tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
+    exchange().tell(new SubscriptionQuote(this.getQuoteSubscriptionLevel()), self());
   }
 
   /**
@@ -126,7 +131,7 @@ public abstract class AgentActor extends BaseActor implements Agent {
   protected Quote getLastValidQuote(String symbol) {
     Quote quote = this.bbboQuotes.get(symbol);
     if (quote == null) {
-      val futureState = Patterns.ask(exchange, new QuoteRequest(symbol), msgResponseTimeout);
+      val futureState = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
       try {
         quote = (Quote) (Await.result(futureState, msgResponseTimeout.duration()));
       } catch (Exception e) {
@@ -141,13 +146,15 @@ public abstract class AgentActor extends BaseActor implements Agent {
    * Cancels all open orders for the given symbol
    */
   protected void cancelAllOpenOrders(String symbol) {
-    val openOrders = openOrderBook.getOrders().get(symbol);
-    for (val openOrder : openOrders) {
-      openOrder.setType(OrderType.CANCEL);
-      exchange.tell(openOrder, self());
+    val symbolOrders = openOrders.getOrders().get(symbol);
+    for (val symbolOrder : symbolOrders) {
+      // FIXME: Sending unsafe mutation of message
+      symbolOrder.setType(OrderType.CANCEL);
+
+      exchange().tell(symbolOrder, self());
     }
 
-    openOrderBook.getOrders().removeAll(symbol);
+    openOrders.getOrders().removeAll(symbol);
   }
 
   protected String generateBroker() {
@@ -224,7 +231,6 @@ public abstract class AgentActor extends BaseActor implements Agent {
       checkState(false, "Unexpected agent type '%s'", type);
       return null;
     }
-
   }
 
 }

@@ -2,6 +2,7 @@ package io.fstream.simulate.actor.agent;
 
 import static io.fstream.simulate.actor.agent.Agent.AgentType.INSTITUTIONAL;
 import io.fstream.simulate.actor.Exchange;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.SubscriptionQuote;
@@ -10,27 +11,22 @@ import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
-import io.fstream.simulate.util.PrototypeActor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import akka.actor.ActorRef;
 
 /**
  * Simulates an institutional participant. The participants trades in larger sizes. Other behaviors such as propensity
  * to buy/sell can be determined from configuration file
  */
 @Slf4j
-@PrototypeActor
 public class InstitutionalAgent extends AgentActor {
 
-  public InstitutionalAgent(String name, ActorRef exchange) {
-    super(INSTITUTIONAL, name, exchange);
+  public InstitutionalAgent(SimulateProperties properties, String name) {
+    super(properties, INSTITUTIONAL, name);
   }
 
   @Override
   public void preStart() {
-    super.preStart();
-
     scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
   }
 
@@ -40,8 +36,8 @@ public class InstitutionalAgent extends AgentActor {
     if (order != null) {
       // Cancel all open orders
       cancelAllOpenOrders(order.getSymbol());
-      exchange.tell(order, self());
-      openOrderBook.addOpenOrder(order);
+      exchange().tell(order, self());
+      openOrders.addOpenOrder(order);
     }
   }
 
@@ -69,7 +65,7 @@ public class InstitutionalAgent extends AgentActor {
 
     if (activeInstruments.getInstruments() == null) {
       // Send a message to exchange and then return null and wait for next decision iteration
-      exchange.tell(activeInstruments, self());
+      exchange().tell(activeInstruments, self());
       return null;
     }
 

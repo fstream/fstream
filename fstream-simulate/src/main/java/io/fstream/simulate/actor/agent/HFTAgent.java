@@ -2,24 +2,22 @@ package io.fstream.simulate.actor.agent;
 
 import static io.fstream.simulate.actor.agent.Agent.AgentType.HFT;
 import io.fstream.simulate.actor.Exchange;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order.OrderSide;
 import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
-import io.fstream.simulate.util.PrototypeActor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import akka.actor.ActorRef;
 
 @Slf4j
-@PrototypeActor
 public class HFTAgent extends AgentActor {
 
-  public HFTAgent(String name, ActorRef exchange) {
-    super(HFT, name, exchange);
+  public HFTAgent(SimulateProperties properties, String name) {
+    super(properties, HFT, name);
   }
 
   @Override
@@ -54,8 +52,8 @@ public class HFTAgent extends AgentActor {
     cancelAllOpenOrders(order.getSymbol());
 
     // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
-    exchange.tell(order, self());
-    openOrderBook.addOpenOrder(order);
+    exchange().tell(order, self());
+    openOrders.addOpenOrder(order);
   }
 
   private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {

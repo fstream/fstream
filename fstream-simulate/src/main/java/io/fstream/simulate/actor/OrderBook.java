@@ -2,6 +2,7 @@ package io.fstream.simulate.actor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.reverseOrder;
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.model.LimitOrder;
 import io.fstream.simulate.model.Order;
@@ -10,7 +11,6 @@ import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Trade;
 import io.fstream.simulate.util.OrderBookFormatter;
-import io.fstream.simulate.util.PrototypeActor;
 
 import java.util.Comparator;
 import java.util.NavigableMap;
@@ -20,13 +20,10 @@ import java.util.TreeSet;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.Seconds;
-
-import akka.actor.ActorRef;
 
 /**
  * A price,time ordered implementation of a central limit order book. The principle data structure is a List of
@@ -35,8 +32,6 @@ import akka.actor.ActorRef;
  */
 @Slf4j
 @Getter
-@RequiredArgsConstructor
-@PrototypeActor
 public class OrderBook extends BaseActor {
 
   /**
@@ -44,14 +39,6 @@ public class OrderBook extends BaseActor {
    */
   @NonNull
   final String symbol;
-
-  /**
-   * Dependencies.
-   */
-  @NonNull
-  final ActorRef exchange;
-  @NonNull
-  final ActorRef publisher;
 
   /**
    * State.
@@ -71,6 +58,11 @@ public class OrderBook extends BaseActor {
   int orderCount = 0;
   int tradeCount = 0;
 
+  public OrderBook(SimulateProperties properties, String symbol) {
+    super(properties);
+    this.symbol = symbol;
+  }
+
   @Override
   public void onReceive(Object message) throws Exception {
     log.debug("Exchange message received {}", message);
@@ -88,17 +80,19 @@ public class OrderBook extends BaseActor {
 
     orderCount += 1;
     order.setProcessedTime(getSimulationTime());
-    if (order.getType() == OrderType.MO) { // process market order
+    if (order.getType() == OrderType.MO) {
+      // Process market order
       log.debug("Processing market order: {}", order);
-      val limitorder = (LimitOrder) order;
-
-      if (order.getSide() == OrderSide.ASK) {
-        limitorder.setPrice(Float.MIN_VALUE);
+      val limitOrder = (LimitOrder) order;
+      if (limitOrder.getSide() == OrderSide.ASK) {
+        limitOrder.setPrice(Float.MIN_VALUE);
       } else {
-        limitorder.setPrice(Float.MAX_VALUE);
+        limitOrder.setPrice(Float.MAX_VALUE);
       }
-      this.processMarketOrder(limitorder);
-    } else { // process limit order
+
+      this.processMarketOrder(limitOrder);
+    } else {
+      // Process limit order
       log.debug("Processing limitorder: {}", order);
       this.processLimitOrder((LimitOrder) order);
     }
@@ -107,10 +101,11 @@ public class OrderBook extends BaseActor {
   private void onReceiveCommand(Command command) {
     if (command == Command.PRINT_ORDER_BOOK) {
       this.printBook();
+
+      // TODO: What does true do here?
       sender().tell(true, self());
     } else if (command == Command.PRINT_SUMMARY) {
-      log.info(
-          "{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
+      log.info("{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
           symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, bestAsk - bestBid);
     }
   }
@@ -225,8 +220,8 @@ public class OrderBook extends BaseActor {
         return;
       }
 
-      exchange.tell(quote, self());
-      publisher.tell(quote, self());
+      exchange().tell(quote, self());
+      publisher().tell(quote, self());
     }
   }
 
@@ -297,8 +292,8 @@ public class OrderBook extends BaseActor {
   private void registerTrade(Order active, Order passive, int executedsize) {
     tradeCount += 1;
     val trade = new Trade(getSimulationTime(), active, passive, executedsize);
-    exchange.tell(trade, self());
-    publisher.tell(trade, self());
+    exchange().tell(trade, self());
+    publisher().tell(trade, self());
     if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
       log.debug("Order took more than 5 seconds to be processed {}", active);
     }
@@ -401,7 +396,7 @@ public class OrderBook extends BaseActor {
     }
 
     // publish to tape
-    publisher.tell(order, self());
+    publisher().tell(order, self());
 
   }
 
@@ -419,6 +414,7 @@ public class OrderBook extends BaseActor {
         return true;
       }
     }
+
     return false;
   }
 
@@ -439,7 +435,7 @@ public class OrderBook extends BaseActor {
         this.bidDepth = removed ? this.bidDepth - order.getAmount() : this.bidDepth;
       }
 
-      publisher.tell(order, self());
+      publisher().tell(order, self());
     }
 
     if (log.isDebugEnabled()) {
@@ -452,13 +448,11 @@ public class OrderBook extends BaseActor {
   }
 
   private NavigableMap<Float, NavigableSet<LimitOrder>> getBook(LimitOrder order) {
-    NavigableMap<Float, NavigableSet<LimitOrder>> book;
     if (order.getSide() == OrderSide.ASK) {
-      book = this.bids;
+      return this.bids;
     } else {
-      book = this.asks;
+      return this.asks;
     }
-    return book;
   }
 
   /**

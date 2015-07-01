@@ -7,34 +7,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.model.LimitOrder;
-import io.fstream.simulate.util.SpringExtension;
 import lombok.val;
 
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.TestActorRef;
 
-@RunWith(MockitoJUnitRunner.class)
 public class OrderBookTest {
 
   /**
    * Class under test.
    */
   OrderBook orderBook;
-
-  /**
-   * Collaborators.
-   */
-  @Mock
-  SpringExtension spring;
 
   /**
    * Dependencies.
@@ -52,22 +41,20 @@ public class OrderBookTest {
   public void setUp() throws Exception {
     this.actorSystem = ActorSystem.create("fstream-simulate-test");
 
+    // Create shared configuration
+    val properties = new SimulateProperties();
+
+    // Create the publisher
     val publisheProps = Props.create(Publisher.class, "log:info");
-    val publisherRef = TestActorRef.<Publisher> create(actorSystem, publisheProps, "testPublisher");
+    TestActorRef.<Publisher> create(actorSystem, publisheProps, "publisher");
 
     // Create the exchange
-    val exchangeProps = Props.create(Exchange.class, () -> {
-      Exchange exchange = new Exchange(publisherRef);
-      exchange.setSpring(spring);
-      exchange.setProperties(new SimulateProperties());
-      return exchange;
-    });
-
-    val exchangeRef = TestActorRef.<Exchange> create(actorSystem, exchangeProps, "testExchange");
+    val exchangeProps = Props.create(Exchange.class, properties);
+    TestActorRef.<Exchange> create(actorSystem, exchangeProps, "exchange");
 
     // Create the order book
-    val orderBookProps = Props.create(OrderBook.class, symbol, exchangeRef, publisherRef);
-    val orderBookRef = TestActorRef.<OrderBook> create(actorSystem, orderBookProps, "testOrderBook");
+    val orderBookProps = Props.create(OrderBook.class, properties, symbol);
+    val orderBookRef = TestActorRef.<OrderBook> create(actorSystem, orderBookProps, symbol);
     this.orderBook = orderBookRef.underlyingActor();
   }
 

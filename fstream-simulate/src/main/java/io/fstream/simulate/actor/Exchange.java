@@ -1,5 +1,6 @@
 package io.fstream.simulate.actor;
 
+import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.QuoteRequest;
@@ -7,7 +8,6 @@ import io.fstream.simulate.message.SubscriptionQuote;
 import io.fstream.simulate.model.DelayedQuote;
 import io.fstream.simulate.model.Order;
 import io.fstream.simulate.model.Quote;
-import io.fstream.simulate.util.SingletonActor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,25 +17,16 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorRef;
+import akka.actor.Props;
 
 @Slf4j
 @Setter
-@SingletonActor
-@RequiredArgsConstructor
 public class Exchange extends BaseActor {
-
-  /**
-   * Dependencies.
-   */
-  @NonNull
-  private final ActorRef publisher;
 
   /**
    * Configuration.
@@ -61,6 +52,10 @@ public class Exchange extends BaseActor {
   // TODO: Static method prevents distributed actors across JVMs.
   public static int nextOrderId() {
     return currentOrderId.incrementAndGet();
+  }
+
+  public Exchange(SimulateProperties properties) {
+    super(properties);
   }
 
   @Override
@@ -207,7 +202,7 @@ public class Exchange extends BaseActor {
 
   private ActorRef resolveOrderBook(String symbol) {
     return orderBooks.computeIfAbsent(symbol, (name) -> {
-      return context().actorOf(spring.props(OrderBook.class, symbol, self(), publisher), name);
+      return context().actorOf(Props.create(OrderBook.class, properties, symbol), name);
     });
   }
 
