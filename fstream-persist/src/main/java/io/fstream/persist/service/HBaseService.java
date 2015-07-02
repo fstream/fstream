@@ -10,7 +10,7 @@
 package io.fstream.persist.service;
 
 import io.fstream.core.model.event.Event;
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -88,7 +88,7 @@ public class HBaseService implements PersistenceService {
     val table = connection.getTable(TABLE_NAME);
     try {
       // TODO: Support other types!
-      val tickEvent = (TickEvent) event;
+      val tickEvent = (QuoteEvent) event;
       val key = createKey(tickEvent);
 
       val row = new Put(Bytes.toBytes(key));
@@ -133,7 +133,7 @@ public class HBaseService implements PersistenceService {
     log.info("Table '{}' exists and is enabled", TABLE_NAME.getNameAsString());
   }
 
-  private String createKey(TickEvent rate) {
+  private String createKey(QuoteEvent rate) {
     val hourFloor = rate.getDateTime().hourOfDay().roundFloorCopy();
 
     return hourFloor.getMillis() + rate.getSymbol();

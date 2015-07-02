@@ -9,7 +9,7 @@
 
 package io.fstream.core.model.event;
 
-import static io.fstream.core.model.event.EventType.TICK;
+import static io.fstream.core.model.event.EventType.QUOTE;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,14 +20,16 @@ import org.joda.time.DateTime;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TickEvent extends AbstractEvent {
+public class QuoteEvent extends AbstractEvent {
 
   private String symbol;
   private float ask;
   private float bid;
   private float mid;
+  private int askAmount;
+  private int bidAmount;
 
-  public TickEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid) {
+  public QuoteEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid) {
     super(dateTime);
     this.symbol = symbol;
     this.ask = ask;
@@ -35,9 +37,20 @@ public class TickEvent extends AbstractEvent {
     this.mid = (ask + bid) / 2.0f;
   }
 
+  public QuoteEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid, int askAmount,
+      int bidAmount) {
+    super(dateTime);
+    this.symbol = symbol;
+    this.ask = ask;
+    this.bid = bid;
+    this.mid = (ask + bid) / 2.0f;
+    this.askAmount = askAmount;
+    this.bidAmount = bidAmount;
+  }
+
   @Override
   public EventType getType() {
-    return TICK;
+    return QUOTE;
   }
 
 }

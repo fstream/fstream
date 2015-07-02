@@ -11,7 +11,7 @@ package io.fstream.persist;
 
 import static com.google.common.base.Strings.repeat;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,7 +89,7 @@ public class JsonParquetTest {
   }
 
   private Object createValue(float fraction) {
-    return new TickEvent(DateTime.now(), "RB", fraction * 40, fraction * 30);
+    return new QuoteEvent(DateTime.now(), "RB", fraction * 40, fraction * 30);
   }
 
   private static ObjectMapper createMapper() {

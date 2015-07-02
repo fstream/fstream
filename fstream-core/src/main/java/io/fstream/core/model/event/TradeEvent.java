@@ -1,12 +1,17 @@
-package io.fstream.simulate.model;
+package io.fstream.core.model.event;
 
-import io.fstream.simulate.model.Order.OrderSide;
+import static io.fstream.core.model.event.EventType.TRADE;
+import io.fstream.core.model.event.Order.OrderSide;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import org.joda.time.DateTime;
 
 @Data
-public class Trade {
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class TradeEvent extends AbstractEvent {
 
   public enum TradeSide {
     ACTIVE, PASSIVE
@@ -17,15 +22,14 @@ public class Trade {
   private float price;
   private boolean activeBuy;
   private String symbol;
-  private DateTime time;
   private DateTime orderTime;
   private int amount;
 
-  public Trade(DateTime tradeTime, Order active, Order passive, int executedSize) {
+  public TradeEvent(DateTime tradeTime, Order active, Order passive, int executedSize) {
+    super(tradeTime);
     this.setPrice(passive.getPrice());
     this.setSymbol(active.getSymbol());
-    this.setTime(tradeTime);
-    this.setOrderTime(active.getSentTime());
+    this.setOrderTime(active.getDateTime());
     this.setAmount(executedSize);
 
     // Use active orders timestamp as trade time as a simplifying assumption
@@ -40,6 +44,11 @@ public class Trade {
       this.activeBuy = true;
       this.buyUser = active.getUserId();
     }
+  }
+
+  @Override
+  public EventType getType() {
+    return TRADE;
   }
 
 }

@@ -13,7 +13,7 @@ import io.fstream.core.model.definition.Definition;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 import io.fstream.core.util.Codec;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
   public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
     log.info("Preparing...");
     val configuration = new Configuration();
-    configuration.addEventType("Rate", TickEvent.class.getName());
+    configuration.addEventType("Rate", QuoteEvent.class.getName());
     configuration.addEventType("Alert", AlertEvent.class.getName());
     configuration.addEventType("Metric", MetricEvent.class.getName());
 

@@ -12,7 +12,7 @@ package io.fstream.compute.esper;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.readLines;
 import static joptsimple.internal.Strings.repeat;
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 
 import java.io.File;
 import java.util.List;
@@ -64,7 +64,7 @@ public abstract class AbstractEsperStatementTest {
   public void setUp() {
     // TODO: Rename "Rate" to "TickEvent"
     val configuration = new Configuration();
-    configuration.addEventType("Rate", TickEvent.class.getName());
+    configuration.addEventType("Rate", QuoteEvent.class.getName());
 
     // Setup engine
     this.provider = EPServiceProviderManager.getProvider(this.getClass().getName(), configuration);
@@ -89,7 +89,7 @@ public abstract class AbstractEsperStatementTest {
     return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), readTickEvents(tickEventFile));
   }
 
-  protected List<?> execute(String statement, TickEvent... events) {
+  protected List<?> execute(String statement, QuoteEvent... events) {
     return execute(statement, events);
   }
 
@@ -128,9 +128,9 @@ public abstract class AbstractEsperStatementTest {
     log.info(repeat('-', 80));
 
     for (val event : events) {
-      if (event instanceof TickEvent) {
+      if (event instanceof QuoteEvent) {
         // Advance time
-        val tickEvent = (TickEvent) event;
+        val tickEvent = (QuoteEvent) event;
         val timeEvent = timeEvent(tickEvent.getDateTime().getMillis());
         log.info("Sending: {}", timeEvent);
         runtime.sendEvent(timeEvent);
@@ -180,17 +180,17 @@ public abstract class AbstractEsperStatementTest {
     return new File("src/test/resources/tick-events", fileName);
   }
 
-  protected static TickEvent tickEvent(long time, String symbol, double ask, double bid) {
-    return new TickEvent(new DateTime(time), symbol, (float) ask, (float) bid);
+  protected static QuoteEvent tickEvent(long time, String symbol, double ask, double bid) {
+    return new QuoteEvent(new DateTime(time), symbol, (float) ask, (float) bid);
   }
 
   @SneakyThrows
-  private static Iterable<TickEvent> readTickEvents(File tickEventFile) {
+  private static Iterable<QuoteEvent> readTickEvents(File tickEventFile) {
     val lines = readLines(tickEventFile.toURI().toURL(), UTF_8);
 
-    val builder = ImmutableList.<TickEvent> builder();
+    val builder = ImmutableList.<QuoteEvent> builder();
     for (val line : lines) {
-      val tickEvent = MAPPER.readValue(line, TickEvent.class);
+      val tickEvent = MAPPER.readValue(line, QuoteEvent.class);
       builder.add(tickEvent);
     }
 

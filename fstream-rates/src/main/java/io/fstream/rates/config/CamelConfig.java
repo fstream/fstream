@@ -9,7 +9,7 @@
 
 package io.fstream.rates.config;
 
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 import io.fstream.rates.util.TickEventTypeConverter;
 
 import org.apache.camel.CamelContext;
@@ -33,7 +33,7 @@ public class CamelConfig {
       public void beforeApplicationStart(CamelContext context) {
         // Define mapping from FIX to fStream objects
         context.getTypeConverterRegistry().addTypeConverter(
-            TickEvent.class, MarketDataSnapshotFullRefresh.class, tickEventTypeConverter());
+            QuoteEvent.class, MarketDataSnapshotFullRefresh.class, tickEventTypeConverter());
       }
 
     };

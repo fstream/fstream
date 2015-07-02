@@ -9,7 +9,7 @@
 
 package io.fstream.rates.util;
 
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -42,8 +42,8 @@ public class TickEventTypeConverter extends TypeConverterSupport {
   }
 
   @SneakyThrows
-  private TickEvent convertTo(MarketDataSnapshotFullRefresh message) {
-    val event = new TickEvent();
+  private QuoteEvent convertTo(MarketDataSnapshotFullRefresh message) {
+    val event = new QuoteEvent();
     event.setSymbol(message.getSymbol().getValue());
     event.setDateTime(new DateTime(message.getHeader().getUtcTimeStamp(SendingTime.FIELD)));
 

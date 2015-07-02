@@ -1,9 +1,9 @@
-package io.fstream.simulate.model;
+package io.fstream.core.model.event;
 
 import org.joda.time.DateTime;
 
 // TODO: Bring back MarketOrder. LimitOrder (has price) extend MarketOrder?
-public interface Order {
+public interface Order extends Event {
 
   enum OrderSide {
     BID,
@@ -17,11 +17,9 @@ public interface Order {
     CANCEL // Limit Order - Cancel
   }
 
-  OrderType getType();
+  OrderType getOrderType();
 
   OrderSide getSide();
-
-  DateTime getSentTime();
 
   int getOid();
 
@@ -37,6 +35,6 @@ public interface Order {
 
   void setProcessedTime(DateTime datetime);
 
-  void setType(OrderType type);
+  void setOrderType(OrderType type);
 
 }

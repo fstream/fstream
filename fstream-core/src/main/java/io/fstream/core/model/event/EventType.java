@@ -17,6 +17,8 @@ public enum EventType {
   ALERT,
   TICK,
   TRADE,
+  QUOTE,
+  ORDER,
   METRIC;
 
 }

@@ -1,16 +1,17 @@
-package io.fstream.simulate.model;
+package io.fstream.core.model.event;
 
+import static io.fstream.core.model.event.EventType.ORDER;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.val;
 
 import org.joda.time.DateTime;
 
 @Data
-public class LimitOrder implements Order, Comparable<LimitOrder> {
+public class LimitOrder extends AbstractEvent implements Order, Comparable<LimitOrder> {
 
   private OrderSide side;
-  private OrderType type;
-  private DateTime time;
+  private OrderType orderType;
   private int oid;
   private String brokerId;
   private String symbol;
@@ -20,11 +21,14 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   private DateTime processedTime;
 
-  public LimitOrder(OrderSide side, OrderType type, DateTime time, int oid, String brokerId, String symbol, int amount,
-      float price, String userId) {
+  public LimitOrder(@NonNull OrderSide side, @NonNull OrderType type, @NonNull DateTime time, int oid,
+      @NonNull String brokerId,
+      @NonNull String symbol,
+      int amount,
+      float price, @NonNull String userId) {
+    super(time);
     this.side = side;
-    this.type = type;
-    this.time = time;
+    this.orderType = type;
     this.oid = oid;
     this.brokerId = brokerId;
     this.symbol = symbol;
@@ -34,15 +38,10 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
   }
 
   @Override
-  public DateTime getSentTime() {
-    return time;
-  }
-
-  @Override
   public boolean equals(Object obj) {
     val order = (LimitOrder) obj;
     if (order.getBrokerId() == this.brokerId && order.getOid() == this.oid
-        && order.getSentTime().equals(this.getSentTime())) {
+        && order.getDateTime().equals(this.getDateTime())) {
       return true;
     }
     return false;
@@ -50,7 +49,7 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
 
   @Override
   public int hashCode() {
-    return this.getBrokerId().hashCode() + this.getOid() + this.getSentTime().hashCode();
+    return this.getBrokerId().hashCode() + this.getOid() + this.getDateTime().hashCode();
   }
 
   @Override
@@ -60,6 +59,37 @@ public class LimitOrder implements Order, Comparable<LimitOrder> {
     }
 
     return 0;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.fstream.core.model.event.Event#getType()
+   */
+  @Override
+  public EventType getType() {
+    return ORDER;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.fstream.core.model.event.Order#getOrderType()
+   */
+  @Override
+  public OrderType getOrderType() {
+    return orderType;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.fstream.core.model.event.Order#setType(io.fstream.core.model.event.Order.OrderType)
+   */
+  @Override
+  public void setOrderType(OrderType type) {
+    this.orderType = type;
+
   }
 
 }
