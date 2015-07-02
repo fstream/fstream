@@ -1,15 +1,15 @@
 package io.fstream.simulate.actor.agent;
 
+import io.fstream.core.model.event.LimitOrder;
+import io.fstream.core.model.event.Order;
+import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Order.OrderSide;
+import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.SubscriptionQuoteRequest;
-import io.fstream.simulate.model.LimitOrder;
-import io.fstream.simulate.model.Order;
-import io.fstream.simulate.model.Order.OrderSide;
-import io.fstream.simulate.model.Order.OrderType;
-import io.fstream.simulate.model.Quote;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,8 +39,8 @@ public abstract class ActiveAgent extends Agent {
       onReceiveActiveInstruments((ActiveInstruments) message);
     } else if (message instanceof SubscriptionQuoteRequest) {
       onReceiveSubscriptionQuote((SubscriptionQuoteRequest) message);
-    } else if (message instanceof Quote) {
-      onReceiveQuote((Quote) message);
+    } else if (message instanceof QuoteEvent) {
+      onReceiveQuote((QuoteEvent) message);
     } else {
       unhandled(message);
     }
@@ -90,11 +90,11 @@ public abstract class ActiveAgent extends Agent {
       if (side == OrderSide.ASK) {
         // TODO remove hard coding.
         // max ensures price stays in bounds.
-        val bestAsk = quote.getAskPrice();
+        val bestAsk = quote.getAsk();
         price = decidePrice(bestAsk, Math.min(bestAsk + (minTickSize * 5), bestAsk), bestAsk, getProbBestPrice());
       } else {
         // min ensures price doesn't go below some lower bound
-        val bestBid = quote.getBidPrice();
+        val bestBid = quote.getBid();
         price = decidePrice(Math.max(bestBid - (minTickSize * 5), bestBid), bestBid, bestBid, getProbBestPrice());
       }
       if (price < 0) {

@@ -9,7 +9,7 @@
 
 package io.fstream.simulate.util;
 
-import io.fstream.simulate.model.LimitOrder;
+import io.fstream.core.model.event.LimitOrder;
 
 import java.util.Comparator;
 
@@ -27,9 +27,9 @@ public final class LimitOrderTimeComparator implements Comparator<LimitOrder> {
     if (order1.equals(order2)) {
       return 0;
     }
-    if (order1.getSentTime().getMillis() < order2.getSentTime().getMillis()) {
+    if (order1.getDateTime().getMillis() < order2.getDateTime().getMillis()) {
       return -1;
-    } else if (order1.getSentTime().getMillis() > order2.getSentTime().getMillis()) {
+    } else if (order1.getDateTime().getMillis() > order2.getDateTime().getMillis()) {
       return 1;
     } else {
       // TODO: This is a hack so orders at same time are not ignored. need a better data structure for orders

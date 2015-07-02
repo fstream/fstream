@@ -10,7 +10,7 @@
 package io.fstream.simulate.util;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import io.fstream.core.model.event.TickEvent;
+import io.fstream.core.model.event.QuoteEvent;
 
 import java.util.Random;
 
@@ -47,7 +47,7 @@ public class RandomTickEventGenerator implements Processor {
 
     val ask = mid + spread / 2;
     val bid = mid - spread / 2;
-    val event = new TickEvent(new DateTime(), symbol, ask, bid);
+    val event = new QuoteEvent(new DateTime(), symbol, ask, bid);
 
     // Random timing
     val delay = generateDelay(0, 2000);

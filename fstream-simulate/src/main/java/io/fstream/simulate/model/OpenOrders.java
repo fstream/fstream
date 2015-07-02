@@ -9,6 +9,7 @@
 
 package io.fstream.simulate.model;
 
+import io.fstream.core.model.event.Order;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;

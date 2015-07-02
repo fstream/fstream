@@ -1,13 +1,13 @@
 package io.fstream.simulate.actor.agent;
 
 import static io.fstream.simulate.actor.agent.AgentType.HFT;
+import io.fstream.core.model.event.LimitOrder;
+import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Order.OrderSide;
+import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
-import io.fstream.simulate.model.LimitOrder;
-import io.fstream.simulate.model.Order.OrderSide;
-import io.fstream.simulate.model.Order.OrderType;
-import io.fstream.simulate.model.Quote;
 import lombok.Value;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +24,15 @@ public class HFTAgent extends Agent {
 
   @Override
   public void onReceive(Object message) throws Exception {
-    if (message instanceof Quote) {
-      onReceiveQuote((Quote) message);
+    if (message instanceof QuoteEvent) {
+      onReceiveQuote((QuoteEvent) message);
     } else if (message instanceof ActiveInstruments) {
       onReceiveActiveInstruments((ActiveInstruments) message);
     }
   }
 
   @Override
-  protected void onReceiveQuote(Quote quote) {
+  protected void onReceiveQuote(QuoteEvent quote) {
     super.onReceiveQuote(quote);
 
     val imbalance = getImbalance(quote);
@@ -48,13 +48,13 @@ public class HFTAgent extends Agent {
     openOrders.addOpenOrder(order);
   }
 
-  private boolean isNormal(Quote quote, Imbalance imbalance) {
-    val spread = quote.getAskPrice() - quote.getBidPrice();
+  private boolean isNormal(QuoteEvent quote, Imbalance imbalance) {
+    val spread = quote.getAsk() - quote.getBid();
 
     return imbalance.getRatio() < 2 && spread > minTickSize;
   }
 
-  private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {
+  private LimitOrder createLiquidityNormal(QuoteEvent quote, Imbalance imbalance) {
     // No stress period, so provide liquidity at better price
     val bestAsk = generateBestAsk(quote);
     val bestBid = generateBestBid(quote);
@@ -80,20 +80,20 @@ public class HFTAgent extends Agent {
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
-  private Imbalance getImbalance(Quote quote) {
+  private Imbalance getImbalance(QuoteEvent quote) {
     int imbalanceAmount;
     OrderSide imbalanceSide;
     float imbalanceRatio;
 
-    if (quote.getAskDepth() > quote.getBidDepth()) {
-      imbalanceAmount = quote.getAskDepth() - quote.getBidDepth();
+    if (quote.getAskAmount() > quote.getBidAmount()) {
+      imbalanceAmount = quote.getAskAmount() - quote.getBidAmount();
       imbalanceSide = OrderSide.BID;
-      imbalanceRatio = quote.getBidDepth() != 0 ? quote.getAskDepth() / quote.getBidDepth() : 0;
+      imbalanceRatio = quote.getBidAmount() != 0 ? quote.getAskAmount() / quote.getBidAmount() : 0;
     } else {
       // TODO: If both sides are 0, then this will bias creation of ASK liquidity. Not a big deal now, but fix later.
-      imbalanceAmount = quote.getBidDepth() - quote.getAskDepth();
+      imbalanceAmount = quote.getBidAmount() - quote.getAskAmount();
       imbalanceSide = OrderSide.ASK;
-      imbalanceRatio = quote.getAskDepth() != 0 ? quote.getBidDepth() / quote.getAskDepth() : 0;
+      imbalanceRatio = quote.getAskAmount() != 0 ? quote.getBidAmount() / quote.getAskAmount() : 0;
     }
 
     return new Imbalance(imbalanceSide, imbalanceAmount, imbalanceRatio);
@@ -102,7 +102,7 @@ public class HFTAgent extends Agent {
   /**
    * Creates liquidity at stressful time e.g. when no liquidity exist on a side or book is unbalanced above a threshold
    */
-  private LimitOrder createLiquidityAtStress(Quote quote, Imbalance imbalance) {
+  private LimitOrder createLiquidityAtStress(QuoteEvent quote, Imbalance imbalance) {
     float price;
 
     if (imbalance.getSide() == OrderSide.ASK) {
@@ -119,14 +119,14 @@ public class HFTAgent extends Agent {
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
-  private float generateBestBid(Quote quote) {
+  private float generateBestBid(QuoteEvent quote) {
     // TODO: 10?
-    return quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
+    return quote.getBidAmount() != 0 ? quote.getBid() : 10;
   }
 
-  private float generateBestAsk(Quote quote) {
+  private float generateBestAsk(QuoteEvent quote) {
     // TODO: 12?
-    return quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
+    return quote.getAskAmount() != 0 ? quote.getAsk() : 12;
   }
 
   @Value

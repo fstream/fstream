@@ -1,12 +1,12 @@
 package io.fstream.simulate.actor;
 
-import static io.fstream.simulate.model.Order.OrderSide.ASK;
-import static io.fstream.simulate.model.Order.OrderSide.BID;
-import static io.fstream.simulate.model.Order.OrderType.ADD;
+import static io.fstream.core.model.event.Order.OrderSide.ASK;
+import static io.fstream.core.model.event.Order.OrderSide.BID;
+import static io.fstream.core.model.event.Order.OrderType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import io.fstream.core.model.event.LimitOrder;
 import io.fstream.simulate.config.SimulateProperties;
-import io.fstream.simulate.model.LimitOrder;
 import lombok.val;
 
 import org.joda.time.DateTime;
@@ -97,7 +97,7 @@ public class OrderBookTest {
     assertTrue(orderBook.getAsks().get(24f).size() == 2);
     LimitOrder[] orderlist = orderBook.getAsks().get(24f).toArray(new LimitOrder[0]);
     assertTrue(orderlist.length == 2);
-    assertTrue(orderlist[0].getSentTime().getMillis() <= orderlist[1].getSentTime().getMillis());
+    assertTrue(orderlist[0].getDateTime().getMillis() <= orderlist[1].getDateTime().getMillis());
 
     orderBook.onReceive(bid5);
     orderBook.onReceive(bid6);

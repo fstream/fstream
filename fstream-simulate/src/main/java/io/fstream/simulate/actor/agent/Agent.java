@@ -1,6 +1,9 @@
 package io.fstream.simulate.actor.agent;
 
 import static com.google.common.base.Preconditions.checkState;
+import io.fstream.core.model.event.Order.OrderSide;
+import io.fstream.core.model.event.Order.OrderType;
+import io.fstream.core.model.event.QuoteEvent;
 import io.fstream.simulate.actor.BaseActor;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.config.SimulateProperties.AgentProperties;
@@ -9,9 +12,6 @@ import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.message.SubscriptionQuoteRequest;
 import io.fstream.simulate.model.OpenOrders;
-import io.fstream.simulate.model.Order.OrderSide;
-import io.fstream.simulate.model.Order.OrderType;
-import io.fstream.simulate.model.Quote;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +49,7 @@ public abstract class Agent extends BaseActor {
    * State.
    */
   final Random random = new Random();
-  final Map<String, Quote> bbboQuotes = new HashMap<>();
+  final Map<String, QuoteEvent> bbboQuotes = new HashMap<>();
   final OpenOrders openOrders = new OpenOrders();
 
   public Agent(SimulateProperties properties, AgentType type, String name) {
@@ -84,7 +84,7 @@ public abstract class Agent extends BaseActor {
     this.activeInstruments.setInstruments(activeInstruments.getInstruments());
   }
 
-  protected void onReceiveQuote(Quote quote) {
+  protected void onReceiveQuote(QuoteEvent quote) {
     this.bbboQuotes.put(quote.getSymbol(), quote);
   }
 
@@ -105,11 +105,11 @@ public abstract class Agent extends BaseActor {
   /**
    * If subscribed successfully, read quote. If not received then get market open quote from exchange.
    */
-  protected Quote getLastValidQuote(String symbol) {
+  protected QuoteEvent getLastValidQuote(String symbol) {
     return bbboQuotes.computeIfAbsent(symbol, (key) -> {
       val future = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
       try {
-        return (Quote) Await.result(future, msgResponseTimeout.duration());
+        return (QuoteEvent) Await.result(future, msgResponseTimeout.duration());
       } catch (Exception e) {
         log.error("Timeout awaiting quote: {}", e.getMessage());
         return null;
@@ -124,7 +124,7 @@ public abstract class Agent extends BaseActor {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
       // FIXME: Sending unsafe mutation of message
-      symbolOrder.setType(OrderType.CANCEL);
+      symbolOrder.setOrderType(OrderType.CANCEL);
 
       exchange().tell(symbolOrder, self());
     }

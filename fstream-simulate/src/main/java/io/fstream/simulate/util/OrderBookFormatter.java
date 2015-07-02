@@ -24,7 +24,7 @@ public class OrderBookFormatter {
     for (val ask : orderBook.getAsks().entrySet()) {
       text += String.format("%s -> ", ask.getKey());
       for (val firstnode : ask.getValue()) {
-        text += String.format("( %s,%s,%s) -> ", firstnode.getSentTime().toString(), firstnode.getPrice(),
+        text += String.format("( %s,%s,%s) -> ", firstnode.getDateTime().toString(), firstnode.getPrice(),
             firstnode.getAmount());
       }
       text += "\n";
@@ -35,7 +35,7 @@ public class OrderBookFormatter {
       text += String.format("%s -> ", bid.getKey());
       for (val firstOrder : bid.getValue()) {
         text += String.format("( %s,%s,%s) -> ",
-            firstOrder.getSentTime().toString(), firstOrder.getPrice(), firstOrder.getAmount());
+            firstOrder.getDateTime().toString(), firstOrder.getPrice(), firstOrder.getAmount());
       }
       text = text + "\n";
     }

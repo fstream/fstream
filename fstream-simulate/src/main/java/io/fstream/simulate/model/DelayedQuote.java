@@ -9,6 +9,8 @@
 
 package io.fstream.simulate.model;
 
+import io.fstream.core.model.event.QuoteEvent;
+
 import org.joda.time.DateTime;
 
 /**
@@ -17,7 +19,7 @@ import org.joda.time.DateTime;
  * Same as in all respects but elicit different behavior from the consumer of message.
  */
 // TODO: Can this class be removed if we can simulate the delay in the producer?
-public class DelayedQuote extends Quote {
+public class DelayedQuote extends QuoteEvent {
 
   public DelayedQuote(DateTime time, String symbol, float ask, float bid, int askDepth, int bidDepth) {
     super(time, symbol, ask, bid, askDepth, bidDepth);

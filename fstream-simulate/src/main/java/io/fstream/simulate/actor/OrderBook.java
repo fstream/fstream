@@ -3,14 +3,14 @@ package io.fstream.simulate.actor;
 import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
 import static java.util.Collections.reverseOrder;
+import io.fstream.core.model.event.LimitOrder;
+import io.fstream.core.model.event.Order;
+import io.fstream.core.model.event.Order.OrderSide;
+import io.fstream.core.model.event.Order.OrderType;
+import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.TradeEvent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
-import io.fstream.simulate.model.LimitOrder;
-import io.fstream.simulate.model.Order;
-import io.fstream.simulate.model.Order.OrderSide;
-import io.fstream.simulate.model.Order.OrderType;
-import io.fstream.simulate.model.Quote;
-import io.fstream.simulate.model.Trade;
 import io.fstream.simulate.util.LimitOrderTimeComparator;
 
 import java.util.NavigableMap;
@@ -81,7 +81,7 @@ public class OrderBook extends BaseActor {
 
     orderCount += 1;
     order.setProcessedTime(getSimulationTime());
-    if (order.getType() == OrderType.MO) {
+    if (order.getOrderType() == OrderType.MO) {
       // Process market order
       log.debug("Processing market order: {}", order);
       val limitOrder = (LimitOrder) order;
@@ -212,7 +212,7 @@ public class OrderBook extends BaseActor {
     this.bestAsk = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestAsk != prevbestaks || this.bestBid != prevbestbid) {
-      val quote = new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
+      val quote = new QuoteEvent(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
           getDepthAtLevel(bestAsk, OrderSide.ASK),
           getDepthAtLevel(bestBid, OrderSide.BID));
 
@@ -295,12 +295,12 @@ public class OrderBook extends BaseActor {
    */
   private void registerTrade(Order active, Order passive, int executedSize) {
     tradeCount += 1;
-    val trade = new Trade(getSimulationTime(), active, passive, executedSize);
+    val trade = new TradeEvent(getSimulationTime(), active, passive, executedSize);
 
     exchange().tell(trade, self());
     publisher().tell(trade, self());
 
-    val latency = Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds();
+    val latency = Seconds.secondsBetween(active.getDateTime(), trade.getDateTime()).getSeconds();
     val delayed = latency > 5;
     if (delayed) {
       log.debug("Order took more than 5 seconds to be processed {}", active);
@@ -308,12 +308,12 @@ public class OrderBook extends BaseActor {
   }
 
   private void processLimitOrder(LimitOrder order) {
-    if (order.getType() == OrderType.AMEND) {
+    if (order.getOrderType() == OrderType.AMEND) {
       log.debug("Order amended");
-    } else if (order.getType() == OrderType.CANCEL) {
+    } else if (order.getOrderType() == OrderType.CANCEL) {
       log.debug("Cancelling order {}", order);
       deleteOrder(order);
-    } else if (order.getType() == OrderType.ADD) {
+    } else if (order.getOrderType() == OrderType.ADD) {
       log.debug("Order added");
       addLimitOrder(order);
     } else {
@@ -395,7 +395,7 @@ public class OrderBook extends BaseActor {
     }
 
     order.setProcessedTime(getSimulationTime());
-    if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
+    if (Seconds.secondsBetween(order.getProcessedTime(), order.getDateTime()).getSeconds() > 5) {
       log.debug("Rrder took more than 5 seconds to be processed: {}", order);
     }
 
