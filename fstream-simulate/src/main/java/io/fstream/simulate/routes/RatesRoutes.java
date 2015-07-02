@@ -65,7 +65,7 @@ public class RatesRoutes extends AbstractRoutes {
       .marshal(new CodecDataFormat())
       .choice()
         .when(profilesActive("console", "file"))
-          .transform().simple("${bodyAs(String)}\n") // Add newline for correct output
+          .transform().simple(addNewline()) // Add newline for correct output
       .end()
       .choice()
         .when(profilesActive("console"))
@@ -73,7 +73,7 @@ public class RatesRoutes extends AbstractRoutes {
       .end()
       .choice()
         .when(profilesActive("file"))
-          .to("stream:file?fileName=build/fstream-simulate-rates.json")
+          .to("stream:file?fileName={{simulate.rates.fileName}}")
       .end()
       .choice()
         .when(profilesActive("log"))
@@ -81,7 +81,7 @@ public class RatesRoutes extends AbstractRoutes {
       .end()
       .choice()
         .when(profilesActive("kafka"))
-          .setHeader(KafkaConstants.PARTITION_KEY, constant("part-0")) // Single partition for now
+          .setHeader(KafkaConstants.PARTITION_KEY, kafkaPartition()) // Single partition for now
           .to("{{simulate.rates.uri}}")
       .end()
       .to("metrics:meter:rates"); // Record metrics    

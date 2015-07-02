@@ -9,13 +9,13 @@ import org.joda.time.DateTime;
 @AllArgsConstructor
 public class Quote {
 
-  DateTime time;
-  String symbol;
+  private DateTime time;
+  private String symbol;
 
-  float askPrice;
-  float bidPrice;
+  private float askPrice;
+  private float bidPrice;
 
-  int askDepth;
-  int bidDepth;
+  private int askDepth;
+  private int bidDepth;
 
 }

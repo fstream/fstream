@@ -34,7 +34,7 @@ public class ToqRoutes extends AbstractRoutes {
       .marshal(new CodecDataFormat())
       .choice()
         .when(profilesActive("console", "file"))
-          .transform().simple("${bodyAs(String)}\n") // Add newline for correct output
+          .transform().simple(addNewline()) // Add newline for correct output
       .end()
       .choice()
         .when(profilesActive("console"))
@@ -42,7 +42,7 @@ public class ToqRoutes extends AbstractRoutes {
       .end()
       .choice()
         .when(profilesActive("file"))
-          .to("stream:file?fileName=build/fstream-simulate-toq.json")
+          .to("stream:file?fileName={{simulate.toq.fileName}}")
       .end()
       .choice()
         .when(profilesActive("log"))
@@ -50,7 +50,7 @@ public class ToqRoutes extends AbstractRoutes {
       .end()
       .choice()
         .when(profilesActive("kafka"))
-          .setHeader(KafkaConstants.PARTITION_KEY, constant("part-0")) // Single partition for now
+          .setHeader(KafkaConstants.PARTITION_KEY, kafkaPartition()) // Single partition for now
           .to("{{simulate.toq.uri}}")
       .end()
       .to("metrics:meter:toq"); // Record metrics

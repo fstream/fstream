@@ -2,12 +2,10 @@ package io.fstream.simulate.model;
 
 import io.fstream.simulate.model.Order.OrderSide;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import org.joda.time.DateTime;
 
 @Data
-@EqualsAndHashCode
 public class Trade {
 
   public enum TradeSide {

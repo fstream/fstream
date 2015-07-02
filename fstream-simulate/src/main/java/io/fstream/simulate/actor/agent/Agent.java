@@ -106,23 +106,21 @@ public abstract class Agent extends BaseActor {
    * If subscribed successfully, read quote. If not received then get market open quote from exchange.
    */
   protected Quote getLastValidQuote(String symbol) {
-    Quote quote = this.bbboQuotes.get(symbol);
-    if (quote == null) {
+    return bbboQuotes.computeIfAbsent(symbol, (key) -> {
       val future = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
       try {
-        quote = (Quote) Await.result(future, msgResponseTimeout.duration());
+        return (Quote) Await.result(future, msgResponseTimeout.duration());
       } catch (Exception e) {
         log.error("Timeout awaiting quote: {}", e.getMessage());
+        return null;
       }
-    }
-
-    return quote;
+    });
   }
 
   /**
    * Cancels all open orders for the given symbol
    */
-  protected void cancelAllOpenOrders(String symbol) {
+  protected void cancelOpenOrdersBySymbol(String symbol) {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
       // FIXME: Sending unsafe mutation of message
@@ -150,17 +148,13 @@ public abstract class Agent extends BaseActor {
   }
 
   /**
-   * Return orderside preferred with the given probability. E.g. prob=0.7, side=BUY returns BUY 70% of the time
+   * Return order side preferred with the given probability. E.g. prob=0.7, side=BUY returns BUY 70% of the time
    */
   protected OrderSide decideSide(float prob, @NonNull OrderSide side) {
     if (random.nextFloat() <= prob) {
       return side;
     } else {
-      if (side == OrderSide.BID) {
-        return OrderSide.ASK;
-      } else {
-        return OrderSide.BID;
-      }
+      return side == OrderSide.BID ? OrderSide.ASK : OrderSide.BID;
     }
   }
 

@@ -41,7 +41,7 @@ public class HFTAgent extends Agent {
         createLiquidityAtStress(quote, imbalance);
 
     // Cancel any existing orders in the book
-    cancelAllOpenOrders(order.getSymbol());
+    cancelOpenOrdersBySymbol(order.getSymbol());
 
     // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
     exchange().tell(order, self());

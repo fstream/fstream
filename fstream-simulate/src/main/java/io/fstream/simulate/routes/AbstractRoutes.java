@@ -38,6 +38,14 @@ public abstract class AbstractRoutes extends RouteBuilder {
     return constant(active);
   }
 
+  protected String addNewline() {
+    return "${bodyAs(String)}\n";
+  }
+
+  protected ValueBuilder kafkaPartition() {
+    return constant("part-0");
+  }
+
   private boolean containsAny(List<String> list, String[] values) {
     return !disjoint(list, ImmutableList.copyOf(values));
   }

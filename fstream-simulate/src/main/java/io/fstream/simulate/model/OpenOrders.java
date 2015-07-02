@@ -20,7 +20,7 @@ import com.google.common.collect.Multimap;
 @Value
 public class OpenOrders {
 
-  final Multimap<String, Order> orders = HashMultimap.create();
+  private final Multimap<String, Order> orders = HashMultimap.create();
 
   public boolean addOpenOrder(@NonNull Order order) {
     if (orders.get(order.getSymbol()).contains(order)) {

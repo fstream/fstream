@@ -48,10 +48,11 @@ public abstract class ActiveAgent extends Agent {
 
   @Override
   public void executeAction() {
+    // "active" behavior"
     val order = createOrder();
     if (order != null) {
-      // Cancel all pending open orders
-      cancelAllOpenOrders(order.getSymbol());
+      // Cancel all pending open orders on this symbol
+      cancelOpenOrdersBySymbol(order.getSymbol());
 
       // Add the new order
       openOrders.addOpenOrder(order);
@@ -87,7 +88,7 @@ public abstract class ActiveAgent extends Agent {
       }
     } else {
       if (side == OrderSide.ASK) {
-        // TODO remove hardcoding.
+        // TODO remove hard coding.
         // max ensures price stays in bounds.
         val bestAsk = quote.getAskPrice();
         price = decidePrice(bestAsk, Math.min(bestAsk + (minTickSize * 5), bestAsk), bestAsk, getProbBestPrice());

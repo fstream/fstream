@@ -42,8 +42,10 @@ simulate:
         serializerClass=${kafka.producerProperties.serializer.class}"
    toq:
       uri: ${simulate.kafka.uri}&topic=toq
+      fileName: build/fstream-simulate-toq.json
    rates:
       uri: ${simulate.kafka.uri}&topic=rates
+      fileName: build/fstream-simulate-rates.json
 
    # Active instruments
    instruments:

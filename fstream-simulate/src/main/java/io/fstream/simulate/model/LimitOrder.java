@@ -8,17 +8,17 @@ import org.joda.time.DateTime;
 @Data
 public class LimitOrder implements Order, Comparable<LimitOrder> {
 
-  OrderSide side;
-  OrderType type;
-  DateTime time;
-  int oid;
-  String brokerId;
-  String symbol;
-  int amount;
-  float price;
-  String userId;
+  private OrderSide side;
+  private OrderType type;
+  private DateTime time;
+  private int oid;
+  private String brokerId;
+  private String symbol;
+  private int amount;
+  private float price;
+  private String userId;
 
-  DateTime processedTime;
+  private DateTime processedTime;
 
   public LimitOrder(OrderSide side, OrderType type, DateTime time, int oid, String brokerId, String symbol, int amount,
       float price, String userId) {
