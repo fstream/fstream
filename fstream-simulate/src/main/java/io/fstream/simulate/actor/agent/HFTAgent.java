@@ -23,11 +23,6 @@ public class HFTAgent extends Agent {
   }
 
   @Override
-  public void executeAction() {
-    // No-op since the agent is internally passive
-  }
-
-  @Override
   public void onReceive(Object message) throws Exception {
     if (message instanceof Quote) {
       onReceiveQuote((Quote) message);
@@ -61,23 +56,23 @@ public class HFTAgent extends Agent {
 
   private LimitOrder createLiquidityNormal(Quote quote, Imbalance imbalance) {
     // No stress period, so provide liquidity at better price
-    float bestask = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
-    float bestbid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
+    val bestAsk = generateBestAsk(quote);
+    val bestBid = generateBestBid(quote);
     float price;
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // Ask imbalance
-      price = Math.max(bestbid + minTickSize, bestask - minTickSize / 2);
-      if ((price - bestbid) < minTickSize) {
-        log.error("Invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestbid, price - bestbid);
-        price = bestask;
+      price = Math.max(bestBid + minTickSize, bestAsk - minTickSize / 2);
+      if ((price - bestBid) < minTickSize) {
+        log.error("Invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestBid, price - bestBid);
+        price = bestAsk;
       }
     } else {
       // Bid imbalance
-      price = Math.min(bestask - minTickSize, bestbid + minTickSize / 2);
-      if ((bestask - price) < minTickSize) {
-        log.error("Invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestask, price, bestask - price);
-        price = bestask;
+      price = Math.min(bestAsk - minTickSize, bestBid + minTickSize / 2);
+      if ((bestAsk - price) < minTickSize) {
+        log.error("Invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestAsk, price, bestAsk - price);
+        price = bestAsk;
       }
     }
 
@@ -108,16 +103,15 @@ public class HFTAgent extends Agent {
    * Creates liquidity at stressful time e.g. when no liquidity exist on a side or book is unbalanced above a threshold
    */
   private LimitOrder createLiquidityAtStress(Quote quote, Imbalance imbalance) {
-    // TODO: 12 and 10?
-    val bestAsk = quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
-    val bestBid = quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
     float price;
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // ask imbalance
+      val bestAsk = generateBestAsk(quote);
       price = bestAsk + (minTickSize * imbalance.getRatio());
     } else {
       // bid imbalance
+      val bestBid = generateBestBid(quote);
       price = bestBid - (minTickSize * imbalance.getRatio());
     }
 
@@ -125,8 +119,18 @@ public class HFTAgent extends Agent {
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
+  private float generateBestBid(Quote quote) {
+    // TODO: 10?
+    return quote.getBidDepth() != 0 ? quote.getBidPrice() : 10;
+  }
+
+  private float generateBestAsk(Quote quote) {
+    // TODO: 12?
+    return quote.getAskDepth() != 0 ? quote.getAskPrice() : 12;
+  }
+
   @Value
-  private class Imbalance {
+  private static class Imbalance {
 
     /**
      * The side which shows less depth e.g. if askSize = 10,000 and bidSize = 5,000. Then Bid is imbalanced.

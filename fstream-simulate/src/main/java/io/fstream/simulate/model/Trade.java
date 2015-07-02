@@ -23,10 +23,10 @@ public class Trade {
   private DateTime orderTime;
   private int amount;
 
-  public Trade(DateTime tradetime, Order active, Order passive, int executedSize) {
+  public Trade(DateTime tradeTime, Order active, Order passive, int executedSize) {
     this.setPrice(passive.getPrice());
     this.setSymbol(active.getSymbol());
-    this.setTime(tradetime);
+    this.setTime(tradeTime);
     this.setOrderTime(active.getSentTime());
     this.setAmount(executedSize);
 

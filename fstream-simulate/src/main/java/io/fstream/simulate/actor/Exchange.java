@@ -31,20 +31,20 @@ public class Exchange extends BaseActor {
   /**
    * Configuration.
    */
-  final float minTickSize;
-  final FiniteDuration quoteDelayDuration;
+  private final float minTickSize;
+  private final FiniteDuration quoteDelayDuration;
 
   /**
    * State.
    */
-  static final AtomicInteger currentOrderId = new AtomicInteger(0);
+  private static final AtomicInteger currentOrderId = new AtomicInteger(0);
 
-  final Map<String, ActorRef> orderBooks = new HashMap<>();
-  final Map<String, Quote> lastValidQuote = new HashMap<>();
+  private final Map<String, ActorRef> orderBooks = new HashMap<>();
+  private final Map<String, Quote> lastValidQuote = new HashMap<>();
 
-  final List<ActorRef> premiumSubscribers = new ArrayList<>();
-  final List<ActorRef> quotesSubscribers = new ArrayList<>();
-  final List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
+  private final List<ActorRef> premiumSubscribers = new ArrayList<>();
+  private final List<ActorRef> quotesSubscribers = new ArrayList<>();
+  private final List<ActorRef> quoteAndOrdersSubscribers = new ArrayList<>();
 
   /**
    * Global order ID generator.

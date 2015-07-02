@@ -17,13 +17,22 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("simulate")
 public class SimulateProperties {
 
+  /**
+   * Reference.
+   */
+  private List<String> brokers = newArrayList();
   private List<String> instruments = newArrayList();
 
+  /**
+   * Settings.
+   */
   private int msgResponseTimeout;
   private float minTickSize;
   private int nonPremiumQuoteDelay;
-  private List<String> brokers = newArrayList();
 
+  /**
+   * Agents.
+   */
   private AgentProperties institutional = new AgentProperties();
   private AgentProperties retail = new AgentProperties();
   private AgentProperties hft = new AgentProperties();
@@ -34,10 +43,13 @@ public class SimulateProperties {
     private float probBestPrice;
     private float probBuy;
     private float probMarket;
+
     private int maxTradeSize;
     private int maxSleep; // in millis
     private int minSleep; // in millis
+
     private int numAgents;
+
     private String quoteSubscriptionLevel;
 
   }

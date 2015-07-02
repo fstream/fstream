@@ -39,11 +39,11 @@ public abstract class Agent extends BaseActor {
   @NonNull
   final String name;
   @Delegate
-  AgentProperties agentProperties;
+  final AgentProperties agentProperties;
 
-  float minTickSize;
-  Timeout msgResponseTimeout;
-  String broker;
+  final float minTickSize;
+  final Timeout msgResponseTimeout;
+  final String broker;
 
   /**
    * State.
@@ -69,7 +69,12 @@ public abstract class Agent extends BaseActor {
     exchange().tell(new SubscriptionQuoteRequest(this.getQuoteSubscriptionLevel()), self());
   }
 
-  abstract public void executeAction();
+  /**
+   * Template method.
+   */
+  protected void executeAction() {
+    // No-op
+  }
 
   protected void onReceiveSubscriptionQuote(SubscriptionQuoteRequest subscriptionQuote) {
     log.debug("{} registered successfully to receive level {} quotes", name, getQuoteSubscriptionLevel());
@@ -86,7 +91,9 @@ public abstract class Agent extends BaseActor {
   protected void onReceiveCommand(Command command) {
     if (command == Command.AGENT_EXECUTE_ACTION) {
       this.executeAction();
-      this.scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
+
+      // Re-schedule
+      this.scheduleSelfOnceRandom(command);
     }
   }
 

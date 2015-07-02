@@ -1,6 +1,7 @@
 package io.fstream.simulate.actor;
 
 import static com.google.common.base.Preconditions.checkState;
+import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
 import static java.util.Collections.reverseOrder;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
@@ -11,7 +12,6 @@ import io.fstream.simulate.model.Order.OrderType;
 import io.fstream.simulate.model.Quote;
 import io.fstream.simulate.model.Trade;
 import io.fstream.simulate.util.LimitOrderTimeComparator;
-import io.fstream.simulate.util.OrderBookFormatter;
 
 import java.util.NavigableMap;
 import java.util.NavigableSet;
@@ -38,25 +38,25 @@ public class OrderBook extends BaseActor {
    * Configuration.
    */
   @NonNull
-  final String symbol;
+  private final String symbol;
 
   /**
    * State.
    */
-  final NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder()); // Non-natural
-  final NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
+  private final NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder()); // Non-natural
+  private final NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
 
   /**
    * Aggregates.
    */
-  float bestBid = Float.MIN_VALUE;
-  float bestAsk = Float.MIN_VALUE;
+  private float bestBid = Float.MIN_VALUE;
+  private float bestAsk = Float.MIN_VALUE;
 
-  int bidDepth;
-  int askDepth;
+  private int bidDepth;
+  private int askDepth;
 
-  int orderCount = 0;
-  int tradeCount = 0;
+  private int orderCount = 0;
+  private int tradeCount = 0;
 
   public OrderBook(SimulateProperties properties, String symbol) {
     super(properties);
@@ -212,10 +212,10 @@ public class OrderBook extends BaseActor {
     this.bestAsk = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestAsk != prevbestaks || this.bestBid != prevbestbid) {
-      val quote =
-          new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(), getDepthAtLevel(
-              bestAsk,
-              OrderSide.ASK), getDepthAtLevel(bestBid, OrderSide.BID));
+      val quote = new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
+          getDepthAtLevel(bestAsk, OrderSide.ASK),
+          getDepthAtLevel(bestBid, OrderSide.BID));
+
       if (!isValidQuote(this.bestBid, this.bestAsk)) {
         log.error("Invalid quote {}", quote);
         return;
@@ -238,7 +238,7 @@ public class OrderBook extends BaseActor {
 
     if (book != null) {
       for (val order : book) {
-        depth = depth + order.getAmount();
+        depth += order.getAmount();
       }
     }
     return depth;
@@ -264,54 +264,59 @@ public class OrderBook extends BaseActor {
    * biddepth/askdepth variables
    */
   private boolean assertBookDepth() {
-    int biddepth = 0;
-    for (val bidsentries : bids.entrySet()) {
-      for (val bids : bidsentries.getValue()) {
-        biddepth += bids.getAmount();
+    int bidDepth = 0;
+    for (val values : bids.values()) {
+      for (val bids : values) {
+        bidDepth += bids.getAmount();
       }
     }
-    if (biddepth != this.bidDepth) {
-      log.error("Bid depth does not add up record = {} actual = {}", this.bidDepth, biddepth);
+
+    if (bidDepth != this.bidDepth) {
+      log.error("Bid depth does not add up record = {} actual = {}", this.bidDepth, bidDepth);
       return false;
     }
-    int askdepth = 0;
-    for (val asksentries : asks.entrySet()) {
-      for (val asks : asksentries.getValue()) {
-        askdepth += asks.getAmount();
+
+    int askDepth = 0;
+    for (val values : asks.values()) {
+      for (val asks : values) {
+        askDepth += asks.getAmount();
       }
     }
-    if (askdepth != this.askDepth) {
-      log.error("Ask depth does not add up record = {} actual = {}", this.askDepth, askdepth);
+
+    if (askDepth != this.askDepth) {
+      log.error("Ask depth does not add up record = {} actual = {}", this.askDepth, askDepth);
       return false;
     }
     return true;
   }
 
   /**
-   * Registers a Trade
+   * Registers a trade
    */
-  private void registerTrade(Order active, Order passive, int executedsize) {
+  private void registerTrade(Order active, Order passive, int executedSize) {
     tradeCount += 1;
-    val trade = new Trade(getSimulationTime(), active, passive, executedsize);
+    val trade = new Trade(getSimulationTime(), active, passive, executedSize);
+
     exchange().tell(trade, self());
     publisher().tell(trade, self());
-    if (Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds() > 5) {
+
+    val latency = Seconds.secondsBetween(active.getSentTime(), trade.getTime()).getSeconds();
+    val delayed = latency > 5;
+    if (delayed) {
       log.debug("Order took more than 5 seconds to be processed {}", active);
     }
   }
 
   private void processLimitOrder(LimitOrder order) {
     if (order.getType() == OrderType.AMEND) {
-      System.out.println("order amended");
-    }
-    else if (order.getType() == OrderType.CANCEL) {
-      log.debug("cancelling order {}", order);
-      this.deleteOrder(order);
-    }
-    else if (order.getType() == OrderType.ADD) {
+      log.debug("Order amended");
+    } else if (order.getType() == OrderType.CANCEL) {
+      log.debug("Cancelling order {}", order);
+      deleteOrder(order);
+    } else if (order.getType() == OrderType.ADD) {
+      log.debug("Order added");
       addLimitOrder(order);
-    }
-    else {
+    } else {
       // TODO: Handle?
     }
   }
@@ -320,22 +325,22 @@ public class OrderBook extends BaseActor {
    * Adds LimitOrder to the order book
    */
   private void addLimitOrder(LimitOrder order) {
-    int availabledepth = 0;
+    int availablePepth = 0;
     if (order.getSide() == OrderSide.ASK) {
       // Executing against bid side of the book.
-      availabledepth = this.bidDepth;
+      availablePepth = this.bidDepth;
     } else {
-      availabledepth = this.askDepth;
+      availablePepth = this.askDepth;
     }
 
-    int unfilledsize;
-    if (crossesSpread(order) && availabledepth > 0) { // if limitprice
+    int unfilledSize;
+    if (crossesSpread(order) && availablePepth > 0) { // if limitprice
       // Crosses spread, treat as market order
-      unfilledsize = processMarketOrder(order);
-      order.setAmount(unfilledsize);
+      unfilledSize = processMarketOrder(order);
+      order.setAmount(unfilledSize);
 
       // Any unfilled amount added to order book
-      if (unfilledsize > 0) {
+      if (unfilledSize > 0) {
         insertOrder(order);
       }
     } else {
@@ -355,25 +360,25 @@ public class OrderBook extends BaseActor {
    */
   private void insertOrder(LimitOrder order) {
     boolean isBid;
-    NavigableMap<Float, NavigableSet<LimitOrder>> sidebook;
+    NavigableMap<Float, NavigableSet<LimitOrder>> sideBook;
     if (order.getSide() == OrderSide.ASK) {
       isBid = false;
-      sidebook = this.asks;
+      sideBook = this.asks;
     } else {
       isBid = true;
-      sidebook = this.bids;
+      sideBook = this.bids;
     }
 
-    if (sidebook.isEmpty() || sidebook.get(order.getPrice()) == null) {
+    if (sideBook.isEmpty() || sideBook.get(order.getPrice()) == null) {
       // Add order to order book
       val orderList = new TreeSet<LimitOrder>(LimitOrderTimeComparator.INSTANCE);
       orderList.add(order);
-      sidebook.put(order.getPrice(), orderList);
+      sideBook.put(order.getPrice(), orderList);
     } else {
       // Order at same price exists, queue it by time
-      val orderList = sidebook.get(order.getPrice());
+      val orderList = sideBook.get(order.getPrice());
       orderList.add(order);
-      sidebook.put(order.getPrice(), orderList);
+      sideBook.put(order.getPrice(), orderList);
     }
 
     // Set best price and depth attributes
@@ -388,6 +393,7 @@ public class OrderBook extends BaseActor {
       }
       this.askDepth = this.askDepth + order.getAmount();
     }
+
     order.setProcessedTime(getSimulationTime());
     if (Seconds.secondsBetween(order.getProcessedTime(), order.getSentTime()).getSeconds() > 5) {
       log.debug("Rrder took more than 5 seconds to be processed: {}", order);
@@ -395,7 +401,6 @@ public class OrderBook extends BaseActor {
 
     // publish to tape
     publisher().tell(order, self());
-
   }
 
   /**
@@ -455,7 +460,7 @@ public class OrderBook extends BaseActor {
   }
 
   public void printBook() {
-    log.info(OrderBookFormatter.formatOrderBook(this));
+    log.info("{}\n", formatOrderBook(this));
   }
 
 }

@@ -30,17 +30,6 @@ public abstract class ActiveAgent extends Agent {
   }
 
   @Override
-  public void executeAction() {
-    val order = createOrder();
-    if (order != null) {
-      // Cancel all open orders
-      cancelAllOpenOrders(order.getSymbol());
-      exchange().tell(order, self());
-      openOrders.addOpenOrder(order);
-    }
-  }
-
-  @Override
   public void onReceive(Object message) throws Exception {
     log.debug("{} message received: {}", name, message);
 
@@ -54,6 +43,19 @@ public abstract class ActiveAgent extends Agent {
       onReceiveQuote((Quote) message);
     } else {
       unhandled(message);
+    }
+  }
+
+  @Override
+  public void executeAction() {
+    val order = createOrder();
+    if (order != null) {
+      // Cancel all pending open orders
+      cancelAllOpenOrders(order.getSymbol());
+
+      // Add the new order
+      openOrders.addOpenOrder(order);
+      exchange().tell(order, self());
     }
   }
 
