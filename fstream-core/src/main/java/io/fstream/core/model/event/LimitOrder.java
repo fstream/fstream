@@ -1,13 +1,17 @@
 package io.fstream.core.model.event;
 
 import static io.fstream.core.model.event.EventType.ORDER;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.val;
 
 import org.joda.time.DateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 public class LimitOrder extends AbstractEvent implements Order, Comparable<LimitOrder> {
 
   private OrderSide side;
@@ -22,10 +26,7 @@ public class LimitOrder extends AbstractEvent implements Order, Comparable<Limit
   private DateTime processedTime;
 
   public LimitOrder(@NonNull OrderSide side, @NonNull OrderType type, @NonNull DateTime time, int oid,
-      @NonNull String brokerId,
-      @NonNull String symbol,
-      int amount,
-      float price, @NonNull String userId) {
+      @NonNull String brokerId, @NonNull String symbol, int amount, float price, @NonNull String userId) {
     super(time);
     this.side = side;
     this.orderType = type;
@@ -61,35 +62,9 @@ public class LimitOrder extends AbstractEvent implements Order, Comparable<Limit
     return 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.fstream.core.model.event.Event#getType()
-   */
   @Override
   public EventType getType() {
     return ORDER;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.fstream.core.model.event.Order#getOrderType()
-   */
-  @Override
-  public OrderType getOrderType() {
-    return orderType;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.fstream.core.model.event.Order#setType(io.fstream.core.model.event.Order.OrderType)
-   */
-  @Override
-  public void setOrderType(OrderType type) {
-    this.orderType = type;
-
   }
 
 }

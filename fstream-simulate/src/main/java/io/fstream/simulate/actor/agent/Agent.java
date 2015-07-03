@@ -41,7 +41,7 @@ public abstract class Agent extends BaseActor {
   @Delegate
   final AgentProperties agentProperties;
 
-  final float minTickSize;
+  final float minQuoteSize;
   final Timeout msgResponseTimeout;
   final String broker;
 
@@ -58,7 +58,7 @@ public abstract class Agent extends BaseActor {
     this.name = name;
     this.agentProperties = resolveAgentProperties();
 
-    this.minTickSize = properties.getMinTickSize();
+    this.minQuoteSize = properties.getMinQuoteSize();
     this.msgResponseTimeout = calculateMsgResponseTimeout();
     this.broker = generateBroker();
   }

@@ -51,7 +51,7 @@ public class HFTAgent extends Agent {
   private boolean isNormal(QuoteEvent quote, Imbalance imbalance) {
     val spread = quote.getAsk() - quote.getBid();
 
-    return imbalance.getRatio() < 2 && spread > minTickSize;
+    return imbalance.getRatio() < 2 && spread > minQuoteSize;
   }
 
   private LimitOrder createLiquidityNormal(QuoteEvent quote, Imbalance imbalance) {
@@ -62,15 +62,15 @@ public class HFTAgent extends Agent {
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // Ask imbalance
-      price = Math.max(bestBid + minTickSize, bestAsk - minTickSize / 2);
-      if ((price - bestBid) < minTickSize) {
+      price = Math.max(bestBid + minQuoteSize, bestAsk - minQuoteSize / 2);
+      if ((price - bestBid) < minQuoteSize) {
         log.error("Invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestBid, price - bestBid);
         price = bestAsk;
       }
     } else {
       // Bid imbalance
-      price = Math.min(bestAsk - minTickSize, bestBid + minTickSize / 2);
-      if ((bestAsk - price) < minTickSize) {
+      price = Math.min(bestAsk - minQuoteSize, bestBid + minQuoteSize / 2);
+      if ((bestAsk - price) < minQuoteSize) {
         log.error("Invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestAsk, price, bestAsk - price);
         price = bestAsk;
       }
@@ -108,11 +108,11 @@ public class HFTAgent extends Agent {
     if (imbalance.getSide() == OrderSide.ASK) {
       // ask imbalance
       val bestAsk = generateBestAsk(quote);
-      price = bestAsk + (minTickSize * imbalance.getRatio());
+      price = bestAsk + (minQuoteSize * imbalance.getRatio());
     } else {
       // bid imbalance
       val bestBid = generateBestBid(quote);
-      price = bestBid - (minTickSize * imbalance.getRatio());
+      price = bestBid - (minQuoteSize * imbalance.getRatio());
     }
 
     return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,

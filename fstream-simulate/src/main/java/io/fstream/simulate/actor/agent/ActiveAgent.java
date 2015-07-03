@@ -91,11 +91,11 @@ public abstract class ActiveAgent extends Agent {
         // TODO remove hard coding.
         // max ensures price stays in bounds.
         val bestAsk = quote.getAsk();
-        price = decidePrice(bestAsk, Math.min(bestAsk + (minTickSize * 5), bestAsk), bestAsk, getProbBestPrice());
+        price = decidePrice(bestAsk, Math.min(bestAsk + (minQuoteSize * 5), bestAsk), bestAsk, getProbBestPrice());
       } else {
         // min ensures price doesn't go below some lower bound
         val bestBid = quote.getBid();
-        price = decidePrice(Math.max(bestBid - (minTickSize * 5), bestBid), bestBid, bestBid, getProbBestPrice());
+        price = decidePrice(Math.max(bestBid - (minQuoteSize * 5), bestBid), bestBid, bestBid, getProbBestPrice());
       }
       if (price < 0) {
         log.error("Invalid price generated {}", price);

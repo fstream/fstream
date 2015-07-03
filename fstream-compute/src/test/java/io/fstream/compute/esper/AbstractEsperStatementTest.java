@@ -62,7 +62,7 @@ public abstract class AbstractEsperStatementTest {
 
   @Before
   public void setUp() {
-    // TODO: Rename "Rate" to "TickEvent"
+    // TODO: Rename "Rate" to "QuoteEvent"
     val configuration = new Configuration();
     configuration.addEventType("Rate", QuoteEvent.class.getName());
 
@@ -85,8 +85,8 @@ public abstract class AbstractEsperStatementTest {
   }
 
   @SneakyThrows
-  protected List<?> execute(File eplFile, File tickEventFile) {
-    return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), readTickEvents(tickEventFile));
+  protected List<?> execute(File eplFile, File quoteEventFile) {
+    return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), readQuoteEvents(quoteEventFile));
   }
 
   protected List<?> execute(String statement, QuoteEvent... events) {
@@ -130,8 +130,8 @@ public abstract class AbstractEsperStatementTest {
     for (val event : events) {
       if (event instanceof QuoteEvent) {
         // Advance time
-        val tickEvent = (QuoteEvent) event;
-        val timeEvent = timeEvent(tickEvent.getDateTime().getMillis());
+        val quoteEvent = (QuoteEvent) event;
+        val timeEvent = timeEvent(quoteEvent.getDateTime().getMillis());
         log.info("Sending: {}", timeEvent);
         runtime.sendEvent(timeEvent);
       }
@@ -176,22 +176,22 @@ public abstract class AbstractEsperStatementTest {
     return new CurrentTimeEvent(time);
   }
 
-  protected static File tickEventFile(String fileName) {
-    return new File("src/test/resources/tick-events", fileName);
+  protected static File quoteEventFile(String fileName) {
+    return new File("src/test/resources/quote-events", fileName);
   }
 
-  protected static QuoteEvent tickEvent(long time, String symbol, double ask, double bid) {
+  protected static QuoteEvent quoteEvent(long time, String symbol, double ask, double bid) {
     return new QuoteEvent(new DateTime(time), symbol, (float) ask, (float) bid);
   }
 
   @SneakyThrows
-  private static Iterable<QuoteEvent> readTickEvents(File tickEventFile) {
-    val lines = readLines(tickEventFile.toURI().toURL(), UTF_8);
+  private static Iterable<QuoteEvent> readQuoteEvents(File quoteEventFile) {
+    val lines = readLines(quoteEventFile.toURI().toURL(), UTF_8);
 
     val builder = ImmutableList.<QuoteEvent> builder();
     for (val line : lines) {
-      val tickEvent = MAPPER.readValue(line, QuoteEvent.class);
-      builder.add(tickEvent);
+      val quoteEvent = MAPPER.readValue(line, QuoteEvent.class);
+      builder.add(quoteEvent);
     }
 
     return builder.build();

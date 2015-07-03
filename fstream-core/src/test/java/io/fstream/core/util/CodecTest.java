@@ -12,16 +12,38 @@ package io.fstream.core.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
+import io.fstream.core.model.event.MetricEvent;
+import io.fstream.core.model.event.QuoteEvent;
+
+import java.util.Arrays;
+
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
+@RequiredArgsConstructor
 public class CodecTest {
 
+  @Parameters(name = "{index}: event({0})")
+  public static Iterable<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        { new AlertEvent(new DateTime(), 1, "data") },
+        { new MetricEvent(new DateTime(), 1, "data") },
+        { new QuoteEvent(new DateTime(), "symbol", 0.1f, 0.2f) }
+        // TODO: Add remaining
+    });
+  }
+
+  private final Event expected;
+
   @Test
-  public void testRoundTrip() {
-    val expected = new AlertEvent(new DateTime(), 1, "data");
+  public void test() {
     val text = Codec.encodeText(expected);
     System.out.println(text);
     val actual = Codec.decodeText(text, Event.class);

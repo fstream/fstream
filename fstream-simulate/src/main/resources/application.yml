@@ -119,3 +119,26 @@ simulate:
       numAgents: 1
    hft:
       numAgents: 0
+      
+---
+
+###############################################################################
+# Profile - "fast"
+###############################################################################
+
+# Profile
+spring.profiles: fast
+
+# Simulation
+simulate:
+   # Agents - Types
+   institutional:
+      maxSleep: 2
+      minSleep: 1
+      numAgents: 100
+   retail:
+      maxSleep: 2
+      minSleep: 1
+      numAgents: 100
+   hft:
+      numAgents: 0

@@ -10,7 +10,7 @@
 package io.fstream.rates.config;
 
 import io.fstream.core.model.event.QuoteEvent;
-import io.fstream.rates.util.TickEventTypeConverter;
+import io.fstream.rates.util.QuoteEventTypeConverter;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spring.boot.CamelContextConfiguration;
@@ -33,15 +33,15 @@ public class CamelConfig {
       public void beforeApplicationStart(CamelContext context) {
         // Define mapping from FIX to fStream objects
         context.getTypeConverterRegistry().addTypeConverter(
-            QuoteEvent.class, MarketDataSnapshotFullRefresh.class, tickEventTypeConverter());
+            QuoteEvent.class, MarketDataSnapshotFullRefresh.class, quoteEventTypeConverter());
       }
 
     };
   }
 
   @Bean
-  public TickEventTypeConverter tickEventTypeConverter() {
-    return new TickEventTypeConverter();
+  public QuoteEventTypeConverter quoteEventTypeConverter() {
+    return new QuoteEventTypeConverter();
   }
 
 }

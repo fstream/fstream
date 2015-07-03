@@ -29,8 +29,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = AlertEvent.class, name = "ALERT"),
     @Type(value = MetricEvent.class, name = "METRIC"),
     @Type(value = QuoteEvent.class, name = "QUOTE"),
-    @Type(value = MetricEvent.class, name = "TRADE"),
-    @Type(value = MetricEvent.class, name = "ORDER")
+    @Type(value = TradeEvent.class, name = "TRADE"),
+    @Type(value = LimitOrder.class, name = "ORDER")
 })
 public interface Event extends Serializable {
 

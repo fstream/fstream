@@ -27,7 +27,7 @@ public class SimulateProperties {
    * Settings.
    */
   private int msgResponseTimeout;
-  private float minTickSize;
+  private float minQuoteSize;
   private int nonPremiumQuoteDelay;
 
   /**

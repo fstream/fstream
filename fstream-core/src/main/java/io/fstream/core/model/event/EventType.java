@@ -15,7 +15,6 @@ package io.fstream.core.model.event;
 public enum EventType {
 
   ALERT,
-  TICK,
   TRADE,
   QUOTE,
   ORDER,

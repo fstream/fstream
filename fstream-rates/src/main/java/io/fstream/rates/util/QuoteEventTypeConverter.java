@@ -30,7 +30,7 @@ import quickfix.fix44.MarketDataSnapshotFullRefresh;
  * ://algo-trader.googlecode.com/svn-history/r539/branches/fix-md/code/src/main/java/com/algoTrader/service/fix/
  * FixMessageHandler.java
  */
-public class TickEventTypeConverter extends TypeConverterSupport {
+public class QuoteEventTypeConverter extends TypeConverterSupport {
 
   @Override
   @SuppressWarnings("unchecked")

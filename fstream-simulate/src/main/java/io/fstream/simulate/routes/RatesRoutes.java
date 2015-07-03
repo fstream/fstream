@@ -11,7 +11,7 @@
 package io.fstream.simulate.routes;
 
 import io.fstream.simulate.util.CodecDataFormat;
-import io.fstream.simulate.util.RandomTickEventGenerator;
+import io.fstream.simulate.util.RandomQuoteEventGenerator;
 import lombok.val;
 
 import org.apache.camel.component.kafka.KafkaConstants;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 /**
  * Simulation and publication of rates.
  * <p>
- * Useful for simulating FX ticks.
+ * Useful for simulating FX quotes.
  */
 @Component
 @Profile("rates")
@@ -36,29 +36,29 @@ public class RatesRoutes extends AbstractRoutes {
   public void configure() throws Exception {
     val period = 5000L;
     
-    from("timer://tick-event1?daemon=false&period=" + period * 1)
-      .process(new RandomTickEventGenerator("EUR/USD", 1.2757f, 1.3990f))
+    from("timer://quote-event1?daemon=false&period=" + period * 1)
+      .process(new RandomQuoteEventGenerator("EUR/USD", 1.2757f, 1.3990f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event2?daemon=false&period=" + period * 2)
-      .process(new RandomTickEventGenerator("USD/JPY", 93.8675f, 105.4415f))
+    from("timer://quote-event2?daemon=false&period=" + period * 2)
+      .process(new RandomQuoteEventGenerator("USD/JPY", 93.8675f, 105.4415f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event3?daemon=false&period=" + period * 3)
-      .process(new RandomTickEventGenerator("GBP/USD", 1.4817f, 1.6997f))
+    from("timer://quote-event3?daemon=false&period=" + period * 3)
+      .process(new RandomQuoteEventGenerator("GBP/USD", 1.4817f, 1.6997f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event4?daemon=false&period=" + period * 4)
-      .process(new RandomTickEventGenerator("AUD/USD", 0.8661f, 0.9791f))
+    from("timer://quote-event4?daemon=false&period=" + period * 4)
+      .process(new RandomQuoteEventGenerator("AUD/USD", 0.8661f, 0.9791f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event5?daemon=false&period=" + period * 5)
-      .process(new RandomTickEventGenerator("USD/CHF", 0.8701f, 0.9792f))
+    from("timer://quote-event5?daemon=false&period=" + period * 5)
+      .process(new RandomQuoteEventGenerator("USD/CHF", 0.8701f, 0.9792f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event6?daemon=false&period=" + period * 6)
-      .process(new RandomTickEventGenerator("USD/CAD", 1.0138f, 1.1279f))
+    from("timer://quote-event6?daemon=false&period=" + period * 6)
+      .process(new RandomQuoteEventGenerator("USD/CAD", 1.0138f, 1.1279f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event6?daemon=false&period=" + period * 6)
-      .process(new RandomTickEventGenerator("AUD/NZD", 1.0138f, 1.1279f))
+    from("timer://quote-event6?daemon=false&period=" + period * 6)
+      .process(new RandomQuoteEventGenerator("AUD/NZD", 1.0138f, 1.1279f))
       .to(RATES_ENDPOINT);
-    from("timer://tick-event6?daemon=false&period=" + period * 6)
-      .process(new RandomTickEventGenerator("NZD/USD", 1.0138f, 1.1279f))
+    from("timer://quote-event6?daemon=false&period=" + period * 6)
+      .process(new RandomQuoteEventGenerator("NZD/USD", 1.0138f, 1.1279f))
       .to(RATES_ENDPOINT);    
     
     from(RATES_ENDPOINT)

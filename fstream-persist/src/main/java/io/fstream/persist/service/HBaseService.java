@@ -88,13 +88,13 @@ public class HBaseService implements PersistenceService {
     val table = connection.getTable(TABLE_NAME);
     try {
       // TODO: Support other types!
-      val tickEvent = (QuoteEvent) event;
-      val key = createKey(tickEvent);
+      val quoteEvent = (QuoteEvent) event;
+      val key = createKey(quoteEvent);
 
       val row = new Put(Bytes.toBytes(key));
-      row.addColumn(CF_DATA, COLUMN_BID, Bytes.toBytes(tickEvent.getBid()));
-      row.addColumn(CF_DATA, COLUMN_ASK, Bytes.toBytes(tickEvent.getAsk()));
-      row.addColumn(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(tickEvent.getSymbol()));
+      row.addColumn(CF_DATA, COLUMN_BID, Bytes.toBytes(quoteEvent.getBid()));
+      row.addColumn(CF_DATA, COLUMN_ASK, Bytes.toBytes(quoteEvent.getAsk()));
+      row.addColumn(CF_DATA, COLUMN_SYMBOL, Bytes.toBytes(quoteEvent.getSymbol()));
 
       log.info("**** Putting row");
       table.put(row);

@@ -124,8 +124,8 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
     val value = (String) tuple.getValue(0);
     val event = Codec.decodeText(value, Event.class);
     // send external timer event - timestamp of incoming event.
-    // TICK are truly external events. Rest are internally generated.
-    if (event.getType().equals(EventType.TICK)) {
+    // Quote are truly external events. Rest are internally generated.
+    if (event.getType().equals(EventType.QUOTE)) {
       runtime.sendEvent(new CurrentTimeEvent(event.getDateTime().getMillis()));
     }
 

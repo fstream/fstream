@@ -18,7 +18,7 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
     execute(
         eplFile("statement1.epl"),
         givenEvents(
-            tickEventFile("tick-events1.json")));
+            quoteEventFile("quote-events1.json")));
   }
 
   @Test
@@ -26,9 +26,9 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
     execute(
         epl("SELECT ask FROM Rate"),
         givenEvents(
-            tickEvent(second("00:00:00"), "EUR/USD", 1.40, 1.30),
+            quoteEvent(second("00:00:00"), "EUR/USD", 1.40, 1.30),
             timeEvent(second("00:00:01")),
-            tickEvent(second("00:00:02"), "EUR/USD", 1.41, 1.31),
+            quoteEvent(second("00:00:02"), "EUR/USD", 1.41, 1.31),
             timeEvent(second("00:00:03"))));
   }
 
