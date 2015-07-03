@@ -69,8 +69,8 @@ public abstract class ActiveAgent extends Agent {
       return null;
     }
 
-    val type = decideOrderType(getProbMarket());
-    val side = decideSide(1 - getProbBuy(), OrderSide.ASK);
+    OrderType type = decideOrderType(getProbMarket());
+    OrderSide side = decideSide(1 - getProbBuy(), OrderSide.ASK);
     val symbol = decideSymbol();
 
     val quote = this.getLastValidQuote(symbol);
