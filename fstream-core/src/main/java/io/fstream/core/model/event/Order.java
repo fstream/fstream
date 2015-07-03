@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Order extends AbstractEvent implements Comparable<Order> {
+public class Order extends AbstractEvent {
 
   public enum OrderSide {
     BID,
@@ -47,15 +47,6 @@ public class Order extends AbstractEvent implements Comparable<Order> {
     this.amount = amount;
     this.price = price;
     this.userId = userId;
-  }
-
-  @Override
-  public int compareTo(Order o) {
-    if (this.getOid() == o.getOid() && this.brokerId.equals(o.getBrokerId())) {
-      return 1;
-    }
-
-    return 0;
   }
 
   @Override
