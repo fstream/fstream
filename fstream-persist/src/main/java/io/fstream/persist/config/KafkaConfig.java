@@ -11,7 +11,7 @@ package io.fstream.persist.config;
 
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.MetricEvent;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.persist.service.KafkaService;
 
@@ -25,7 +25,7 @@ public class KafkaConfig {
 
   @Bean
   public KafkaService ratesService() {
-    return new KafkaService(Topic.RATES, QuoteEvent.class);
+    return new KafkaService(Topic.RATES, Quote.class);
   }
 
   @Bean

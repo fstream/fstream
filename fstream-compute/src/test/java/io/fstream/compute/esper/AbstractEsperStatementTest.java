@@ -12,7 +12,7 @@ package io.fstream.compute.esper;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.readLines;
 import static joptsimple.internal.Strings.repeat;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 
 import java.io.File;
 import java.util.List;
@@ -64,7 +64,7 @@ public abstract class AbstractEsperStatementTest {
   public void setUp() {
     // TODO: Rename "Rate" to "QuoteEvent"
     val configuration = new Configuration();
-    configuration.addEventType("Rate", QuoteEvent.class.getName());
+    configuration.addEventType("Quote", Quote.class.getName());
 
     // Setup engine
     this.provider = EPServiceProviderManager.getProvider(this.getClass().getName(), configuration);
@@ -89,7 +89,7 @@ public abstract class AbstractEsperStatementTest {
     return execute(Resources.toString(eplFile.toURI().toURL(), UTF_8), readQuoteEvents(quoteEventFile));
   }
 
-  protected List<?> execute(String statement, QuoteEvent... events) {
+  protected List<?> execute(String statement, Quote... events) {
     return execute(statement, events);
   }
 
@@ -128,9 +128,9 @@ public abstract class AbstractEsperStatementTest {
     log.info(repeat('-', 80));
 
     for (val event : events) {
-      if (event instanceof QuoteEvent) {
+      if (event instanceof Quote) {
         // Advance time
-        val quoteEvent = (QuoteEvent) event;
+        val quoteEvent = (Quote) event;
         val timeEvent = timeEvent(quoteEvent.getDateTime().getMillis());
         log.info("Sending: {}", timeEvent);
         runtime.sendEvent(timeEvent);
@@ -180,17 +180,17 @@ public abstract class AbstractEsperStatementTest {
     return new File("src/test/resources/quote-events", fileName);
   }
 
-  protected static QuoteEvent quoteEvent(long time, String symbol, double ask, double bid) {
-    return new QuoteEvent(new DateTime(time), symbol, (float) ask, (float) bid);
+  protected static Quote quoteEvent(long time, String symbol, double ask, double bid) {
+    return new Quote(new DateTime(time), symbol, (float) ask, (float) bid);
   }
 
   @SneakyThrows
-  private static Iterable<QuoteEvent> readQuoteEvents(File quoteEventFile) {
+  private static Iterable<Quote> readQuoteEvents(File quoteEventFile) {
     val lines = readLines(quoteEventFile.toURI().toURL(), UTF_8);
 
-    val builder = ImmutableList.<QuoteEvent> builder();
+    val builder = ImmutableList.<Quote> builder();
     for (val line : lines) {
-      val quoteEvent = MAPPER.readValue(line, QuoteEvent.class);
+      val quoteEvent = MAPPER.readValue(line, Quote.class);
       builder.add(quoteEvent);
     }
 

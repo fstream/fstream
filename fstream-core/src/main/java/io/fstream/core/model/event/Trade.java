@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TradeEvent extends AbstractEvent {
+public class Trade extends AbstractEvent {
 
   public enum TradeSide {
     ACTIVE, PASSIVE
@@ -25,7 +25,7 @@ public class TradeEvent extends AbstractEvent {
   private DateTime orderTime;
   private int amount;
 
-  public TradeEvent(DateTime tradeTime, Order active, Order passive, int executedSize) {
+  public Trade(DateTime tradeTime, Order active, Order passive, int executedSize) {
     super(tradeTime);
     this.setPrice(passive.getPrice());
     this.setSymbol(active.getSymbol());

@@ -13,7 +13,7 @@ import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.MetricEvent;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import io.fstream.core.util.Codec;
 
 import java.util.concurrent.TimeUnit;
@@ -83,7 +83,7 @@ public class InfluxDBService implements PersistenceService {
 
   private Serie createSerie(Event event) {
     if (event.getType() == EventType.QUOTE) {
-      val quoteEvent = (QuoteEvent) event;
+      val quoteEvent = (Quote) event;
       return new Serie.Builder("quotes")
           .columns("time", "symbol", "ask", "bid")
           .values(event.getDateTime().getMillis(), quoteEvent.getSymbol(), quoteEvent.getAsk(), quoteEvent.getBid())

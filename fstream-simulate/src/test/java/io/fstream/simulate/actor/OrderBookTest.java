@@ -5,7 +5,7 @@ import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
-import io.fstream.core.model.event.LimitOrder;
+import io.fstream.core.model.event.Order;
 import io.fstream.simulate.config.SimulateProperties;
 import lombok.val;
 
@@ -65,15 +65,15 @@ public class OrderBookTest {
   }
 
   @Test
-  public void testAddLimitOrders() throws Exception {
-    val ask1 = new LimitOrder(ASK, ADD, time, 1, brokerId, symbol, 1000, 25f, "u1");
-    val ask2 = new LimitOrder(ASK, ADD, time.plusMinutes(1), 2, brokerId, symbol, 1000, 26f, "u2");
-    val ask3 = new LimitOrder(ASK, ADD, time.plusMinutes(2), 3, brokerId, symbol, 1000, 24f, "u3");
-    val ask4 = new LimitOrder(ASK, ADD, time.plusMinutes(3), 4, brokerId, symbol, 1000, 24f, "u4");
+  public void testAddOrders() throws Exception {
+    val ask1 = new Order(ASK, ADD, time, 1, brokerId, symbol, 1000, 25f, "u1");
+    val ask2 = new Order(ASK, ADD, time.plusMinutes(1), 2, brokerId, symbol, 1000, 26f, "u2");
+    val ask3 = new Order(ASK, ADD, time.plusMinutes(2), 3, brokerId, symbol, 1000, 24f, "u3");
+    val ask4 = new Order(ASK, ADD, time.plusMinutes(3), 4, brokerId, symbol, 1000, 24f, "u4");
 
-    val bid5 = new LimitOrder(ASK, ADD, time.plus(4), 4, brokerId, symbol, 1000, 19f, "u5");
-    val bid6 = new LimitOrder(ASK, ADD, time.plusMinutes(5), 5, brokerId, symbol, 1000, 19f, "u6");
-    val bid7 = new LimitOrder(ASK, ADD, time.plusMinutes(6), 6, brokerId, symbol, 1000, 18f, "u7");
+    val bid5 = new Order(ASK, ADD, time.plus(4), 4, brokerId, symbol, 1000, 19f, "u5");
+    val bid6 = new Order(ASK, ADD, time.plusMinutes(5), 5, brokerId, symbol, 1000, 19f, "u6");
+    val bid7 = new Order(ASK, ADD, time.plusMinutes(6), 6, brokerId, symbol, 1000, 18f, "u7");
 
     orderBook.onReceive(ask1);
     assertTrue(orderBook.getAsks().size() == 1);
@@ -95,7 +95,7 @@ public class OrderBookTest {
     assertTrue(orderBook.getAskDepth() == 4000);
     assertTrue(orderBook.getBestAsk() == 24f);
     assertTrue(orderBook.getAsks().get(24f).size() == 2);
-    LimitOrder[] orderlist = orderBook.getAsks().get(24f).toArray(new LimitOrder[0]);
+    Order[] orderlist = orderBook.getAsks().get(24f).toArray(new Order[0]);
     assertTrue(orderlist.length == 2);
     assertTrue(orderlist[0].getDateTime().getMillis() <= orderlist[1].getDateTime().getMillis());
 
@@ -106,13 +106,13 @@ public class OrderBookTest {
 
   @Test
   public void addLimitTest2() throws Exception {
-    val ask0 = new LimitOrder(ASK, ADD, time, 1, brokerId, symbol, 91, 10.277141f, "u1");
-    val bid1 = new LimitOrder(BID, ADD, time.plusMinutes(1), 1, brokerId, symbol, 36, 6.828021f, "u1");
-    val bid2 = new LimitOrder(BID, ADD, time.plusMinutes(2), 1, brokerId, symbol, 63, 6.5065575f, "u1");
-    val bid3 = new LimitOrder(BID, ADD, time.plusMinutes(3), 1, brokerId, symbol, 51, 3.4671168f, "u1");
-    val bid4 = new LimitOrder(BID, ADD, time.plusMinutes(4), 1, brokerId, symbol, 35, 4.0023165f, "u1");
-    val bid5 = new LimitOrder(BID, ADD, time.plusMinutes(5), 1, brokerId, symbol, 47, 5.373663f, "u1");
-    val bid6 = new LimitOrder(BID, ADD, time.plusMinutes(6), 1, brokerId, symbol, 52, 10.277141f, "u1");
+    val ask0 = new Order(ASK, ADD, time, 1, brokerId, symbol, 91, 10.277141f, "u1");
+    val bid1 = new Order(BID, ADD, time.plusMinutes(1), 1, brokerId, symbol, 36, 6.828021f, "u1");
+    val bid2 = new Order(BID, ADD, time.plusMinutes(2), 1, brokerId, symbol, 63, 6.5065575f, "u1");
+    val bid3 = new Order(BID, ADD, time.plusMinutes(3), 1, brokerId, symbol, 51, 3.4671168f, "u1");
+    val bid4 = new Order(BID, ADD, time.plusMinutes(4), 1, brokerId, symbol, 35, 4.0023165f, "u1");
+    val bid5 = new Order(BID, ADD, time.plusMinutes(5), 1, brokerId, symbol, 47, 5.373663f, "u1");
+    val bid6 = new Order(BID, ADD, time.plusMinutes(6), 1, brokerId, symbol, 52, 10.277141f, "u1");
 
     orderBook.onReceive(ask0);
     orderBook.onReceive(bid1);
@@ -134,11 +134,11 @@ public class OrderBookTest {
     // processing 2015-05-20T10:29:05.647-04:00,84,7.9161587,ASK,hft2
     // ask depth does not add up record = 229 actual =145
 
-    val bid0 = new LimitOrder(BID, ADD, time, 0, brokerId, symbol, 34, 7.9161587f, "u1");
-    val bid1 = new LimitOrder(BID, ADD, time, 1, brokerId, symbol, 50, 7.9161587f, "u1");
-    val ask1 = new LimitOrder(ASK, ADD, time.plusMinutes(1), 2, brokerId, symbol, 89, 10.97681f, "u1");
-    val ask2 = new LimitOrder(ASK, ADD, time.plusMinutes(2), 3, brokerId, symbol, 90, 7.9161587f, "u1");
-    val ask3 = new LimitOrder(ASK, ADD, time.plusMinutes(3), 4, brokerId, symbol, 84, 7.9161587f, "u1");
+    val bid0 = new Order(BID, ADD, time, 0, brokerId, symbol, 34, 7.9161587f, "u1");
+    val bid1 = new Order(BID, ADD, time, 1, brokerId, symbol, 50, 7.9161587f, "u1");
+    val ask1 = new Order(ASK, ADD, time.plusMinutes(1), 2, brokerId, symbol, 89, 10.97681f, "u1");
+    val ask2 = new Order(ASK, ADD, time.plusMinutes(2), 3, brokerId, symbol, 90, 7.9161587f, "u1");
+    val ask3 = new Order(ASK, ADD, time.plusMinutes(3), 4, brokerId, symbol, 84, 7.9161587f, "u1");
 
     orderBook.onReceive(bid0);
     orderBook.onReceive(bid1);
@@ -156,10 +156,10 @@ public class OrderBookTest {
     // processing 2015-05-20T21:02:27.740-04:00,55,10.0,BID,hft2
     // processing 2015-05-20T21:02:27.741-04:00,83,10.0,ASK,hft1
 
-    val bid1 = new LimitOrder(BID, ADD, time, 1, brokerId, symbol, 7, 6.180016f, "u1");
-    val bid2 = new LimitOrder(BID, ADD, time, 2, brokerId, symbol, 9, 10.0f, "u1");
-    val bid3 = new LimitOrder(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 55, 10.0f, "u1");
-    val ask1 = new LimitOrder(ASK, ADD, time.plusMinutes(2), 4, brokerId, symbol, 83, 10.0f, "u1");
+    val bid1 = new Order(BID, ADD, time, 1, brokerId, symbol, 7, 6.180016f, "u1");
+    val bid2 = new Order(BID, ADD, time, 2, brokerId, symbol, 9, 10.0f, "u1");
+    val bid3 = new Order(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 55, 10.0f, "u1");
+    val ask1 = new Order(ASK, ADD, time.plusMinutes(2), 4, brokerId, symbol, 83, 10.0f, "u1");
 
     orderBook.onReceive(bid1);
     orderBook.onReceive(bid2);
@@ -176,10 +176,10 @@ public class OrderBookTest {
     // processing 2015-05-20T22:19:11.284-04:00,3,35,10.0,BID,hft1
     // processing 2015-05-20T22:19:11.284-04:00,4,32,10.0,BID,hft2
 
-    val bid1 = new LimitOrder(BID, ADD, time, 1, brokerId, symbol, 47, 7.5659113f, "u1");
-    val bid2 = new LimitOrder(BID, ADD, time, 2, brokerId, symbol, 48, 10.0f, "u1");
-    val bid3 = new LimitOrder(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 35, 10.0f, "u1");
-    val bid4 = new LimitOrder(BID, ADD, time.plusMinutes(1), 4, brokerId, symbol, 32, 10.0f, "u1");
+    val bid1 = new Order(BID, ADD, time, 1, brokerId, symbol, 47, 7.5659113f, "u1");
+    val bid2 = new Order(BID, ADD, time, 2, brokerId, symbol, 48, 10.0f, "u1");
+    val bid3 = new Order(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 35, 10.0f, "u1");
+    val bid4 = new Order(BID, ADD, time.plusMinutes(1), 4, brokerId, symbol, 32, 10.0f, "u1");
 
     orderBook.onReceive(bid1);
     orderBook.onReceive(bid2);
@@ -196,10 +196,10 @@ public class OrderBookTest {
     // processing 2015-05-21T12:48:20.574-04:00,3,98,8.0,ASK,hft2
     // processing 2015-05-21T12:48:20.574-04:00,4,32,8.0,BID,hft1
 
-    val ask1 = new LimitOrder(ASK, ADD, time, 1, brokerId, symbol, 81, 8.0f, "u1");
-    val ask2 = new LimitOrder(ASK, ADD, time, 2, brokerId, symbol, 91, 11.686356f, "u1");
-    val ask3 = new LimitOrder(ASK, ADD, time.plusMinutes(1), 3, brokerId, symbol, 98, 8.0f, "u1");
-    val bid1 = new LimitOrder(BID, ADD, time.plusMinutes(1), 4, brokerId, symbol, 32, 8.0f, "u1");
+    val ask1 = new Order(ASK, ADD, time, 1, brokerId, symbol, 81, 8.0f, "u1");
+    val ask2 = new Order(ASK, ADD, time, 2, brokerId, symbol, 91, 11.686356f, "u1");
+    val ask3 = new Order(ASK, ADD, time.plusMinutes(1), 3, brokerId, symbol, 98, 8.0f, "u1");
+    val bid1 = new Order(BID, ADD, time.plusMinutes(1), 4, brokerId, symbol, 32, 8.0f, "u1");
 
     orderBook.onReceive(ask1);
     orderBook.onReceive(ask2);
@@ -227,16 +227,16 @@ public class OrderBookTest {
     // Trade registered for active ASK of 173 at price 10.0
     // bid depth does not add up record = 153 actual =231
 
-    val bid1 = new LimitOrder(BID, ADD, time, 1, brokerId, symbol, 50, 7.8310976f, "u1");
-    val bid2 = new LimitOrder(BID, ADD, time, 2, brokerId, symbol, 67, 6.1404834f, "u1");
-    val bid3 = new LimitOrder(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 63, 10.0f, "u1");
-    val bid4 = new LimitOrder(BID, ADD, time.plusMinutes(1), 4, brokerId, symbol, 9, 6.307989f, "u1");
-    val bid5 = new LimitOrder(BID, ADD, time.plusMinutes(2), 5, brokerId, symbol, 76, 10.0f, "u1");
-    val bid6 = new LimitOrder(BID, ADD, time.plusMinutes(2), 6, brokerId, symbol, 15, 10.0f, "u1");
-    val bid7 = new LimitOrder(BID, ADD, time.plusMinutes(3), 7, brokerId, symbol, 2, 10.0f, "u1");
-    val bid8 = new LimitOrder(BID, ADD, time.plusMinutes(3), 8, brokerId, symbol, 32, 10.0f, "u1");
-    val bid9 = new LimitOrder(BID, ADD, time.plusMinutes(4), 9, brokerId, symbol, 12, 10.0f, "u1");
-    val ask1 = new LimitOrder(ASK, ADD, time.plusMinutes(4), 11, brokerId, symbol, 95, 10.0f, "u1");
+    val bid1 = new Order(BID, ADD, time, 1, brokerId, symbol, 50, 7.8310976f, "u1");
+    val bid2 = new Order(BID, ADD, time, 2, brokerId, symbol, 67, 6.1404834f, "u1");
+    val bid3 = new Order(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 63, 10.0f, "u1");
+    val bid4 = new Order(BID, ADD, time.plusMinutes(1), 4, brokerId, symbol, 9, 6.307989f, "u1");
+    val bid5 = new Order(BID, ADD, time.plusMinutes(2), 5, brokerId, symbol, 76, 10.0f, "u1");
+    val bid6 = new Order(BID, ADD, time.plusMinutes(2), 6, brokerId, symbol, 15, 10.0f, "u1");
+    val bid7 = new Order(BID, ADD, time.plusMinutes(3), 7, brokerId, symbol, 2, 10.0f, "u1");
+    val bid8 = new Order(BID, ADD, time.plusMinutes(3), 8, brokerId, symbol, 32, 10.0f, "u1");
+    val bid9 = new Order(BID, ADD, time.plusMinutes(4), 9, brokerId, symbol, 12, 10.0f, "u1");
+    val ask1 = new Order(ASK, ADD, time.plusMinutes(4), 11, brokerId, symbol, 95, 10.0f, "u1");
 
     orderBook.onReceive(bid1);
     orderBook.onReceive(bid2);
@@ -259,10 +259,10 @@ public class OrderBookTest {
     // processing 2015-05-21T16:21:10.329-04:00,3,66,10.0,BID,hft1
     // processing 2015-05-21T16:21:10.329-04:00,4,77,7.4102798,ASK,hft2
 
-    val bid1 = new LimitOrder(BID, ADD, time, 1, brokerId, symbol, 67, 6.4096193f, "u1");
-    val bid2 = new LimitOrder(BID, ADD, time, 2, brokerId, symbol, 55, 7.4102798f, "u1");
-    val bid3 = new LimitOrder(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 66, 10.0f, "u1");
-    val ask1 = new LimitOrder(ASK, ADD, time.plusMinutes(1), 4, brokerId, symbol, 77, 7.4102798f, "u1");
+    val bid1 = new Order(BID, ADD, time, 1, brokerId, symbol, 67, 6.4096193f, "u1");
+    val bid2 = new Order(BID, ADD, time, 2, brokerId, symbol, 55, 7.4102798f, "u1");
+    val bid3 = new Order(BID, ADD, time.plusMinutes(1), 3, brokerId, symbol, 66, 10.0f, "u1");
+    val ask1 = new Order(ASK, ADD, time.plusMinutes(1), 4, brokerId, symbol, 77, 7.4102798f, "u1");
 
     orderBook.onReceive(bid1);
     orderBook.onReceive(bid2);
@@ -273,20 +273,20 @@ public class OrderBookTest {
   }
 
   public void addLimitTest9() {
-    // val order1 = new LimitOrder(ASK, ADD, time, 1,
+    // val order1 = new Order(ASK, ADD, time, 1,
     // brokerId, symbol, 1000, 25f,"u1");
-    // val order2 = new LimitOrder(ASK, ADD,
+    // val order2 = new Order(ASK, ADD,
     // time.plusMinutes(1), 2, brokerId, symbol, 1000, 25f,"u2");
-    // val order6 = new LimitOrder(ASK, ADD,
+    // val order6 = new Order(ASK, ADD,
     // time.plusMinutes(4), 5, brokerId, symbol, 10000, 19f,"u3");
-    // val order7 = new LimitOrder(ASK, ADD,
+    // val order7 = new Order(ASK, ADD,
     // time.plusMinutes(5), 6, brokerId, symbol, 1000, 26f,"u4");
     //
-    // val order3 = new LimitOrder(BID, ADD,
+    // val order3 = new Order(BID, ADD,
     // time.plusMinutes(2), 3, brokerId, symbol, 1000, 20f,"u5");
-    // val order4 = new LimitOrder(BID, ADD,
+    // val order4 = new Order(BID, ADD,
     // time.plusMinutes(3), 4, brokerId, symbol, 5000, 19f,"u6");
-    // val order5 = new LimitOrder(BID, ADD,
+    // val order5 = new Order(BID, ADD,
     // time.plusMinutes(6), 7, brokerId, symbol, 5000, 19f,"u7");
   }
 

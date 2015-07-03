@@ -1,10 +1,9 @@
 package io.fstream.simulate.actor.agent;
 
-import io.fstream.core.model.event.LimitOrder;
 import io.fstream.core.model.event.Order;
-import io.fstream.core.model.event.QuoteEvent;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
+import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
@@ -39,8 +38,8 @@ public abstract class ActiveAgent extends Agent {
       onReceiveActiveInstruments((ActiveInstruments) message);
     } else if (message instanceof SubscriptionQuoteRequest) {
       onReceiveSubscriptionQuote((SubscriptionQuoteRequest) message);
-    } else if (message instanceof QuoteEvent) {
-      onReceiveQuote((QuoteEvent) message);
+    } else if (message instanceof Quote) {
+      onReceiveQuote((Quote) message);
     } else {
       unhandled(message);
     }
@@ -102,7 +101,7 @@ public abstract class ActiveAgent extends Agent {
       }
     }
 
-    return new LimitOrder(side, type, getSimulationTime(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
+    return new Order(side, type, getSimulationTime(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
   }
 
 }

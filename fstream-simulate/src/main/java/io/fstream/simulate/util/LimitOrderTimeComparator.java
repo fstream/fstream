@@ -9,7 +9,7 @@
 
 package io.fstream.simulate.util;
 
-import io.fstream.core.model.event.LimitOrder;
+import io.fstream.core.model.event.Order;
 
 import java.util.Comparator;
 
@@ -18,12 +18,12 @@ import java.util.Comparator;
  * <p>
  * (Price -> {ordert1, ordert2, ...}
  */
-public final class LimitOrderTimeComparator implements Comparator<LimitOrder> {
+public final class LimitOrderTimeComparator implements Comparator<Order> {
 
   public static final LimitOrderTimeComparator INSTANCE = new LimitOrderTimeComparator();
 
   @Override
-  public int compare(LimitOrder order1, LimitOrder order2) {
+  public int compare(Order order1, Order order2) {
     if (order1.equals(order2)) {
       return 0;
     }

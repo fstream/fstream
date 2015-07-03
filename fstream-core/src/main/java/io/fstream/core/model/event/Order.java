@@ -1,40 +1,82 @@
 package io.fstream.core.model.event;
 
+import static io.fstream.core.model.event.EventType.ORDER;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.val;
+
 import org.joda.time.DateTime;
 
-// TODO: Bring back MarketOrder. LimitOrder (has price) extend MarketOrder?
-public interface Order extends Event {
+@Getter
+@Setter
+@ToString
+public class Order extends AbstractEvent implements Comparable<Order> {
 
-  enum OrderSide {
+  public enum OrderSide {
     BID,
     ASK // Offer
   };
 
-  enum OrderType {
+  public enum OrderType {
     MO, // Market Order
     ADD, // Limit Order - Add
     AMEND, // Limit Order - Amend
     CANCEL // Limit Order - Cancel
   }
 
-  OrderType getOrderType();
+  private OrderSide side;
+  private OrderType orderType;
+  private int oid;
+  private String brokerId;
+  private String symbol;
+  private int amount;
+  private float price;
+  private String userId;
 
-  OrderSide getSide();
+  private DateTime processedTime;
 
-  int getOid();
+  public Order(@NonNull OrderSide side, @NonNull OrderType type, @NonNull DateTime time, int oid,
+      @NonNull String brokerId, @NonNull String symbol, int amount, float price, @NonNull String userId) {
+    super(time);
+    this.side = side;
+    this.orderType = type;
+    this.oid = oid;
+    this.brokerId = brokerId;
+    this.symbol = symbol;
+    this.amount = amount;
+    this.price = price;
+    this.userId = userId;
+  }
 
-  String getBrokerId();
+  @Override
+  public boolean equals(Object obj) {
+    val order = (Order) obj;
+    if (order.getBrokerId() == this.brokerId && order.getOid() == this.oid
+        && order.getDateTime().equals(this.getDateTime())) {
+      return true;
+    }
+    return false;
+  }
 
-  int getAmount();
+  @Override
+  public int hashCode() {
+    return this.getBrokerId().hashCode() + this.getOid() + this.getDateTime().hashCode();
+  }
 
-  String getSymbol();
+  @Override
+  public int compareTo(Order o) {
+    if (this.getOid() == o.getOid() && this.brokerId == o.getBrokerId()) {
+      return 1;
+    }
 
-  float getPrice();
+    return 0;
+  }
 
-  String getUserId();
-
-  void setProcessedTime(DateTime datetime);
-
-  void setOrderType(OrderType type);
+  @Override
+  public EventType getType() {
+    return ORDER;
+  }
 
 }

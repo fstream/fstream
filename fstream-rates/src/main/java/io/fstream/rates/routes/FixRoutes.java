@@ -11,7 +11,7 @@
 package io.fstream.rates.routes;
 
 import static org.apache.camel.LoggingLevel.DEBUG;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import io.fstream.rates.util.CodecDataFormat;
 
 import org.apache.camel.component.kafka.KafkaConstants;
@@ -40,7 +40,7 @@ public class FixRoutes extends AbstractFixRoutes {
           .to("{{rates.uri}}")
           
         .when(marketDataSnapshotFullRefresh())
-          .convertBodyTo(QuoteEvent.class)
+          .convertBodyTo(Quote.class)
           .log(DEBUG, "${body}")
           .marshal(new CodecDataFormat())
           .setHeader(KafkaConstants.PARTITION_KEY, constant("0")) // Required

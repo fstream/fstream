@@ -3,7 +3,7 @@ package io.fstream.simulate.actor.agent;
 import static com.google.common.base.Preconditions.checkState;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.actor.BaseActor;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.config.SimulateProperties.AgentProperties;
@@ -49,7 +49,7 @@ public abstract class Agent extends BaseActor {
    * State.
    */
   final Random random = new Random();
-  final Map<String, QuoteEvent> bbboQuotes = new HashMap<>();
+  final Map<String, Quote> bbboQuotes = new HashMap<>();
   final OpenOrders openOrders = new OpenOrders();
 
   public Agent(SimulateProperties properties, AgentType type, String name) {
@@ -84,7 +84,7 @@ public abstract class Agent extends BaseActor {
     this.activeInstruments.setInstruments(activeInstruments.getInstruments());
   }
 
-  protected void onReceiveQuote(QuoteEvent quote) {
+  protected void onReceiveQuote(Quote quote) {
     this.bbboQuotes.put(quote.getSymbol(), quote);
   }
 
@@ -105,11 +105,11 @@ public abstract class Agent extends BaseActor {
   /**
    * If subscribed successfully, read quote. If not received then get market open quote from exchange.
    */
-  protected QuoteEvent getLastValidQuote(String symbol) {
+  protected Quote getLastValidQuote(String symbol) {
     return bbboQuotes.computeIfAbsent(symbol, (key) -> {
       val future = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
       try {
-        return (QuoteEvent) Await.result(future, msgResponseTimeout.duration());
+        return (Quote) Await.result(future, msgResponseTimeout.duration());
       } catch (Exception e) {
         log.error("Timeout awaiting quote: {}", e.getMessage());
         return null;

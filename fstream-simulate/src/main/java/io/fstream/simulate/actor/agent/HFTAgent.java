@@ -1,10 +1,10 @@
 package io.fstream.simulate.actor.agent;
 
 import static io.fstream.simulate.actor.agent.AgentType.HFT;
-import io.fstream.core.model.event.LimitOrder;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
+import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
@@ -24,15 +24,15 @@ public class HFTAgent extends Agent {
 
   @Override
   public void onReceive(Object message) throws Exception {
-    if (message instanceof QuoteEvent) {
-      onReceiveQuote((QuoteEvent) message);
+    if (message instanceof Quote) {
+      onReceiveQuote((Quote) message);
     } else if (message instanceof ActiveInstruments) {
       onReceiveActiveInstruments((ActiveInstruments) message);
     }
   }
 
   @Override
-  protected void onReceiveQuote(QuoteEvent quote) {
+  protected void onReceiveQuote(Quote quote) {
     super.onReceiveQuote(quote);
 
     val imbalance = getImbalance(quote);
@@ -48,13 +48,13 @@ public class HFTAgent extends Agent {
     openOrders.addOpenOrder(order);
   }
 
-  private boolean isNormal(QuoteEvent quote, Imbalance imbalance) {
+  private boolean isNormal(Quote quote, Imbalance imbalance) {
     val spread = quote.getAsk() - quote.getBid();
 
     return imbalance.getRatio() < 2 && spread > minQuoteSize;
   }
 
-  private LimitOrder createLiquidityNormal(QuoteEvent quote, Imbalance imbalance) {
+  private Order createLiquidityNormal(Quote quote, Imbalance imbalance) {
     // No stress period, so provide liquidity at better price
     val bestAsk = generateBestAsk(quote);
     val bestBid = generateBestBid(quote);
@@ -76,11 +76,11 @@ public class HFTAgent extends Agent {
       }
     }
 
-    return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
+    return new Order(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
-  private Imbalance getImbalance(QuoteEvent quote) {
+  private Imbalance getImbalance(Quote quote) {
     int imbalanceAmount;
     OrderSide imbalanceSide;
     float imbalanceRatio;
@@ -102,7 +102,7 @@ public class HFTAgent extends Agent {
   /**
    * Creates liquidity at stressful time e.g. when no liquidity exist on a side or book is unbalanced above a threshold
    */
-  private LimitOrder createLiquidityAtStress(QuoteEvent quote, Imbalance imbalance) {
+  private Order createLiquidityAtStress(Quote quote, Imbalance imbalance) {
     float price;
 
     if (imbalance.getSide() == OrderSide.ASK) {
@@ -115,16 +115,16 @@ public class HFTAgent extends Agent {
       price = bestBid - (minQuoteSize * imbalance.getRatio());
     }
 
-    return new LimitOrder(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
+    return new Order(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
-  private float generateBestBid(QuoteEvent quote) {
+  private float generateBestBid(Quote quote) {
     // TODO: 10?
     return quote.getBidAmount() != 0 ? quote.getBid() : 10;
   }
 
-  private float generateBestAsk(QuoteEvent quote) {
+  private float generateBestAsk(Quote quote) {
     // TODO: 12?
     return quote.getAskAmount() != 0 ? quote.getAsk() : 12;
   }

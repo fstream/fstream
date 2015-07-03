@@ -13,7 +13,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.MetricEvent;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Order;
+import io.fstream.core.model.event.Order.OrderSide;
+import io.fstream.core.model.event.Order.OrderType;
+import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Trade;
 
 import java.util.Arrays;
 
@@ -35,8 +39,12 @@ public class CodecTest {
     return Arrays.asList(new Object[][] {
         { new AlertEvent(new DateTime(), 1, "data") },
         { new MetricEvent(new DateTime(), 1, "data") },
-        { new QuoteEvent(new DateTime(), "symbol", 0.1f, 0.2f) }
-        // TODO: Add remaining
+        { new Quote(new DateTime(), "symbol", 0.1f, 0.2f) },
+        { new Trade(new DateTime(), new Order(OrderSide.ASK, OrderType.MO, new DateTime(), 123, "xx", "RY",
+            1000, 10.0f, "hft1"), new Order(OrderSide.ASK, OrderType.ADD, new DateTime(), 123, "xx", "RY", 1000,
+            10.0f, "hft2"), 1000) },
+        { new Order(OrderSide.ASK, OrderType.ADD, new DateTime(), 123, "xx", "RY", 1000,
+            10.0f, "retail1") }
     });
   }
 

@@ -9,7 +9,7 @@
 
 package io.fstream.simulate.util;
 
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import io.fstream.core.util.Codec;
 
 import java.io.InputStream;
@@ -27,7 +27,7 @@ public class CodecDataFormat implements DataFormat {
 
   @Override
   public Object unmarshal(Exchange exchange, InputStream stream) throws Exception {
-    return Codec.decodeBytes(stream, QuoteEvent.class);
+    return Codec.decodeBytes(stream, Quote.class);
   }
 
 }

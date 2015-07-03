@@ -3,12 +3,11 @@ package io.fstream.simulate.actor;
 import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
 import static java.util.Collections.reverseOrder;
-import io.fstream.core.model.event.LimitOrder;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
-import io.fstream.core.model.event.QuoteEvent;
-import io.fstream.core.model.event.TradeEvent;
+import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Trade;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.util.LimitOrderTimeComparator;
@@ -43,8 +42,8 @@ public class OrderBook extends BaseActor {
   /**
    * State.
    */
-  private final NavigableMap<Float, NavigableSet<LimitOrder>> bids = new TreeMap<>(reverseOrder()); // Non-natural
-  private final NavigableMap<Float, NavigableSet<LimitOrder>> asks = new TreeMap<>();
+  private final NavigableMap<Float, NavigableSet<Order>> bids = new TreeMap<>(reverseOrder()); // Non-natural
+  private final NavigableMap<Float, NavigableSet<Order>> asks = new TreeMap<>();
 
   /**
    * Aggregates.
@@ -84,7 +83,7 @@ public class OrderBook extends BaseActor {
     if (order.getOrderType() == OrderType.MO) {
       // Process market order
       log.debug("Processing market order: {}", order);
-      val limitOrder = (LimitOrder) order;
+      val limitOrder = order;
       if (limitOrder.getSide() == OrderSide.ASK) {
         limitOrder.setPrice(Float.MIN_VALUE);
       } else {
@@ -95,7 +94,7 @@ public class OrderBook extends BaseActor {
     } else {
       // Process limit order
       log.debug("Processing limitorder: {}", order);
-      this.processLimitOrder((LimitOrder) order);
+      this.processLimitOrder(order);
     }
   }
 
@@ -113,10 +112,10 @@ public class OrderBook extends BaseActor {
 
   /**
    * Accepts IOrder and executes it against available depth. Returns unfilled amount TODO currently MarketOrders are
-   * mimicked via LimitOrders where trigger price is best ask/bid. Need to add marketable order implementation
+   * mimicked via Orders where trigger price is best ask/bid. Need to add marketable order implementation
    */
-  private int processMarketOrder(LimitOrder order) {
-    NavigableMap<Float, NavigableSet<LimitOrder>> book;
+  private int processMarketOrder(Order order) {
+    NavigableMap<Float, NavigableSet<Order>> book;
     if (order.getSide() == OrderSide.ASK) {
       if (this.bids.isEmpty()) {
         log.debug("No depth. Order not filled {}", order);
@@ -212,7 +211,7 @@ public class OrderBook extends BaseActor {
     this.bestAsk = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
     if (this.bestAsk != prevbestaks || this.bestBid != prevbestbid) {
-      val quote = new QuoteEvent(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
+      val quote = new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
           getDepthAtLevel(bestAsk, OrderSide.ASK),
           getDepthAtLevel(bestBid, OrderSide.BID));
 
@@ -229,7 +228,7 @@ public class OrderBook extends BaseActor {
   private int getDepthAtLevel(float price, OrderSide side) {
     int depth = 0;
 
-    NavigableSet<LimitOrder> book;
+    NavigableSet<Order> book;
     if (side == OrderSide.ASK) {
       book = this.asks.get(price);
     } else {
@@ -295,7 +294,7 @@ public class OrderBook extends BaseActor {
    */
   private void registerTrade(Order active, Order passive, int executedSize) {
     tradeCount += 1;
-    val trade = new TradeEvent(getSimulationTime(), active, passive, executedSize);
+    val trade = new Trade(getSimulationTime(), active, passive, executedSize);
 
     exchange().tell(trade, self());
     publisher().tell(trade, self());
@@ -307,7 +306,7 @@ public class OrderBook extends BaseActor {
     }
   }
 
-  private void processLimitOrder(LimitOrder order) {
+  private void processLimitOrder(Order order) {
     if (order.getOrderType() == OrderType.AMEND) {
       log.debug("Order amended");
     } else if (order.getOrderType() == OrderType.CANCEL) {
@@ -324,7 +323,7 @@ public class OrderBook extends BaseActor {
   /**
    * Adds LimitOrder to the order book
    */
-  private void addLimitOrder(LimitOrder order) {
+  private void addLimitOrder(Order order) {
     int availablePepth = 0;
     if (order.getSide() == OrderSide.ASK) {
       // Executing against bid side of the book.
@@ -358,9 +357,9 @@ public class OrderBook extends BaseActor {
   /**
    * Inserts limit order in the TreeMap<Float,TreeSet<LimitOrder>> data strucuture
    */
-  private void insertOrder(LimitOrder order) {
+  private void insertOrder(Order order) {
     boolean isBid;
-    NavigableMap<Float, NavigableSet<LimitOrder>> sideBook;
+    NavigableMap<Float, NavigableSet<Order>> sideBook;
     if (order.getSide() == OrderSide.ASK) {
       isBid = false;
       sideBook = this.asks;
@@ -371,7 +370,7 @@ public class OrderBook extends BaseActor {
 
     if (sideBook.isEmpty() || sideBook.get(order.getPrice()) == null) {
       // Add order to order book
-      val orderList = new TreeSet<LimitOrder>(LimitOrderTimeComparator.INSTANCE);
+      val orderList = new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
       orderList.add(order);
       sideBook.put(order.getPrice(), orderList);
     } else {
@@ -407,7 +406,7 @@ public class OrderBook extends BaseActor {
    * Determines if a limit order crosses the spread i.e. LimitBuy is better priced than bestask or LimitSell is better
    * priced than best bid
    */
-  private boolean crossesSpread(LimitOrder order) {
+  private boolean crossesSpread(Order order) {
     if (order.getSide() == OrderSide.ASK) {
       if (order.getPrice() <= this.bestBid) {
         return true;
@@ -425,7 +424,7 @@ public class OrderBook extends BaseActor {
    * Deletes an order from this order book.
    */
   // TODO: Untested method.
-  private boolean deleteOrder(LimitOrder order) {
+  private boolean deleteOrder(Order order) {
     val book = getBook(order);
     val orders = book.get(order.getPrice());
 
@@ -451,7 +450,7 @@ public class OrderBook extends BaseActor {
     return removed;
   }
 
-  private NavigableMap<Float, NavigableSet<LimitOrder>> getBook(LimitOrder order) {
+  private NavigableMap<Float, NavigableSet<Order>> getBook(Order order) {
     if (order.getSide() == OrderSide.ASK) {
       return this.bids;
     } else {

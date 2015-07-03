@@ -9,7 +9,7 @@
 
 package io.fstream.rates.util;
 
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -42,8 +42,8 @@ public class QuoteEventTypeConverter extends TypeConverterSupport {
   }
 
   @SneakyThrows
-  private QuoteEvent convertTo(MarketDataSnapshotFullRefresh message) {
-    val event = new QuoteEvent();
+  private Quote convertTo(MarketDataSnapshotFullRefresh message) {
+    val event = new Quote();
     event.setSymbol(message.getSymbol().getValue());
     event.setDateTime(new DateTime(message.getHeader().getUtcTimeStamp(SendingTime.FIELD)));
 

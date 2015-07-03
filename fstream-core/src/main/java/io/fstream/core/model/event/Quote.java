@@ -20,7 +20,7 @@ import org.joda.time.DateTime;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class QuoteEvent extends AbstractEvent {
+public class Quote extends AbstractEvent {
 
   private String symbol;
   private float ask;
@@ -29,7 +29,7 @@ public class QuoteEvent extends AbstractEvent {
   private int askAmount;
   private int bidAmount;
 
-  public QuoteEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid) {
+  public Quote(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid) {
     super(dateTime);
     this.symbol = symbol;
     this.ask = ask;
@@ -37,7 +37,7 @@ public class QuoteEvent extends AbstractEvent {
     this.mid = (ask + bid) / 2.0f;
   }
 
-  public QuoteEvent(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid, int askAmount,
+  public Quote(@NonNull DateTime dateTime, @NonNull String symbol, float ask, float bid, int askAmount,
       int bidAmount) {
     super(dateTime);
     this.symbol = symbol;

@@ -1,7 +1,7 @@
 package io.fstream.simulate.actor;
 
 import io.fstream.core.model.event.Order;
-import io.fstream.core.model.event.QuoteEvent;
+import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
@@ -40,7 +40,7 @@ public class Exchange extends BaseActor {
   private static final AtomicInteger currentOrderId = new AtomicInteger(0);
 
   private final Map<String, ActorRef> orderBooks = new HashMap<>();
-  private final Map<String, QuoteEvent> lastValidQuote = new HashMap<>();
+  private final Map<String, Quote> lastValidQuote = new HashMap<>();
 
   private final List<ActorRef> premiumSubscribers = new ArrayList<>();
   private final List<ActorRef> quotesSubscribers = new ArrayList<>();
@@ -73,7 +73,7 @@ public class Exchange extends BaseActor {
     for (val symbol : activeInstruments.getInstruments()) {
       val bid = minBid - (random.nextInt(5) * minQuoteSize);
       val ask = minAsk + (random.nextInt(5) * minQuoteSize);
-      val quote = new QuoteEvent(getSimulationTime(), symbol, ask, bid, 0, 0);
+      val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
 
       lastValidQuote.put(symbol, quote);
     }
@@ -93,8 +93,8 @@ public class Exchange extends BaseActor {
       onReceiveActiveInstruments();
     } else if (message instanceof SubscriptionQuoteRequest) {
       onReceiveSubscriptionQuoteRequest((SubscriptionQuoteRequest) message);
-    } else if (message instanceof QuoteEvent) {
-      onReceiveQuote((QuoteEvent) message);
+    } else if (message instanceof Quote) {
+      onReceiveQuote((Quote) message);
     } else {
       unhandled(message);
     }
@@ -110,7 +110,7 @@ public class Exchange extends BaseActor {
     orderBook.tell(order, self());
   }
 
-  private void onReceiveQuote(QuoteEvent quote) {
+  private void onReceiveQuote(Quote quote) {
     if (quote instanceof DelayedQuote) {
       notifyQuoteAndOrderSubscribers(quote);
       notifyQuoteSubscribers(quote);
@@ -171,19 +171,19 @@ public class Exchange extends BaseActor {
     return message;
   }
 
-  private void notifyQuoteSubscribers(QuoteEvent quote) {
+  private void notifyQuoteSubscribers(Quote quote) {
     notifyAgents(quote, quotesSubscribers);
   }
 
-  private void notifyQuoteAndOrderSubscribers(QuoteEvent quote) {
+  private void notifyQuoteAndOrderSubscribers(Quote quote) {
     notifyAgents(quote, quoteAndOrdersSubscribers);
   }
 
-  private void notifyPremiumSubscribers(QuoteEvent quote) {
+  private void notifyPremiumSubscribers(Quote quote) {
     notifyAgents(quote, premiumSubscribers);
   }
 
-  private void notifyAgents(QuoteEvent quote, List<ActorRef> agents) {
+  private void notifyAgents(Quote quote, List<ActorRef> agents) {
     agents.stream().forEach(agent -> agent.tell(quote, self()));
   }
 
