@@ -137,7 +137,6 @@ public class Exchange extends BaseActor {
 
   private void onReceiveActiveInstruments() {
     val activeInstruments = new ActiveInstruments(this.activeInstruments.getInstruments());
-
     sender().tell(activeInstruments, self());
   }
 

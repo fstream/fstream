@@ -86,8 +86,8 @@ public abstract class ActiveAgent extends Agent {
         price = Float.MAX_VALUE;
       }
     } else {
+      // TODO remove hard coding.
       if (side == OrderSide.ASK) {
-        // TODO remove hard coding.
         // max ensures price stays in bounds.
         val bestAsk = quote.getAsk();
         price = decidePrice(bestAsk, Math.min(bestAsk + (minQuoteSize * 5), bestAsk), bestAsk, getProbBestPrice());

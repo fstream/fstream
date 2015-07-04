@@ -63,7 +63,7 @@ public class OrderBook extends BaseActor {
   }
 
   public void printBook() {
-    log.info("{}\n", formatOrderBook(this));
+    log.info("\n{}", formatOrderBook(this));
   }
 
   @Override
@@ -85,7 +85,7 @@ public class OrderBook extends BaseActor {
     // Book keeping
     orderCount += 1;
 
-    if (orderCount % 100000 == 0) {
+    if (orderCount % 100_000 == 0) {
       log.info("[{}] ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
           symbol, calculateAskCount(), calculateBidCount(), askDepth, bidDepth);
     }
@@ -101,15 +101,15 @@ public class OrderBook extends BaseActor {
         order.setPrice(Float.MAX_VALUE);
       }
 
-      this.processMarketOrder(order);
+      processMarketOrder(order);
     } else {
-      this.processLimitOrder(order);
+      processLimitOrder(order);
     }
   }
 
   private void onReceiveCommand(Command command) {
     if (command == Command.PRINT_ORDER_BOOK) {
-      this.printBook();
+      printBook();
 
       // TODO: Explain what does sending "true" achieve
       sender().tell(true, self());
@@ -120,8 +120,10 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * Accepts IOrder and executes it against available depth. Returns unfilled amount TODO currently MarketOrders are
-   * mimicked via Orders where trigger price is best ask/bid. Need to add marketable order implementation
+   * Accepts {@code Order} and executes it against available depth. Returns unfilled amount.
+   * <p>
+   * TODO: Currently MarketOrders are mimicked via Orders where trigger price is best ask/bid. Need to add marketable
+   * order implementation
    */
   private int processMarketOrder(Order order) {
     NavigableMap<Float, NavigableSet<Order>> book;
@@ -230,11 +232,12 @@ public class OrderBook extends BaseActor {
    * Updates best ask/bid
    */
   private void updateBestPrices() {
-    val prevbestaks = this.bestAsk;
-    val prevbestbid = this.bestBid;
+    val prevBestAsk = this.bestAsk;
+    val prevBestBid = this.bestBid;
     this.bestAsk = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
-    if (this.bestAsk != prevbestaks || this.bestBid != prevbestbid) {
+
+    if (this.bestAsk != prevBestAsk || this.bestBid != prevBestBid) {
       val quote = new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
           getDepthAtLevel(bestAsk, OrderSide.ASK),
           getDepthAtLevel(bestBid, OrderSide.BID));
@@ -264,6 +267,7 @@ public class OrderBook extends BaseActor {
         depth += order.getAmount();
       }
     }
+
     return depth;
   }
 
@@ -274,17 +278,17 @@ public class OrderBook extends BaseActor {
   /**
    * Updates bid depth / ask depth based on executed size
    */
-  private void updateDepth(OrderSide orderside, int executedsize) {
-    if (orderside == OrderSide.ASK) {
-      this.bidDepth -= executedsize;
+  private void updateDepth(OrderSide side, int executedSize) {
+    if (side == OrderSide.ASK) {
+      this.bidDepth -= executedSize;
     } else {
-      this.askDepth -= executedsize;
+      this.askDepth -= executedSize;
     }
   }
 
   /**
-   * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained
-   * biddepth/askdepth variables
+   * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
+   * ask depth variables
    */
   private boolean assertBookDepth() {
     val bidDepth = calculateBidDepth();
@@ -463,42 +467,38 @@ public class OrderBook extends BaseActor {
    * Cancels and removes an order from this order book.
    */
   private boolean cancelOrder(Order order) {
-    val book = resolveBook(order);
-    val priceLevel = book.get(order.getPrice());
+    val priceLevel = getPriceLevel(order);
 
-    boolean removed = false;
-    if (priceLevel != null) {
-      removed = priceLevel.remove(order);
-      if (removed) {
-        log.debug("Cancelled order");
-      }
-
-      if (order.getSide() == OrderSide.ASK) {
-        this.askDepth = removed ? this.askDepth - order.getAmount() : this.askDepth;
-      } else {
-        this.bidDepth = removed ? this.bidDepth - order.getAmount() : this.bidDepth;
-      }
+    val empty = priceLevel == null;
+    if (empty) {
+      return false;
     }
 
-    if (removed) {
-      publisher().tell(order, self());
+    val missing = !priceLevel.remove(order);
+    if (missing) {
+      return false;
     }
 
-    if (log.isDebugEnabled()) {
-      if (!assertBookDepth()) {
-        System.exit(1);
-      }
+    if (order.getSide() == OrderSide.ASK) {
+      this.askDepth -= order.getAmount();
+    } else {
+      this.bidDepth -= order.getAmount();
     }
 
-    return removed;
+    if (log.isDebugEnabled() && !assertBookDepth()) {
+      System.exit(1);
+    }
+
+    log.debug("Cancelled order");
+    publisher().tell(order, self());
+
+    return true;
   }
 
-  private NavigableMap<Float, NavigableSet<Order>> resolveBook(Order order) {
-    if (order.getSide() == OrderSide.ASK) {
-      return this.bids;
-    } else {
-      return this.asks;
-    }
+  private NavigableSet<Order> getPriceLevel(Order order) {
+    val orders = order.getSide() == OrderSide.ASK ? this.asks : this.bids;
+
+    return orders.get(order.getPrice());
   }
 
 }
