@@ -177,7 +177,7 @@ public abstract class Agent extends BaseActor {
    */
   protected OrderType decideOrderType(float probMarket) {
     if (random.nextFloat() <= probMarket) {
-      return OrderType.MO;
+      return OrderType.MARKET;
     } else {
       return OrderType.ADD;
     }

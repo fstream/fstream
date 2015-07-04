@@ -19,7 +19,7 @@ public class Order extends AbstractEvent {
   };
 
   public enum OrderType {
-    MO, // Market Order
+    MARKET, // Market Order
     ADD, // Limit Order - Add
     AMEND, // Limit Order - Amend
     CANCEL // Limit Order - Cancel

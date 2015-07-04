@@ -78,22 +78,21 @@ public class OrderBook extends BaseActor {
   private void onReceiveOrder(Order order) {
     checkState(order.getSymbol() == this.symbol);
 
+    // Book keeping
     orderCount += 1;
+
+    log.debug("Processing {} order: {}", order.getOrderType(), order);
     order.setProcessedTime(getSimulationTime());
-    if (order.getOrderType() == OrderType.MO) {
-      // Process market order
-      log.debug("Processing market order: {}", order);
-      val limitOrder = order;
-      if (limitOrder.getSide() == OrderSide.ASK) {
-        limitOrder.setPrice(Float.MIN_VALUE);
+
+    if (order.getOrderType() == OrderType.MARKET) {
+      if (order.getSide() == OrderSide.ASK) {
+        order.setPrice(Float.MIN_VALUE);
       } else {
-        limitOrder.setPrice(Float.MAX_VALUE);
+        order.setPrice(Float.MAX_VALUE);
       }
 
-      this.processMarketOrder(limitOrder);
+      this.processMarketOrder(order);
     } else {
-      // Process limit order
-      log.debug("Processing limitorder: {}", order);
       this.processLimitOrder(order);
     }
   }
@@ -130,76 +129,91 @@ public class OrderBook extends BaseActor {
       book = this.asks;
     }
 
-    int unfilledsize = order.getAmount();
-    int executedsize = 0;
-    int totalexecutedsize = 0;
-    val bookiterator = book.entrySet().iterator();
-    while (bookiterator.hasNext()) {
-      val pricelevel = bookiterator.next();
-      val orderiterator = pricelevel.getValue().iterator();
-      while (orderiterator.hasNext()) {
-        val passiveorder = orderiterator.next();
+    int unfilledSize = order.getAmount();
+    int executedSize = 0;
+    int totalExecutedsize = 0;
+    val bookIterator = book.entrySet().iterator();
+    while (bookIterator.hasNext()) {
+      val priceLevel = bookIterator.next();
+      val orderIterator = priceLevel.getValue().iterator();
+      while (orderIterator.hasNext()) {
+        val passiveOrder = orderIterator.next();
 
-        if (unfilledsize <= 0) {
+        if (unfilledSize <= 0) {
           break;
         }
-        if (order.getSide() == OrderSide.ASK) { // limit price exists,
-          // respect bounds
-          if (order.getPrice() > passiveorder.getPrice()) {
-            log.debug("Breaking price crossed on active ASK (SELL) MO for {} orderprice={} passiveorder={}",
-                this.getSymbol(), order.getPrice(), passiveorder.getPrice());
-            this.updateDepth(order.getSide(), totalexecutedsize);
+        if (order.getSide() == OrderSide.ASK) {
+          // Limit price exists, respect bounds
+          if (order.getPrice() > passiveOrder.getPrice()) {
+            log.debug("Breaking price crossed on active ASK (SELL) MO for {} order price={} passive order={}",
+                this.getSymbol(), order.getPrice(), passiveOrder.getPrice());
+            this.updateDepth(order.getSide(), totalExecutedsize);
             this.updateBestPrices();
-            return unfilledsize; // price has crossed
+            return unfilledSize; // price has crossed
           }
         } else {
-          if (order.getPrice() < passiveorder.getPrice()) {
-            log.debug("breaking price crossed on active BID (BUY) MO for {} orderprice={} passiveorder={}",
-                this.getSymbol(), order.getPrice(), passiveorder.getPrice());
-            this.updateDepth(order.getSide(), totalexecutedsize);
+          if (order.getPrice() < passiveOrder.getPrice()) {
+            log.debug("Breaking price crossed on active BID (BUY) MO for {} order price={} passive order={}",
+                this.getSymbol(), order.getPrice(), passiveOrder.getPrice());
+            this.updateDepth(order.getSide(), totalExecutedsize);
             this.updateBestPrices();
-            return unfilledsize; // price has crossed
+            return unfilledSize; // price has crossed
           }
         }
-        unfilledsize = unfilledsize - passiveorder.getAmount();
+        unfilledSize = unfilledSize - passiveOrder.getAmount();
 
-        if (unfilledsize == 0) {
-          // nothing else to do.
-          executedsize = order.getAmount();
-          totalexecutedsize = totalexecutedsize + executedsize;
-          registerTrade(order, passiveorder, executedsize);
-          orderiterator.remove(); // remove the passive order (last
-          // one returned by iterator)
+        if (unfilledSize == 0) {
+          // Nothing else to do.
+          executedSize = order.getAmount();
+          totalExecutedsize = totalExecutedsize + executedSize;
 
-        } else if (unfilledsize < 0) {
-          // incoming was smaller than first order in queue. repost
-          // remainder
-          executedsize = order.getAmount();
-          totalexecutedsize = totalexecutedsize + executedsize;
-          passiveorder.setAmount(Math.abs(unfilledsize));
-          registerTrade(order, passiveorder, executedsize);
+          registerTrade(order, passiveOrder, executedSize);
 
+          // Remove the passive order (last one returned by iterator)
+          orderIterator.remove();
+        } else if (unfilledSize < 0) {
+          // Incoming was smaller than first order in queue. Repost remainder
+          executedSize = order.getAmount();
+          totalExecutedsize = totalExecutedsize + executedSize;
+          passiveOrder.setAmount(Math.abs(unfilledSize));
+
+          registerTrade(order, passiveOrder, executedSize);
         } else {
-          // incoming larger than the first order in current level.
-          // keep
-          // on iterating.
-          executedsize = passiveorder.getAmount();
-          order.setAmount(order.getAmount() - executedsize);
-          totalexecutedsize = totalexecutedsize + executedsize;
-          registerTrade(order, passiveorder, executedsize);
-          orderiterator.remove(); // remove the passive order (last
-          // one returned by iterator)
+          // Incoming larger than the first order in current level. Keep on iterating.
+          executedSize = passiveOrder.getAmount();
+          totalExecutedsize = totalExecutedsize + executedSize;
+          order.setAmount(order.getAmount() - executedSize);
+
+          registerTrade(order, passiveOrder, executedSize);
+
+          // Remove the passive order (last one returned by iterator)
+          orderIterator.remove();
         }
       }
-      if (book.get(pricelevel.getKey()).isEmpty()) {
-        bookiterator.remove(); // removes price level if orderqueue in
-        // it is empty (last one returned by
-        // iterator)
+      if (book.get(priceLevel.getKey()).isEmpty()) {
+        // Removes price level if order queue in it is empty (last one returned by iterator)
+        bookIterator.remove();
       }
     }
-    this.updateDepth(order.getSide(), totalexecutedsize);
+
+    this.updateDepth(order.getSide(), totalExecutedsize);
     this.updateBestPrices();
-    return unfilledsize;
+
+    return unfilledSize;
+  }
+
+  private void processLimitOrder(Order order) {
+    if (order.getOrderType() == OrderType.ADD) {
+      log.debug("Order added");
+      addLimitOrder(order);
+    } else if (order.getOrderType() == OrderType.AMEND) {
+      log.debug("Order amended");
+    } else if (order.getOrderType() == OrderType.CANCEL) {
+      log.debug("Cancelling order {}", order);
+      cancelOrder(order);
+    } else {
+      checkState(false);
+    }
   }
 
   /**
@@ -306,20 +320,6 @@ public class OrderBook extends BaseActor {
     }
   }
 
-  private void processLimitOrder(Order order) {
-    if (order.getOrderType() == OrderType.AMEND) {
-      log.debug("Order amended");
-    } else if (order.getOrderType() == OrderType.CANCEL) {
-      log.debug("Cancelling order {}", order);
-      deleteOrder(order);
-    } else if (order.getOrderType() == OrderType.ADD) {
-      log.debug("Order added");
-      addLimitOrder(order);
-    } else {
-      // TODO: Handle?
-    }
-  }
-
   /**
    * Adds LimitOrder to the order book
    */
@@ -421,16 +421,18 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * Deletes an order from this order book.
+   * Cancels and removes an order from this order book.
    */
-  // TODO: Untested method.
-  private boolean deleteOrder(Order order) {
-    val book = getBook(order);
-    val orders = book.get(order.getPrice());
+  private boolean cancelOrder(Order order) {
+    val book = resolveBook(order);
+    val priceLevel = book.get(order.getPrice());
 
     boolean removed = false;
-    if (orders != null) {
-      removed = orders.remove(order);
+    if (priceLevel != null) {
+      removed = priceLevel.remove(order);
+      if (removed) {
+        log.debug("Cancelled order");
+      }
 
       if (order.getSide() == OrderSide.ASK) {
         this.askDepth = removed ? this.askDepth - order.getAmount() : this.askDepth;
@@ -450,7 +452,7 @@ public class OrderBook extends BaseActor {
     return removed;
   }
 
-  private NavigableMap<Float, NavigableSet<Order>> getBook(Order order) {
+  private NavigableMap<Float, NavigableSet<Order>> resolveBook(Order order) {
     if (order.getSide() == OrderSide.ASK) {
       return this.bids;
     } else {

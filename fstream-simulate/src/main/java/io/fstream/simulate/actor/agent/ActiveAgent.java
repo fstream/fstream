@@ -79,7 +79,7 @@ public abstract class ActiveAgent extends Agent {
       return null;
     }
 
-    if (type == OrderType.MO) {
+    if (type == OrderType.MARKET) {
       if (side == OrderSide.ASK) {
         price = Float.MIN_VALUE;
       } else {

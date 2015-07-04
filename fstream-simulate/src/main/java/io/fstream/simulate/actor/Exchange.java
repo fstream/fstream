@@ -184,15 +184,22 @@ public class Exchange extends BaseActor {
   }
 
   private void notifyAgents(Quote quote, List<ActorRef> agents) {
-    agents.stream().forEach(agent -> agent.tell(quote, self()));
+    for (val agent : agents) {
+      agent.tell(quote, self());
+    }
   }
 
   private ActorRef resolveOrderBook(String symbol) {
     // Create book on demand, as needed
-    return orderBooks.computeIfAbsent(symbol, (name) -> {
-      Props props = Props.create(OrderBook.class, properties, symbol);
-      return context().actorOf(props, name);
-    });
+    ActorRef orderBook = orderBooks.get(symbol);
+    if (orderBook == null) {
+      val props = Props.create(OrderBook.class, properties, symbol);
+      orderBook = context().actorOf(props, symbol);
+
+      orderBooks.put(symbol, orderBook);
+    }
+
+    return orderBook;
   }
 
 }
