@@ -423,10 +423,9 @@ public class OrderBook extends BaseActor {
   /**
    * Deletes an order from this order book.
    */
-  // TODO: Untested method.
   private boolean deleteOrder(Order order) {
-    val book = getBook(order);
-    val orders = book.get(order.getPrice());
+    NavigableMap<Float, NavigableSet<Order>> book = getBook(order);
+    NavigableSet<Order> orders = book.get(order.getPrice());
 
     boolean removed = false;
     if (orders != null) {
@@ -437,7 +436,9 @@ public class OrderBook extends BaseActor {
       } else {
         this.bidDepth = removed ? this.bidDepth - order.getAmount() : this.bidDepth;
       }
+    }
 
+    if (removed) {
       publisher().tell(order, self());
     }
 

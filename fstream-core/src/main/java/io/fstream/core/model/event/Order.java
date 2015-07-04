@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "processedTime" })
 public class Order extends AbstractEvent {
 
   public enum OrderSide {
