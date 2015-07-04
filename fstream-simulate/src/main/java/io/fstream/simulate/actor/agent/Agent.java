@@ -125,7 +125,7 @@ public abstract class Agent extends BaseActor {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
       // FIXME: Sending unsafe mutation of message
-      symbolOrder.setOrderType(OrderType.CANCEL);
+      symbolOrder.setOrderType(OrderType.LIMIT_CANCEL);
 
       exchange().tell(symbolOrder, self());
     }
@@ -177,9 +177,9 @@ public abstract class Agent extends BaseActor {
    */
   protected OrderType decideOrderType(float probMarket) {
     if (random.nextFloat() <= probMarket) {
-      return OrderType.MARKET;
+      return OrderType.MARKET_ORDER;
     } else {
-      return OrderType.ADD;
+      return OrderType.LIMIT_ADD;
     }
   }
 

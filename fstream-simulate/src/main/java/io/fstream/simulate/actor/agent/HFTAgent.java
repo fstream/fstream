@@ -76,7 +76,7 @@ public class HFTAgent extends Agent {
       }
     }
 
-    return new Order(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
+    return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 
@@ -115,7 +115,7 @@ public class HFTAgent extends Agent {
       price = bestBid - (minQuoteSize * imbalance.getRatio());
     }
 
-    return new Order(imbalance.getSide(), OrderType.ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
+    return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(), imbalance.getAmount(), price, name);
   }
 

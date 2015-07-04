@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 /**
@@ -80,7 +81,7 @@ public class OrderBook extends BaseActor {
   }
 
   private void onReceiveOrder(Order order) {
-    checkState(order.getSymbol() == this.symbol);
+    checkState(order.getSymbol() == symbol);
 
     // Book keeping
     orderCount += 1;
@@ -93,13 +94,10 @@ public class OrderBook extends BaseActor {
     log.debug("Processing {} order: {}", order.getOrderType(), order);
     order.setProcessedTime(getSimulationTime());
 
-    if (order.getOrderType() == OrderType.MARKET) {
+    if (order.getOrderType() == OrderType.MARKET_ORDER) {
       // TODO: Explain the need for this
-      if (order.getSide() == OrderSide.ASK) {
-        order.setPrice(Float.MIN_VALUE);
-      } else {
-        order.setPrice(Float.MAX_VALUE);
-      }
+      val price = order.getSide() == OrderSide.ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
+      order.setPrice(price);
 
       processMarketOrder(order);
     } else {
@@ -126,25 +124,16 @@ public class OrderBook extends BaseActor {
    * order implementation
    */
   private int processMarketOrder(Order order) {
-    NavigableMap<Float, NavigableSet<Order>> book;
-    if (order.getSide() == OrderSide.ASK) {
-      if (this.bids.isEmpty()) {
-        log.debug("No depth. Order not filled {}", order);
-        return order.getAmount();
-      }
-      book = this.bids;
-    } else {
-      if (this.asks.isEmpty()) {
-        log.debug("No depth. Order not filled {}", order);
-        return order.getAmount();
-      }
-      book = this.asks;
+    val bookSide = order.getSide() == OrderSide.ASK ? this.bids : this.asks;
+    if (bookSide.isEmpty()) {
+      log.debug("No depth. Order not filled {}", order);
+      return order.getAmount();
     }
 
     int unfilledSize = order.getAmount();
     int executedSize = 0;
     int totalExecutedsize = 0;
-    val bookIterator = book.entrySet().iterator();
+    val bookIterator = bookSide.entrySet().iterator();
     while (bookIterator.hasNext()) {
       val priceLevel = bookIterator.next();
       val orderIterator = priceLevel.getValue().iterator();
@@ -202,7 +191,7 @@ public class OrderBook extends BaseActor {
           orderIterator.remove();
         }
       }
-      if (book.get(priceLevel.getKey()).isEmpty()) {
+      if (bookSide.get(priceLevel.getKey()).isEmpty()) {
         // Removes price level if order queue in it is empty (last one returned by iterator)
         bookIterator.remove();
       }
@@ -215,12 +204,13 @@ public class OrderBook extends BaseActor {
   }
 
   private void processLimitOrder(Order order) {
-    if (order.getOrderType() == OrderType.ADD) {
+    if (order.getOrderType() == OrderType.LIMIT_ADD) {
       log.debug("Order added");
       addLimitOrder(order);
-    } else if (order.getOrderType() == OrderType.AMEND) {
+    } else if (order.getOrderType() == OrderType.LIMIT_AMEND) {
       log.debug("Order amended");
-    } else if (order.getOrderType() == OrderType.CANCEL) {
+      // TODO: Add support?
+    } else if (order.getOrderType() == OrderType.LIMIT_CANCEL) {
       log.debug("Cancelling order {}", order);
       cancelOrder(order);
     } else {
@@ -234,13 +224,14 @@ public class OrderBook extends BaseActor {
   private void updateBestPrices() {
     val prevBestAsk = this.bestAsk;
     val prevBestBid = this.bestBid;
+
     this.bestAsk = this.asks.isEmpty() ? Float.MAX_VALUE : this.asks.firstKey();
     this.bestBid = this.bids.isEmpty() ? Float.MIN_VALUE : this.bids.firstKey();
 
     if (this.bestAsk != prevBestAsk || this.bestBid != prevBestBid) {
       val quote = new Quote(getSimulationTime(), this.getSymbol(), this.getBestAsk(), this.getBestBid(),
-          getDepthAtLevel(bestAsk, OrderSide.ASK),
-          getDepthAtLevel(bestBid, OrderSide.BID));
+          calculatePriceLevelDepth(bestAsk, OrderSide.ASK),
+          calculatePriceLevelDepth(bestBid, OrderSide.BID));
 
       if (!isValidQuote(this.bestBid, this.bestAsk)) {
         log.error("Invalid quote {}", quote);
@@ -252,20 +243,15 @@ public class OrderBook extends BaseActor {
     }
   }
 
-  private int getDepthAtLevel(float price, OrderSide side) {
-    int depth = 0;
-
-    NavigableSet<Order> book;
-    if (side == OrderSide.ASK) {
-      book = this.asks.get(price);
-    } else {
-      book = this.bids.get(price);
+  private int calculatePriceLevelDepth(float price, OrderSide side) {
+    val priceLevel = getPriceLevel(side, price);
+    if (priceLevel == null) {
+      return 0;
     }
 
-    if (book != null) {
-      for (val order : book) {
-        depth += order.getAmount();
-      }
+    int depth = 0;
+    for (val order : priceLevel) {
+      depth += order.getAmount();
     }
 
     return depth;
@@ -356,7 +342,7 @@ public class OrderBook extends BaseActor {
     exchange().tell(trade, self());
     publisher().tell(trade, self());
 
-    val latency = Seconds.secondsBetween(active.getDateTime(), trade.getDateTime()).getSeconds();
+    val latency = calculateLatency(active.getDateTime(), trade.getDateTime());
     val delayed = latency > 5;
     if (delayed) {
       log.debug("Order took more than 5 seconds to be processed {}", active);
@@ -364,7 +350,7 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * Adds LimitOrder to the order book
+   * Adds the supplied limit order to the order book.
    */
   private void addLimitOrder(Order order) {
     long availableDepth = 0;
@@ -376,8 +362,8 @@ public class OrderBook extends BaseActor {
     }
 
     int unfilledSize;
-    if (crossesSpread(order) && availableDepth > 0) { // if limitprice
-      // Crosses spread, treat as market order
+    if (crossesSpread(order) && availableDepth > 0) {
+      // If limit price crosses spread, treat as market order
       unfilledSize = processMarketOrder(order);
       order.setAmount(unfilledSize);
 
@@ -386,45 +372,24 @@ public class OrderBook extends BaseActor {
         insertOrder(order);
       }
     } else {
-      // Mot crossing spread or no depth available. So add to limit book
+      // Not crossing spread or no depth available. So add to limit book
       insertOrder(order);
     }
 
-    if (log.isDebugEnabled()) {
-      if (!assertBookDepth()) {
-        System.exit(1);
-      }
+    if (log.isDebugEnabled() && !assertBookDepth()) {
+      System.exit(1);
     }
   }
 
   /**
-   * Inserts limit order in the TreeMap<Float,TreeSet<LimitOrder>> data strucuture
+   * Inserts limit order in the book side data structure.
    */
   private void insertOrder(Order order) {
-    boolean isBid;
-    NavigableMap<Float, NavigableSet<Order>> sideBook;
-    if (order.getSide() == OrderSide.ASK) {
-      isBid = false;
-      sideBook = this.asks;
-    } else {
-      isBid = true;
-      sideBook = this.bids;
-    }
-
-    if (sideBook.isEmpty() || sideBook.get(order.getPrice()) == null) {
-      // Add order to order book
-      val orderList = new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
-      orderList.add(order);
-      sideBook.put(order.getPrice(), orderList);
-    } else {
-      // Order at same price exists, queue it by time
-      val orderList = sideBook.get(order.getPrice());
-      orderList.add(order);
-      sideBook.put(order.getPrice(), orderList);
-    }
+    val priceLevel = resolvePriceLevel(order);
+    priceLevel.add(order);
 
     // Set best price and depth attributes
-    if (isBid) {
+    if (order.getSide() == OrderSide.BID) {
       if (this.bidDepth == 0 || order.getPrice() > this.bestBid) {
         this.bestBid = order.getPrice();
       }
@@ -433,34 +398,19 @@ public class OrderBook extends BaseActor {
       if (this.askDepth == 0 || order.getPrice() < this.bestAsk) {
         this.bestAsk = order.getPrice();
       }
-      this.askDepth = this.askDepth + order.getAmount();
+      this.askDepth += order.getAmount();
     }
 
     order.setProcessedTime(getSimulationTime());
-    if (Seconds.secondsBetween(order.getProcessedTime(), order.getDateTime()).getSeconds() > 5) {
-      log.debug("Rrder took more than 5 seconds to be processed: {}", order);
+
+    val latency = calculateLatency(order.getProcessedTime(), order.getDateTime());
+    val delayed = latency > 5;
+    if (delayed) {
+      log.debug("Order took more than 5 seconds to be processed: {}", order);
     }
 
     // publish to tape
     publisher().tell(order, self());
-  }
-
-  /**
-   * Determines if a limit order crosses the spread i.e. LimitBuy is better priced than bestask or LimitSell is better
-   * priced than best bid
-   */
-  private boolean crossesSpread(Order order) {
-    if (order.getSide() == OrderSide.ASK) {
-      if (order.getPrice() <= this.bestBid) {
-        return true;
-      }
-    } else {
-      if (order.getPrice() >= this.bestAsk) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   /**
@@ -495,10 +445,55 @@ public class OrderBook extends BaseActor {
     return true;
   }
 
-  private NavigableSet<Order> getPriceLevel(Order order) {
-    val orders = order.getSide() == OrderSide.ASK ? this.asks : this.bids;
+  /**
+   * Determines if a limit order crosses the spread i.e. LimitBuy is better priced than bestask or LimitSell is better
+   * priced than best bid
+   */
+  private boolean crossesSpread(Order order) {
+    if (order.getSide() == OrderSide.ASK) {
+      if (order.getPrice() <= this.bestBid) {
+        return true;
+      }
+    } else {
+      if (order.getPrice() >= this.bestAsk) {
+        return true;
+      }
+    }
 
-    return orders.get(order.getPrice());
+    return false;
+  }
+
+  private NavigableSet<Order> resolvePriceLevel(Order order) {
+    val priceLevel = getPriceLevel(order);
+    val exists = priceLevel != null;
+    if (exists) {
+      return priceLevel;
+    }
+
+    val newPriceLevel = new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
+    getBookSide(order).put(order.getPrice(), newPriceLevel);
+
+    return newPriceLevel;
+  }
+
+  private NavigableSet<Order> getPriceLevel(Order order) {
+    return getPriceLevel(order.getSide(), order.getPrice());
+  }
+
+  private NavigableSet<Order> getPriceLevel(OrderSide side, float price) {
+    return getBookSide(side).get(price);
+  }
+
+  private NavigableMap<Float, NavigableSet<Order>> getBookSide(Order order) {
+    return getBookSide(order.getSide());
+  }
+
+  private NavigableMap<Float, NavigableSet<Order>> getBookSide(OrderSide side) {
+    return side == OrderSide.ASK ? this.asks : this.bids;
+  }
+
+  private static int calculateLatency(DateTime endTime, DateTime startTime) {
+    return Seconds.secondsBetween(endTime, startTime).getSeconds();
   }
 
 }
