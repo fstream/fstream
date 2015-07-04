@@ -439,7 +439,9 @@ public class OrderBook extends BaseActor {
       } else {
         this.bidDepth = removed ? this.bidDepth - order.getAmount() : this.bidDepth;
       }
+    }
 
+    if (removed) {
       publisher().tell(order, self());
     }
 
