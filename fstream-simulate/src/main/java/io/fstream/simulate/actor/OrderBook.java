@@ -51,8 +51,8 @@ public class OrderBook extends BaseActor {
   private float bestBid = Float.MIN_VALUE;
   private float bestAsk = Float.MIN_VALUE;
 
-  private int bidDepth;
-  private int askDepth;
+  private long bidDepth;
+  private long askDepth;
 
   private int orderCount = 0;
   private int tradeCount = 0;
@@ -60,6 +60,10 @@ public class OrderBook extends BaseActor {
   public OrderBook(SimulateProperties properties, String symbol) {
     super(properties);
     this.symbol = symbol;
+  }
+
+  public void printBook() {
+    log.info("{}\n", formatOrderBook(this));
   }
 
   @Override
@@ -81,10 +85,16 @@ public class OrderBook extends BaseActor {
     // Book keeping
     orderCount += 1;
 
+    if (orderCount % 100000 == 0) {
+      log.info("[{}] ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
+          symbol, calculateAskCount(), calculateBidCount(), askDepth, bidDepth);
+    }
+
     log.debug("Processing {} order: {}", order.getOrderType(), order);
     order.setProcessedTime(getSimulationTime());
 
     if (order.getOrderType() == OrderType.MARKET) {
+      // TODO: Explain the need for this
       if (order.getSide() == OrderSide.ASK) {
         order.setPrice(Float.MIN_VALUE);
       } else {
@@ -101,7 +111,7 @@ public class OrderBook extends BaseActor {
     if (command == Command.PRINT_ORDER_BOOK) {
       this.printBook();
 
-      // TODO: What does true do here?
+      // TODO: Explain what does sending "true" achieve
       sender().tell(true, self());
     } else if (command == Command.PRINT_SUMMARY) {
       log.info("{} orders processed={}, trades processed={}, biddepth={}, askdepth={} bestask={} bestbid={} spread={}",
@@ -167,7 +177,7 @@ public class OrderBook extends BaseActor {
           executedSize = order.getAmount();
           totalExecutedsize = totalExecutedsize + executedSize;
 
-          registerTrade(order, passiveOrder, executedSize);
+          executeTrade(order, passiveOrder, executedSize);
 
           // Remove the passive order (last one returned by iterator)
           orderIterator.remove();
@@ -177,14 +187,14 @@ public class OrderBook extends BaseActor {
           totalExecutedsize = totalExecutedsize + executedSize;
           passiveOrder.setAmount(Math.abs(unfilledSize));
 
-          registerTrade(order, passiveOrder, executedSize);
+          executeTrade(order, passiveOrder, executedSize);
         } else {
           // Incoming larger than the first order in current level. Keep on iterating.
           executedSize = passiveOrder.getAmount();
           totalExecutedsize = totalExecutedsize + executedSize;
           order.setAmount(order.getAmount() - executedSize);
 
-          registerTrade(order, passiveOrder, executedSize);
+          executeTrade(order, passiveOrder, executedSize);
 
           // Remove the passive order (last one returned by iterator)
           orderIterator.remove();
@@ -266,9 +276,9 @@ public class OrderBook extends BaseActor {
    */
   private void updateDepth(OrderSide orderside, int executedsize) {
     if (orderside == OrderSide.ASK) {
-      this.bidDepth = this.bidDepth - executedsize;
+      this.bidDepth -= executedsize;
     } else {
-      this.askDepth = this.askDepth - executedsize;
+      this.askDepth -= executedsize;
     }
   }
 
@@ -277,18 +287,22 @@ public class OrderBook extends BaseActor {
    * biddepth/askdepth variables
    */
   private boolean assertBookDepth() {
-    int bidDepth = 0;
-    for (val values : bids.values()) {
-      for (val bids : values) {
-        bidDepth += bids.getAmount();
-      }
-    }
-
+    val bidDepth = calculateBidDepth();
     if (bidDepth != this.bidDepth) {
       log.error("Bid depth does not add up record = {} actual = {}", this.bidDepth, bidDepth);
       return false;
     }
 
+    val askDepth = calculateAskDepth();
+    if (askDepth != this.askDepth) {
+      log.error("Ask depth does not add up record = {} actual = {}", this.askDepth, askDepth);
+      return false;
+    }
+
+    return true;
+  }
+
+  private int calculateAskDepth() {
     int askDepth = 0;
     for (val values : asks.values()) {
       for (val asks : values) {
@@ -296,17 +310,42 @@ public class OrderBook extends BaseActor {
       }
     }
 
-    if (askDepth != this.askDepth) {
-      log.error("Ask depth does not add up record = {} actual = {}", this.askDepth, askDepth);
-      return false;
+    return askDepth;
+  }
+
+  private int calculateBidDepth() {
+    int bidDepth = 0;
+    for (val values : bids.values()) {
+      for (val bids : values) {
+        bidDepth += bids.getAmount();
+      }
     }
-    return true;
+
+    return bidDepth;
+  }
+
+  private int calculateAskCount() {
+    int askCount = 0;
+    for (val values : asks.values()) {
+      askCount += values.size();
+    }
+
+    return askCount;
+  }
+
+  private int calculateBidCount() {
+    int bidCount = 0;
+    for (val values : bids.values()) {
+      bidCount += values.size();
+    }
+
+    return bidCount;
   }
 
   /**
    * Registers a trade
    */
-  private void registerTrade(Order active, Order passive, int executedSize) {
+  private void executeTrade(Order active, Order passive, int executedSize) {
     tradeCount += 1;
     val trade = new Trade(getSimulationTime(), active, passive, executedSize);
 
@@ -324,16 +363,16 @@ public class OrderBook extends BaseActor {
    * Adds LimitOrder to the order book
    */
   private void addLimitOrder(Order order) {
-    int availablePepth = 0;
+    long availableDepth = 0;
     if (order.getSide() == OrderSide.ASK) {
       // Executing against bid side of the book.
-      availablePepth = this.bidDepth;
+      availableDepth = this.bidDepth;
     } else {
-      availablePepth = this.askDepth;
+      availableDepth = this.askDepth;
     }
 
     int unfilledSize;
-    if (crossesSpread(order) && availablePepth > 0) { // if limitprice
+    if (crossesSpread(order) && availableDepth > 0) { // if limitprice
       // Crosses spread, treat as market order
       unfilledSize = processMarketOrder(order);
       order.setAmount(unfilledSize);
@@ -460,10 +499,6 @@ public class OrderBook extends BaseActor {
     } else {
       return this.asks;
     }
-  }
-
-  public void printBook() {
-    log.info("{}\n", formatOrderBook(this));
   }
 
 }
