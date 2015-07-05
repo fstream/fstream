@@ -76,26 +76,26 @@ public class OrderBookTest {
     val bid7 = new Order(ASK, LIMIT_ADD, time.plusMinutes(6), 6, brokerId, symbol, 1000, 18f, "u7");
 
     orderBook.onReceive(ask1);
-    assertTrue(orderBook.getAsks().size() == 1);
-    assertTrue(orderBook.getAskDepth() == 1000);
+    assertTrue(orderBook.getAsks().getPriceLevelCount() == 1);
+    assertTrue(orderBook.getAsks().getDepth() == 1000);
     assertTrue(orderBook.getBestAsk() == 25f);
 
     orderBook.onReceive(ask2);
-    assertTrue(orderBook.getAsks().size() == 2);
-    assertTrue(orderBook.getAskDepth() == 2000);
+    assertTrue(orderBook.getAsks().getPriceLevelCount() == 2);
+    assertTrue(orderBook.getAsks().getDepth() == 2000);
     assertTrue(orderBook.getBestAsk() == 25f);
 
     orderBook.onReceive(ask3);
-    assertTrue(orderBook.getAsks().size() == 3);
-    assertTrue(orderBook.getAskDepth() == 3000);
+    assertTrue(orderBook.getAsks().getPriceLevelCount() == 3);
+    assertTrue(orderBook.getAsks().getDepth() == 3000);
     assertTrue(orderBook.getBestAsk() == 24f);
 
     orderBook.onReceive(ask4);
-    assertTrue(orderBook.getAsks().size() == 3);
-    assertTrue(orderBook.getAskDepth() == 4000);
+    assertTrue(orderBook.getAsks().getPriceLevelCount() == 3);
+    assertTrue(orderBook.getAsks().getDepth() == 4000);
     assertTrue(orderBook.getBestAsk() == 24f);
-    assertTrue(orderBook.getAsks().get(24f).size() == 2);
-    Order[] orderlist = orderBook.getAsks().get(24f).toArray(new Order[0]);
+    assertTrue(orderBook.getAsks().getPriceLevel(24f).size() == 2);
+    Order[] orderlist = orderBook.getAsks().getPriceLevel(24f).toArray(new Order[0]);
     assertTrue(orderlist.length == 2);
     assertTrue(orderlist[0].getDateTime().getMillis() <= orderlist[1].getDateTime().getMillis());
 

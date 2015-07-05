@@ -11,7 +11,6 @@ package io.fstream.simulate.util;
 
 import io.fstream.simulate.actor.OrderBook;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -21,29 +20,15 @@ public class OrderBookFormatter {
     String text = String.format("BOOK = %s\n", orderBook.getSymbol());
 
     text += "------ ASKS -------\n";
-    for (val ask : orderBook.getAsks().entrySet()) {
-      text += String.format("%s -> ", ask.getKey());
-      for (val firstnode : ask.getValue()) {
-        text += String.format("( %s,%s,%s) -> ", firstnode.getDateTime().toString(), firstnode.getPrice(),
-            firstnode.getAmount());
-      }
-      text += "\n";
-    }
+    text += orderBook.getAsks();
 
     text += "------ BIDS -------\n";
-    for (val bid : orderBook.getBids().entrySet()) {
-      text += String.format("%s -> ", bid.getKey());
-      for (val firstOrder : bid.getValue()) {
-        text += String.format("( %s,%s,%s) -> ",
-            firstOrder.getDateTime().toString(), firstOrder.getPrice(), firstOrder.getAmount());
-      }
-      text = text + "\n";
-    }
+    text += orderBook.getBids();
 
     text += String.format("bid depth = %s, ask depth = %s\n",
-        orderBook.getBidDepth(), orderBook.getAskDepth());
+        orderBook.getBids().getDepth(), orderBook.getAsks().getDepth());
     text += String.format("best ask = %s, best bid =%s, spread = %s\n",
-        orderBook.getBestAsk(), orderBook.getBestBid(), orderBook.getBestAsk() - orderBook.getBestBid());
+        orderBook.getBestAsk(), orderBook.getBestBid(), orderBook.getSpread());
 
     text += "----- END -----\n";
 

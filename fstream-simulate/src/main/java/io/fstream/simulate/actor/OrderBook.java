@@ -5,7 +5,6 @@ import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
-import static java.util.Collections.reverseOrder;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
@@ -13,13 +12,7 @@ import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
-import io.fstream.simulate.util.LimitOrderTimeComparator;
-
-import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import io.fstream.simulate.model.BookSide;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -48,17 +41,14 @@ public class OrderBook extends BaseActor {
   /**
    * State.
    */
-  private final NavigableMap<Float, NavigableSet<Order>> asks = new TreeMap<>(); // Ascending price
-  private final NavigableMap<Float, NavigableSet<Order>> bids = new TreeMap<>(reverseOrder()); // Descending price
+  private final BookSide asks = new BookSide(ASK);
+  private final BookSide bids = new BookSide(BID);
 
   /**
    * Aggregation caches.
    */
-  private float bestAsk = calculateBestAsk();
-  private float bestBid = calculateBestBid();
-
-  private long askDepth;
-  private long bidDepth;
+  private float bestAsk = asks.getBestPrice();
+  private float bestBid = bids.getBestPrice();
 
   private int orderCount = 0;
   private int tradeCount = 0;
@@ -70,6 +60,10 @@ public class OrderBook extends BaseActor {
 
   public void printBook() {
     log.info("\n{}", formatOrderBook(this));
+  }
+
+  public float getSpread() {
+    return bestAsk - bestBid;
   }
 
   @Override
@@ -93,7 +87,7 @@ public class OrderBook extends BaseActor {
 
     if (orderCount % 100_000 == 0) {
       log.info("[{}] trade count = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
-          symbol, tradeCount, calculateAskCount(), calculateBidCount(), askDepth, bidDepth);
+          symbol, tradeCount, asks.calculateOrderCount(), bids.calculateOrderCount(), asks.getDepth(), bids.getDepth());
     }
 
     log.debug("Processing {} order: {}", order.getOrderType(), order);
@@ -122,9 +116,8 @@ public class OrderBook extends BaseActor {
       // TODO: Explain what does sending "true" achieve
       sender().tell(true, self());
     } else if (command == Command.PRINT_SUMMARY) {
-      val spread = calculateSpread();
       log.info("{} orders processed={}, trades processed={}, bidDepth={}, askDepth={} bestAsk={} bestBid={} spread={}",
-          symbol, orderCount, tradeCount, bidDepth, askDepth, bestAsk, bestBid, spread);
+          symbol, orderCount, tradeCount, bids.getDepth(), asks.getDepth(), bestAsk, bestBid, getSpread());
     }
   }
 
@@ -144,11 +137,10 @@ public class OrderBook extends BaseActor {
     }
 
     int executedSize = 0;
-    int totalExecutedSize = 0;
     int unfilledSize = order.getAmount();
 
     // Iterate in price order
-    val priceLevelIterator = bookSide.values().iterator();
+    val priceLevelIterator = bookSide.iterator();
 
     execution: while (priceLevelIterator.hasNext()) {
       val priceLevel = priceLevelIterator.next();
@@ -184,8 +176,6 @@ public class OrderBook extends BaseActor {
             priceLevelIterator.remove();
           }
 
-          totalExecutedSize += executedSize;
-
           // Finished
           break execution;
         } else if (unfilledSize < 0) {
@@ -194,8 +184,6 @@ public class OrderBook extends BaseActor {
 
           executedSize = order.getAmount();
           executeTrade(order, passiveOrder, executedSize);
-
-          totalExecutedSize += executedSize;
 
           // Finished
           break execution;
@@ -212,15 +200,12 @@ public class OrderBook extends BaseActor {
             priceLevelIterator.remove();
           }
 
-          totalExecutedSize += executedSize;
-
           // Continue filling
           continue;
         }
       }
     }
 
-    updateDepth(order.getSide(), totalExecutedSize);
     updateQuote();
 
     return unfilledSize;
@@ -228,13 +213,10 @@ public class OrderBook extends BaseActor {
 
   private void processLimitOrder(Order order) {
     if (order.getOrderType() == OrderType.LIMIT_ADD) {
-      log.debug("Order added");
       addLimitOrder(order);
     } else if (order.getOrderType() == OrderType.LIMIT_AMEND) {
-      log.debug("Order amended");
       // TODO: Add support?
     } else if (order.getOrderType() == OrderType.LIMIT_CANCEL) {
-      log.debug("Cancelling order {}", order);
       cancelOrder(order);
     } else {
       checkState(false);
@@ -246,22 +228,22 @@ public class OrderBook extends BaseActor {
    */
   private void updateQuote() {
     val prevBestAsk = bestAsk;
+    val ask = bestAsk = asks.getBestPrice();
+
     val prevBestBid = bestBid;
+    val bid = bestBid = bids.getBestPrice();
 
-    bestAsk = calculateBestAsk();
-    bestBid = calculateBestBid();
+    val invalid = ask <= bid;
+    if (invalid) {
+      log.error("Invalid quote [ask = {}, bid = {}]", ask, bid);
+      return;
+    }
 
-    val changed = this.bestAsk != prevBestAsk || this.bestBid != prevBestBid;
+    val changed = bestAsk != prevBestAsk || bestBid != prevBestBid;
     if (changed) {
       val quote = new Quote(getSimulationTime(), symbol, bestAsk, bestBid,
-          calculatePriceLevelDepth(ASK, bestAsk),
-          calculatePriceLevelDepth(BID, bestBid));
-
-      val valid = bestAsk > bestBid;
-      if (!valid) {
-        log.error("Invalid quote {}", quote);
-        return;
-      }
+          asks.calculatePriceLevelDepth(bestAsk),
+          bids.calculatePriceLevelDepth(bestBid));
 
       // Publish
       exchange().tell(quote, self());
@@ -270,30 +252,19 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * Updates bid depth / ask depth based on executed size
-   */
-  private void updateDepth(OrderSide side, int executedSize) {
-    if (side == ASK) {
-      bidDepth -= executedSize;
-    } else {
-      askDepth -= executedSize;
-    }
-  }
-
-  /**
    * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
    * ask depth variables
    */
   private boolean assertBookDepth() {
-    val bidDepth = calculateBidDepth();
-    if (bidDepth != this.bidDepth) {
-      log.error("Bid depth does not add up record = {} actual = {}", this.bidDepth, bidDepth);
+    val bidDepth = bids.calculateDepth();
+    if (bidDepth != bids.getDepth()) {
+      log.error("Bid depth does not add up record = {} actual = {}", bids.getDepth(), bidDepth);
       return false;
     }
 
-    val askDepth = calculateAskDepth();
-    if (askDepth != this.askDepth) {
-      log.error("Ask depth does not add up record = {} actual = {}", this.askDepth, askDepth);
+    val askDepth = asks.calculateDepth();
+    if (askDepth != asks.getDepth()) {
+      log.error("Ask depth does not add up record = {} actual = {}", asks.getDepth(), askDepth);
       return false;
     }
 
@@ -324,7 +295,7 @@ public class OrderBook extends BaseActor {
    * Adds the supplied limit order to the order book.
    */
   private void addLimitOrder(Order order) {
-    val availableDepth = order.getSide() == ASK ? bidDepth : askDepth;
+    val availableDepth = order.getSide() == ASK ? bids.getDepth() : asks.getDepth();
 
     val executable = isCrossesSpread(order) && availableDepth > 0;
     if (executable) {
@@ -347,22 +318,13 @@ public class OrderBook extends BaseActor {
    * Inserts limit order in the book side data structure.
    */
   private void insertOrder(Order order) {
-    val priceLevel = resolvePriceLevel(order);
-    priceLevel.add(order);
+    getBookSide(order).addOrder(order);
 
     // Set best price and depth attributes
-    if (order.getSide() == BID) {
-      if (bidDepth == 0 || order.getPrice() > bestBid) {
-        bestBid = order.getPrice();
-      }
-
-      bidDepth += order.getAmount();
-    } else {
-      if (askDepth == 0 || order.getPrice() < bestAsk) {
-        bestAsk = order.getPrice();
-      }
-
-      askDepth += order.getAmount();
+    if (order.getSide() == ASK && (asks.getDepth() == 0 || order.getPrice() < bestAsk)) {
+      bestAsk = order.getPrice();
+    } else if (order.getSide() == BID && (bids.getDepth() == 0 || order.getPrice() > bestBid)) {
+      bestBid = order.getPrice();
     }
 
     // TODO: Is this needed? It is done in onReceiveOrder
@@ -382,27 +344,9 @@ public class OrderBook extends BaseActor {
    * Cancels and removes an order from this order book.
    */
   private boolean cancelOrder(Order order) {
-    val priceLevel = getPriceLevel(order);
-
-    val empty = priceLevel == null;
-    if (empty) {
-      return false;
-    }
-
-    val missing = !priceLevel.remove(order);
-    if (missing) {
-      return false;
-    }
-
-    if (priceLevel.isEmpty()) {
-      removePriceLevel(order);
-    }
-
-    // Reduce depth due to cancellation
-    if (order.getSide() == ASK) {
-      askDepth -= order.getAmount();
-    } else {
-      bidDepth -= order.getAmount();
+    val removed = getBookSide(order).removeOrder(order);
+    if (!removed) {
+      return true;
     }
 
     log.debug("Cancelled order {}", order);
@@ -426,107 +370,8 @@ public class OrderBook extends BaseActor {
     }
   }
 
-  private NavigableSet<Order> resolvePriceLevel(Order order) {
-    val priceLevel = getPriceLevel(order);
-    val exists = priceLevel != null;
-    if (exists) {
-      return priceLevel;
-    }
-
-    val newPriceLevel = createPriceLevel();
-    getBookSide(order).put(order.getPrice(), newPriceLevel);
-
-    return newPriceLevel;
-  }
-
-  private TreeSet<Order> createPriceLevel() {
-    return new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
-  }
-
-  private NavigableSet<Order> getPriceLevel(Order order) {
-    return getPriceLevel(order.getSide(), order.getPrice());
-  }
-
-  private NavigableSet<Order> getPriceLevel(OrderSide side, float price) {
-    return getBookSide(side).get(price);
-  }
-
-  private NavigableSet<Order> removePriceLevel(Order order) {
-    return removePriceLevel(order.getSide(), order.getPrice());
-  }
-
-  private NavigableSet<Order> removePriceLevel(OrderSide side, float price) {
-    return getBookSide(side).remove(price);
-  }
-
-  private NavigableMap<Float, NavigableSet<Order>> getBookSide(Order order) {
-    return getBookSide(order.getSide());
-  }
-
-  private NavigableMap<Float, NavigableSet<Order>> getBookSide(OrderSide side) {
-    return side == OrderSide.ASK ? asks : bids;
-  }
-
-  private float calculateSpread() {
-    return bestAsk - bestBid;
-  }
-
-  private float calculateBestBid() {
-    return bids.isEmpty() ? Float.MIN_VALUE : bids.firstKey();
-  }
-
-  private float calculateBestAsk() {
-    return asks.isEmpty() ? Float.MAX_VALUE : asks.firstKey();
-  }
-
-  private int calculatePriceLevelDepth(OrderSide side, float price) {
-    val priceLevel = getPriceLevel(side, price);
-    if (priceLevel == null) {
-      return 0;
-    }
-
-    int depth = 0;
-    for (val order : priceLevel) {
-      depth += order.getAmount();
-    }
-
-    return depth;
-  }
-
-  private int calculateAskDepth() {
-    return calculateBookSideDepth(asks);
-  }
-
-  private int calculateBidDepth() {
-    return calculateBookSideDepth(bids);
-  }
-
-  private int calculateBookSideDepth(NavigableMap<Float, NavigableSet<Order>> bookSide) {
-    int depth = 0;
-    for (val priceLevel : bookSide.values()) {
-      for (val order : priceLevel) {
-        depth += order.getAmount();
-      }
-    }
-
-    return depth;
-  }
-
-  private int calculateAskCount() {
-    return calculateBookSideCount(asks);
-  }
-
-  private int calculateBidCount() {
-    return calculateBookSideCount(bids);
-  }
-
-  private int calculateBookSideCount(NavigableMap<Float, NavigableSet<Order>> bookSide) {
-    int count = 0;
-    for (val priceLevel : bookSide.values()) {
-      count += priceLevel.size();
-    }
-
-    return count;
+  private BookSide getBookSide(Order order) {
+    return order.getSide() == OrderSide.ASK ? asks : bids;
   }
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {
