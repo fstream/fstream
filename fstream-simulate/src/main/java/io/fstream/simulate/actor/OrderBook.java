@@ -3,6 +3,7 @@ package io.fstream.simulate.actor;
 import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
+import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
 import static java.util.Collections.reverseOrder;
 import io.fstream.core.model.event.Order;
@@ -53,8 +54,8 @@ public class OrderBook extends BaseActor {
   /**
    * Aggregation caches.
    */
-  private float bestAsk = Float.MAX_VALUE;
-  private float bestBid = Float.MIN_VALUE;
+  private float bestAsk = calculateBestAsk();
+  private float bestBid = calculateBestBid();
 
   private long askDepth;
   private long bidDepth;
@@ -91,18 +92,19 @@ public class OrderBook extends BaseActor {
     orderCount += 1;
 
     if (orderCount % 100_000 == 0) {
-      log.info("[{}] ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
-          symbol, calculateAskCount(), calculateBidCount(), askDepth, bidDepth);
+      log.info("[{}] trade count = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
+          symbol, tradeCount, calculateAskCount(), calculateBidCount(), askDepth, bidDepth);
     }
 
     log.debug("Processing {} order: {}", order.getOrderType(), order);
     order.setProcessedTime(getSimulationTime());
 
-    if (order.getOrderType() == OrderType.MARKET_ORDER) {
+    if (order.getOrderType() == MARKET_ORDER) {
       // TODO: Explain the need for this. Perhaps this should go into processMarketOrder.
       val price = order.getSide() == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
       order.setPrice(price);
 
+      // TODO: Explain what happens if the order cannot be completely filled. Should it be rejected?
       processMarketOrder(order);
     } else {
       processLimitOrder(order);
@@ -127,36 +129,34 @@ public class OrderBook extends BaseActor {
   }
 
   /**
-   * Accepts {@code Order} and executes it against available depth. Returns unfilled amount.
-   * <p>
+   * Accepts {@code Order} and executes it against available depth.
+   * 
+   * @return Unfilled amount.
    */
-  // TODO: Currently market orders are mimicked via Orders where trigger price is best ask/bid. Need to add marketable
-  // order implementation.
+  // TODO: Currently market orders are mimicked via {@code Order}s where trigger price is best ask/bid. Need to add
+  // marketable order implementation.
   private int processMarketOrder(Order order) {
     // Match against opposite side
-    val bookSide = order.getSide() == OrderSide.ASK ? bids : asks;
+    val bookSide = order.getSide() == ASK ? bids : asks;
     if (bookSide.isEmpty()) {
       log.debug("No depth. Order not filled {}", order);
       return order.getAmount();
     }
 
-    int unfilledSize = order.getAmount();
     int executedSize = 0;
     int totalExecutedSize = 0;
+    int unfilledSize = order.getAmount();
 
     // Iterate in price order
-    val priceLevelIterator = bookSide.entrySet().iterator();
-    while (priceLevelIterator.hasNext()) {
+    val priceLevelIterator = bookSide.values().iterator();
+
+    execution: while (priceLevelIterator.hasNext()) {
       val priceLevel = priceLevelIterator.next();
 
       // Iterate in time order
-      val orderIterator = priceLevel.getValue().iterator();
+      val orderIterator = priceLevel.iterator();
       while (orderIterator.hasNext()) {
         val passiveOrder = orderIterator.next();
-
-        if (unfilledSize <= 0) {
-          break;
-        }
 
         val priceCrossed =
             order.getSide() == ASK && order.getPrice() > passiveOrder.getPrice() ||
@@ -167,47 +167,56 @@ public class OrderBook extends BaseActor {
           log.debug("Breaking price crossed on active {} MO for {} order price={} passive order={}",
               order.getSide(), symbol, order.getPrice(), passiveOrder.getPrice());
 
-          updateDepth(order.getSide(), totalExecutedSize);
-          updateQuote();
-
-          return unfilledSize;
+          break execution;
         }
 
+        // Account for current passive order
         unfilledSize -= passiveOrder.getAmount();
 
         if (unfilledSize == 0) {
-          // Nothing else to do.
+          // Filled
           executedSize = order.getAmount();
-          totalExecutedSize += executedSize;
-
           executeTrade(order, passiveOrder, executedSize);
 
-          // Remove the passive order (last one returned by iterator)
+          // Remove the passive order
           orderIterator.remove();
-        } else if (unfilledSize < 0) {
-          // Incoming was smaller than first order in queue. Repost remainder
-          executedSize = order.getAmount();
+          if (priceLevel.isEmpty()) {
+            priceLevelIterator.remove();
+          }
+
           totalExecutedSize += executedSize;
+
+          // Finished
+          break execution;
+        } else if (unfilledSize < 0) {
+          // Remaining unfilled was smaller than the current passive order
           passiveOrder.setAmount(Math.abs(unfilledSize));
 
+          executedSize = order.getAmount();
           executeTrade(order, passiveOrder, executedSize);
-        } else {
-          // Incoming larger than the first order in current level. Keep on iterating.
-          executedSize = passiveOrder.getAmount();
+
           totalExecutedSize += executedSize;
-          order.setAmount(order.getAmount() - executedSize);
 
+          // Finished
+          break execution;
+        } else if (unfilledSize > 0) {
+          // Remaining unfilled is larger than the current passive order.
+          order.setAmount(order.getAmount() - passiveOrder.getAmount());
+
+          executedSize = passiveOrder.getAmount();
           executeTrade(order, passiveOrder, executedSize);
 
-          // Remove the passive order (last one returned by iterator)
+          // Remove the passive order
           orderIterator.remove();
-        }
-      }
+          if (priceLevel.isEmpty()) {
+            priceLevelIterator.remove();
+          }
 
-      val price = priceLevel.getKey();
-      if (bookSide.get(price).isEmpty()) {
-        // Removes price level if order queue in it is empty (last one returned by iterator)
-        priceLevelIterator.remove();
+          totalExecutedSize += executedSize;
+
+          // Continue filling
+          continue;
+        }
       }
     }
 
@@ -245,8 +254,8 @@ public class OrderBook extends BaseActor {
     val changed = this.bestAsk != prevBestAsk || this.bestBid != prevBestBid;
     if (changed) {
       val quote = new Quote(getSimulationTime(), symbol, bestAsk, bestBid,
-          calculatePriceLevelDepth(bestAsk, ASK),
-          calculatePriceLevelDepth(bestBid, BID));
+          calculatePriceLevelDepth(ASK, bestAsk),
+          calculatePriceLevelDepth(BID, bestBid));
 
       val valid = bestAsk > bestBid;
       if (!valid) {
@@ -424,10 +433,14 @@ public class OrderBook extends BaseActor {
       return priceLevel;
     }
 
-    val newPriceLevel = new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
+    val newPriceLevel = createPriceLevel();
     getBookSide(order).put(order.getPrice(), newPriceLevel);
 
     return newPriceLevel;
+  }
+
+  private TreeSet<Order> createPriceLevel() {
+    return new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
   }
 
   private NavigableSet<Order> getPriceLevel(Order order) {
@@ -466,7 +479,7 @@ public class OrderBook extends BaseActor {
     return asks.isEmpty() ? Float.MAX_VALUE : asks.firstKey();
   }
 
-  private int calculatePriceLevelDepth(float price, OrderSide side) {
+  private int calculatePriceLevelDepth(OrderSide side, float price) {
     val priceLevel = getPriceLevel(side, price);
     if (priceLevel == null) {
       return 0;
@@ -481,43 +494,39 @@ public class OrderBook extends BaseActor {
   }
 
   private int calculateAskDepth() {
-    int askDepth = 0;
-    for (val values : asks.values()) {
-      for (val asks : values) {
-        askDepth += asks.getAmount();
-      }
-    }
-
-    return askDepth;
+    return calculateBookSideDepth(asks);
   }
 
   private int calculateBidDepth() {
-    int bidDepth = 0;
-    for (val values : bids.values()) {
-      for (val bids : values) {
-        bidDepth += bids.getAmount();
+    return calculateBookSideDepth(bids);
+  }
+
+  private int calculateBookSideDepth(NavigableMap<Float, NavigableSet<Order>> bookSide) {
+    int depth = 0;
+    for (val priceLevel : bookSide.values()) {
+      for (val order : priceLevel) {
+        depth += order.getAmount();
       }
     }
 
-    return bidDepth;
+    return depth;
   }
 
   private int calculateAskCount() {
-    int askCount = 0;
-    for (val values : asks.values()) {
-      askCount += values.size();
-    }
-
-    return askCount;
+    return calculateBookSideCount(asks);
   }
 
   private int calculateBidCount() {
-    int bidCount = 0;
-    for (val values : bids.values()) {
-      bidCount += values.size();
+    return calculateBookSideCount(bids);
+  }
+
+  private int calculateBookSideCount(NavigableMap<Float, NavigableSet<Order>> bookSide) {
+    int count = 0;
+    for (val priceLevel : bookSide.values()) {
+      count += priceLevel.size();
     }
 
-    return bidCount;
+    return count;
   }
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {

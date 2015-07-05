@@ -1,5 +1,7 @@
 package io.fstream.simulate.actor.agent;
 
+import static io.fstream.core.model.event.Order.OrderSide.ASK;
+import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
@@ -9,6 +11,7 @@ import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.SubscriptionQuoteRequest;
+import lombok.NonNull;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,48 +63,48 @@ public abstract class ActiveAgent extends Agent {
   }
 
   private Order createOrder() {
-    val amount = decideAmount();
-    float price;
-
     if (activeInstruments.isEmpty()) {
       // Send a message to exchange and then return null and wait for next decision iteration
       exchange().tell(new ActiveInstruments(), self());
       return null;
     }
 
-    OrderType type = decideOrderType(getProbMarket());
-    OrderSide side = decideSide(1 - getProbBuy(), OrderSide.ASK);
     val symbol = decideSymbol();
+    val quote = getLastValidQuote(symbol);
+    val orderType = decideOrderType();
+    val side = decideSide();
+    val amount = decideAmount();
+    val price = decidePrice(orderType, side, quote);
 
-    val quote = this.getLastValidQuote(symbol);
-    if (quote == null) {
-      log.warn("Empty quote returned by agent {} for symbol {}", name, symbol);
-      return null;
-    }
+    return new Order(side, orderType, getSimulationTime(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
+  }
 
-    if (type == OrderType.MARKET_ORDER) {
-      if (side == OrderSide.ASK) {
-        price = Float.MIN_VALUE;
-      } else {
-        price = Float.MAX_VALUE;
-      }
+  private float decidePrice(OrderType orderType, OrderSide side, @NonNull Quote quote) {
+    float price;
+    if (orderType == MARKET_ORDER) {
+      // TODO: Explain why this is needed if the same calculation is done in OrderBook#onReceiveOrder
+      price = side == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
     } else {
-      // TODO remove hard coding.
-      if (side == OrderSide.ASK) {
-        // max ensures price stays in bounds.
+      // TODO: Explain what the 5 is for
+      val priceOffset = minQuoteSize * 5;
+      if (side == ASK) {
         val bestAsk = quote.getAsk();
-        price = decidePrice(bestAsk, Math.min(bestAsk + (minQuoteSize * 5), bestAsk), bestAsk, getProbBestPrice());
+        val maxPrice = Math.min(bestAsk + priceOffset, bestAsk);
+
+        price = decidePrice(bestAsk, maxPrice, bestAsk);
       } else {
-        // min ensures price doesn't go below some lower bound
         val bestBid = quote.getBid();
-        price = decidePrice(Math.max(bestBid - (minQuoteSize * 5), bestBid), bestBid, bestBid, getProbBestPrice());
+        val minPrice = Math.max(bestBid - priceOffset, bestBid);
+
+        price = decidePrice(minPrice, bestBid, bestBid);
       }
+
       if (price < 0) {
         log.error("Invalid price generated {}", price);
       }
     }
 
-    return new Order(side, type, getSimulationTime(), Exchange.nextOrderId(), broker, symbol, amount, price, name);
+    return price;
   }
 
 }

@@ -1,6 +1,12 @@
 package io.fstream.simulate.actor.agent;
 
 import static com.google.common.base.Preconditions.checkState;
+import static io.fstream.core.model.event.Order.OrderSide.ASK;
+import static io.fstream.core.model.event.Order.OrderSide.BID;
+import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
+import static io.fstream.core.model.event.Order.OrderType.LIMIT_CANCEL;
+import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.core.model.event.Quote;
@@ -14,9 +20,9 @@ import io.fstream.simulate.message.SubscriptionQuoteRequest;
 import io.fstream.simulate.model.OpenOrders;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
 import lombok.val;
@@ -50,7 +56,7 @@ public abstract class Agent extends BaseActor {
    * State.
    */
   final Random random = new Random();
-  final Map<String, Quote> bbboQuotes = new HashMap<>();
+  final Map<String, Quote> quotes = new HashMap<>();
   final OpenOrders openOrders = new OpenOrders();
 
   public Agent(SimulateProperties properties, AgentType type, String name) {
@@ -60,7 +66,7 @@ public abstract class Agent extends BaseActor {
     this.agentProperties = resolveAgentProperties();
 
     this.minQuoteSize = properties.getMinQuoteSize();
-    this.msgResponseTimeout = calculateMsgResponseTimeout();
+    this.msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     this.broker = generateBroker();
   }
 
@@ -86,7 +92,7 @@ public abstract class Agent extends BaseActor {
   }
 
   protected void onReceiveQuote(Quote quote) {
-    this.bbboQuotes.put(quote.getSymbol(), quote);
+    this.quotes.put(quote.getSymbol(), quote);
   }
 
   protected void onReceiveCommand(Command command) {
@@ -100,14 +106,14 @@ public abstract class Agent extends BaseActor {
 
   @NonNull
   protected <T> void scheduleSelfOnceRandom(T message) {
-    scheduleSelfOnce(message, generateRandomDuration());
+    scheduleSelfOnce(message, decideRandomDuration());
   }
 
   /**
    * If subscribed successfully, read quote. If not received then get market open quote from exchange.
    */
   protected Quote getLastValidQuote(String symbol) {
-    return bbboQuotes.computeIfAbsent(symbol, (key) -> {
+    return quotes.computeIfAbsent(symbol, (key) -> {
       Future<Object> future = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
       try {
         return (Quote) Await.result(future, msgResponseTimeout.duration());
@@ -125,7 +131,7 @@ public abstract class Agent extends BaseActor {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
       // FIXME: Sending unsafe mutation of message
-      symbolOrder.setOrderType(OrderType.LIMIT_CANCEL);
+      symbolOrder.setOrderType(LIMIT_CANCEL);
 
       exchange().tell(symbolOrder, self());
     }
@@ -134,68 +140,81 @@ public abstract class Agent extends BaseActor {
   }
 
   protected String generateBroker() {
-    return properties.getBrokers().get(random.nextInt(properties.getBrokers().size()));
-  }
-
-  protected Timeout calculateMsgResponseTimeout() {
-    return new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
+    return randomElement(properties.getBrokers());
   }
 
   /**
    * Generates a random duration between minsleeptime and maxsleeptime;
    */
-  protected FiniteDuration generateRandomDuration() {
-    return Duration.create(getMinSleep() + random.nextInt(getMaxSleep() - getMinSleep()) + 1, TimeUnit.MILLISECONDS);
+  protected FiniteDuration decideRandomDuration() {
+    return Duration.create(randomInt(getMinSleep(), getMaxSleep()), MILLISECONDS);
   }
 
   /**
-   * Return order side preferred with the given probability. E.g. prob=0.7, side=BUY returns BUY 70% of the time
+   * With a configured {@code probBestPrice} will simply return the best price. Otherwise will return a random price
+   * within the min / max bounds.
    */
-  protected OrderSide decideSide(float prob, @NonNull OrderSide side) {
-    if (random.nextFloat() <= prob) {
-      return side;
-    } else {
-      return side == OrderSide.BID ? OrderSide.ASK : OrderSide.BID;
-    }
+  protected float decidePrice(float min, float max, float bestPrice) {
+    return randomChoice(getProbBestPrice(), bestPrice, randomFloat(min, max));
   }
 
   /**
-   * With a given probbest will simply return the best price. Otherwise will return a random price within the min/max
-   * bounds
+   * Return a market order with a configured {@code probMarket} probability otherwise limit.
    */
-  protected float decidePrice(float min, float max, float best, float probBest) {
-    if (random.nextFloat() <= probBest) {
-      return best;
-    } else {
-      val price = min + (random.nextFloat() * (max - min));
-      return price;
-    }
+  protected OrderType decideOrderType() {
+    return randomChoice(getProbMarket(), MARKET_ORDER, LIMIT_ADD);
   }
 
   /**
-   * Return a market order with a given probability otherwise limit
+   * Return order side preferred with a configured {@code probBuy} probability.
+   * <p>
+   * e.g. probBuy=0.7, side=BID returns BID 70% of the time
    */
-  protected OrderType decideOrderType(float probMarket) {
-    if (random.nextFloat() <= probMarket) {
-      return OrderType.MARKET_ORDER;
-    } else {
-      return OrderType.LIMIT_ADD;
-    }
+  protected OrderSide decideSide() {
+    return randomChoice(getProbBuy(), BID, ASK);
   }
 
   /**
-   * Return a random amount in the range {@code [1, maxTradeSize]}
+   * Return a random amount in {@code [1, getMaxTradeSize()]}
    */
   protected int decideAmount() {
-    return random.nextInt(getMaxTradeSize()) + 1;
+    return randomInt(1, getMaxTradeSize());
   }
 
   /**
    * Return a random active symbol.
    */
   protected String decideSymbol() {
-    val index = random.nextInt(activeInstruments.size());
-    return activeInstruments.get(index);
+    return randomElement(activeInstruments);
+  }
+
+  /**
+   * Return a random element in {@code list}.
+   */
+  protected <T> T randomElement(List<T> list) {
+    val randomIndex = random.nextInt(list.size());
+    return list.get(randomIndex);
+  }
+
+  /**
+   * Return a random number in range {@code [min, max]}
+   */
+  protected int randomInt(int min, int max) {
+    return min + random.nextInt(max - min) + 1;
+  }
+
+  /**
+   * Return a random number in range {@code [min, max]}
+   */
+  protected float randomFloat(float min, float max) {
+    return min + random.nextFloat() * (max - min);
+  }
+
+  /**
+   * Return {@code a} with {@code aProb}, else {@code b}.
+   */
+  protected <T> T randomChoice(float aProb, T a, T b) {
+    return random.nextFloat() <= aProb ? a : b;
   }
 
   private AgentProperties resolveAgentProperties() {

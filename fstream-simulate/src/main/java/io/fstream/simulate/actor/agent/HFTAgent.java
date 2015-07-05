@@ -58,8 +58,15 @@ public class HFTAgent extends Agent {
     // No stress period, so provide liquidity at better price
     val bestAsk = generateBestAsk(quote);
     val bestBid = generateBestBid(quote);
-    float price;
 
+    val price = decidePrice(imbalance, bestAsk, bestBid);
+
+    return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
+        quote.getSymbol(), imbalance.getAmount(), price, name);
+  }
+
+  private float decidePrice(Imbalance imbalance, final float bestAsk, final float bestBid) {
+    float price;
     if (imbalance.getSide() == OrderSide.ASK) {
       // Ask imbalance
       price = Math.max(bestBid + minQuoteSize, bestAsk - minQuoteSize / 2);
@@ -76,8 +83,7 @@ public class HFTAgent extends Agent {
       }
     }
 
-    return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(), imbalance.getAmount(), price, name);
+    return price;
   }
 
   private Imbalance getImbalance(Quote quote) {
@@ -120,12 +126,12 @@ public class HFTAgent extends Agent {
   }
 
   private float generateBestBid(Quote quote) {
-    // TODO: 10?
+    // TODO: Explain why 10
     return quote.getBidAmount() != 0 ? quote.getBid() : 10;
   }
 
   private float generateBestAsk(Quote quote) {
-    // TODO: 12?
+    // TODO: Explain why 12
     return quote.getAskAmount() != 0 ? quote.getAsk() : 12;
   }
 

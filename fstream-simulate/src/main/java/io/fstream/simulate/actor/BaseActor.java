@@ -9,7 +9,7 @@
 
 package io.fstream.simulate.actor;
 
-import static org.assertj.core.util.Lists.newArrayList;
+import static com.google.common.collect.Lists.newArrayList;
 import io.fstream.simulate.config.SimulateProperties;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public abstract class BaseActor extends UntypedActor {
     // getSelf().tell(message, getSelf());
   }
 
-  protected boolean isActiveInstrument(String symbol) {
+  protected boolean isActive(String symbol) {
     return activeInstruments.contains(symbol);
   }
 

@@ -102,7 +102,7 @@ public class Exchange extends BaseActor {
 
   private void onReceiveOrder(Order order) {
     val symbol = order.getSymbol();
-    if (!isActiveInstrument(symbol)) {
+    if (!isActive(symbol)) {
       log.error("Order sent for inactive symbol {}", symbol);
     }
 
@@ -191,13 +191,17 @@ public class Exchange extends BaseActor {
     // Create book on demand, as needed
     ActorRef orderBook = orderBooks.get(symbol);
     if (orderBook == null) {
-      val props = Props.create(OrderBook.class, properties, symbol);
-      orderBook = context().actorOf(props, symbol);
+      orderBook = createOrderBook(symbol);
 
       orderBooks.put(symbol, orderBook);
     }
 
     return orderBook;
+  }
+
+  private ActorRef createOrderBook(String symbol) {
+    val props = Props.create(OrderBook.class, properties, symbol);
+    return context().actorOf(props, symbol);
   }
 
 }

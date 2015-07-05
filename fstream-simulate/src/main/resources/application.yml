@@ -138,10 +138,10 @@ simulate:
    institutional:
       maxSleep: 2
       minSleep: 1
-      numAgents: 100
+      numAgents: 40
    retail:
       maxSleep: 2
       minSleep: 1
-      numAgents: 100
+      numAgents: 40
    hft:
       numAgents: 0
