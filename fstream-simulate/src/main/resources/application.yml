@@ -46,6 +46,9 @@ simulate:
    rates:
       uri: ${simulate.kafka.uri}&topic=rates
       fileName: build/fstream-simulate-rates.json
+      
+   # Flags
+   debug: false
 
    # Active instruments
    instruments:
@@ -57,11 +60,11 @@ simulate:
       
    # Active brokers
    brokers:
-      - xxx
-      - yyy
-      - zzz
-      - ddd
-      - aaa
+      - TD Ameritrade
+      - Fidelity
+      - ETrade
+      - Scottrade
+      - Merrill Edge
 
    # Agents - Common
    msgResponseTimeout: 5 # in seconds

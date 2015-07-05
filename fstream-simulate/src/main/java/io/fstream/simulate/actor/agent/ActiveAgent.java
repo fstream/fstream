@@ -63,9 +63,9 @@ public abstract class ActiveAgent extends Agent {
     val amount = decideAmount();
     float price;
 
-    if (activeInstruments.getInstruments() == null) {
+    if (activeInstruments.isEmpty()) {
       // Send a message to exchange and then return null and wait for next decision iteration
-      exchange().tell(activeInstruments, self());
+      exchange().tell(new ActiveInstruments(), self());
       return null;
     }
 

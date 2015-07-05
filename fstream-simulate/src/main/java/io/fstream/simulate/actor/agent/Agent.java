@@ -82,7 +82,7 @@ public abstract class Agent extends BaseActor {
   }
 
   protected void onReceiveActiveInstruments(ActiveInstruments activeInstruments) {
-    this.activeInstruments.setInstruments(activeInstruments.getInstruments());
+    this.activeInstruments = activeInstruments.getInstruments();
   }
 
   protected void onReceiveQuote(Quote quote) {
@@ -194,9 +194,8 @@ public abstract class Agent extends BaseActor {
    * Return a random active symbol.
    */
   protected String decideSymbol() {
-    val instruments = activeInstruments.getInstruments();
-    val index = random.nextInt(instruments.size());
-    return instruments.get(index);
+    val index = random.nextInt(activeInstruments.size());
+    return activeInstruments.get(index);
   }
 
   private AgentProperties resolveAgentProperties() {

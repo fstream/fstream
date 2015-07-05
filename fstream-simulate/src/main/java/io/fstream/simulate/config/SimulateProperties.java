@@ -18,6 +18,11 @@ import org.springframework.stereotype.Component;
 public class SimulateProperties {
 
   /**
+   * Flags.
+   */
+  private boolean debug;
+
+  /**
    * Reference.
    */
   private List<String> brokers = newArrayList();

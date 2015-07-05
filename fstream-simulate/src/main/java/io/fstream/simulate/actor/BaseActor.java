@@ -9,8 +9,11 @@
 
 package io.fstream.simulate.actor;
 
+import static org.assertj.core.util.Lists.newArrayList;
 import io.fstream.simulate.config.SimulateProperties;
-import io.fstream.simulate.message.ActiveInstruments;
+
+import java.util.List;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -40,7 +43,7 @@ public abstract class BaseActor extends UntypedActor {
   /**
    * State.
    */
-  protected ActiveInstruments activeInstruments = new ActiveInstruments();
+  protected List<String> activeInstruments = newArrayList();
 
   protected ActorSelection exchange() {
     return context().actorSelection("/user/exchange");
@@ -65,8 +68,7 @@ public abstract class BaseActor extends UntypedActor {
   }
 
   protected boolean isActiveInstrument(String symbol) {
-    val instruments = activeInstruments.getInstruments();
-    return instruments != null && instruments.contains(symbol);
+    return activeInstruments.contains(symbol);
   }
 
 }

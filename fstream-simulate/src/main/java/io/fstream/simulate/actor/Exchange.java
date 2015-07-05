@@ -56,7 +56,7 @@ public class Exchange extends BaseActor {
 
   public Exchange(SimulateProperties properties) {
     super(properties);
-    this.activeInstruments.setInstruments(properties.getInstruments());
+    this.activeInstruments = properties.getInstruments();
     this.minQuoteSize = properties.getMinQuoteSize();
     this.quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
   }
@@ -70,7 +70,7 @@ public class Exchange extends BaseActor {
     val minBid = 10;
     val minAsk = 12;
 
-    for (val symbol : activeInstruments.getInstruments()) {
+    for (val symbol : activeInstruments) {
       val bid = minBid - (random.nextInt(5) * minQuoteSize);
       val ask = minAsk + (random.nextInt(5) * minQuoteSize);
       val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
@@ -136,8 +136,7 @@ public class Exchange extends BaseActor {
   }
 
   private void onReceiveActiveInstruments() {
-    val activeInstruments = new ActiveInstruments(this.activeInstruments.getInstruments());
-    sender().tell(activeInstruments, self());
+    sender().tell(new ActiveInstruments(activeInstruments), self());
   }
 
   private void onReceiveQuoteRequest(QuoteRequest quoteRequest) {
