@@ -7,27 +7,27 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.simulate.model;
+package io.fstream.simulate.util;
 
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
-import static java.util.Collections.reverseOrder;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
-import io.fstream.simulate.util.LimitOrderTimeComparator;
 
 import java.util.Iterator;
-import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.collect.Ordering;
+import com.google.common.collect.TreeMultimap;
 
 /**
  * The main data structure for representing one half of an order book.
  */
+@Slf4j
 public class BookSide {
 
   /**
@@ -38,7 +38,7 @@ public class BookSide {
   /**
    * Ordered price levels.
    */
-  private final NavigableMap<Float, NavigableSet<Order>> priceLevels;
+  private final TreeMultimap<Float, Order> priceLevels;
 
   /**
    * The depth of the book side.
@@ -48,60 +48,45 @@ public class BookSide {
 
   public BookSide(@NonNull OrderSide side) {
     this.side = side;
-    this.priceLevels = side == ASK ? new TreeMap<>() : new TreeMap<>(reverseOrder());
+    this.priceLevels = createPriceLevels(side);
   }
 
   /**
-   * Return an iterator in price order.
+   * Return an iterator in (price, time) order.
    * <p>
    * Price is ascending for bids and descending for asks.
    */
-  public Iterator<NavigableSet<Order>> iterator() {
+  public Iterator<Order> iterator() {
     return priceLevels.values().iterator();
   }
 
-  public boolean isEmpty() {
-    return priceLevels.isEmpty();
-  }
-
   public int getPriceLevelCount() {
-    return priceLevels.size();
+    return priceLevels.keySet().size();
   }
 
   public void addOrder(@NonNull Order order) {
     val price = order.getPrice();
-    NavigableSet<Order> priceLevel = priceLevels.get(price);
-    if (priceLevel == null) {
-      priceLevel = new TreeSet<Order>(LimitOrderTimeComparator.INSTANCE);
+    priceLevels.put(price, order);
 
-      priceLevels.put(price, priceLevel);
-    }
-
-    priceLevel.add(order);
     depth += order.getAmount();
   }
 
   public boolean removeOrder(@NonNull Order order) {
     val price = order.getPrice();
-    val priceLevel = getPriceLevel(price);
 
-    val empty = priceLevel == null;
-    if (empty) {
-      return false;
-    }
-
-    val missing = !priceLevel.remove(order);
+    val missing = !priceLevels.remove(price, order);
     if (missing) {
       return false;
     }
 
-    if (priceLevel.isEmpty()) {
-      // Prune empty levels to prevent memory accumulation
-      priceLevels.remove(price);
-    }
-
     depth -= order.getAmount();
+
     return true;
+  }
+
+  // TODO: Remove the need for this by forcing all consumers to repost on modification
+  public void removeDepth(float amount) {
+    depth -= amount;
   }
 
   public NavigableSet<Order> getPriceLevel(float price) {
@@ -109,32 +94,25 @@ public class BookSide {
   }
 
   public float getBestPrice() {
-    if (isEmpty()) {
+    if (priceLevels.isEmpty()) {
       return side == ASK ? Float.MAX_VALUE : Float.MIN_VALUE;
     }
 
-    return priceLevels.firstKey();
+    return priceLevels.keySet().first();
   }
 
   public int calculateDepth() {
     int depth = 0;
-    for (val priceLevel : priceLevels.values()) {
-      for (val order : priceLevel) {
-        depth += order.getAmount();
-      }
+    for (val order : priceLevels.values()) {
+      depth += order.getAmount();
     }
 
     return depth;
   }
 
-  public int calculatePriceLevelDepth(float price) {
-    val priceLevel = getPriceLevel(price);
-    if (priceLevel == null) {
-      return 0;
-    }
-
+  public int calculatePriceDepth(float price) {
     int depth = 0;
-    for (val order : priceLevel) {
+    for (val order : getPriceLevel(price)) {
       depth += order.getAmount();
     }
 
@@ -142,27 +120,42 @@ public class BookSide {
   }
 
   public int calculateOrderCount() {
-    int count = 0;
-    for (val priceLevel : priceLevels.values()) {
-      count += priceLevel.size();
+    return priceLevels.size();
+  }
+
+  public boolean isDepthValid() {
+    val actual = calculateDepth();
+    int expected = getDepth();
+
+    val invalid = actual != expected;
+    if (invalid) {
+      log.error("Bid depth does not add up record = {} actual = {}", expected, actual);
     }
 
-    return count;
+    return invalid;
   }
 
   @Override
   public String toString() {
     String text = "";
-    for (val bid : priceLevels.entrySet()) {
-      text += String.format("%s -> ", bid.getKey());
-      for (val firstOrder : bid.getValue()) {
+    for (val price : priceLevels.keySet()) {
+      text += String.format("%s -> ", price);
+      for (val order : priceLevels.get(price)) {
         text += String.format("( %s,%s,%s) -> ",
-            firstOrder.getDateTime().toString(), firstOrder.getPrice(), firstOrder.getAmount());
+            order.getDateTime().toString(), order.getPrice(), order.getAmount());
       }
+
       text = text + "\n";
     }
 
     return text;
+  }
+
+  private TreeMultimap<Float, Order> createPriceLevels(OrderSide side) {
+    val keyOrder = side == ASK ? Ordering.<Float> natural() : Ordering.<Float> natural().reverse();
+    val valueOrder = LimitOrderTimeComparator.INSTANCE;
+
+    return TreeMultimap.create(keyOrder, valueOrder);
   }
 
 }

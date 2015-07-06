@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.simulate.model;
+package io.fstream.simulate.util;
 
 import io.fstream.core.model.event.Order;
 import lombok.NonNull;

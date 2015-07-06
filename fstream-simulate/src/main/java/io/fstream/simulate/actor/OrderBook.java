@@ -6,13 +6,12 @@ import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
 import io.fstream.core.model.event.Order;
-import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
-import io.fstream.simulate.model.BookSide;
+import io.fstream.simulate.util.BookSide;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -130,79 +129,62 @@ public class OrderBook extends BaseActor {
   // marketable order implementation.
   private int processMarketOrder(Order order) {
     // Match against opposite side
-    val bookSide = order.getSide() == ASK ? bids : asks;
-    if (bookSide.isEmpty()) {
-      log.debug("No depth. Order not filled {}", order);
-      return order.getAmount();
-    }
-
-    int executedSize = 0;
+    val bookSide = getPassiveBookSide(order);
     int unfilledSize = order.getAmount();
 
-    // Iterate in price order
-    val priceLevelIterator = bookSide.iterator();
+    // Iterate in (price, time) order
+    val orderIterator = bookSide.iterator();
+    while (orderIterator.hasNext()) {
+      val passiveOrder = orderIterator.next();
 
-    execution: while (priceLevelIterator.hasNext()) {
-      val priceLevel = priceLevelIterator.next();
+      val priceCrossed =
+          order.getSide() == ASK && order.getPrice() > passiveOrder.getPrice() ||
+              order.getSide() == BID && order.getPrice() < passiveOrder.getPrice();
 
-      // Iterate in time order
-      val orderIterator = priceLevel.iterator();
-      while (orderIterator.hasNext()) {
-        val passiveOrder = orderIterator.next();
+      if (priceCrossed) {
+        // Limit price exists, respect bounds
+        log.debug("Breaking price crossed on active {} MO for {} order price={} passive order={}",
+            order.getSide(), symbol, order.getPrice(), passiveOrder.getPrice());
 
-        val priceCrossed =
-            order.getSide() == ASK && order.getPrice() > passiveOrder.getPrice() ||
-                order.getSide() == BID && order.getPrice() < passiveOrder.getPrice();
+        // Finished
+        break;
+      }
 
-        if (priceCrossed) {
-          // Limit price exists, respect bounds
-          log.debug("Breaking price crossed on active {} MO for {} order price={} passive order={}",
-              order.getSide(), symbol, order.getPrice(), passiveOrder.getPrice());
+      // Account for current passive order
+      unfilledSize -= passiveOrder.getAmount();
 
-          break execution;
-        }
+      if (unfilledSize == 0) {
+        // Filled
+        executeTrade(order, passiveOrder, order.getAmount());
 
-        // Account for current passive order
-        unfilledSize -= passiveOrder.getAmount();
+        // Remove the passive order
+        bookSide.removeDepth(order.getAmount());
+        orderIterator.remove();
 
-        if (unfilledSize == 0) {
-          // Filled
-          executedSize = order.getAmount();
-          executeTrade(order, passiveOrder, executedSize);
+        // Finished filling
+        break;
+      } else if (unfilledSize < 0) {
+        // Remaining unfilled was smaller than the current passive order
+        passiveOrder.setAmount(Math.abs(unfilledSize));
 
-          // Remove the passive order
-          orderIterator.remove();
-          if (priceLevel.isEmpty()) {
-            priceLevelIterator.remove();
-          }
+        executeTrade(order, passiveOrder, order.getAmount());
 
-          // Finished
-          break execution;
-        } else if (unfilledSize < 0) {
-          // Remaining unfilled was smaller than the current passive order
-          passiveOrder.setAmount(Math.abs(unfilledSize));
+        bookSide.removeDepth(order.getAmount());
 
-          executedSize = order.getAmount();
-          executeTrade(order, passiveOrder, executedSize);
+        // Finished filling
+        break;
+      } else if (unfilledSize > 0) {
+        // Remaining unfilled is larger than the current passive order.
+        order.setAmount(order.getAmount() - passiveOrder.getAmount());
 
-          // Finished
-          break execution;
-        } else if (unfilledSize > 0) {
-          // Remaining unfilled is larger than the current passive order.
-          order.setAmount(order.getAmount() - passiveOrder.getAmount());
+        executeTrade(order, passiveOrder, passiveOrder.getAmount());
 
-          executedSize = passiveOrder.getAmount();
-          executeTrade(order, passiveOrder, executedSize);
+        // Remove the passive order
+        bookSide.removeDepth(passiveOrder.getAmount());
+        orderIterator.remove();
 
-          // Remove the passive order
-          orderIterator.remove();
-          if (priceLevel.isEmpty()) {
-            priceLevelIterator.remove();
-          }
-
-          // Continue filling
-          continue;
-        }
+        // Continue filling
+        continue;
       }
     }
 
@@ -215,7 +197,7 @@ public class OrderBook extends BaseActor {
     if (order.getOrderType() == OrderType.LIMIT_ADD) {
       addLimitOrder(order);
     } else if (order.getOrderType() == OrderType.LIMIT_AMEND) {
-      // TODO: Add support?
+      // TODO: Add support for ammend?
     } else if (order.getOrderType() == OrderType.LIMIT_CANCEL) {
       cancelOrder(order);
     } else {
@@ -228,22 +210,22 @@ public class OrderBook extends BaseActor {
    */
   private void updateQuote() {
     val prevBestAsk = bestAsk;
-    val ask = bestAsk = asks.getBestPrice();
+    bestAsk = asks.getBestPrice();
 
     val prevBestBid = bestBid;
-    val bid = bestBid = bids.getBestPrice();
+    bestBid = bids.getBestPrice();
 
-    val invalid = ask <= bid;
+    val invalid = bestAsk <= bestBid;
     if (invalid) {
-      log.error("Invalid quote [ask = {}, bid = {}]", ask, bid);
+      log.error("Invalid quote [ask = {}, bid = {}]", bestAsk, bestBid);
       return;
     }
 
     val changed = bestAsk != prevBestAsk || bestBid != prevBestBid;
     if (changed) {
       val quote = new Quote(getSimulationTime(), symbol, bestAsk, bestBid,
-          asks.calculatePriceLevelDepth(bestAsk),
-          bids.calculatePriceLevelDepth(bestBid));
+          asks.calculatePriceDepth(bestAsk),
+          bids.calculatePriceDepth(bestBid));
 
       // Publish
       exchange().tell(quote, self());
@@ -253,22 +235,10 @@ public class OrderBook extends BaseActor {
 
   /**
    * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
-   * ask depth variables
+   * ask depth variables.
    */
   private boolean assertBookDepth() {
-    val bidDepth = bids.calculateDepth();
-    if (bidDepth != bids.getDepth()) {
-      log.error("Bid depth does not add up record = {} actual = {}", bids.getDepth(), bidDepth);
-      return false;
-    }
-
-    val askDepth = asks.calculateDepth();
-    if (askDepth != asks.getDepth()) {
-      log.error("Ask depth does not add up record = {} actual = {}", asks.getDepth(), askDepth);
-      return false;
-    }
-
-    return true;
+    return asks.isDepthValid() && bids.isDepthValid();
   }
 
   /**
@@ -295,23 +265,24 @@ public class OrderBook extends BaseActor {
    * Adds the supplied limit order to the order book.
    */
   private void addLimitOrder(Order order) {
-    val availableDepth = order.getSide() == ASK ? bids.getDepth() : asks.getDepth();
-
-    val executable = isCrossesSpread(order) && availableDepth > 0;
-    if (executable) {
+    int unfilledSize = order.getAmount();
+    if (isExecutable(order)) {
       // If limit price crosses spread, treat as market order
-      val unfilledSize = processMarketOrder(order);
+      unfilledSize = processMarketOrder(order);
 
       order.setAmount(unfilledSize);
+    }
 
-      // Any unfilled amount added to order book
-      if (unfilledSize > 0) {
-        insertOrder(order);
-      }
-    } else {
-      // Not crossing spread or no depth available. So add to limit book
+    // Any unfilled amount added to order book
+    if (unfilledSize > 0) {
       insertOrder(order);
     }
+  }
+
+  private boolean isExecutable(Order order) {
+    val depthAvailable = getPassiveBookSide(order).getDepth() > 0;
+
+    return depthAvailable && isCrossesSpread(order);
   }
 
   /**
@@ -326,9 +297,6 @@ public class OrderBook extends BaseActor {
     } else if (order.getSide() == BID && (bids.getDepth() == 0 || order.getPrice() > bestBid)) {
       bestBid = order.getPrice();
     }
-
-    // TODO: Is this needed? It is done in onReceiveOrder
-    order.setProcessedTime(getSimulationTime());
 
     val latency = calculateLatency(order.getProcessedTime(), order.getDateTime());
     val delayed = latency > 5;
@@ -346,7 +314,7 @@ public class OrderBook extends BaseActor {
   private boolean cancelOrder(Order order) {
     val removed = getBookSide(order).removeOrder(order);
     if (!removed) {
-      return true;
+      return false;
     }
 
     log.debug("Cancelled order {}", order);
@@ -361,17 +329,16 @@ public class OrderBook extends BaseActor {
    * Happens when buy is better priced than best ask or sell is better priced than best bid.
    */
   private boolean isCrossesSpread(Order order) {
-    if (order.getSide() == ASK && order.getPrice() <= bestBid) {
-      return true;
-    } else if (order.getSide() == BID && order.getPrice() >= bestAsk) {
-      return true;
-    } else {
-      return false;
-    }
+    return order.getSide() == ASK && order.getPrice() <= bestBid ||
+        order.getSide() == BID && order.getPrice() >= bestAsk;
   }
 
   private BookSide getBookSide(Order order) {
-    return order.getSide() == OrderSide.ASK ? asks : bids;
+    return order.getSide() == ASK ? asks : bids;
+  }
+
+  private BookSide getPassiveBookSide(Order order) {
+    return order.getSide() == BID ? asks : bids;
   }
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {

@@ -17,7 +17,7 @@ import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.message.QuoteRequest;
 import io.fstream.simulate.message.SubscriptionQuoteRequest;
-import io.fstream.simulate.model.OpenOrders;
+import io.fstream.simulate.util.OpenOrders;
 
 import java.util.HashMap;
 import java.util.List;
