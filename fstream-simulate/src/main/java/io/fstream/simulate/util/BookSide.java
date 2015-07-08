@@ -9,6 +9,7 @@
 
 package io.fstream.simulate.util;
 
+import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
@@ -57,7 +58,34 @@ public class BookSide {
    * Price is ascending for bids and descending for asks.
    */
   public Iterator<Order> iterator() {
-    return priceLevels.values().iterator();
+    val delegate = priceLevels.values().iterator();
+    return new Iterator<Order>() {
+
+      private Order current;
+
+      @Override
+      public boolean hasNext() {
+        return delegate.hasNext();
+      }
+
+      @Override
+      public Order next() {
+        current = delegate.next();
+        return current;
+      }
+
+      @Override
+      public void remove() {
+        checkState(current != null);
+
+        // Remove depth to ensure consistency
+        removeDepth(current.getAmount());
+        delegate.remove();
+
+        current = null;
+      }
+
+    };
   }
 
   public int getPriceLevelCount() {

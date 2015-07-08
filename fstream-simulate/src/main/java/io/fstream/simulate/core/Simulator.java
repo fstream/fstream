@@ -96,13 +96,13 @@ public class Simulator {
 
   private ActorRef createPublisher() {
     val name = "publisher";
-    val props = Props.create(Publisher.class);
+    val props = Props.create(Publisher.class).withDispatcher("publisher-dispatcher");
     return actorSystem.actorOf(props, name);
   }
 
   private ActorRef createExchange() {
     val name = "exchange";
-    val props = Props.create(Exchange.class, properties);
+    val props = Props.create(Exchange.class, properties).withDispatcher("exchange-dispatcher");
     return actorSystem.actorOf(props, name);
   }
 
@@ -145,7 +145,7 @@ public class Simulator {
   }
 
   private ActorRef createAgent(Class<? extends Agent> agentClass, String name) {
-    val props = Props.create(agentClass, properties, name);
+    val props = Props.create(agentClass, properties, name).withDispatcher("agent-dispatcher");
     return actorSystem.actorOf(props, name);
   }
 

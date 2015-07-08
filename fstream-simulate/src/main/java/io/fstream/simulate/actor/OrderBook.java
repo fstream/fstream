@@ -158,7 +158,6 @@ public class OrderBook extends BaseActor {
         executeTrade(order, passiveOrder, order.getAmount());
 
         // Remove the passive order
-        bookSide.removeDepth(order.getAmount());
         orderIterator.remove();
 
         // Finished filling
@@ -169,6 +168,7 @@ public class OrderBook extends BaseActor {
 
         executeTrade(order, passiveOrder, order.getAmount());
 
+        // TODO: Make this automatic
         bookSide.removeDepth(order.getAmount());
 
         // Finished filling
@@ -180,7 +180,6 @@ public class OrderBook extends BaseActor {
         executeTrade(order, passiveOrder, passiveOrder.getAmount());
 
         // Remove the passive order
-        bookSide.removeDepth(passiveOrder.getAmount());
         orderIterator.remove();
 
         // Continue filling
