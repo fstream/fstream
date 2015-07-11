@@ -133,10 +133,10 @@ public class HBaseService implements PersistenceService {
     log.info("Table '{}' exists and is enabled", TABLE_NAME.getNameAsString());
   }
 
-  private String createKey(Quote rate) {
-    val hourFloor = rate.getDateTime().hourOfDay().roundFloorCopy();
+  private String createKey(Quote quote) {
+    val hourFloor = quote.getDateTime().hourOfDay().roundFloorCopy();
 
-    return hourFloor.getMillis() + rate.getSymbol();
+    return hourFloor.getMillis() + quote.getSymbol();
   }
 
   @SneakyThrows

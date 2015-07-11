@@ -62,7 +62,6 @@ public abstract class AbstractEsperStatementTest {
 
   @Before
   public void setUp() {
-    // TODO: Rename "Rate" to "QuoteEvent"
     val configuration = new Configuration();
     configuration.addEventType("Quote", Quote.class.getName());
 

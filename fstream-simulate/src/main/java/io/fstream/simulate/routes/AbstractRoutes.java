@@ -36,6 +36,7 @@ public abstract class AbstractRoutes extends RouteBuilder {
     return constant(isProfilesActive(profiles));
   }
 
+  @NonNull
   protected boolean isProfilesActive(String... profiles) {
     return containsAny(activeProfiles, profiles);
   }
@@ -45,7 +46,7 @@ public abstract class AbstractRoutes extends RouteBuilder {
   }
 
   protected ValueBuilder kafkaPartition() {
-    return constant("part-0");
+    return constant("all");
   }
 
   private boolean containsAny(List<String> list, String[] values) {

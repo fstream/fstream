@@ -23,7 +23,7 @@
 
 # Provision the application
 # - include: fstream-simulate.yml
-- include: fstream-rates.yml
+- include: fstream-feed.yml
 - include: fstream-compute.yml
 - include: fstream-persist.yml
 - include: fstream-web.yml

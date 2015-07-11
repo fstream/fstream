@@ -18,13 +18,13 @@ public class EsperStatementTest extends AbstractEsperStatementTest {
     execute(
         eplFile("statement1.epl"),
         givenEvents(
-            quoteEventFile("quote-events1.json")));
+        quoteEventFile("quote-events1.json")));
   }
 
   @Test
   public void testStatement1Java() {
     execute(
-        epl("SELECT ask FROM Rate"),
+        epl("SELECT ask FROM Quote"),
         givenEvents(
             quoteEvent(second("00:00:00"), "EUR/USD", 1.40, 1.30),
             timeEvent(second("00:00:01")),

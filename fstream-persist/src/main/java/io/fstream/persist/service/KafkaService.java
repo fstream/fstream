@@ -90,8 +90,8 @@ public class KafkaService extends AbstractExecutionThreadService {
         log.debug("Received: {}", new String(message));
       }
 
-      val rate = Codec.decodeText(message, eventClass);
-      persistenceService.persist(rate);
+      val event = Codec.decodeText(message, eventClass);
+      persistenceService.persist(event);
     }
   }
 

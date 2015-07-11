@@ -1,0 +1,23 @@
+---
+# Copyright (c) 2014 fStream. All Rights Reserved.
+#
+# fStream - Master playbook 
+#
+# Description: 
+#   The is the master Ansible playbook file for provisioning the fStream system.
+#
+# See:
+#   - http://www.ansibleworks.com/docs/playbooks.html
+
+# This playbook will provision fstream-feed hosts
+- hosts: fstream-feed
+  sudo: yes
+    
+  vars_prompt:
+    - name: fstream_feed_password
+      prompt: OANDA FIX password
+      confirm: yes
+      
+  # Apply role
+  roles: 
+    - fstream_feed

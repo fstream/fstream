@@ -13,7 +13,7 @@ import static backtype.storm.Config.STORM_ZOOKEEPER_PORT;
 import static backtype.storm.Config.STORM_ZOOKEEPER_SERVERS;
 import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
-import static io.fstream.core.model.topic.Topic.RATES;
+import static io.fstream.core.model.topic.Topic.QUOTES;
 import static io.fstream.core.util.ZooKeepers.parseZkPort;
 import static io.fstream.core.util.ZooKeepers.parseZkServers;
 import static java.util.UUID.randomUUID;
@@ -139,7 +139,7 @@ public class StormJobFactory {
      * Setup
      */
     // IDs
-    val ratesSpoutId = prefix + "-rates-spout";
+    val quotesSpoutId = prefix + "-quotes-spout";
     val alertsSpoutId = prefix + "-alerts-spout";
     val alertsBoltId = prefix + "-alerts-bolt";
     val alertsKafkaBoltId = prefix + "-alerts-kafka-bolt";
@@ -160,8 +160,8 @@ public class StormJobFactory {
      */
 
     if (alertsExist || metricsExist) {
-      // Alerts and metrics Kafka rates input
-      topologyBuilder.setSpout(ratesSpoutId, createKafkaSpout(prefix, zkConnect, RATES), parallelismHint);
+      // Alerts and metrics Kafka quotes input
+      topologyBuilder.setSpout(quotesSpoutId, createKafkaSpout(prefix, zkConnect, QUOTES), parallelismHint);
     }
 
     if (metricsExist) {
@@ -176,7 +176,7 @@ public class StormJobFactory {
     if (alertsExist) {
       // Alerts Esper computation
       topologyBuilder.setBolt(alertsBoltId, new AlertBolt())
-          .shuffleGrouping(ratesSpoutId);
+          .shuffleGrouping(quotesSpoutId);
 
       // Alerts Kafka output
       topologyBuilder.setBolt(alertsKafkaBoltId, new KafkaBolt<String, String>())
@@ -187,7 +187,7 @@ public class StormJobFactory {
     if (metricsExist) {
       // Metric Esper computation
       topologyBuilder.setBolt(metricsBoltId, new MetricBolt())
-          .shuffleGrouping(ratesSpoutId)
+          .shuffleGrouping(quotesSpoutId)
           .shuffleGrouping(alertsSpoutId);
 
       // Metrics Kafka output

@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 @Slf4j
 @Data
 @Component
-@Profile("toq")
+@Profile("akka")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class Simulator {
 

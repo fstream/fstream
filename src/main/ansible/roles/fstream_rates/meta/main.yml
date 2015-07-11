@@ -1,5 +1,0 @@
----
-# Copyright (c) 2014 fStream. All Rights Reserved.
-
-dependencies:
-  - { role: fstream_common, fstream_module: 'fstream-rates', main_class: 'org.springframework.boot.loader.JarLauncher', http_port: '8082', priority: '10' }

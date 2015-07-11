@@ -45,10 +45,10 @@ boxes:
      aws:
         instance_type: t2.micro
         
-   # Rates
-   - name: fstream-rates
+   # Feed
+   - name: fstream-feed
      groups:
-        - fstream-rates
+        - fstream-feed
      aws:
         instance_type: t2.micro
         

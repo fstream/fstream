@@ -22,7 +22,7 @@ import org.apache.camel.Processor;
 import org.joda.time.DateTime;
 
 /**
- * {@link QuoteEvent} generator used to create a simulated rate feed when running in simulation mode.
+ * {@link QuoteEvent} generator used to create a simulated quote feed when running in simulation mode.
  */
 @RequiredArgsConstructor
 public class RandomQuoteEventGenerator implements Processor {

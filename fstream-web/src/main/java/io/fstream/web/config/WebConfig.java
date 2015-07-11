@@ -11,7 +11,9 @@ package io.fstream.web.config;
 
 import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
-import static io.fstream.core.model.topic.Topic.RATES;
+import static io.fstream.core.model.topic.Topic.ORDERS;
+import static io.fstream.core.model.topic.Topic.QUOTES;
+import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.core.config.CoreConfig;
 import io.fstream.web.service.TopicMessageService;
 
@@ -31,12 +33,22 @@ import org.springframework.context.annotation.Configuration;
 public class WebConfig extends CoreConfig {
 
   @Bean
-  public TopicMessageService ratesMessageService() {
-    return new TopicMessageService(RATES);
+  public TopicMessageService tradesMessageService() {
+    return new TopicMessageService(TRADES);
   }
 
   @Bean
-  public TopicMessageService alertMessageService() {
+  public TopicMessageService ordersMessageService() {
+    return new TopicMessageService(ORDERS);
+  }
+
+  @Bean
+  public TopicMessageService quotesMessageService() {
+    return new TopicMessageService(QUOTES);
+  }
+
+  @Bean
+  public TopicMessageService alertsMessageService() {
     return new TopicMessageService(ALERTS);
   }
 

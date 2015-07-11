@@ -64,7 +64,7 @@ state:
         PARTITION BY 
            symbol 
         FROM
-           Rate
+           Quote
       
    alerts:
          
@@ -76,7 +76,7 @@ state:
            SELECT
               ask / prior(1, ask) AS askPercentChange, symbol,dateTime
            FROM
-              Rate
+              Quote
            WHERE
               ask / prior(1, ask) > 1.01
 
@@ -89,7 +89,7 @@ state:
                symbol, dateTime,
                COUNT(*) AS eventCnt 
            FROM
-               Rate.win:time(60 sec)
+               Quote.win:time(60 sec)
            GROUP BY 
                symbol
            HAVING
@@ -104,7 +104,7 @@ state:
                symbol, 
                COUNT(*) AS eventCnt 
            FROM
-               Rate.win:time(1 sec)
+               Quote.win:time(1 sec)
            GROUP BY 
                symbol
            HAVING
@@ -119,7 +119,7 @@ state:
                amid, bmid, cmid, 
                amid - (bmid * cmid) AS diff
            FROM 
-               Rate(symbol in ['AUD/USD','AUD/NZD','NZD/USD']).win:time(1 millisecond)
+               Quote(symbol in ['AUD/USD','AUD/NZD','NZD/USD']).win:time(1 millisecond)
            MATCH_RECOGNIZE (
                MEASURES 
                   last(A.mid)      AS amid, last(B.mid)      AS bmid, 
@@ -128,9 +128,9 @@ state:
                PATTERN 
                   ((A+ B+ C+) | (A+ C+ B+) | (B+ A+ C+) | (B+ C+ A+) | (C+ A+ B+) | (C+ B+ A+)) 
                DEFINE
-                  A AS Rate.symbol = 'AUD/USD',
-                  B AS Rate.symbol = 'AUD/NZD',
-                  C AS Rate.symbol = 'NZD/USD'
+                  A AS Quote.symbol = 'AUD/USD',
+                  B AS Quote.symbol = 'AUD/NZD',
+                  C AS Quote.symbol = 'NZD/USD'
            )
            WHERE
                amid - (bmid * cmid) > 0.00001
@@ -145,7 +145,7 @@ state:
            SELECT
                COUNT(*) AS count
            FROM
-               Rate.win:time_batch(1 min)
+               Quote.win:time_batch(1 min)
 
       - id: 2
         name: Alerts per Minute

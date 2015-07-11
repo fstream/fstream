@@ -9,7 +9,7 @@
 
 package io.fstream.simulate.actor;
 
-import static io.fstream.simulate.routes.ToqRoutes.TOQ_ENDPOINT;
+import static io.fstream.simulate.routes.PublishRoutes.PUBLISH_ENDPOINT;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -23,7 +23,7 @@ public class Publisher extends UntypedProducerActor {
    * The endpoint to publish to.
    */
   @NonNull
-  private String endpointUri = TOQ_ENDPOINT;
+  private String endpointUri = PUBLISH_ENDPOINT;
 
   @Override
   public String getEndpointUri() {

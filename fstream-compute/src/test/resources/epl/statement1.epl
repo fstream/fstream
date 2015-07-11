@@ -1,12 +1,12 @@
-SELECT amid,Math.round(bmid * cmid *10000)/10000 FROM Rate.win:time(1 sec)
+SELECT amid,Math.round(bmid * cmid *10000)/10000 FROM Quote.win:time(1 sec)
 match_recognize (
 	MEASURES last(A.mid) as amid, last(B.mid) as bmid, 
 			last(C.mid) as cmid, last(A.dateTime) as adt, 
 			last(B.dateTime) as bdt,last(C.dateTime) as cdt
 	PATTERN ((A+ B+ C+) | (A+ C+ B+) | (B+ A+ C+) | (B+ C+ A+) | (C+ A+ B+) | (C+ B+ A+)) 
 	DEFINE
-		A as Rate.symbol = 'AUD/USD',
-		B as Rate.symbol = 'AUD/NZD',
-		C as Rate.symbol = 'NZD/USD'
+		A as Quote.symbol = 'AUD/USD',
+		B as Quote.symbol = 'AUD/NZD',
+		C as Quote.symbol = 'NZD/USD'
 )
 where Math.round(amid*10000)/10000 != Math.round(bmid * cmid *10000)/10000

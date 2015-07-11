@@ -37,7 +37,7 @@ boxes:
         
         # fstream 
         - fstream-persist
-        - fstream-rates
+        - fstream-feed
         - fstream-compute
         - fstream-web
      virtualbox:

@@ -188,7 +188,7 @@ task up << {
 		'fstream-configure',
 		'fstream-test',
 		'fstream-persist',
-		'fstream-rates',
+		'fstream-feed',
 		'fstream-compute',
 		'fstream-web',
 		'fstream-ui'

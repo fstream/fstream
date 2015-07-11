@@ -5,7 +5,7 @@ fstream_user: fstream
 fstream_group: fstream
 fstream_uid: 3080
 fstream_gid: 3080
-fstream_rates_password:
+fstream_feed_password:
 
 fstream_dist_dir: "{{ fstream_dir}}/{{ fstream_module }}/build/distributions/{{ fstream_archive }}"
 fstream_artifact: "{{ fstream_module }}-{{ fstream_version }}"

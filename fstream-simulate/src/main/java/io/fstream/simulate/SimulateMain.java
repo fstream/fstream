@@ -30,13 +30,13 @@ public class SimulateMain {
   public static void main(String... args) throws Exception {
     SpringApplication.run(SimulateMain.class, args);
 
-    out.println("\n\n*** Running rates. Press CTLR+C to shutdown\n\n");
+    out.println("\n\n*** Running simulate. Press CTLR+C to shutdown\n\n");
   }
 
   @EventListener
   public void start(ApplicationReadyEvent ready) {
-    val toq = simulator != null;
-    if (toq) {
+    val active = simulator != null;
+    if (active) {
       simulator.simulate();
     }
   }

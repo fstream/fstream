@@ -62,9 +62,6 @@ public abstract class BaseActor extends UntypedActor {
     val scheduler = getContext().system().scheduler();
     val dispatcher = getContext().dispatcher();
     scheduler.scheduleOnce(duration, getSelf(), message, dispatcher, null);
-
-    // This really increases the rate of messages
-    // getSelf().tell(message, getSelf());
   }
 
   protected boolean isActive(String symbol) {

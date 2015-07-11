@@ -18,7 +18,7 @@ boxes:
         - storm-nimbus
         - storm-supervisor
         - fstream-persist        
-        - fstream-rates
+        - fstream-feed
         - fstream-compute
         - fstream-web
      aws:

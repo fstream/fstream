@@ -11,8 +11,8 @@
 ###############################################################################
 
 # Available simulation profiles:
-# - toq
-# - rates
+# - akka
+# - timer
 
 # Available output profiles:
 # - console
@@ -22,9 +22,12 @@
 
 # Available config profiles:
 # - simple
+# - fast
+# - throughput
+# - demo
 
 # Profiles
-spring.profiles.active: toq,file
+spring.profiles.active: akka,file
 
 ###############################################################################
 # Profile - common
@@ -40,12 +43,8 @@ simulate:
         zookeeperConnect=${zk.connect}&\
         partitioner=${kafka.producerProperties.partitioner.class}&\
         serializerClass=${kafka.producerProperties.serializer.class}"
-   toq:
-      uri: ${simulate.kafka.uri}&topic=toq
-      fileName: build/fstream-simulate-toq.json
-   rates:
-      uri: ${simulate.kafka.uri}&topic=rates
-      fileName: build/fstream-simulate-rates.json
+   file:
+      dir: build
       
    # Flags
    debug: false
@@ -103,29 +102,6 @@ simulate:
 ---
 
 ###############################################################################
-# Profile - "simple"
-###############################################################################
-
-# Profile
-spring.profiles: simple
-
-# Simulation
-simulate:
-   # Agents - Types
-   institutional:
-      maxSleep: 2
-      minSleep: 1
-      numAgents: 1
-   retail:
-      maxSleep: 2
-      minSleep: 1
-      numAgents: 1
-   hft:
-      numAgents: 0
-      
----
-
-###############################################################################
 # Profile - "fast"
 ###############################################################################
 
@@ -134,14 +110,50 @@ spring.profiles: fast
 
 # Simulation
 simulate:
-   # Agents - Types
    institutional:
-      maxSleep: 2
       minSleep: 1
+      maxSleep: 2
+   retail:
+      minSleep: 1
+      maxSleep: 2
+   hft:
+      minSleep: 1   
+      maxSleep: 2
+
+---
+      
+###############################################################################
+# Profile - "simple"
+###############################################################################
+
+# Profile
+spring.profiles: simple
+spring.profiles.include: fast
+
+# Simulation
+simulate:
+   institutional:
+      numAgents: 1
+   retail:
+      numAgents: 1
+   hft:
+      numAgents: 0
+
+---
+
+###############################################################################
+# Profile - "throughput"
+###############################################################################
+
+# Profile
+spring.profiles: throughput
+spring.profiles.include: fast
+
+# Simulation
+simulate:
+   institutional:
       numAgents: 100
    retail:
-      maxSleep: 2
-      minSleep: 1
       numAgents: 100
    hft:
       numAgents: 0
@@ -154,18 +166,13 @@ simulate:
 
 # Profile
 spring.profiles: demo
+spring.profiles.include: fast
 
 # Simulation
 simulate:
-   # Agents - Types
    institutional:
-      maxSleep: 2
-      minSleep: 1
       numAgents: 10
    retail:
-      maxSleep: 2
-      minSleep: 1
       numAgents: 10
    hft:
       numAgents: 0
-

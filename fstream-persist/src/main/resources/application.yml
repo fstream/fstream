@@ -11,7 +11,7 @@
 ###############################################################################
 
 # Profiles
-spring.profiles.active: spark,development,rates
+spring.profiles.active: spark,development,quotes
 
 ###############################################################################
 # Profile - common
@@ -20,8 +20,9 @@ spring.profiles.active: spark,development,rates
 # Persist
 persist:
    topics: 
-      - RATES
-      - TOQ
+      - TRADES
+      - ORDERS
+      - QUOTES
       
 # Kafka
 kafka:
@@ -74,16 +75,16 @@ spark:
 ---
 
 ###############################################################################
-# Profile - "rates"
+# Profile - "quotes"
 ###############################################################################
 
 # Profile
-spring.profiles: rates
+spring.profiles: quotes
 
 # Kafka
 kafka:
    topics: 
-      - RATES
+      - QUOTES
      
 ---
  
@@ -97,4 +98,6 @@ spring.profiles: toq
 # Kafka
 kafka:
    topics: 
-      - TOQ
+      - TRADES
+      - ORDERS
+      - QUOTES
