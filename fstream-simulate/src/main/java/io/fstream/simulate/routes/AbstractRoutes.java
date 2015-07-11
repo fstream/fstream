@@ -13,7 +13,6 @@ import static java.util.Collections.disjoint;
 import java.util.List;
 
 import lombok.NonNull;
-import lombok.val;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.ValueBuilder;
@@ -34,8 +33,11 @@ public abstract class AbstractRoutes extends RouteBuilder {
 
   @NonNull
   protected ValueBuilder profilesActive(String... profiles) {
-    val active = containsAny(activeProfiles, profiles);
-    return constant(active);
+    return constant(isProfilesActive(profiles));
+  }
+
+  protected boolean isProfilesActive(String... profiles) {
+    return containsAny(activeProfiles, profiles);
   }
 
   protected String addNewline() {

@@ -70,7 +70,7 @@ public abstract class ActiveAgent extends Agent {
     }
 
     val symbol = decideSymbol();
-    val quote = getLastValidQuote(symbol);
+    val quote = getLastQuote(symbol);
     val orderType = decideOrderType();
     val side = decideSide();
     val amount = decideAmount();

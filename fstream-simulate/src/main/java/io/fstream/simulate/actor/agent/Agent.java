@@ -112,7 +112,7 @@ public abstract class Agent extends BaseActor {
   /**
    * If subscribed successfully, read quote. If not received then get market open quote from exchange.
    */
-  protected Quote getLastValidQuote(String symbol) {
+  protected Quote getLastQuote(String symbol) {
     return quotes.computeIfAbsent(symbol, (key) -> {
       Future<Object> future = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
       try {

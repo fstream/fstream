@@ -145,3 +145,27 @@ simulate:
       numAgents: 100
    hft:
       numAgents: 0
+      
+---
+
+###############################################################################
+# Profile - "demo"
+###############################################################################
+
+# Profile
+spring.profiles: demo
+
+# Simulation
+simulate:
+   # Agents - Types
+   institutional:
+      maxSleep: 2
+      minSleep: 1
+      numAgents: 10
+   retail:
+      maxSleep: 2
+      minSleep: 1
+      numAgents: 10
+   hft:
+      numAgents: 0
+
