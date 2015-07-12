@@ -28,15 +28,21 @@
             $scope.connected = false;
          });
 
-         // TODO: Rename
-         $scope.$on('rate', function (e, rate) {
-            queueEvent($scope.rates, rate, 50);
+         var limit = 50;
+         $scope.$on('trade', function (e, trade) {
+            queueEvent($scope.trades, trade, limit);
+         });
+         $scope.$on('order', function (e, order) {
+            queueEvent($scope.orders, order, limit);
+         });
+         $scope.$on('quote', function (e, quote) {
+            queueEvent($scope.quotes, quote, limit);
          });
          $scope.$on('alert', function (e, alert) {
-            queueEvent($scope.alerts, alert, 50);
+            queueEvent($scope.alerts, alert, limit);
          });
          $scope.$on('metric', function (e, metric) {
-            queueEvent($scope.metrics, metric, 60);
+            queueEvent($scope.metrics, metric, limit);
          });
          $scope.$on('state', function (e, state) {
             updateState(state);
@@ -67,10 +73,13 @@
       }
 
       function resetModel() {
-         $scope.rates = [];
+         $scope.trades = [];
+         $scope.orders = [];
+         $scope.quotes = [];
+         
          $scope.alerts = [];
-         $scope.commands = [];
          $scope.metrics = [];
+         $scope.commands = [];
       }
 
       function registerAlert() {

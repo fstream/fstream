@@ -150,37 +150,37 @@
                }
             });
 
-            $scope.$on('rate', function (e, tick) {
-               if ($scope.loading || tick.symbol !== $scope.options.symbol || tick.dateTime < $scope.maxTime) {
+            $scope.$on('quote', function (e, quote) {
+               if ($scope.loading || quote.symbol !== $scope.options.symbol || quote.dateTime < $scope.maxTime) {
                   return;
                }
 
-               $scope.maxTime = tick.dateTime;
+               $scope.maxTime = quote.dateTime;
 
                var shift = false,
                    animate = false;
 
-               chart.series[0].addPoint([tick.dateTime, (tick.ask + tick.bid) / 2.0], false, shift, animate);
-               chart.series[1].addPoint([tick.dateTime, tick.bid, tick.ask], enabled, shift, animate);
+               chart.series[0].addPoint([quote.dateTime, (quote.ask + quote.bid) / 2.0], false, shift, animate);
+               chart.series[1].addPoint([quote.dateTime, quote.bid, quote.ask], enabled, shift, animate);
             });
 
             historyService.getTicks({
                symbol: $scope.options.symbol,
                interval: 'm'
-            }).then(function (ticks) {
-               var sorted = lodash.sortBy(ticks, 'time');
+            }).then(function (quotes) {
+               var sorted = lodash.sortBy(quotes, 'time');
 
-               var mids = lodash.map(sorted, function (tick) {
-                  return [tick.time, (tick.ask + tick.bid) / 2.0];
+               var mids = lodash.map(sorted, function (quote) {
+                  return [quote.time, (quote.ask + quote.bid) / 2.0];
                });
-               var rates = lodash.map(sorted, function (tick) {
-                  return [tick.time, tick.bid, tick.ask];
+               var values = lodash.map(sorted, function (quote) {
+                  return [quote.time, quote.bid, quote.ask];
                });
 
                $scope.maxTime = lodash.last(sorted).time;
 
                chart.series[0].setData(mids, false, false);
-               chart.series[1].setData(rates, true, false);
+               chart.series[1].setData(values, true, false);
 
                $scope.loading = false;
             });

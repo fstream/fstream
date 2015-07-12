@@ -27,14 +27,19 @@
             stompClient.connect({}, function (frame) {
                publishEvent("connected");
 
-               stompClient.subscribe('/topic/rates', function (frame) {
-                  publishEvent("rate", frame);
+               stompClient.subscribe('/topic/trades', function (frame) {
+                  publishEvent("trade", frame);
+               });
+               stompClient.subscribe('/topic/orders', function (frame) {
+                  publishEvent("orders", frame);
+               });
+               stompClient.subscribe('/topic/quotes', function (frame) {
+                  publishEvent("quote", frame);
                });
 
                stompClient.subscribe('/topic/alerts', function (frame) {
                   publishEvent("alert", frame);
                });
-
                stompClient.subscribe('/topic/metrics', function (frame) {
                   publishEvent("metric", frame);
                });

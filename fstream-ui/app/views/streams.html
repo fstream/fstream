@@ -9,12 +9,12 @@
    <div class="content" animate-panel>
       <div class="row">
          <h1><i class="fa fa-arrow-right"></i> Streams</h1>
-         <p class="lead">Showing <b>{{ rates.length }}</b> events for <b>{{ state.symbols.length }}</b> registered streams</p>
+         <p class="lead">Showing <b>{{ quotes.length }}</b> events for <b>{{ state.symbols.length }}</b> registered streams</p>
       </div>
       <div class="row">
-         <div id="rates">
-            <div class="col-sm-3" ng-repeat="rate in rates" >
-               <prism class="language-javascript" code="{{ rate | json }}"></prism>
+         <div id="quotes">
+            <div class="col-sm-3" ng-repeat="quote in quotes" >
+               <prism class="language-javascript" code="{{ quote | json }}"></prism>
             </div>
          </div>
       </div>
