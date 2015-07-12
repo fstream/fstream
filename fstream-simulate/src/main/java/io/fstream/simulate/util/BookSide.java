@@ -94,6 +94,8 @@ public class BookSide {
 
   public void addOrder(@NonNull Order order) {
     val price = order.getPrice();
+    // checkState(price != Float.MAX_VALUE && price != Float.MIN_VALUE, "Price not set for order! %s", order);
+
     priceLevels.put(price, order);
 
     depth += order.getAmount();
@@ -173,7 +175,7 @@ public class BookSide {
             order.getDateTime().toString(), order.getPrice(), order.getAmount());
       }
 
-      text = text + "\n";
+      text += "\n";
     }
 
     return text;

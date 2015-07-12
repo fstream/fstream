@@ -78,7 +78,7 @@ public class OrderBookTest {
     orderBook.onReceive(ask1);
     assertTrue(orderBook.getAsks().getPriceLevelCount() == 1);
     assertTrue(orderBook.getAsks().getDepth() == 1000);
-    assertTrue(orderBook.getBestAsk() == 25f);
+    assertThat(orderBook.getBestAsk()).isEqualTo(25f);
 
     orderBook.onReceive(ask2);
     assertTrue(orderBook.getAsks().getPriceLevelCount() == 2);

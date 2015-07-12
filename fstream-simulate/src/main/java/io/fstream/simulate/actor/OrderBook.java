@@ -121,6 +121,7 @@ public class OrderBook extends BaseActor {
 
       // Any unfilled amount added to order book
       if (unfilledSize > 0) {
+        // TODO: Price never set!
         insertOrder(order);
       }
     } else if (order.getOrderType() == LIMIT_AMEND) {
@@ -211,11 +212,26 @@ public class OrderBook extends BaseActor {
   /**
    * Registers a trade
    */
-  private void executeTrade(Order active, Order passive, int executedSize) {
+  private void executeTrade(Order active, Order passiveOrder, int executedSize) {
     // Book keeping
     tradeCount += 1;
 
-    val trade = new Trade(getSimulationTime(), active, passive, executedSize);
+    val trade = new Trade();
+    trade.setDateTime(getSimulationTime());
+    trade.setPrice(passiveOrder.getPrice());
+
+    // Use active order's timestamp as trade time as a simplifying assumption
+    if (active.getSide() == ASK) {
+      // Active seller
+      trade.setActiveBuy(false);
+      trade.setSellUser(active.getUserId());
+      trade.setBuyUser(passiveOrder.getUserId());
+    } else {
+      // Active buy
+      trade.setActiveBuy(true);
+      trade.setSellUser(passiveOrder.getUserId());
+      trade.setBuyUser(active.getUserId());
+    }
 
     // Publish
     exchange().tell(trade, self());

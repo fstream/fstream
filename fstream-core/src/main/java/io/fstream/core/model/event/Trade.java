@@ -1,7 +1,6 @@
 package io.fstream.core.model.event;
 
 import static io.fstream.core.model.event.EventType.TRADE;
-import io.fstream.core.model.event.Order.OrderSide;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -22,28 +21,17 @@ public class Trade extends AbstractEvent {
   private float price;
   private boolean activeBuy;
   private String symbol;
-  private DateTime orderTime;
   private int amount;
 
-  public Trade(DateTime tradeTime, Order active, Order passive, int executedSize) {
-    super(tradeTime);
-    this.setPrice(passive.getPrice());
-    this.setSymbol(active.getSymbol());
-    this.setOrderTime(active.getDateTime());
-    this.setAmount(executedSize);
-
-    // Use active orders timestamp as trade time as a simplifying assumption
-    if (active.getSide() == OrderSide.ASK) {
-      // Active seller
-      this.sellUser = active.getUserId();
-      this.activeBuy = false;
-      this.buyUser = passive.getUserId();
-    } else {
-      // Active buy
-      this.sellUser = passive.getUserId();
-      this.activeBuy = true;
-      this.buyUser = active.getUserId();
-    }
+  public Trade(DateTime dateTime, String buyUser, String sellUser, float price, boolean activeBuy, String symbol,
+      int amount) {
+    this.dateTime = dateTime;
+    this.buyUser = buyUser;
+    this.sellUser = sellUser;
+    this.price = price;
+    this.activeBuy = activeBuy;
+    this.symbol = symbol;
+    this.amount = amount;
   }
 
   @Override
