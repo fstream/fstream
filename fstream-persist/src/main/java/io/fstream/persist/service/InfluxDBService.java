@@ -9,11 +9,17 @@
 
 package io.fstream.persist.service;
 
+import static io.fstream.core.model.event.EventType.ALERT;
+import static io.fstream.core.model.event.EventType.METRIC;
+import static io.fstream.core.model.event.EventType.ORDER;
+import static io.fstream.core.model.event.EventType.QUOTE;
+import static io.fstream.core.model.event.EventType.TRADE;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
-import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.MetricEvent;
+import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Trade;
 import io.fstream.core.util.Codec;
 
 import java.util.concurrent.TimeUnit;
@@ -82,19 +88,35 @@ public class InfluxDBService implements PersistenceService {
   }
 
   private Serie createSerie(Event event) {
-    if (event.getType() == EventType.QUOTE) {
-      val quoteEvent = (Quote) event;
+    if (event.getType() == TRADE) {
+      val trade = (Trade) event;
+      return new Serie.Builder("trades")
+          .columns("time", "symbol", "amount", "price", "buyUser", "sellUser", "activeBuy")
+          .values(event.getDateTime().getMillis(), trade.getSymbol(), trade.getAmount(), trade.getPrice(),
+              trade.getBuyUser(), trade.getSellUser(), trade.isActiveBuy())
+          .build();
+    } else if (event.getType() == ORDER) {
+      val order = (Order) event;
+      return new Serie.Builder("orders")
+          .columns("time", "symbol", "amount", "price", "oid", "orderType", "side", "brokerId", "userId",
+              "processedTime")
+          .values(event.getDateTime().getMillis(), order.getSymbol(), order.getAmount(), order.getPrice(),
+              order.getOid(), order.getOrderType(), order.getSide(), order.getBrokerId(), order.getUserId(),
+              order.getProcessedTime().getMillis())
+          .build();
+    } else if (event.getType() == QUOTE) {
+      val quote = (Quote) event;
       return new Serie.Builder("quotes")
           .columns("time", "symbol", "ask", "bid")
-          .values(event.getDateTime().getMillis(), quoteEvent.getSymbol(), quoteEvent.getAsk(), quoteEvent.getBid())
+          .values(event.getDateTime().getMillis(), quote.getSymbol(), quote.getAsk(), quote.getBid())
           .build();
-    } else if (event.getType() == EventType.METRIC) {
+    } else if (event.getType() == METRIC) {
       val metricEvent = (MetricEvent) event;
       return new Serie.Builder("metrics")
           .columns("time", "id", "data")
           .values(event.getDateTime().getMillis(), metricEvent.getId(), Codec.encodeText(metricEvent.getData()))
           .build();
-    } else if (event.getType() == EventType.ALERT) {
+    } else if (event.getType() == ALERT) {
       val alertEvent = (AlertEvent) event;
       return new Serie.Builder("alerts")
           .columns("time", "id", "data")

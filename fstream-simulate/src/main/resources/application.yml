@@ -66,6 +66,7 @@ simulate:
       - Merrill Edge
 
    # Agents - Common
+   tickDuration: 10ms
    msgResponseTimeout: 5 # in seconds
    minTickSize: 0.1
    nonPremiumQuoteDelay: 1000 # in milliseconds
@@ -110,6 +111,7 @@ spring.profiles: fast
 
 # Simulation
 simulate:
+   tickDuration: 1ms
    institutional:
       minSleep: 1
       maxSleep: 2
@@ -166,13 +168,13 @@ simulate:
 
 # Profile
 spring.profiles: demo
-spring.profiles.include: fast
 
 # Simulation
 simulate:
+   tickDuration: 1s
    institutional:
-      numAgents: 10
+      numAgents: 5
    retail:
-      numAgents: 10
+      numAgents: 5
    hft:
-      numAgents: 0
+      numAgents: 5

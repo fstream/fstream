@@ -31,6 +31,7 @@ public class SimulateProperties {
   /**
    * Settings.
    */
+  private String tickDuration;
   private int msgResponseTimeout;
   private float minQuoteSize;
   private int nonPremiumQuoteDelay;
