@@ -65,7 +65,7 @@ public abstract class Agent extends BaseActor {
     this.name = name;
     this.agentProperties = resolveAgentProperties();
 
-    this.minQuoteSize = properties.getMinQuoteSize();
+    this.minQuoteSize = properties.getTickSize();
     this.msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     this.broker = generateBroker();
   }

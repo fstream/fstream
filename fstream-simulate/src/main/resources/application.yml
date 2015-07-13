@@ -68,7 +68,7 @@ simulate:
    # Agents - Common
    tickDuration: 10ms
    msgResponseTimeout: 5 # in seconds
-   minTickSize: 0.1
+   tickSize: 0.1
    nonPremiumQuoteDelay: 1000 # in milliseconds
    
    # Agents - Types

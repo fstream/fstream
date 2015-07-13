@@ -85,7 +85,7 @@ public abstract class ActiveAgent extends Agent {
       // TODO: Explain why this is needed if the same calculation is done in OrderBook#onReceiveOrder
       price = side == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
     } else {
-      // TODO: Explain what the 5 is for
+      // TODO hardcoded 5 to be removed. Represents how far from current price a new order can be priced.
       val priceOffset = minQuoteSize * 5;
       if (side == ASK) {
         val bestAsk = quote.getAsk();
