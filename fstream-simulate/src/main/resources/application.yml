@@ -154,11 +154,11 @@ spring.profiles.include: fast
 # Simulation
 simulate:
    institutional:
-      numAgents: 100
+      numAgents: 1
    retail:
-      numAgents: 100
+      numAgents: 1
    hft:
-      numAgents: 0
+      numAgents: 50
       
 ---
 

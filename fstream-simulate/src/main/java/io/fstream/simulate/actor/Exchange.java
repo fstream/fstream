@@ -200,7 +200,7 @@ public class Exchange extends BaseActor {
   }
 
   private ActorRef createOrderBook(String symbol) {
-    val props = Props.create(OrderBook.class, properties, symbol).withDispatcher("order-book-dispatcher");
+    val props = Props.create(OrderBook.class, properties, symbol);
     return context().actorOf(props, symbol);
   }
 

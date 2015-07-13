@@ -2,19 +2,11 @@ package io.fstream.simulate.core;
 
 import static akka.actor.ActorRef.noSender;
 import static com.google.common.base.Stopwatch.createStarted;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.IntStream.range;
+import io.fstream.simulate.actor.Broker;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.actor.Publisher;
-import io.fstream.simulate.actor.agent.Agent;
-import io.fstream.simulate.actor.agent.HFTAgent;
-import io.fstream.simulate.actor.agent.InstitutionalAgent;
-import io.fstream.simulate.actor.agent.RetailAgent;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
-
-import java.util.List;
-import java.util.function.IntFunction;
 
 import javax.annotation.PreDestroy;
 
@@ -35,7 +27,6 @@ import akka.actor.PoisonPill;
 import akka.actor.Props;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.ImmutableList;
 
 @Slf4j
 @Data
@@ -57,7 +48,7 @@ public class Simulator {
    */
   private ActorRef exchange;
   private ActorRef publisher;
-  private List<ActorRef> agents;
+  private ActorRef broker;
 
   private Stopwatch watch;
 
@@ -66,7 +57,7 @@ public class Simulator {
     watch = createStarted();
     publisher = createPublisher();
     exchange = createExchange();
-    agents = createAgents();
+    broker = createBroker();
   }
 
   @PreDestroy
@@ -74,11 +65,8 @@ public class Simulator {
     val shutdownWatch = createStarted();
     log.info("Shutting down actor system after simulating for {}", watch);
 
-    // Agents
-    for (val agent : agents) {
-      shutdown(agent);
-    }
-    pause();
+    // Broker
+    shutdown(broker);
 
     // Exchange
     exchange.tell(Command.PRINT_SUMMARY, noSender());
@@ -96,56 +84,19 @@ public class Simulator {
 
   private ActorRef createPublisher() {
     val name = "publisher";
-    val props = Props.create(Publisher.class).withDispatcher("publisher-dispatcher");
+    val props = Props.create(Publisher.class);
     return actorSystem.actorOf(props, name);
   }
 
   private ActorRef createExchange() {
     val name = "exchange";
-    val props = Props.create(Exchange.class, properties).withDispatcher("exchange-dispatcher");
+    val props = Props.create(Exchange.class, properties);
     return actorSystem.actorOf(props, name);
   }
 
-  private List<ActorRef> createAgents() {
-    return ImmutableList.<ActorRef> builder()
-        .addAll(createRetailAgents())
-        .addAll(createInstitutionalAgents())
-        .addAll(createHftAgents()).build();
-  }
-
-  private List<ActorRef> createRetailAgents() {
-    log.info("Creating {} retail agents...", properties.getRetail().getNumAgents());
-    return createActors(properties.getRetail().getNumAgents(), this::createRetailAgent);
-  }
-
-  private List<ActorRef> createInstitutionalAgents() {
-    log.info("Creating {} institutional agents...", properties.getInstitutional().getNumAgents());
-    return createActors(properties.getInstitutional().getNumAgents(), this::createInstitutionalAgent);
-  }
-
-  private List<ActorRef> createHftAgents() {
-    log.info("Creating {} hft agents...", properties.getHft().getNumAgents());
-    return createActors(properties.getHft().getNumAgents(), this::createHftAgent);
-  }
-
-  private static List<ActorRef> createActors(int count, IntFunction<ActorRef> factory) {
-    return range(0, count).mapToObj(factory).collect(toList());
-  }
-
-  private ActorRef createRetailAgent(int i) {
-    return createAgent(RetailAgent.class, "retail-agent-" + i);
-  }
-
-  private ActorRef createInstitutionalAgent(int i) {
-    return createAgent(InstitutionalAgent.class, "institutional-agent-" + i);
-  }
-
-  private ActorRef createHftAgent(int i) {
-    return createAgent(HFTAgent.class, "hft-agent-" + i);
-  }
-
-  private ActorRef createAgent(Class<? extends Agent> agentClass, String name) {
-    val props = Props.create(agentClass, properties, name).withDispatcher("agent-dispatcher");
+  private ActorRef createBroker() {
+    val name = "broker";
+    val props = Props.create(Broker.class, properties);
     return actorSystem.actorOf(props, name);
   }
 
