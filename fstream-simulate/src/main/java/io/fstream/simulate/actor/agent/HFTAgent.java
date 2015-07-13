@@ -110,15 +110,19 @@ public class HFTAgent extends Agent {
    */
   private Order createLiquidityAtStress(Quote quote, Imbalance imbalance) {
     float price;
+    float askCeiling = properties.getMaxPrice();
+    float bidFloor = properties.getMinPrice();
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // ask imbalance
       val bestAsk = generateBestAsk(quote);
       price = bestAsk + (minQuoteSize * imbalance.getRatio());
+      price = price <= askCeiling ? price : askCeiling;
     } else {
       // bid imbalance
       val bestBid = generateBestBid(quote);
       price = bestBid - (minQuoteSize * imbalance.getRatio());
+      price = price >= bidFloor ? price : bidFloor;
     }
 
     return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,

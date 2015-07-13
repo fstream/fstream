@@ -35,6 +35,9 @@ public class SimulateProperties {
   private int msgResponseTimeout;
   private float tickSize;
   private int nonPremiumQuoteDelay;
+  private float minPrice;
+  private float maxPrice;
+  private int riskDistance;
 
   /**
    * Agents.

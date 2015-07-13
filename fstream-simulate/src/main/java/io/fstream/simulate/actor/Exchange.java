@@ -67,12 +67,13 @@ public class Exchange extends BaseActor {
 
     // TODO remove the hard coding.
     val random = new Random();
-    val minBid = 10;
-    val minAsk = 12;
+    val minBid = properties.getMinPrice();
+    val minAsk = properties.getMaxPrice();
+    val riskDistance = properties.getRiskDistance();
 
     for (val symbol : activeInstruments) {
-      val bid = minBid - (random.nextInt(5) * tickSize);
-      val ask = minAsk + (random.nextInt(5) * tickSize);
+      val bid = minBid - (random.nextInt(riskDistance) * tickSize);
+      val ask = minAsk + (random.nextInt(riskDistance) * tickSize);
       val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
 
       lastValidQuote.put(symbol, quote);

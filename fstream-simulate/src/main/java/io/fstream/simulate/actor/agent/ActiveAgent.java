@@ -57,7 +57,10 @@ public abstract class ActiveAgent extends Agent {
       cancelOpenOrdersBySymbol(order.getSymbol());
 
       // Add the new order
-      openOrders.addOpenOrder(order);
+      if (order.getOrderType() != OrderType.MARKET_ORDER) {
+        openOrders.addOpenOrder(order);
+      }
+
       exchange().tell(order, self());
     }
   }
@@ -81,22 +84,28 @@ public abstract class ActiveAgent extends Agent {
 
   private float decidePrice(OrderType orderType, OrderSide side, @NonNull Quote quote) {
     float price;
+    // represents how far from current price should order be to compensate for risk
+    val riskDistance = properties.getRiskDistance();
+    val askCeiling = properties.getMaxPrice();
+    val bidFloor = properties.getMinPrice();
     if (orderType == MARKET_ORDER) {
       // TODO: Explain why this is needed if the same calculation is done in OrderBook#onReceiveOrder
       price = side == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
     } else {
-      // TODO hardcoded 5 to be removed. Represents how far from current price a new order can be priced.
-      val priceOffset = minQuoteSize * 5;
+      val priceOffset = minQuoteSize * riskDistance;
       if (side == ASK) {
         val bestAsk = quote.getAsk();
         val maxPrice = Math.max(bestAsk + priceOffset, bestAsk);
 
         price = decidePrice(bestAsk, maxPrice, bestAsk);
+        // make sure price does go above max bound
+        price = price <= askCeiling ? price : askCeiling;
       } else {
         val bestBid = quote.getBid();
         val minPrice = Math.min(bestBid - priceOffset, bestBid);
-
         price = decidePrice(minPrice, bestBid, bestBid);
+        // make sure price does not drop below min bound
+        price = price >= bidFloor ? price : bidFloor;
       }
 
       if (price < 0) {
