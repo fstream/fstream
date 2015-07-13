@@ -157,9 +157,16 @@ public class BookSide {
     val actual = calculateDepth();
     int expected = getDepth();
 
-    val invalid = actual != expected;
-    if (invalid) {
-      log.error("Bid depth does not add up record = {} actual = {}", expected, actual);
+    val mismatch = actual != expected;
+    if (mismatch) {
+      log.error("{} depth does not match. expected = {} actual = {}, delta = {}", side, expected, actual, expected
+          - actual);
+      return false;
+    }
+
+    val negative = actual < 0;
+    if (negative) {
+      log.error("{} depth is negative: {}", side, actual);
       return false;
     }
 

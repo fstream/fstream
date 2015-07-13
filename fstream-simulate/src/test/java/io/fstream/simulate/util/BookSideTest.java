@@ -24,7 +24,7 @@ public class BookSideTest {
   public void testIteratorRemove() {
     // Setup
     val orderAmount = 100;
-    val order = new Order(ASK, LIMIT_ADD, DateTime.now(), 1, "Fidelity", "RB", orderAmount, 50.0f, "trader1");
+    val order = new Order(ASK, LIMIT_ADD, DateTime.now(), 1, "Fidelity", "RY", orderAmount, 50.0f, "trader1");
 
     val bookSide = new BookSide(ASK);
     bookSide.addOrder(order);
