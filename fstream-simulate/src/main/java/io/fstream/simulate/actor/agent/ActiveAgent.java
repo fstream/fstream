@@ -89,12 +89,12 @@ public abstract class ActiveAgent extends Agent {
       val priceOffset = minQuoteSize * 5;
       if (side == ASK) {
         val bestAsk = quote.getAsk();
-        val maxPrice = Math.min(bestAsk + priceOffset, bestAsk);
+        val maxPrice = Math.max(bestAsk + priceOffset, bestAsk);
 
         price = decidePrice(bestAsk, maxPrice, bestAsk);
       } else {
         val bestBid = quote.getBid();
-        val minPrice = Math.max(bestBid - priceOffset, bestBid);
+        val minPrice = Math.min(bestBid - priceOffset, bestBid);
 
         price = decidePrice(minPrice, bestBid, bestBid);
       }
