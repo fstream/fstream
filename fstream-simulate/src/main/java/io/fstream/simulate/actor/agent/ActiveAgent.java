@@ -1,5 +1,6 @@
 package io.fstream.simulate.actor.agent;
 
+import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import io.fstream.core.model.event.Order;
@@ -99,9 +100,7 @@ public abstract class ActiveAgent extends Agent {
         price = decidePrice(minPrice, bestBid, bestBid);
       }
 
-      if (price < 0) {
-        log.error("Invalid price generated {}", price);
-      }
+      checkState(price >= 0, "Invalid negative price generated %s", price);
     }
 
     return price;

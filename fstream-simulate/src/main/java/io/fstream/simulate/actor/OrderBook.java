@@ -133,6 +133,12 @@ public class OrderBook extends BaseActor {
     }
 
     if (properties.isDebug() && !assertBookDepth()) {
+      log.error("------------------------------");
+      log.error("Invalid depth state!");
+      log.error("------------------------------");
+      printBook();
+      printStatus();
+      printSummary();
       System.exit(1);
     }
   }

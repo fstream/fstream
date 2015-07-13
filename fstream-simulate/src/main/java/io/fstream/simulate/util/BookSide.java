@@ -160,9 +160,10 @@ public class BookSide {
     val invalid = actual != expected;
     if (invalid) {
       log.error("Bid depth does not add up record = {} actual = {}", expected, actual);
+      return false;
     }
 
-    return invalid;
+    return true;
   }
 
   @Override
