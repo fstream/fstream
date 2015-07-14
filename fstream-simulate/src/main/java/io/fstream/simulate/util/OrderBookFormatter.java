@@ -27,7 +27,7 @@ public class OrderBookFormatter {
 
     text += String.format("bid depth = %s, ask depth = %s\n",
         orderBook.getBids().getDepth(), orderBook.getAsks().getDepth());
-    text += String.format("best ask = %s, best bid =%s, spread = %s\n",
+    text += String.format("best ask = %s, best bid = %s, spread = %s\n",
         orderBook.getBestAsk(), orderBook.getBestBid(), orderBook.getSpread());
 
     text += "----- END -----\n";

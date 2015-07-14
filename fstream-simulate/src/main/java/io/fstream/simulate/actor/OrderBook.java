@@ -1,6 +1,7 @@
 package io.fstream.simulate.actor;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Strings.repeat;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
@@ -350,13 +351,17 @@ public class OrderBook extends BaseActor {
   private void validate() {
     val valid = asks.isDepthValid() && bids.isDepthValid();
     if (!valid) {
-      log.error("------------------------------");
+      log.error(repeat("#", 100));
       log.error("Invalid depth state!");
-      log.error("------------------------------");
+      log.error(repeat("#", 100));
+
+      // Dump state
       printBook();
       printStatus();
       printSummary();
-      System.exit(1);
+
+      // Shutdown system
+      getContext().system().shutdown();
     }
   }
 
