@@ -65,7 +65,7 @@ public abstract class Agent extends BaseActor {
     this.name = name;
     this.agentProperties = resolveAgentProperties();
 
-    this.minQuoteSize = properties.getMinQuoteSize();
+    this.minQuoteSize = properties.getTickSize();
     this.msgResponseTimeout = new Timeout(Duration.create(properties.getMsgResponseTimeout(), "seconds"));
     this.broker = generateBroker();
   }
@@ -132,7 +132,6 @@ public abstract class Agent extends BaseActor {
     for (val symbolOrder : symbolOrders) {
       // FIXME: Sending unsafe mutation of message
       symbolOrder.setOrderType(LIMIT_CANCEL);
-
       exchange().tell(symbolOrder, self());
     }
 
@@ -155,7 +154,7 @@ public abstract class Agent extends BaseActor {
    * within the min / max bounds.
    */
   protected float decidePrice(float min, float max, float bestPrice) {
-    return randomChoice(getProbBestPrice(), bestPrice, randomFloat(min, max));
+    return randomChoice(getProbBestPrice(), bestPrice, min + randomInt(0, 4) * properties.getTickSize());
   }
 
   /**

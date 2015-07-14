@@ -31,7 +31,7 @@ public class Exchange extends BaseActor {
   /**
    * Configuration.
    */
-  private final float minQuoteSize;
+  private final float tickSize;
   private final FiniteDuration quoteDelayDuration;
 
   /**
@@ -57,7 +57,7 @@ public class Exchange extends BaseActor {
   public Exchange(SimulateProperties properties) {
     super(properties);
     this.activeInstruments = properties.getInstruments();
-    this.minQuoteSize = properties.getMinQuoteSize();
+    this.tickSize = properties.getTickSize();
     this.quoteDelayDuration = FiniteDuration.create(properties.getNonPremiumQuoteDelay(), TimeUnit.MILLISECONDS);
   }
 
@@ -67,12 +67,13 @@ public class Exchange extends BaseActor {
 
     // TODO remove the hard coding.
     val random = new Random();
-    val minBid = 10;
-    val minAsk = 12;
+    val minBid = 10;// properties.getMinPrice();
+    val minAsk = 12; // properties.getMaxPrice();
+    val riskDistance = properties.getRiskDistance();
 
     for (val symbol : activeInstruments) {
-      val bid = minBid - (random.nextInt(5) * minQuoteSize);
-      val ask = minAsk + (random.nextInt(5) * minQuoteSize);
+      val bid = minBid - (random.nextInt(riskDistance) * tickSize);
+      val ask = minAsk + (random.nextInt(riskDistance) * tickSize);
       val quote = new Quote(getSimulationTime(), symbol, ask, bid, 0, 0);
 
       lastValidQuote.put(symbol, quote);

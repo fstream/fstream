@@ -54,11 +54,13 @@ public abstract class ActiveAgent extends Agent {
     // "active" behavior"
     val order = createOrder();
     if (order != null) {
-      // Cancel all pending open orders on this symbol
-      cancelOpenOrdersBySymbol(order.getSymbol());
-
       // Add the new order
-      openOrders.addOpenOrder(order);
+      if (order.getOrderType() != OrderType.MARKET_ORDER) {
+        // Cancel all pending open orders on this symbol
+        cancelOpenOrdersBySymbol(order.getSymbol());
+        openOrders.addOpenOrder(order);
+      }
+
       exchange().tell(order, self());
     }
   }
@@ -82,22 +84,28 @@ public abstract class ActiveAgent extends Agent {
 
   private float decidePrice(OrderType orderType, OrderSide side, @NonNull Quote quote) {
     float price;
+    // represents how far from current price should order be to compensate for risk
+    val riskDistance = properties.getRiskDistance();
+    val askCeiling = properties.getMaxPrice();
+    val bidFloor = properties.getMinPrice();
     if (orderType == MARKET_ORDER) {
       // TODO: Explain why this is needed if the same calculation is done in OrderBook#onReceiveOrder
       price = side == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
     } else {
-      // TODO: Explain what the 5 is for
-      val priceOffset = minQuoteSize * 5;
+      val priceOffset = minQuoteSize * riskDistance;
       if (side == ASK) {
         val bestAsk = quote.getAsk();
-        val maxPrice = Math.min(bestAsk + priceOffset, bestAsk);
+        val maxPrice = bestAsk + priceOffset;
 
         price = decidePrice(bestAsk, maxPrice, bestAsk);
+        // make sure price does go above max bound
+        price = price <= askCeiling ? price : askCeiling;
       } else {
         val bestBid = quote.getBid();
-        val minPrice = Math.max(bestBid - priceOffset, bestBid);
-
+        val minPrice = bestBid - priceOffset;
         price = decidePrice(minPrice, bestBid, bestBid);
+        // make sure price does not drop below min bound
+        price = price >= bidFloor ? price : bidFloor;
       }
 
       checkState(price >= 0, "Invalid negative price generated %s", price);

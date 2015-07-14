@@ -220,6 +220,8 @@ public class OrderBook extends BaseActor {
     val trade = new Trade();
     trade.setDateTime(getSimulationTime());
     trade.setPrice(passiveOrder.getPrice());
+    trade.setSymbol(getSymbol());
+    trade.setAmount(executedSize);
 
     // Use active order's timestamp as trade time as a simplifying assumption
     if (active.getSide() == ASK) {
