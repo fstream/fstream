@@ -138,17 +138,6 @@ public abstract class Agent extends BaseActor {
     openOrders.getOrders().removeAll(symbol);
   }
 
-  protected void cancelOpenOrdersBySymbolPrice(String symbol, float price) {
-    val symbolOrders = openOrders.getOrders().get(symbol);
-    for (val symbolOrder : symbolOrders) {
-      if (symbolOrder.getPrice() == price) {
-        symbolOrder.setOrderType(LIMIT_CANCEL);
-        exchange().tell(symbolOrder, self());
-        openOrders.getOrders().remove(symbolOrder.getSymbol(), symbolOrder);
-      }
-    }
-  }
-
   protected String generateBroker() {
     return randomElement(properties.getBrokers());
   }

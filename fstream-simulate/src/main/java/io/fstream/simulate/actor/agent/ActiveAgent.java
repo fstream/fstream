@@ -54,12 +54,10 @@ public abstract class ActiveAgent extends Agent {
     // "active" behavior"
     val order = createOrder();
     if (order != null) {
-      // Cancel all pending open orders on this symbol
-      // cancelOpenOrdersBySymbol(order.getSymbol());
-
       // Add the new order
       if (order.getOrderType() != OrderType.MARKET_ORDER) {
-        cancelOpenOrdersBySymbolPrice(order.getSymbol(), order.getPrice());
+        // Cancel all pending open orders on this symbol
+        cancelOpenOrdersBySymbol(order.getSymbol());
         openOrders.addOpenOrder(order);
       }
 
