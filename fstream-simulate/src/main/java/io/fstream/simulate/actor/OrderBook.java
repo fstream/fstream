@@ -132,14 +132,8 @@ public class OrderBook extends BaseActor {
       checkState(false);
     }
 
-    if (properties.isDebug() && !assertBookDepth()) {
-      log.error("------------------------------");
-      log.error("Invalid depth state!");
-      log.error("------------------------------");
-      printBook();
-      printStatus();
-      printSummary();
-      System.exit(1);
+    if (properties.isValidate()) {
+      validate();
     }
   }
 
@@ -337,14 +331,6 @@ public class OrderBook extends BaseActor {
         order.getSide() == BID && order.getPrice() >= bestAsk;
   }
 
-  /**
-   * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
-   * ask depth variables.
-   */
-  private boolean assertBookDepth() {
-    return asks.isDepthValid() && bids.isDepthValid();
-  }
-
   private BookSide getBookSide(Order order) {
     return order.getSide() == ASK ? asks : bids;
   }
@@ -355,6 +341,23 @@ public class OrderBook extends BaseActor {
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {
     return Seconds.secondsBetween(endTime, startTime).getSeconds();
+  }
+
+  /**
+   * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
+   * ask depth variables.
+   */
+  private void validate() {
+    val valid = asks.isDepthValid() && bids.isDepthValid();
+    if (!valid) {
+      log.error("------------------------------");
+      log.error("Invalid depth state!");
+      log.error("------------------------------");
+      printBook();
+      printStatus();
+      printSummary();
+      System.exit(1);
+    }
   }
 
 }

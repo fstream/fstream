@@ -1,5 +1,7 @@
 package io.fstream.simulate.config;
 
+import lombok.val;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +30,12 @@ public class AkkaConfig {
 
   @Bean
   public Config akkaConfiguration() {
-    return ConfigFactory.load().withValue("akka.scheduler.tick-duration",
-        ConfigValueFactory.fromAnyRef(properties.getTickDuration()));
-  }
+    Config config = ConfigFactory.load();
 
+    val profile = properties.isSingleThreaded() ? "single-thread" : "multi-thread";
+    config = config.getConfig(profile).withFallback(config);
+
+    val tickDuration = ConfigValueFactory.fromAnyRef(properties.getTickDuration());
+    return config.withValue("akka.scheduler.tick-duration", tickDuration);
+  }
 }
