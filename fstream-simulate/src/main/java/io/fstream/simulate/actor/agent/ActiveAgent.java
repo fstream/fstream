@@ -54,10 +54,11 @@ public abstract class ActiveAgent extends Agent {
     val order = createOrder();
     if (order != null) {
       // Cancel all pending open orders on this symbol
-      cancelOpenOrdersBySymbol(order.getSymbol());
+      // cancelOpenOrdersBySymbol(order.getSymbol());
 
       // Add the new order
       if (order.getOrderType() != OrderType.MARKET_ORDER) {
+        cancelOpenOrdersBySymbolPrice(order.getSymbol(), order.getPrice());
         openOrders.addOpenOrder(order);
       }
 
@@ -95,14 +96,14 @@ public abstract class ActiveAgent extends Agent {
       val priceOffset = minQuoteSize * riskDistance;
       if (side == ASK) {
         val bestAsk = quote.getAsk();
-        val maxPrice = Math.max(bestAsk + priceOffset, bestAsk);
+        val maxPrice = bestAsk + priceOffset;
 
         price = decidePrice(bestAsk, maxPrice, bestAsk);
         // make sure price does go above max bound
         price = price <= askCeiling ? price : askCeiling;
       } else {
         val bestBid = quote.getBid();
-        val minPrice = Math.min(bestBid - priceOffset, bestBid);
+        val minPrice = bestBid - priceOffset;
         price = decidePrice(minPrice, bestBid, bestBid);
         // make sure price does not drop below min bound
         price = price >= bidFloor ? price : bidFloor;

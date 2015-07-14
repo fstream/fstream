@@ -27,7 +27,7 @@
 # - demo
 
 # Profiles
-spring.profiles.active: akka,file
+spring.profiles.active: akka,file,simple
 
 ###############################################################################
 # Profile - common
@@ -52,10 +52,10 @@ simulate:
    # Active instruments
    instruments:
       - RY
-      - BMO
-      - TD
-      - BBM
-      - HUF
+      # - BMO
+      # - TD
+      # - BBM
+      # - HUF
       
    # Active brokers
    brokers:
@@ -68,14 +68,19 @@ simulate:
    # Agents - Common
    tickDuration: 10ms
    msgResponseTimeout: 5 # in seconds
-   tickSize: 0.1
+   tickSize: 0.10
    nonPremiumQuoteDelay: 1000 # in milliseconds
+   # all securities trade in same range currently
+   minPrice: 10
+   maxPrice: 12
+   # risk quote delta. Currently fixed at 5 ticks.
+   riskDistance: 5
    
    # Agents - Types
    institutional:
       probBuy: 0.49
-      probMarket: 0.30
-      probBestPrice: 0.70
+      probMarket: 0.10
+      probBestPrice: 0.30
       maxTradeSize: 5000
       minSleep: 1000 # in millis
       maxSleep: 2500 # in millis
@@ -94,7 +99,7 @@ simulate:
       probBuy: 0.49
       probMarket: 0.69
       probBestPrice: 0.19
-      maxTradeSize: 1000
+      maxTradeSize: 10000
       maxSleep: 1000 # in millis
       minSleep: 100 # in millis
       numAgents: 500 #500
@@ -139,7 +144,7 @@ simulate:
    retail:
       numAgents: 1
    hft:
-      numAgents: 0
+      numAgents: 1
 
 ---
 

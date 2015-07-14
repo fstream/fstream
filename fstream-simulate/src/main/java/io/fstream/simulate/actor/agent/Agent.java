@@ -132,11 +132,21 @@ public abstract class Agent extends BaseActor {
     for (val symbolOrder : symbolOrders) {
       // FIXME: Sending unsafe mutation of message
       symbolOrder.setOrderType(LIMIT_CANCEL);
-
       exchange().tell(symbolOrder, self());
     }
 
     openOrders.getOrders().removeAll(symbol);
+  }
+
+  protected void cancelOpenOrdersBySymbolPrice(String symbol, float price) {
+    val symbolOrders = openOrders.getOrders().get(symbol);
+    for (val symbolOrder : symbolOrders) {
+      if (symbolOrder.getPrice() == price) {
+        symbolOrder.setOrderType(LIMIT_CANCEL);
+        exchange().tell(symbolOrder, self());
+        openOrders.getOrders().remove(symbolOrder.getSymbol(), symbolOrder);
+      }
+    }
   }
 
   protected String generateBroker() {
@@ -155,7 +165,7 @@ public abstract class Agent extends BaseActor {
    * within the min / max bounds.
    */
   protected float decidePrice(float min, float max, float bestPrice) {
-    return randomChoice(getProbBestPrice(), bestPrice, randomFloat(min, max));
+    return randomChoice(getProbBestPrice(), bestPrice, min + randomInt(0, 4) * properties.getTickSize());
   }
 
   /**

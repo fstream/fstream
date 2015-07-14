@@ -132,6 +132,10 @@ public class OrderBook extends BaseActor {
       checkState(false);
     }
 
+    if (getOppositeBookSide(order).getDepth() < 0) {
+      log.info("stop depth negative");
+    }
+
     if (properties.isDebug() && !assertBookDepth()) {
       System.exit(1);
     }
