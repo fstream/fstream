@@ -9,6 +9,7 @@
 
 package io.fstream.simulate.util;
 
+import static io.fstream.core.util.Formatters.formatCount;
 import io.fstream.simulate.actor.OrderBook;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -26,7 +27,7 @@ public class OrderBookFormatter {
     text += orderBook.getBids();
 
     text += String.format("bid depth = %s, ask depth = %s\n",
-        orderBook.getBids().getDepth(), orderBook.getAsks().getDepth());
+        formatCount(orderBook.getBids().getDepth()), formatCount(orderBook.getAsks().getDepth()));
     text += String.format("best ask = %s, best bid = %s, spread = %s\n",
         orderBook.getBestAsk(), orderBook.getBestBid(), orderBook.getSpread());
 

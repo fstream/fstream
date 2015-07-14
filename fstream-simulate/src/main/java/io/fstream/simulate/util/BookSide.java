@@ -11,6 +11,7 @@ package io.fstream.simulate.util;
 
 import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
+import static io.fstream.core.util.Formatters.formatCount;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
 
@@ -45,7 +46,7 @@ public class BookSide {
    * The depth of the book side.
    */
   @Getter
-  private int depth;
+  private long depth;
 
   public BookSide(@NonNull OrderSide side) {
     this.side = side;
@@ -155,7 +156,7 @@ public class BookSide {
 
   public boolean isDepthValid() {
     val actual = calculateDepth();
-    int expected = getDepth();
+    val expected = getDepth();
 
     val mismatch = actual != expected;
     if (mismatch) {
@@ -177,10 +178,15 @@ public class BookSide {
   public String toString() {
     String text = "";
     for (val price : priceLevels.keySet()) {
-      text += String.format("%s -> ", price);
+      text += String.format("Price: %s - %s depth\n", price, formatCount(calculatePriceDepth(price)));
+      text += String.format("   %3s %-15s %15s %15s %15s %-15s%n", "#", "Time", "Price", "Amount", "OID", "User ID");
+
+      int i = 1;
       for (val order : priceLevels.get(price)) {
-        text += String.format("( %s,%s,%s) -> ",
-            order.getDateTime().toString(), order.getPrice(), order.getAmount());
+        text += String.format("   %3s %-15s %15.5f %15s %15s %-15s%n",
+            i, order.getDateTime().getMillis(), order.getPrice(), formatCount(order.getAmount()), order.getOid(),
+            order.getUserId());
+        i++;
       }
 
       text += "\n";
