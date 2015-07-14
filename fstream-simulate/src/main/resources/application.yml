@@ -35,10 +35,11 @@ spring.profiles.active: akka,file,simple
 
 # Remote shell
 #   Use ssh -p 2000 fstream@localhost to connect
-shell.auth.simple.user:
-  name: fstream
-  password: fstream
-
+shell:
+  auth.simple.user:
+    name: fstream
+    password: fstream
+    
 # Simulation
 simulate:
    # Camel

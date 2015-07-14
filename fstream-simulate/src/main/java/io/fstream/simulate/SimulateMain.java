@@ -6,6 +6,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
+
 package io.fstream.simulate;
 
 import static java.lang.System.out;
