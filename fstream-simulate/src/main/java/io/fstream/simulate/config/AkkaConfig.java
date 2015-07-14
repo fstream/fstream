@@ -1,8 +1,11 @@
 package io.fstream.simulate.config;
 
+import java.util.List;
+
 import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -20,6 +23,11 @@ import com.typesafe.config.ConfigValueFactory;
 @Profile("akka")
 public class AkkaConfig {
 
+  /**
+   * Configuration.
+   */
+  @Value("#{environment.getActiveProfiles()}")
+  List<String> activeProfiles;
   @Autowired
   SimulateProperties properties;
 
@@ -30,12 +38,20 @@ public class AkkaConfig {
 
   @Bean
   public Config akkaConfiguration() {
-    Config config = ConfigFactory.load();
+    val baseConfig = ConfigFactory.load();
 
-    val profile = properties.isSingleThreaded() ? "single-thread" : "multi-thread";
-    config = config.getConfig(profile).withFallback(config);
+    val threadProfilePath = "profile." + (properties.isSingleThreaded() ? "single-thread" : "multi-thread");
+    Config profileConfig = baseConfig.getConfig(threadProfilePath);
+
+    for (val profile : activeProfiles) {
+      val profilePath = "profile." + profile;
+      if (baseConfig.hasPath(profilePath)) {
+        profileConfig = profileConfig.withFallback(baseConfig.getConfig(profilePath));
+      }
+    }
 
     val tickDuration = ConfigValueFactory.fromAnyRef(properties.getTickDuration());
-    return config.withValue("akka.scheduler.tick-duration", tickDuration);
+    return profileConfig.withFallback(baseConfig).withValue("akka.scheduler.tick-duration", tickDuration);
   }
+
 }
