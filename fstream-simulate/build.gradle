@@ -29,6 +29,7 @@ dependencies {
 
   // Spring
   compile libraries.springBootActuator
+  compile libraries.springBootRemoteShell
 
   // Akka
   compile libraries.akkaActor

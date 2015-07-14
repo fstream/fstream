@@ -14,20 +14,33 @@ import io.fstream.core.model.state.State;
 import io.fstream.core.service.StateService;
 import io.fstream.core.util.Port;
 import io.fstream.core.util.ZooKeepers;
+
+import java.util.List;
+
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
-@Configuration
+@Slf4j
 public class CoreConfig {
 
+  /**
+   * Configuration.
+   */
+  @Value("#{environment.getActiveProfiles()}")
+  List<String> activeProfiles;
+
+  /**
+   * Dependencies.
+   */
   @Autowired
   protected State state;
-
   @Autowired
   protected StateService stateService;
 
@@ -41,6 +54,13 @@ public class CoreConfig {
     zkPort.waitFor(1L, MINUTES);
 
     return zkPort;
+  }
+
+  @EventListener
+  public void start(ApplicationReadyEvent ready) {
+    log.info("");
+    log.info("Active profiles: {}", activeProfiles);
+    log.info("");
   }
 
 }
