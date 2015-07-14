@@ -46,8 +46,11 @@ simulate:
    file:
       dir: build
       
-   # Flags
-   debug: false
+   # Enable assertions
+   validate: false
+   
+   # Run all actors in a single thread
+   singleThreaded: false
 
    # Active instruments
    instruments:
@@ -159,11 +162,11 @@ spring.profiles.include: fast
 # Simulation
 simulate:
    institutional:
-      numAgents: 100
+      numAgents: 50
    retail:
-      numAgents: 100
+      numAgents: 50
    hft:
-      numAgents: 0
+      numAgents: 50
       
 ---
 

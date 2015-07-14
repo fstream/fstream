@@ -20,7 +20,8 @@ public class SimulateProperties {
   /**
    * Flags.
    */
-  private boolean debug;
+  private boolean validate;
+  private boolean singleThreaded;
 
   /**
    * Reference.

@@ -1,6 +1,7 @@
 package io.fstream.simulate.actor;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Strings.repeat;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
@@ -132,12 +133,8 @@ public class OrderBook extends BaseActor {
       checkState(false);
     }
 
-    if (getOppositeBookSide(order).getDepth() < 0) {
-      log.info("stop depth negative");
-    }
-
-    if (properties.isDebug() && !assertBookDepth()) {
-      System.exit(1);
+    if (properties.isValidate()) {
+      validate();
     }
   }
 
@@ -337,14 +334,6 @@ public class OrderBook extends BaseActor {
         order.getSide() == BID && order.getPrice() >= bestAsk;
   }
 
-  /**
-   * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
-   * ask depth variables.
-   */
-  private boolean assertBookDepth() {
-    return asks.isDepthValid() && bids.isDepthValid();
-  }
-
   private BookSide getBookSide(Order order) {
     return order.getSide() == ASK ? asks : bids;
   }
@@ -355,6 +344,27 @@ public class OrderBook extends BaseActor {
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {
     return Seconds.secondsBetween(endTime, startTime).getSeconds();
+  }
+
+  /**
+   * Checks the validity of the book by inspecting actual depth in the book and comparing it to maintained bid depth /
+   * ask depth variables.
+   */
+  private void validate() {
+    val valid = asks.isDepthValid() && bids.isDepthValid();
+    if (!valid) {
+      log.error(repeat("#", 100));
+      log.error("Invalid depth state!");
+      log.error(repeat("#", 100));
+
+      // Dump state
+      printBook();
+      printStatus();
+      printSummary();
+
+      // Shutdown system
+      getContext().system().shutdown();
+    }
   }
 
 }
