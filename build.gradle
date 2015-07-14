@@ -48,6 +48,7 @@ buildscript {
 			springBoot:              "org.springframework.boot:spring-boot:$springBootVersion",
 			springBootWeb:           "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
 			springBootActuator:      "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
+			springBootRemoteShell:   "org.springframework.boot:spring-boot-starter-remote-shell:$springBootVersion",
 			springBootAutoconfigure: "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion",
 			springCloudClient:       "org.springframework.cloud:spring-cloud-config-client:$springCloudVersion",
 			springCloudServer:       "org.springframework.cloud:spring-cloud-config-server:$springCloudVersion",
