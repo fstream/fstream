@@ -10,8 +10,20 @@
 # Profile Activation
 ###############################################################################
 
+# Available environment profiles:
+# - development
+# - production
+
+# Available input profiles:
+# - kafka
+
+# Available output profiles:
+# - influxdb
+# - hadoop
+# - hbase
+
 # Profiles
-spring.profiles.active: spark,development,quotes
+spring.profiles.active: kafka,influxdb
 
 ###############################################################################
 # Profile - common
@@ -84,20 +96,4 @@ spring.profiles: quotes
 # Kafka
 kafka:
    topics: 
-      - QUOTES
-     
----
- 
-###############################################################################
-# Profile - "toq"
-###############################################################################
-
-# Profile
-spring.profiles: toq
-
-# Kafka
-kafka:
-   topics: 
-      - TRADES
-      - ORDERS
       - QUOTES

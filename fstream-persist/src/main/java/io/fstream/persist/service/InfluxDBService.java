@@ -6,6 +6,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
+// @formatter:off
 
 package io.fstream.persist.service;
 
@@ -66,17 +67,13 @@ public class InfluxDBService implements PersistenceService {
       influxDb.createDatabase(databaseName);
 
       // Register "fanout continuous query"
-      influxDb.query(databaseName,
-          "SELECT ask, bid FROM quotes INTO quotes.[symbol]", PRECISION);
+      influxDb.query(databaseName, "SELECT symbol, amount, price, buyUser, sellUser, activeBuy FROM trades INTO trades.[symbol]", PRECISION);
+      influxDb.query(databaseName, "SELECT symbol, amount, price, oid, orderType, side, brokerId, userId, processedTime FROM orders INTO orders.[symbol]", PRECISION);
+      influxDb.query(databaseName, "SELECT time, symbol, ask, bid, mid, askAmount, bidAmount FROM quotes INTO quotes.[symbol]", PRECISION);
 
       // Register "downsampling continuous query"
-      influxDb
-          .query(
-              databaseName,
-              "SELECT MEAN(ask) AS ask, MEAN(bid) AS bid FROM /^quotes\\..*/ GROUP BY time(1m) INTO rollups.1m.:series_name",
-              PRECISION);
-      influxDb.query(databaseName,
-          "SELECT MEAN(ask), MEAN(bid) FROM /^quotes\\..*/ GROUP BY time(1h) INTO rollups.1h.:series_name", PRECISION);
+      influxDb.query(databaseName, "SELECT MEAN(ask) AS ask, MEAN(bid) AS bid FROM /^quotes\\..*/ GROUP BY time(1m) INTO rollups.1m.:series_name", PRECISION);
+      influxDb.query(databaseName, "SELECT MEAN(ask), MEAN(bid) FROM /^quotes\\..*/ GROUP BY time(1h) INTO rollups.1h.:series_name", PRECISION);
     }
   }
 
@@ -92,23 +89,19 @@ public class InfluxDBService implements PersistenceService {
       val trade = (Trade) event;
       return new Serie.Builder("trades")
           .columns("time", "symbol", "amount", "price", "buyUser", "sellUser", "activeBuy")
-          .values(event.getDateTime().getMillis(), trade.getSymbol(), trade.getAmount(), trade.getPrice(),
-              trade.getBuyUser(), trade.getSellUser(), trade.isActiveBuy())
+          .values(event.getDateTime().getMillis(), trade.getSymbol(), trade.getAmount(), trade.getPrice(), trade.getBuyUser(), trade.getSellUser(), trade.isActiveBuy())
           .build();
     } else if (event.getType() == ORDER) {
       val order = (Order) event;
       return new Serie.Builder("orders")
-          .columns("time", "symbol", "amount", "price", "oid", "orderType", "side", "brokerId", "userId",
-              "processedTime")
-          .values(event.getDateTime().getMillis(), order.getSymbol(), order.getAmount(), order.getPrice(),
-              order.getOid(), order.getOrderType(), order.getSide(), order.getBrokerId(), order.getUserId(),
-              order.getProcessedTime().getMillis())
+          .columns("time", "symbol", "amount", "price", "oid", "orderType", "side", "brokerId", "userId", "processedTime")
+          .values(event.getDateTime().getMillis(), order.getSymbol(), order.getAmount(), order.getPrice(), order.getOid(), order.getOrderType(), order.getSide(), order.getBrokerId(), order.getUserId(), order.getProcessedTime().getMillis())
           .build();
     } else if (event.getType() == QUOTE) {
       val quote = (Quote) event;
       return new Serie.Builder("quotes")
-          .columns("time", "symbol", "ask", "bid")
-          .values(event.getDateTime().getMillis(), quote.getSymbol(), quote.getAsk(), quote.getBid())
+          .columns("time", "symbol", "ask", "bid", "mid", "askAmount", "bidAmount")
+          .values(event.getDateTime().getMillis(), quote.getSymbol(), quote.getAsk(), quote.getBid(), quote.getMid(), quote.getAskAmount(), quote.getBidAmount())
           .build();
     } else if (event.getType() == METRIC) {
       val metricEvent = (MetricEvent) event;

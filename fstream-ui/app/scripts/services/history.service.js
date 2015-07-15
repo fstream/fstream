@@ -21,7 +21,7 @@
       function getSymbols() {
          return executeQuery('LIST SERIES').then(function (result) {
             return _.compact(_.map(result, function (series) {
-               var match = /^ticks\.([^.]+)/.exec(series.name);
+               var match = /^quotes\.([^.]+)/.exec(series.name);
                return match && {
                   name: match[1]
                };
@@ -58,7 +58,7 @@
 
       function getHistory(params) {
          params = params || {};
-         var series = 'ticks';
+         var series = 'quotes';
          var where = getWhere(params, ['time', 'symbol']);
          var groupBy = 'symbol';
          var limit = getLimit(params);
@@ -69,7 +69,7 @@
 
       function getSeries(params) {
          var prefix = params.interval ? 'rollups.1' + params.interval + '.' : ''
-         var suffix = params.symbol ? 'ticks.' + params.symbol : 'ticks';
+         var suffix = params.symbol ? 'quotes.' + params.symbol : 'quotes';
 
          return prefix + suffix;
       }

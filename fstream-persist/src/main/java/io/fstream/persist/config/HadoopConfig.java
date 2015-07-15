@@ -6,12 +6,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Hadoop configuration.
  * <p>
  * See annotation documentation for details.
  */
+@Profile("spark")
 @org.springframework.context.annotation.Configuration
 public class HadoopConfig {
 
