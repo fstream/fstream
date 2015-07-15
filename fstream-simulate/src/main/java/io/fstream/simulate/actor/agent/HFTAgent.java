@@ -60,7 +60,7 @@ public class HFTAgent extends Agent {
   private boolean isNormal(Quote quote, Imbalance imbalance) {
     val spread = quote.getAsk() - quote.getBid();
 
-    return imbalance.getRatio() < 100 && spread > minQuoteSize;
+    return imbalance.getRatio() < 10 && imbalance.getRatio() > 0 && spread > minQuoteSize;
   }
 
   private Order createLiquidityNormal(Quote quote, Imbalance imbalance) {
@@ -71,7 +71,7 @@ public class HFTAgent extends Agent {
     val price = decidePrice(imbalance, bestAsk, bestBid);
 
     return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(), imbalance.getAmount(), price, name);
+        quote.getSymbol(), getMaxTradeSize(), price, name);
   }
 
   private float decidePrice(Imbalance imbalance, final float bestAsk, final float bestBid) {
@@ -105,12 +105,12 @@ public class HFTAgent extends Agent {
     if (quote.getAskAmount() > quote.getBidAmount()) {
       imbalanceAmount = quote.getAskAmount() - quote.getBidAmount();
       imbalanceSide = OrderSide.BID;
-      imbalanceRatio = quote.getBidAmount() != 0 ? quote.getAskAmount() / quote.getBidAmount() : Float.MAX_VALUE;
+      imbalanceRatio = quote.getBidAmount() != 0 ? quote.getAskAmount() / quote.getBidAmount() : -1;
     } else {
       // TODO: If both sides are 0, then this will bias creation of ASK liquidity. Not a big deal now, but fix later.
       imbalanceAmount = quote.getBidAmount() - quote.getAskAmount();
       imbalanceSide = OrderSide.ASK;
-      imbalanceRatio = quote.getAskAmount() != 0 ? quote.getBidAmount() / quote.getAskAmount() : Float.MAX_VALUE;
+      imbalanceRatio = quote.getAskAmount() != 0 ? quote.getBidAmount() / quote.getAskAmount() : -1;
     }
 
     return new Imbalance(imbalanceSide, imbalanceAmount, imbalanceRatio);
@@ -138,7 +138,7 @@ public class HFTAgent extends Agent {
     }
 
     return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(), imbalance.getAmount(), price, name);
+        quote.getSymbol(), getMaxTradeSize(), price, name);
   }
 
   private float generateBestBid(Quote quote) {

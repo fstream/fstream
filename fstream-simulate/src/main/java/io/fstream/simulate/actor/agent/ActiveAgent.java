@@ -101,20 +101,20 @@ public abstract class ActiveAgent extends Agent {
       // TODO: Explain why this is needed if the same calculation is done in OrderBook#onReceiveOrder
       price = side == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
     } else {
-      val priceOffset = minQuoteSize * riskDistance;
+      val priceOffset = minQuoteSize * (properties.getTickSize() * randomInt(0, riskDistance));
       if (side == ASK) {
         val bestAsk = quote.getAsk();
         val maxPrice = bestAsk + priceOffset;
 
         price = decidePrice(bestAsk, maxPrice, bestAsk);
         // make sure price does go above max bound
-        price = price <= askCeiling ? price : askCeiling;
+        price = price <= askCeiling ? price : askCeiling - (properties.getTickSize() * randomInt(0, riskDistance * 2));
       } else {
         val bestBid = quote.getBid();
         val minPrice = bestBid - priceOffset;
         price = decidePrice(minPrice, bestBid, bestBid);
         // make sure price does not drop below min bound
-        price = price >= bidFloor ? price : bidFloor;
+        price = price >= bidFloor ? price : bidFloor + (properties.getTickSize() * randomInt(0, riskDistance * 2));
       }
 
       checkState(price >= 0, "Invalid negative price generated %s", price);

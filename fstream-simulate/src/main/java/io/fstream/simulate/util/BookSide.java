@@ -126,7 +126,7 @@ public class BookSide {
 
   public float getBestPrice() {
     if (priceLevels.isEmpty()) {
-      return side == ASK ? Float.MAX_VALUE : Float.MIN_VALUE;
+      return 0;
     }
 
     return priceLevels.keySet().first();

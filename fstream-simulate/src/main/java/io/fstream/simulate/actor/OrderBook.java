@@ -266,7 +266,11 @@ public class OrderBook extends BaseActor {
     val prevBestBid = bestBid;
     bestBid = bids.getBestPrice();
 
-    val invalid = bestAsk <= bestBid;
+    if (bestBid == 0 && bestAsk == 0) {
+      return; // no quote.
+    }
+
+    val invalid = bestAsk != 0 && bestAsk <= bestBid;
     if (invalid) {
       log.error("Invalid quote [ask = {}, bid = {}]", bestAsk, bestBid);
       return;
