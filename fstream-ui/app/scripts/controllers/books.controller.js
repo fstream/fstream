@@ -14,25 +14,16 @@
       .module('fstream')
       .controller('booksController', booksController);
 
-   booksController.$inject = ['$scope', 'lodash'];
+   booksController.$inject = ['$scope', 'lodash', 'booksService'];
    
-   function booksController($scope, _) {
+   function booksController($scope, _, booksService) {
       $scope.symbols = {
          selected: []
       };
-      $scope.top = {
-         values: _.times(20, function(i) {
-            return {userId: 'user' + i, value: (20 - i)* 1000000};
-         }),
-         trades: _.times(20, function(i) {
-            return {userId: 'user' + i, value: (20 - i)* 1000000};
-         }),
-         orders: _.times(20, function(i) {
-            return {userId: 'user' + i, value: (20 - i)* 1000000};
-         }),
-         ratios: _.times(20, function(i) {
-            return {userId: 'user' + i, value: (20 - i)* 1000000};
-         })
-      };      
+      $scope.top = {};
+      
+      booksService.getTop().then(function(top) {
+         $scope.top = top;
+      });
    }
 })();
