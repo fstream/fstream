@@ -58,9 +58,9 @@
                      <td>{{ result.time }}</td>
                      <td>{{ result.buyUser }}</td>
                      <td>{{ result.sellUser }}</td>
-                     <td>{{ result.buyActive }}</td>
-                     <td>${{ result.amount | number:2 }}</td>
-                     <td>{{ result.price | number:2 }}</td>
+                     <td class="text-center"><i class="fa fa-check" ng-if="result.buyActive"></i></td>
+                     <td class="text-right">${{ result.amount | number:2 }}</td>
+                     <td class="text-right">{{ result.price | number:2 }}</td>
                   </tr>
                </tbody>
             </table>
