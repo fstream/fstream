@@ -3,11 +3,11 @@
 
    angular
       .module('fstream')
-      .controller('historyCtrl', historyCtrl);
+      .controller('historyController', historyController);
 
-   historyCtrl.$inject = ['$scope', '$filter', 'historyService'];
+   historyController.$inject = ['$scope', '$filter', 'historyService'];
 
-   function historyCtrl($scope, $filter, historyService) {
+   function historyController($scope, $filter, historyService) {
       $scope.updateHistory = updateHistory;
       $scope.updateTimeRange = updateTimeRange;
       $scope.updateSymbol = updateSymbol;

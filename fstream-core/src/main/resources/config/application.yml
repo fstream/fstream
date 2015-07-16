@@ -46,6 +46,14 @@ state:
 
    # Registered instruments
    symbols:
+     - RY
+     - BMO
+     - TD
+     - BBM
+     - HUF
+
+   # Registered instruments
+   fxSymbols:
      - EUR/USD
      - USD/JPY
      - GBP/USD

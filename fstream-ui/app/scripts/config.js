@@ -53,6 +53,15 @@
          }
       })
 
+      // Books
+      .state('books', {
+         url: "/books",
+         templateUrl: "views/books.html",
+         data: {
+            pageTitle: 'Books',
+         }
+      })
+      
       // Streams
       .state('streams', {
          url: "/streams",

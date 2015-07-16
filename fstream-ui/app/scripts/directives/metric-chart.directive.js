@@ -26,7 +26,6 @@
             $scope.loading = true;
 
             var chart,
-                index = $scope.options.index,
                 colors = Highcharts.getOptions().colors,
                 color = '#62cb31',
                 opacity = 0.5,

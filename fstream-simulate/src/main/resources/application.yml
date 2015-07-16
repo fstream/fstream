@@ -62,10 +62,10 @@ simulate:
    # Active instruments
    instruments:
       - RY
-      # - BMO
-      # - TD
-      # - BBM
-      # - HUF
+      - BMO
+      - TD
+      - BBM
+      - HUF
       
    # Active brokers
    brokers:
