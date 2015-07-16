@@ -52,26 +52,10 @@
                         </tr>
                      </thead>
                      <tbody>
-                        <tr>
-                           <td>user1</td>
-                           <td>$200,000</td>
-                        </tr>
-                        <tr>
-                           <td>user2</td>
-                           <td>$100,000</td>
-                        </tr>
-                        <tr>
-                           <td>user3</td>
-                           <td>$50,000</td>
-                        </tr>
-                        <tr>
-                           <td>user4</td>
-                           <td>$10,000</td>
-                        </tr> 
-                        <tr>
-                           <td>user5</td>
-                           <td>$5,000</td>
-                        </tr>                       
+                        <tr ng-repeat="row in top.values">
+                           <td>{{ row.userId }}</td>
+                           <td>{{ row.value | number:2 }}</td>
+                        </tr>                     
                      </tbody>
                   </table>
                </div>
@@ -92,26 +76,10 @@
                         </tr>
                      </thead>
                      <tbody>
-                        <tr>
-                           <td>user1</td>
-                           <td>$200,000</td>
-                        </tr>
-                        <tr>
-                           <td>user2</td>
-                           <td>$100,000</td>
-                        </tr>
-                        <tr>
-                           <td>user3</td>
-                           <td>$50,000</td>
-                        </tr>
-                        <tr>
-                           <td>user4</td>
-                           <td>$10,000</td>
-                        </tr> 
-                        <tr>
-                           <td>user5</td>
-                           <td>$5,000</td>
-                        </tr>                       
+                        <tr ng-repeat="row in top.trades">
+                           <td>{{ row.userId }}</td>
+                           <td>{{ row.value | number:2 }}</td>
+                        </tr>                     
                      </tbody>
                   </table>
                </div>
@@ -132,26 +100,10 @@
                         </tr>
                      </thead>
                      <tbody>
-                        <tr>
-                           <td>user1</td>
-                           <td>$200,000</td>
-                        </tr>
-                        <tr>
-                           <td>user2</td>
-                           <td>$100,000</td>
-                        </tr>
-                        <tr>
-                           <td>user3</td>
-                           <td>$50,000</td>
-                        </tr>
-                        <tr>
-                           <td>user4</td>
-                           <td>$10,000</td>
-                        </tr> 
-                        <tr>
-                           <td>user5</td>
-                           <td>$5,000</td>
-                        </tr>                       
+                        <tr ng-repeat="row in top.orders">
+                           <td>{{ row.userId }}</td>
+                           <td>{{ row.value | number:2 }}</td>
+                        </tr>                     
                      </tbody>
                   </table>
                </div>
@@ -172,26 +124,10 @@
                         </tr>
                      </thead>
                      <tbody>
-                        <tr>
-                           <td>user1</td>
-                           <td>$200,000</td>
-                        </tr>
-                        <tr>
-                           <td>user2</td>
-                           <td>$100,000</td>
-                        </tr>
-                        <tr>
-                           <td>user3</td>
-                           <td>$50,000</td>
-                        </tr>
-                        <tr>
-                           <td>user4</td>
-                           <td>$10,000</td>
-                        </tr> 
-                        <tr>
-                           <td>user5</td>
-                           <td>$5,000</td>
-                        </tr>                       
+                        <tr ng-repeat="row in top.ratios">
+                           <td>{{ row.userId }}</td>
+                           <td>{{ row.value | number:2 }}</td>
+                        </tr>                     
                      </tbody>
                   </table>
                </div>

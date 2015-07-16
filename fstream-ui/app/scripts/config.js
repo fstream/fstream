@@ -52,6 +52,15 @@
             pageTitle: 'Charts',
          }
       })
+      
+      // Analytics
+      .state('analytics', {
+         url: "/analytics",
+         templateUrl: "views/analytics.html",
+         data: {
+            pageTitle: 'Analytics',
+         }
+      })      
 
       // Books
       .state('books', {

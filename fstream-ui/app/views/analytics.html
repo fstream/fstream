@@ -1,0 +1,70 @@
+<!-- Header -->
+<div id="header" ng-include="'views/common/header.html'"></div>
+
+<!-- Navigation -->
+<aside id="menu" ng-include="'views/common/navigation.html'"></aside>
+
+<!-- Main Wrapper -->
+<div id="wrapper">
+   <div ng-controller="analyticsController" class="content" animate-panel>
+      <div class="row">
+         <h1><i class="fa fa-search"></i> Analytics</h1>
+         <p class="lead">Post Trade Analytics</p>
+      </div>
+      <div class="row">
+         <h3>Query</h3>
+         <form class="form-horizontal">
+            <fieldset>
+               <div class="form-group">
+                  <div class="col-sm-6">
+                     <div id="alert-statement" ng-model="sql" ui-ace="{
+                         useWrapMode : true,
+                         showGutter: true,
+                         theme:'fstream',
+                         mode: 'sql',
+                         onLoad: aceLoaded,
+                         require: ['ace/ext/language_tools'],
+                         advanced: {
+                           enableBasicAutocompletion: true,
+                           enableLiveAutocompletion: true
+                         }                      
+                      }"></div>
+                  </div>
+               </div> 
+               <div class="form-group">
+                  <div class="col-sm-10">
+                     <button type="submit" class="btn btn-outline btn-success" ng-click="executeQuery(sql)">Execute</button>
+                  </div>
+               </div>               
+            </fieldset>
+         </form>
+      </div>
+      <div class="row">
+         <h3>Results</h3>
+         <div>
+            <table datatable="ng" class="table table-striped table-hover">
+               <thead>
+                  <tr>
+                     <th>Date / Time</th>
+                     <th>Buy User</th>
+                     <th>Sell User</th>
+                     <th>Buy Active?</th>
+                     <th>Amount</th>
+                     <th>Price</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <tr ng-repeat="result in results">
+                     <td>{{ result.time }}</td>
+                     <td>{{ result.buyUser }}</td>
+                     <td>{{ result.sellUser }}</td>
+                     <td>{{ result.buyActive }}</td>
+                     <td>${{ result.amount | number:2 }}</td>
+                     <td>{{ result.price | number:2 }}</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+</div>
