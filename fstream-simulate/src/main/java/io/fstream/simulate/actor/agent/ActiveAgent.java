@@ -66,10 +66,16 @@ public abstract class ActiveAgent extends Agent {
       // Add the new order
       if (order.getOrderType() != OrderType.MARKET_ORDER) {
         // Cancel all pending open orders on this symbol
-        cancelOpenOrdersBySymbol(order.getSymbol());
-        openOrders.addOpenOrder(order);
+        if (openOrders.getOrders().containsKey(order.getSymbol())) { // if existing order then decide to
+                                                                     // cancel/re-insert
+                                                                     // with cancelProb
+          if (!randomChoice(getProbCancel(), true, false)) {
+            return;
+          }
+        }
       }
-
+      cancelOpenOrdersBySymbol(order.getSymbol());
+      openOrders.addOpenOrder(order);
       exchange().tell(order, self());
     }
   }
