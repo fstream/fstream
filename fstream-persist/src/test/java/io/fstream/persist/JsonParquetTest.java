@@ -78,14 +78,14 @@ public class JsonParquetTest {
 
   private static DataFrame readJsonFile(String inputFile) {
     val sqlContext = createSQLContext();
-    return sqlContext.jsonFile(inputFile);
+    return sqlContext.read().json(inputFile);
   }
 
   private static void convertJsonFile(String inputFile, String outputFile) {
     val input = readJsonFile(inputFile);
 
     // Force 1 file
-    input.repartition(1).saveAsParquetFile(outputFile);
+    input.repartition(1).write().parquet(outputFile);
   }
 
   private Object createValue(float fraction) {

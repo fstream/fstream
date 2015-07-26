@@ -87,8 +87,13 @@ dependencies {
   // Kafka
   compile libraries.kafka
 
-  // Utilities
-  // - This is needed for Hadoop: https://issues.apache.org/jira/browse/HADOOP-10961
-  configurations.all { resolutionStrategy.force "com.google.guava:guava:15.0" }
+  // Overrides
+  configurations.all { 
+    // HADOOP-10961
+    resolutionStrategy.force "com.google.guava:guava:15.0" 
+    
+    // http://stackoverflow.com/questions/31039367/spark-parallelize-could-not-find-creator-property-with-name-id
+    resolutionStrategy.force "com.fasterxml.jackson.core:jackson-databind:2.4.4" 
+  }
   
 }

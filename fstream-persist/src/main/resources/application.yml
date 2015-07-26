@@ -80,9 +80,9 @@ hadoop:
 
 # Spark
 spark:
-   master: local[3]
-   properties:
-     spark.default.parallelism: 1
+   # Need as many threads as (# of topics + 1) to service the streams. 
+   # "local[*]" indicates physical cores on machine (8 typically)
+   master: local[*] 
      
 ---
 

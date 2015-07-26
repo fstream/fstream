@@ -115,9 +115,9 @@ public class SparkService {
 
     val combined = messages.coalesce(1); // Combine into single partition
 
-    val schemaRdd = sqlContext.jsonRDD(combined);
+    val schemaRdd = sqlContext.read().json(combined);
     val parquetFile = getParquetFileName(topic, time);
-    schemaRdd.saveAsParquetFile(parquetFile);
+    schemaRdd.write().parquet(parquetFile);
   }
 
   private void start(JavaStreamingContext streamingContext) {
@@ -135,6 +135,7 @@ public class SparkService {
   private JavaStreamingContext createStreamingContext() {
     val duration = new Duration(SECONDS.toMillis(interval));
 
+    log.info("Creating streaming context at {}", duration);
     return new JavaStreamingContext(sparkContext, duration);
   }
 
