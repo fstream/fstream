@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+
+// Can't use Boot's nested jar packaging due to Spark's classloader
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = "io.fstream.analyze.AnalyzeMain"
+
+shadowJar {
+  zip64 true
+  
+  exclude 'META-INF/*.SF'
+  exclude 'META-INF/*.DSA'
+  exclude 'META-INF/*.RSA'
+  
+  classifier = ''
+
+  // Required for Spring
+  mergeServiceFiles()
+  transform(AppendingTransformer) { resource = 'reference.conf'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.handlers'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.schemas'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
+  transform(AppendingTransformer) { resource = 'META-INF/spring.factories'  }
+}
+
+build.dependsOn shadowJar
+
+applicationDistribution.with {
+  // Exclude defaults in lieu of fat jar
+  exclude { it.file in configurations.runtime.files }
+  from("src/main/conf") {
+    into "conf"
+  }
+}
+
+startScripts {
+  classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files
+  classpath += files('conf')
+  doLast {
+    // https://issues.gradle.org/browse/GRADLE-2991
+    unixScript.text = unixScript.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
+  }
+}
+
+distTar {
+  dependsOn shadowJar
+  compression Compression.GZIP
+  extension "tar.gz"
+}
+
+dependencies {
+  // fStream
+  compile project(':fstream-core')
+
+  // Spring
+  compile libraries.springBootActuator
+
+  // Spark
+  compile libraries.sparkSql
+  compile libraries.sparkStreaming
+  compile libraries.sparkStreamingKafka
+
+  // Hadoop
+  compile(libraries.hadoopClient) {
+    exclude group: 'javax.servlet',  module: 'servlet-api'
+  }
+  
+  // Commons Pool
+  compile 'org.apache.commons:commons-pool2:2.4.1'
+
+  // Kafka
+  compile libraries.kafka
+
+  // Overrides
+  configurations.all { 
+    // HADOOP-10961
+    resolutionStrategy.force "com.google.guava:guava:15.0" 
+    
+    // http://stackoverflow.com/questions/31039367/spark-parallelize-could-not-find-creator-property-with-name-id
+    resolutionStrategy.force "com.fasterxml.jackson.core:jackson-databind:2.4.4" 
+  }
+  
+}

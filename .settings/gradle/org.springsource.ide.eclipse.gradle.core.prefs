@@ -1,5 +1,5 @@
 #org.springsource.ide.eclipse.gradle.core.preferences.GradleProjectPreferences
-#Sat Jul 11 12:36:31 EDT 2015
-build.family.org.gradle.tooling.model.eclipse.HierarchicalEclipseProject=;fstream-compute;fstream-configure;fstream-core;fstream-feed;fstream-persist;fstream-simulate;fstream-test;fstream-ui;fstream-web;
+#Sun Jul 26 12:55:44 EDT 2015
+build.family.org.gradle.tooling.model.eclipse.HierarchicalEclipseProject=;fstream-analyze;fstream-compute;fstream-configure;fstream-core;fstream-feed;fstream-persist;fstream-simulate;fstream-test;fstream-ui;fstream-web;
 org.springsource.ide.eclipse.gradle.linkedresources=
 org.springsource.ide.eclipse.gradle.rootprojectloc=

@@ -1,0 +1,69 @@
+---
+# Copyright (c) 2015 fStream. All Rights Reserved.
+# 
+# Project and contact information: https://bitbucket.org/fstream/fstream
+# 
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# Proprietary and confidential.
+
+###############################################################################
+# Profile Activation
+###############################################################################
+
+# Available environment profiles:
+# - development
+# - production
+
+# Profiles
+spring.profiles.active: 
+
+###############################################################################
+# Profile - common
+###############################################################################
+
+# Persist
+persist:
+   topics: 
+      - TRADES
+      - ORDERS
+      - QUOTES
+      
+# Kafka
+kafka:
+   consumerProperties:
+      group.id: fstream-analyze
+
+# Spark
+spark:
+   interval: 1 # Seconds
+   properties:
+#      spark.serializer: org.apache.spark.serializer.KryoSerializer
+#      spark.kryo.registrator: io.fstream.analyze.util.CustomKryoRegistrator
+
+---
+
+###############################################################################
+# Profile - "production"
+###############################################################################
+
+# Profile
+spring.profiles: production
+
+# Spark
+spark:
+   properties:
+     
+---
+
+###############################################################################
+# Profile - "development"
+###############################################################################
+
+# Profile
+spring.profiles: development
+
+# Spark
+spark:
+   # Need as many threads as (# of topics + 1) to service the streams. 
+   # "local[*]" indicates physical cores on machine (8 typically)
+   master: local[*] 

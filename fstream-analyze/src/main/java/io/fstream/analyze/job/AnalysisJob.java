@@ -7,13 +7,15 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.service;
+package io.fstream.analyze.job;
 
 import static com.google.common.base.Strings.repeat;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import io.fstream.analyze.config.AnalyzeProperties;
+import io.fstream.analyze.kafka.KafkaProducer;
+import io.fstream.analyze.kafka.KafkaProducerObjectPool;
 import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.topic.Topic;
-import io.fstream.persist.config.PersistProperties;
 
 import java.io.IOException;
 
@@ -24,10 +26,10 @@ import lombok.Cleanup;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
@@ -37,12 +39,9 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-
-import scala.Tuple2;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 /**
  * Service responsible for persisting to the long-term HDFS backing store.
@@ -50,20 +49,16 @@ import com.google.common.collect.ImmutableMap;
  * This class is <em>not</em> thread-safe.
  */
 @Slf4j
-@Service
-@Profile("spark")
-public class SparkService {
+public abstract class AnalysisJob extends AbstractExecutionThreadService {
 
   /**
    * Configuration.
    */
-  @Value("${spark.workDir}")
-  private String workDir;
   @Value("${spark.interval}")
   private long interval;
 
   @Autowired
-  private PersistProperties properties;
+  private AnalyzeProperties properties;
   @Autowired
   private KafkaProperties kafkaProperties;
 
@@ -72,64 +67,65 @@ public class SparkService {
    */
   @Autowired
   private JavaSparkContext sparkContext;
-  @Autowired
-  private FileSystem fileSystem;
 
   @PostConstruct
-  public void run() throws IOException {
-    clean();
+  public void init() throws Exception {
+    log.info("Initializing analytics job...");
+    startAsync();
+    log.info("Finished initializing analytics job");
+  }
 
+  @Override
+  protected void run() throws IOException {
     @Cleanup
     val streamingContext = createStreamingContext();
 
+    createStreams(streamingContext);
+
+    startStreams(streamingContext);
+  }
+
+  private void createStreams(JavaStreamingContext streamingContext) {
     for (val topic : properties.getTopics()) {
-      create(topic, streamingContext);
+      createStream(topic, streamingContext);
     }
-
-    start(streamingContext);
   }
 
-  private void clean() throws IOException {
-    log.info("Deleting work dir '{}'...", workDir);
-    fileSystem.delete(new Path(workDir), true);
-  }
-
-  private void create(Topic topic, JavaStreamingContext streamingContext) {
+  private void createStream(Topic topic, JavaStreamingContext streamingContext) {
     log.info(repeat("-", 100));
     log.info("Creating DStream for topic '{}'...", topic);
     log.info(repeat("-", 100));
 
+    // Setup
     val sqlContext = createSQLContext();
     val kafkaStream = createKafkaStream(topic, streamingContext);
+    val pool = createProducerPool(streamingContext);
 
+    // Define
     kafkaStream.foreachRDD((rdd, time) -> {
-      persist(topic, sqlContext, rdd, time);
-
+      analyzeBatch(rdd, time, topic, pool, sqlContext);
       return null;
     });
   }
 
-  private void persist(Topic topic, SQLContext sqlContext, JavaPairRDD<String, String> rdd, Time time) {
-    val messages = rdd.map(Tuple2::_2);
-    log.info("[{}] Partition count: {}, message count: {}", topic, messages.partitions().size(), messages.count());
+  /**
+   * Template method to analyze the current {@code rdd} batch produced at {@code time}.
+   * 
+   * @param rdd the current RDD
+   * @param time the current batch interval time
+   * @param topic the topic being consumed
+   * @param pool the Kafka producer pool
+   * @param sqlContext
+   */
+  protected abstract void analyzeBatch(JavaPairRDD<String, String> rdd, Time time, Topic topic,
+      Broadcast<ObjectPool<KafkaProducer>> pool, SQLContext sqlContext);
 
-    val combined = messages.coalesce(1); // Combine into single partition
-
-    val schemaRdd = sqlContext.read().json(combined);
-    val parquetFile = getParquetFileName(topic, time);
-    schemaRdd.write().parquet(parquetFile);
-  }
-
-  private void start(JavaStreamingContext streamingContext) {
+  private void startStreams(JavaStreamingContext streamingContext) {
     log.info("Starting streams...");
     streamingContext.start();
 
     log.info("Awaiting shutdown...");
     streamingContext.awaitTermination();
-  }
-
-  private SQLContext createSQLContext() {
-    return new SQLContext(sparkContext);
   }
 
   private JavaStreamingContext createStreamingContext() {
@@ -139,8 +135,12 @@ public class SparkService {
     return new JavaStreamingContext(sparkContext, duration);
   }
 
+  private SQLContext createSQLContext() {
+    return new SQLContext(sparkContext);
+  }
+
   /**
-   * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
+   * @see https://spark.apache.org/docs/1.4.1/streaming-kafka-integration.html
    */
   private JavaPairReceiverInputDStream<String, String> createKafkaStream(Topic topic,
       JavaStreamingContext streamingContext) {
@@ -157,8 +157,10 @@ public class SparkService {
         kafkaParams, partitions, storageLevel);
   }
 
-  private String getParquetFileName(Topic topic, Time time) {
-    return workDir + "/" + topic.getId() + "/" + topic.getId() + "-" + time.milliseconds();
+  private Broadcast<ObjectPool<KafkaProducer>> createProducerPool(JavaStreamingContext streamingContext) {
+    val pool = new KafkaProducerObjectPool(kafkaProperties.getProducerProperties());
+
+    return streamingContext.sparkContext().broadcast(pool);
   }
 
 }
