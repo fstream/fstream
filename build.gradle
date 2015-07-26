@@ -64,6 +64,7 @@ buildscript {
 			sparkSql:                "org.apache.spark:spark-sql_2.10:$sparkVersion",
 			sparkStreaming:          "org.apache.spark:spark-streaming_2.10:$sparkVersion",
 			sparkStreamingKafka:     "org.apache.spark:spark-streaming-kafka_2.10:$sparkVersion",
+			sparkHiveThriftServer:   "org.apache.spark:spark-hive-thriftserver_2.10:$sparkVersion",
 			                         
 			akkaActor:               "com.typesafe.akka:akka-actor_2.10:${akkaVersion}",
 			akkaCamel:               "com.typesafe.akka:akka-camel_2.10:${akkaVersion}",
