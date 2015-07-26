@@ -48,13 +48,18 @@ public class HFTAgent extends Agent {
     val order = isNormal(quote, imbalance) ?
         createLiquidityNormal(quote, imbalance) :
         createLiquidityAtStress(quote, imbalance);
-
+    if (openOrders.getOrders().containsKey(order.getSymbol())) {
+      if (!randomChoice(getProbCancel(), true, false)) { // determine whether to cancel/send and order with given
+                                                         // probability
+        return;
+      }
+    }
     // Cancel any existing orders in the book
     cancelOpenOrdersBySymbol(order.getSymbol());
-
     // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
     exchange().tell(order, self());
     openOrders.addOpenOrder(order);
+
   }
 
   private boolean isNormal(Quote quote, Imbalance imbalance) {
