@@ -9,7 +9,9 @@
 
 package io.fstream.analyze.util;
 
+import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.Order;
+import io.fstream.core.model.event.Trade;
 import io.fstream.core.util.Codec;
 
 import java.util.List;
@@ -46,6 +48,14 @@ public class Functions {
 
   public static Function<Tuple2<String, String>, Order> parseOrder() {
     return tuple -> Codec.decodeText(tuple._2, Order.class);
+  }
+
+  public static Function<Tuple2<String, String>, Trade> parseTrade() {
+    return tuple -> Codec.decodeText(tuple._2, Trade.class);
+  }
+
+  public static Function<Tuple2<String, String>, Event> parseEvents() {
+    return tuple -> Codec.decodeText(tuple._2, Event.class);
   }
 
   public static PairFunction<Order, String, Long> mapUserIdAmount() {
