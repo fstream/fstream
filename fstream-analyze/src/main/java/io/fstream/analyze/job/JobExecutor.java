@@ -9,24 +9,17 @@
 
 package io.fstream.analyze.job;
 
-import static com.google.common.base.Strings.repeat;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.Collectors.toMap;
 import io.fstream.analyze.config.AnalyzeProperties;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.analyze.kafka.KafkaProducerObjectPool;
 import io.fstream.core.config.KafkaProperties;
-import io.fstream.core.model.topic.Topic;
 
 import java.io.IOException;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import kafka.serializer.StringDecoder;
 import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,13 +27,11 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
-import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
@@ -50,22 +41,18 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
  * This class is <em>not</em> thread-safe.
  */
 @Slf4j
-@RequiredArgsConstructor
-public abstract class AnalysisJob extends AbstractExecutionThreadService {
+@Component
+public class JobExecutor extends AbstractExecutionThreadService {
 
   /**
    * Configuration.
    */
   @Value("${spark.interval}")
   private long interval;
-
   @Autowired
   private AnalyzeProperties properties;
   @Autowired
   private KafkaProperties kafkaProperties;
-
-  @NonNull
-  protected final Set<Topic> topics;
 
   /**
    * Dependencies.
@@ -85,26 +72,18 @@ public abstract class AnalysisJob extends AbstractExecutionThreadService {
     @Cleanup
     val streamingContext = createStreamingContext();
 
-    createStream(streamingContext);
+    createJobs(streamingContext);
 
     startStreams(streamingContext);
   }
 
-  private void createStream(JavaStreamingContext streamingContext) {
-    log.info(repeat("-", 100));
-    log.info("Creating DStream from topics '{}'...", topics);
-    log.info(repeat("-", 100));
+  private void createJobs(JavaStreamingContext streamingContext) {
+    log.info("Creating jobs...");
+    val jobContext = createJobContext(streamingContext);
 
-    // Setup
-    val sqlContext = createSQLContext();
-    val kafkaStream = createKafkaStream(streamingContext);
-    val pool = createProducerPool(streamingContext);
-
-    analyze(sqlContext, kafkaStream, pool);
+    new TopUserValueJob(jobContext).execute(streamingContext);
+    new EventsJob(jobContext).execute(streamingContext);
   }
-
-  protected abstract void analyze(SQLContext sqlContext, JavaPairReceiverInputDStream<String, String> kafkaStream,
-      Broadcast<ObjectPool<KafkaProducer>> pool);
 
   private void startStreams(JavaStreamingContext streamingContext) {
     log.info("Starting streams...");
@@ -112,6 +91,14 @@ public abstract class AnalysisJob extends AbstractExecutionThreadService {
 
     log.info("Awaiting shutdown...");
     streamingContext.awaitTermination();
+  }
+
+  private JobContext createJobContext(JavaStreamingContext streamingContext) {
+    // Setup
+    val sqlContext = createSQLContext();
+    val pool = createProducerPool(streamingContext);
+
+    return new JobContext(kafkaProperties, sqlContext, pool);
   }
 
   private JavaStreamingContext createStreamingContext() {
@@ -126,24 +113,6 @@ public abstract class AnalysisJob extends AbstractExecutionThreadService {
 
   private SQLContext createSQLContext() {
     return new SQLContext(sparkContext);
-  }
-
-  /**
-   * @see https://spark.apache.org/docs/1.4.1/streaming-kafka-integration.html
-   */
-  private JavaPairReceiverInputDStream<String, String> createKafkaStream(
-      JavaStreamingContext streamingContext) {
-    log.info("Reading from topics: {}", topics);
-    val keyTypeClass = String.class;
-    val valueTypeClass = String.class;
-    val keyDecoderClass = StringDecoder.class;
-    val valueDecoderClass = StringDecoder.class;
-    val kafkaParams = kafkaProperties.getConsumerProperties();
-    val partitions = topics.stream().collect(toMap(Topic::getId, (x) -> 1));
-    val storageLevel = StorageLevel.MEMORY_AND_DISK_SER_2();
-
-    return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,
-        kafkaParams, partitions, storageLevel);
   }
 
   private Broadcast<ObjectPool<KafkaProducer>> createProducerPool(JavaStreamingContext streamingContext) {

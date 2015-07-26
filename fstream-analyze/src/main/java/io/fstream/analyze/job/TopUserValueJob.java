@@ -25,10 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
-import org.springframework.stereotype.Service;
 
 import scala.Tuple2;
 
@@ -38,20 +36,18 @@ import com.google.common.collect.ImmutableSet;
  * Calculates a running total of all user / order values.
  */
 @Slf4j
-@Service
-public class TopUserValueAnalysisJob extends AnalysisJob {
+public class TopUserValueJob extends Job {
 
-  public TopUserValueAnalysisJob() {
-    super(ImmutableSet.of(Topic.ORDERS));
+  public TopUserValueJob(JobContext jobContext) {
+    super(ImmutableSet.of(Topic.ORDERS), jobContext);
   }
 
   @Override
-  protected void analyze(SQLContext sqlContext, JavaPairReceiverInputDStream<String, String> kafkaStream,
-      Broadcast<ObjectPool<KafkaProducer>> pool) {
-    analyzeStream(sqlContext, kafkaStream, pool, topics);
+  protected void analyze(JavaPairReceiverInputDStream<String, String> kafkaStream) {
+    analyzeStream(kafkaStream, jobContext.getPool(), topics);
   }
 
-  private static void analyzeStream(SQLContext sqlContext, JavaPairReceiverInputDStream<String, String> kafkaStream,
+  private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
       Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics) {
     log.info("[{}] Order count: {}", topics, kafkaStream.count());
 
@@ -64,14 +60,12 @@ public class TopUserValueAnalysisJob extends AnalysisJob {
 
     aggregatedUserAmounts.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, order count: {}", topics, rdd.partitions().size(), rdd.count());
-      analyzeBatch(rdd, time, pool, sqlContext);
+      analyzeBatch(rdd, time, pool);
       return null;
     });
   }
 
-  private static void analyzeBatch(JavaPairRDD<String, Long> rdd, Time time,
-      Broadcast<ObjectPool<KafkaProducer>> pool, SQLContext sqlContext) {
-
+  private static void analyzeBatch(JavaPairRDD<String, Long> rdd, Time time, Broadcast<ObjectPool<KafkaProducer>> pool) {
     rdd.foreachPartition((partition) -> {
       KafkaProducer producer = pool.getValue().borrowObject();
       analyzeBatchPartition(time, partition, producer);

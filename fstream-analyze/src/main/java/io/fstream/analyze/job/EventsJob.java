@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 
@@ -35,21 +34,18 @@ import com.google.common.collect.ImmutableSet;
  * For demo purposes only!
  */
 @Slf4j
-// @Service
-// Note: Right now each job must run in a separate JVM.
-public class EventsAnalysisJob extends AnalysisJob {
+public class EventsJob extends Job {
 
-  public EventsAnalysisJob() {
-    super(ImmutableSet.of(Topic.ORDERS, Topic.TRADES, Topic.QUOTES));
+  public EventsJob(JobContext context) {
+    super(ImmutableSet.of(Topic.ORDERS, Topic.TRADES, Topic.QUOTES), context);
   }
 
   @Override
-  protected void analyze(SQLContext sqlContext, JavaPairReceiverInputDStream<String, String> kafkaStream,
-      Broadcast<ObjectPool<KafkaProducer>> pool) {
-    analyzeStream(sqlContext, kafkaStream, pool, topics);
+  protected void analyze(JavaPairReceiverInputDStream<String, String> kafkaStream) {
+    analyzeStream(kafkaStream, jobContext.getPool(), topics);
   }
 
-  private static void analyzeStream(SQLContext sqlContext, JavaPairReceiverInputDStream<String, String> kafkaStream,
+  private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
       Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics) {
     log.info("[{}] message count: {}", topics, kafkaStream.count());
 
@@ -59,14 +55,12 @@ public class EventsAnalysisJob extends AnalysisJob {
 
     events.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, event count: {}", topics, rdd.partitions().size(), rdd.count());
-      analyzeBatch(rdd, time, pool, sqlContext);
+      analyzeBatch(rdd, time, pool);
       return null;
     });
   }
 
-  private static void analyzeBatch(JavaRDD<Event> rdd, Time time,
-      Broadcast<ObjectPool<KafkaProducer>> pool, SQLContext sqlContext) {
-
+  private static void analyzeBatch(JavaRDD<Event> rdd, Time time, Broadcast<ObjectPool<KafkaProducer>> pool) {
     rdd.foreachPartition((partition) -> {
       KafkaProducer producer = pool.getValue().borrowObject();
       analyzeBatchPartition(time, partition, producer);
