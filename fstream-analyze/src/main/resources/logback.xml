@@ -1,0 +1,25 @@
+<configuration debug="false">
+  <property name="pattern" value="%date{ISO8601} [%thread] %-5level %logger{200} - %msg%n" />
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${pattern}</pattern>
+    </encoder>
+  </appender>
+  
+  <logger name="akka" level="info" additivity="false"/>
+  <logger name="org.eclipse.jetty" level="info" additivity="false"/>
+  <logger name="parquet.hadoop" level="warn" additivity="false"/>
+  <logger name="org.apache.spark" level="info" additivity="false"/>
+  <logger name="org.apache.hadoop.mapred.FileInputFormat" level="info" additivity="false"/>
+  <logger name="org.apache.hadoop.net.NetworkTopology" level="info" additivity="false"/>
+  <logger name="org.apache.hadoop.util.NativeCodeLoader" level="info" additivity="false"/>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

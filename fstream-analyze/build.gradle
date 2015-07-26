@@ -9,11 +9,11 @@
 
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 
-// Can't use Boot's nested jar packaging due to Storm's classloader
+// Can't use Boot's nested jar packaging due to Spark's classloader
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-mainClassName = "io.fstream.persist.PersistMain"
+mainClassName = "io.fstream.analyze.AnalyzeMain"
 
 shadowJar {
   zip64 true
@@ -22,7 +22,6 @@ shadowJar {
   exclude 'META-INF/*.DSA'
   exclude 'META-INF/*.RSA'
   
-  exclude 'defaults.yaml'
   classifier = ''
 
   // Required for Spring
@@ -66,9 +65,6 @@ dependencies {
   // Spring
   compile libraries.springBootActuator
 
-  // InfluxDB  
-  compile libraries.influxdb
-  
   // Spark
   compile libraries.sparkSql
   compile libraries.sparkStreaming
@@ -78,11 +74,9 @@ dependencies {
   compile(libraries.hadoopClient) {
     exclude group: 'javax.servlet',  module: 'servlet-api'
   }
-
-  // HBase
-  compile(libraries.hbaseClient) {
-    exclude group: 'javax.servlet',  module: 'servlet-api'
-  }
+  
+  // Commons Pool
+  compile 'org.apache.commons:commons-pool2:2.4.1'
 
   // Kafka
   compile libraries.kafka

@@ -14,16 +14,8 @@
 # - development
 # - production
 
-# Available input profiles:
-# - kafka
-
-# Available output profiles:
-# - influxdb
-# - hadoop
-# - hbase
-
 # Profiles
-spring.profiles.active: kafka,influxdb
+spring.profiles.active: 
 
 ###############################################################################
 # Profile - common
@@ -39,12 +31,14 @@ persist:
 # Kafka
 kafka:
    consumerProperties:
-      group.id: fstream-persist
+      group.id: fstream-analyze
 
 # Spark
 spark:
-   workDir: /tmp/fstream
-   interval: 20
+   interval: 1 # Seconds
+   properties:
+#      spark.serializer: org.apache.spark.serializer.KryoSerializer
+#      spark.kryo.registrator: io.fstream.analyze.util.CustomKryoRegistrator
 
 ---
 
@@ -54,11 +48,6 @@ spark:
 
 # Profile
 spring.profiles: production
-
-# Hadoop
-hadoop:
-   properties:
-      # parquet.block.size: 1048576
 
 # Spark
 spark:
@@ -73,27 +62,8 @@ spark:
 # Profile
 spring.profiles: development
 
-# Hadoop
-hadoop:
-   properties:
-      fs.defaultFS: file:///
-
 # Spark
 spark:
    # Need as many threads as (# of topics + 1) to service the streams. 
    # "local[*]" indicates physical cores on machine (8 typically)
    master: local[*] 
-     
----
-
-###############################################################################
-# Profile - "quotes"
-###############################################################################
-
-# Profile
-spring.profiles: quotes
-
-# Kafka
-kafka:
-   topics: 
-      - QUOTES
