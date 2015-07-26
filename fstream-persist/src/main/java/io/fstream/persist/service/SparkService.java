@@ -16,11 +16,11 @@ import io.fstream.core.model.topic.Topic;
 import io.fstream.persist.config.PersistProperties;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import javax.annotation.PostConstruct;
 
 import kafka.serializer.StringDecoder;
-import lombok.Cleanup;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,10 +29,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.Time;
-import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
+import org.apache.spark.streaming.api.java.JavaPairInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,24 +76,27 @@ public class SparkService {
 
   @PostConstruct
   public void run() throws IOException {
-    clean();
+    // TODO: This should not happen in production!
+    cleanStorage();
 
-    @Cleanup
-    val streamingContext = createStreamingContext();
-
-    for (val topic : persistProperties.getTopics()) {
-      create(topic, streamingContext);
+    try (val streamingContext = createStreamingContext()) {
+      createStreams(streamingContext);
+      startStream(streamingContext);
     }
-
-    start(streamingContext);
   }
 
-  private void clean() throws IOException {
+  private void cleanStorage() throws IOException {
     log.info("Deleting work dir '{}'...", workDir);
     fileSystem.delete(new Path(workDir), true);
   }
 
-  private void create(Topic topic, JavaStreamingContext streamingContext) {
+  private void createStreams(final org.apache.spark.streaming.api.java.JavaStreamingContext streamingContext) {
+    for (val topic : persistProperties.getTopics()) {
+      createStream(topic, streamingContext);
+    }
+  }
+
+  private void createStream(Topic topic, JavaStreamingContext streamingContext) {
     log.info(repeat("-", 100));
     log.info("Creating DStream for topic '{}'...", topic);
     log.info(repeat("-", 100));
@@ -103,24 +105,25 @@ public class SparkService {
     val kafkaStream = createKafkaStream(topic, streamingContext);
 
     kafkaStream.foreachRDD((rdd, time) -> {
-      persist(topic, sqlContext, rdd, time);
+      persistInterval(topic, sqlContext, rdd, time);
       return null;
     });
   }
 
-  private void persist(Topic topic, SQLContext sqlContext, JavaPairRDD<String, String> rdd, Time time) {
+  private void persistInterval(Topic topic, SQLContext sqlContext, JavaPairRDD<String, String> rdd, Time time) {
     val messages = rdd.map(Tuple2::_2);
     log.info("[{}] Partition count: {}", topic, messages.partitions().size());
     log.info("[{}] Message count: {}", topic, messages.count());
 
-    val combined = messages.coalesce(1); // Combine into single partition
+    // Combine into single partition
+    val combined = messages.coalesce(1);
 
     val schemaRdd = sqlContext.read().json(combined);
     val parquetFile = getParquetFileName(topic, time);
     schemaRdd.write().parquet(parquetFile);
   }
 
-  private void start(JavaStreamingContext streamingContext) {
+  private void startStream(JavaStreamingContext streamingContext) {
     log.info("Starting streams...");
     streamingContext.start();
 
@@ -133,28 +136,31 @@ public class SparkService {
   }
 
   private JavaStreamingContext createStreamingContext() {
+    log.info("Creating streaming context with a duration {}s", interval);
     val duration = new Duration(SECONDS.toMillis(interval));
 
-    log.info("Creating streaming context at {}", duration);
     return new JavaStreamingContext(sparkContext, duration);
   }
 
   /**
-   * @see https://spark.apache.org/docs/1.3.1/streaming-kafka-integration.html
+   * @see http://spark.apache.org/docs/latest/streaming-kafka-integration.html#approach-2-direct-approach-no-receivers
    */
-  private JavaPairReceiverInputDStream<String, String> createKafkaStream(Topic topic,
+  private JavaPairInputDStream<String, String> createKafkaStream(Topic topic,
       JavaStreamingContext streamingContext) {
     log.info("Reading from topic: {}", topic.getId());
+    val topics = Collections.singleton(topic.getId());
+
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;
     val keyDecoderClass = StringDecoder.class;
     val valueDecoderClass = StringDecoder.class;
-    val kafkaParams = kafkaProperties.getConsumerProperties();
-    val partitions = ImmutableMap.of(topic.getId(), 1);
-    val storageLevel = StorageLevel.MEMORY_AND_DISK_SER_2();
+    val kafkaParams = ImmutableMap.<String, String> builder()
+        .putAll(kafkaProperties.getProducerProperties())
+        .putAll(kafkaProperties.getConsumerProperties())
+        .build();
 
-    return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,
-        kafkaParams, partitions, storageLevel);
+    return KafkaUtils.createDirectStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass,
+        valueDecoderClass, kafkaParams, topics);
   }
 
   private String getParquetFileName(Topic topic, Time time) {
