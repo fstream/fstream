@@ -90,7 +90,7 @@ public abstract class Job {
   }
 
   private Map<String, String> resolveKafkaParams() {
-    val consumerProperties = jobContext.getKafkaProperties().getConsumerProperties();
+    val consumerProperties = jobContext.getKafka().getConsumerProperties();
 
     // Ensure Kafka consumers from different jobs are namespaced and therefore isolated
     val groupIdKey = "group.id";

@@ -44,7 +44,7 @@ kafka:
 # Spark
 spark:
    workDir: /tmp/fstream
-   interval: 20
+   batchInterval: 20
 
 ---
 

@@ -96,28 +96,29 @@ public class TopUserValueJob extends Job {
     try {
       val metric = createMetricEvent(time, tuples);
 
-      log.info("Sending metric: {}...", metric.getData());
+      log.info("Sending metric: {}...", metric);
       producer.send(METRICS, metric);
     } finally {
       pool.getValue().returnObject(producer);
     }
   }
 
-  private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {
-    val data = Lists.newArrayListWithCapacity(tuples.size());
-    for (val tuple : tuples) {
-      data.add(ImmutableMap.of("userId", tuple._1, "value", tuple._2));
-    }
-
-    return new MetricEvent(new DateTime(time.milliseconds()), "topNUserValues".hashCode(), data);
-  }
-
   private static Comparator<Tuple2<String, Float>> userValueDescending() {
     return serialize((x, y) -> x._2.compareTo(y._2));
   }
 
-  public static PairFunction<Order, String, Float> pairUserIdValue() {
+  private static PairFunction<Order, String, Float> pairUserIdValue() {
     return order -> new Tuple2<>(order.getUserId(), order.getAmount() * order.getPrice());
+  }
+
+  private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {
+    val data = Lists.newArrayListWithCapacity(tuples.size());
+    for (val tuple : tuples) {
+      val record = ImmutableMap.of("userId", tuple._1, "value", tuple._2);
+      data.add(record);
+    }
+  
+    return new MetricEvent(new DateTime(time.milliseconds()), "topNUserValues".hashCode(), data);
   }
 
 }

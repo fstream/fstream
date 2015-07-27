@@ -38,16 +38,16 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Echos all incoming Kafka events to the "result" topic in Kafka.
+ * Relays all incoming Kafka events to the {@code metrics} topic in Kafka.
  * <p>
  * For demo purposes only!
  */
 @Slf4j
 @Component
-public class EventsJob extends Job {
+public class RelayEventsJob extends Job {
 
   @Autowired
-  public EventsJob(JobContext context) {
+  public RelayEventsJob(JobContext context) {
     super(ImmutableSet.of(ORDERS, TRADES, QUOTES), context);
   }
 

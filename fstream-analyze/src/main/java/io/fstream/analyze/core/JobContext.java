@@ -29,7 +29,7 @@ public class JobContext {
    * Configuration.
    */
   @NonNull
-  KafkaProperties kafkaProperties;
+  KafkaProperties kafka;
 
   /**
    * Sub-contexts;
@@ -40,7 +40,7 @@ public class JobContext {
   SQLContext sqlContext;
 
   /**
-   * Producers.
+   * Producer pool.
    */
   @NonNull
   Broadcast<ObjectPool<KafkaProducer>> pool;

@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
@@ -29,8 +29,8 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
  * Runs asynchronously in its own thread.
  */
 @Slf4j
-@Component
-public class JobExecutor extends AbstractExecutionThreadService {
+@Service
+public class JobExecutorService extends AbstractExecutionThreadService {
 
   /**
    * Dependencies.

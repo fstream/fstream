@@ -33,16 +33,13 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "analyze")
 public class AnalyzeProperties {
 
+  private int batchInterval;
+  private String checkpointDir;
+
   @Bean
   @ConfigurationProperties(prefix = "kafka")
   public KafkaProperties kafkaProperties() {
     return new KafkaProperties();
-  }
-
-  @Bean
-  @ConfigurationProperties(prefix = "hadoop")
-  public HadoopProperties hadoopProperties() {
-    return new HadoopProperties();
   }
 
   @Bean

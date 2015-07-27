@@ -18,9 +18,7 @@
 package io.fstream.analyze.config;
 
 import static scala.collection.JavaConversions.asScalaMap;
-import io.fstream.analyze.config.AnalyzeProperties.HadoopProperties;
 import io.fstream.analyze.config.AnalyzeProperties.SparkProperties;
-import io.fstream.analyze.util.Configurations;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,8 +44,6 @@ public class SparkConfig {
    */
   @Autowired
   SparkProperties spark;
-  @Autowired
-  HadoopProperties hadoop;
 
   @Bean
   public SparkConf sparkConf() {
@@ -64,9 +60,6 @@ public class SparkConfig {
   public JavaSparkContext sparkContext() {
     log.info("Creating JavaSparkContext...");
     val sparkContext = new JavaSparkContext(sparkConf());
-
-    log.info("Adding hadoop properties to config...: {}", hadoop.getProperties());
-    Configurations.setAll(sparkContext.hadoopConfiguration(), hadoop.getProperties());
 
     val jobJar = getJobJar();
     if (jobJar != null) {

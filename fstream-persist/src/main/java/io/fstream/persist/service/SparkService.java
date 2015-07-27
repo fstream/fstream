@@ -59,8 +59,8 @@ public class SparkService {
    */
   @Value("${spark.workDir}")
   private String workDir;
-  @Value("${spark.interval}")
-  private long interval;
+  @Value("${spark.batchInterval}")
+  private long batchInterval;
 
   @Autowired
   private PersistProperties properties;
@@ -133,10 +133,10 @@ public class SparkService {
   }
 
   private JavaStreamingContext createStreamingContext() {
-    val duration = new Duration(SECONDS.toMillis(interval));
+    val batchDuration = new Duration(SECONDS.toMillis(batchInterval));
 
-    log.info("Creating streaming context at {}", duration);
-    return new JavaStreamingContext(sparkContext, duration);
+    log.info("Creating streaming context with batch duration {}", batchDuration);
+    return new JavaStreamingContext(sparkContext, batchDuration);
   }
 
   /**

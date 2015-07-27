@@ -26,9 +26,14 @@ kafka:
    consumerProperties:
       group.id: fstream-analyze
 
+# Analyze
+analyze:
+   batchInterval: 1 # Seconds
+   checkpointDir: /tmp/fstream/checkpoint
+   
+   
 # Spark
 spark:
-   interval: 1 # Seconds
    properties:
 #      spark.serializer: org.apache.spark.serializer.KryoSerializer
 #      spark.kryo.registrator: io.fstream.analyze.util.CustomKryoRegistrator
