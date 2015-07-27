@@ -121,8 +121,8 @@ public abstract class Job {
     return ImmutableMap.of(k1, v1, k2, v2);
   }
 
-  protected static MetricEvent metric(Time time, String id, Object data) {
-    return new MetricEvent(new DateTime(time.milliseconds()), id.hashCode(), data);
+  protected static MetricEvent metric(Time time, int id, Object data) {
+    return new MetricEvent(new DateTime(time.milliseconds()), id, data);
   }
 
 }

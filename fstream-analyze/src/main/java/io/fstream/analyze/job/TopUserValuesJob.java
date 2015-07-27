@@ -52,6 +52,11 @@ import com.google.common.collect.Lists;
 public class TopUserValuesJob extends Job {
 
   /**
+   * The metric id.
+   */
+  private static final int ID = 10;
+
+  /**
    * Top N.
    */
   private final int n;
@@ -127,7 +132,7 @@ public class TopUserValuesJob extends Job {
       data.add(record);
     }
 
-    return metric(time, "topNUserValues", data);
+    return metric(time, ID, data);
   }
 
 }

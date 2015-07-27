@@ -9,21 +9,27 @@
 
 (function () {
    'use strict';
-   
+
    angular
       .module('fstream')
       .controller('booksController', booksController);
 
    booksController.$inject = ['$scope', 'lodash', 'booksService'];
-   
+
    function booksController($scope, _, booksService) {
       $scope.symbols = {
          selected: []
       };
       $scope.top = {};
-      
+
       booksService.getTop().then(function(top) {
          $scope.top = top;
+      });
+
+      $scope.$on('metric', function (e, metric) {
+         if (metric.id == 10) {
+            $scope.top.values = metric.data
+         }
       });
    }
 })();

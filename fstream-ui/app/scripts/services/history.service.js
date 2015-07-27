@@ -20,6 +20,7 @@
       var service = {
          getSymbols: getSymbols,
          getMetrics: getMetrics,
+         getLastMetric: getLastMetric,
          getAlerts: getAlerts,
          getTicks: getTicks,
          getHistory: getHistory
@@ -46,6 +47,17 @@
 
          return executeQuery(query);
       }
+      
+      function getLastMetric(params) {
+         var series = 'metrics';
+         var limit = 1;
+         var where = ' WHERE id = ' + params.id + ' ';
+         var query = 'SELECT * FROM "' + series + '"' + where + ' LIMIT ' + limit;
+
+         return executeQuery(query, function(result) {
+            return JSON.parse(_.get(result, 'data[0].rows[0].data', '[]'));
+         });
+      }      
 
       function getAlerts(params) {
          var series = 'alerts';
@@ -105,10 +117,10 @@
          return params.limit || 50;
       }
 
-      function executeQuery(query) {
+      function executeQuery(query, transformer) {
          return $http.get('/history', {
             params: {query: query}
-         }).then(transformPoints);
+         }).then(transformer || transformPoints);
       }
 
       function transformPoints(result) {
