@@ -9,6 +9,7 @@
 
 package io.fstream.analyze.kafka;
 
+import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 
 import java.io.Closeable;
@@ -29,11 +30,11 @@ public class KafkaProducer implements Closeable {
   @NonNull
   private final Producer<String, String> producer;
 
-  public void send(Object payload) {
-    String key = "1";
-    String value = Codec.encodeText(payload);
-    String topic = "results";
-    val message = new KeyedMessage<String, String>(topic, key, value);
+  public void send(Topic topic, Object payload) {
+    // FIXME: Fix
+    val key = "1";
+    val value = Codec.encodeText(payload);
+    val message = new KeyedMessage<String, String>(topic.getId(), key, value);
 
     producer.send(message);
   }

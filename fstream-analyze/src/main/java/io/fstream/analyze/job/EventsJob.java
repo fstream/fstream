@@ -10,6 +10,9 @@
 package io.fstream.analyze.job;
 
 import static io.fstream.analyze.util.Functions.parseEvents;
+import static io.fstream.core.model.topic.Topic.METRICS;
+import io.fstream.analyze.core.Job;
+import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.topic.Topic;
@@ -24,6 +27,7 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
+import org.apache.spark.streaming.api.java.JavaPairInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 
 import com.google.common.collect.ImmutableSet;
@@ -45,13 +49,12 @@ public class EventsJob extends Job {
     analyzeStream(kafkaStream, jobContext.getPool(), topics);
   }
 
-  private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
+  private static void analyzeStream(JavaPairInputDStream<String, String> kafkaStream,
       Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics) {
-    log.info("[{}] message count: {}", topics, kafkaStream.count());
+    log.info("Current message count: {}", kafkaStream.count());
 
     // Define
-    val events = kafkaStream
-        .map(parseEvents());
+    val events = kafkaStream.map(parseEvents());
 
     events.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, event count: {}", topics, rdd.partitions().size(), rdd.count());
@@ -72,7 +75,7 @@ public class EventsJob extends Job {
   private static void analyzeBatchPartition(Time time, Iterator<Event> partition, KafkaProducer producer) {
     partition.forEachRemaining(event -> {
       log.info("Event = {}", event);
-      producer.send(event);
+      producer.send(METRICS, event);
     });
   }
 

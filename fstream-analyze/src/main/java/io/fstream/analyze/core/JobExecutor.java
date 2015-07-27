@@ -7,10 +7,11 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.analyze.job;
+package io.fstream.analyze.core;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import io.fstream.analyze.config.AnalyzeProperties;
+import io.fstream.analyze.job.EventsJob;
+import io.fstream.analyze.job.TopUserValueJob;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.analyze.kafka.KafkaProducerObjectPool;
 import io.fstream.core.config.KafkaProperties;
@@ -19,7 +20,6 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Cleanup;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,9 +36,9 @@ import org.springframework.stereotype.Component;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 /**
- * Service responsible for persisting to the long-term HDFS backing store.
+ * Executes {@link Job}s against a shared {@link JavaStreamingContext} with a provided {@link JobContext}.
  * <p>
- * This class is <em>not</em> thread-safe.
+ * Runs asynchronously in its own thread.
  */
 @Slf4j
 @Component
@@ -49,8 +49,6 @@ public class JobExecutor extends AbstractExecutionThreadService {
    */
   @Value("${spark.interval}")
   private long interval;
-  @Autowired
-  private AnalyzeProperties properties;
   @Autowired
   private KafkaProperties kafkaProperties;
 
@@ -69,23 +67,22 @@ public class JobExecutor extends AbstractExecutionThreadService {
 
   @Override
   protected void run() throws IOException {
-    @Cleanup
-    val streamingContext = createStreamingContext();
-
-    createJobs(streamingContext);
-
-    startStreams(streamingContext);
+    try (val streamingContext = createStreamingContext()) {
+      createJobs(streamingContext);
+      startJobs(streamingContext);
+    }
   }
 
   private void createJobs(JavaStreamingContext streamingContext) {
     log.info("Creating jobs...");
     val jobContext = createJobContext(streamingContext);
 
+    // Registered jobs
     new TopUserValueJob(jobContext).execute(streamingContext);
     new EventsJob(jobContext).execute(streamingContext);
   }
 
-  private void startStreams(JavaStreamingContext streamingContext) {
+  private void startJobs(JavaStreamingContext streamingContext) {
     log.info("Starting streams...");
     streamingContext.start();
 
@@ -94,7 +91,6 @@ public class JobExecutor extends AbstractExecutionThreadService {
   }
 
   private JobContext createJobContext(JavaStreamingContext streamingContext) {
-    // Setup
     val sqlContext = createSQLContext();
     val pool = createProducerPool(streamingContext);
 
@@ -118,7 +114,7 @@ public class JobExecutor extends AbstractExecutionThreadService {
   private Broadcast<ObjectPool<KafkaProducer>> createProducerPool(JavaStreamingContext streamingContext) {
     val pool = new KafkaProducerObjectPool(kafkaProperties.getProducerProperties());
 
-    return streamingContext.sparkContext().broadcast(pool);
+    return sparkContext.broadcast(pool);
   }
 
 }

@@ -17,12 +17,9 @@
  */
 package io.fstream.analyze.config;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import io.fstream.core.config.KafkaProperties;
-import io.fstream.core.model.topic.Topic;
 
-import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
@@ -33,10 +30,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "persist")
+@ConfigurationProperties(prefix = "analyze")
 public class AnalyzeProperties {
-
-  private List<Topic> topics = newArrayList();
 
   @Bean
   @ConfigurationProperties(prefix = "kafka")
@@ -58,13 +53,6 @@ public class AnalyzeProperties {
 
   @Data
   public static class HadoopProperties {
-
-    private Map<String, String> properties = newLinkedHashMap();
-
-  }
-
-  @Data
-  public static class HBaseProperties {
 
     private Map<String, String> properties = newLinkedHashMap();
 

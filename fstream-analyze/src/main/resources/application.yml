@@ -21,13 +21,6 @@ spring.profiles.active:
 # Profile - common
 ###############################################################################
 
-# Persist
-persist:
-   topics: 
-      - TRADES
-      - ORDERS
-      - QUOTES
-      
 # Kafka
 kafka:
    consumerProperties:

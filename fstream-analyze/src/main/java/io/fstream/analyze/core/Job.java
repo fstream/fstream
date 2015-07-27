@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.analyze.job;
+package io.fstream.analyze.core;
 
 import static com.google.common.base.Strings.repeat;
 import static java.util.stream.Collectors.toMap;
@@ -27,16 +27,21 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 
 /**
- * Service responsible for persisting to the long-term HDFS backing store.
- * <p>
- * This class is <em>not</em> thread-safe.
+ * Represents streaming analytical job.
  */
 @Slf4j
 @RequiredArgsConstructor
 public abstract class Job {
 
+  /**
+   * Configuration
+   */
   @NonNull
   protected final Set<Topic> topics;
+
+  /**
+   * Dependencies.
+   */
   @NonNull
   protected JobContext jobContext;
 
@@ -51,14 +56,18 @@ public abstract class Job {
     analyze(kafkaStream);
   }
 
+  /**
+   * Template method
+   */
   protected abstract void analyze(JavaPairReceiverInputDStream<String, String> kafkaStream);
 
   /**
    * @see https://spark.apache.org/docs/1.4.1/streaming-kafka-integration.html
    */
-  private JavaPairReceiverInputDStream<String, String> createKafkaStream(
-      JavaStreamingContext streamingContext) {
-    log.info("Reading from topics: {}", topics);
+  private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
+    log.info(repeat("-", 100));
+    log.info("Creating DStream from topics '{}'...", topics);
+    log.info(repeat("-", 100));
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;
     val keyDecoderClass = StringDecoder.class;

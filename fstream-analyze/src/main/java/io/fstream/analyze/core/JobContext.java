@@ -7,21 +7,28 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.analyze.job;
+package io.fstream.analyze.core;
 
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.core.config.KafkaProperties;
+import lombok.NonNull;
 import lombok.Value;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.SQLContext;
 
+/**
+ * Execution context of a {@code Job}.
+ */
 @Value
 public class JobContext {
 
+  @NonNull
   KafkaProperties kafkaProperties;
+  @NonNull
   SQLContext sqlContext;
+  @NonNull
   Broadcast<ObjectPool<KafkaProducer>> pool;
 
 }
