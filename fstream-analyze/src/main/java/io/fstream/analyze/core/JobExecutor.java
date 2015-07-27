@@ -9,28 +9,16 @@
 
 package io.fstream.analyze.core;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import io.fstream.analyze.job.EventsJob;
-import io.fstream.analyze.job.TopUserValueJob;
-import io.fstream.analyze.kafka.KafkaProducer;
-import io.fstream.analyze.kafka.KafkaProducerObjectPool;
-import io.fstream.core.config.KafkaProperties;
-
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.pool2.ObjectPool;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
@@ -45,18 +33,12 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
 public class JobExecutor extends AbstractExecutionThreadService {
 
   /**
-   * Configuration.
-   */
-  @Value("${spark.interval}")
-  private long interval;
-  @Autowired
-  private KafkaProperties kafkaProperties;
-
-  /**
    * Dependencies.
    */
   @Autowired
-  private JavaSparkContext sparkContext;
+  private JavaStreamingContext streamingContext;
+  @Autowired
+  private List<Job> jobs;
 
   @PostConstruct
   public void init() throws Exception {
@@ -67,54 +49,23 @@ public class JobExecutor extends AbstractExecutionThreadService {
 
   @Override
   protected void run() throws IOException {
-    try (val streamingContext = createStreamingContext()) {
-      createJobs(streamingContext);
-      startJobs(streamingContext);
+    registerJobs();
+    startJobs();
+  }
+
+  private void registerJobs() {
+    log.info("Registering {} jobs...", jobs.size());
+    for (val job : jobs) {
+      job.register();
     }
   }
 
-  private void createJobs(JavaStreamingContext streamingContext) {
-    log.info("Creating jobs...");
-    val jobContext = createJobContext(streamingContext);
-
-    // Registered jobs
-    new TopUserValueJob(jobContext).execute(streamingContext);
-    new EventsJob(jobContext).execute(streamingContext);
-  }
-
-  private void startJobs(JavaStreamingContext streamingContext) {
-    log.info("Starting streams...");
+  private void startJobs() {
+    log.info("Starting jobs...");
     streamingContext.start();
 
     log.info("Awaiting shutdown...");
     streamingContext.awaitTermination();
-  }
-
-  private JobContext createJobContext(JavaStreamingContext streamingContext) {
-    val sqlContext = createSQLContext();
-    val pool = createProducerPool(streamingContext);
-
-    return new JobContext(kafkaProperties, sqlContext, pool);
-  }
-
-  private JavaStreamingContext createStreamingContext() {
-    val duration = new Duration(SECONDS.toMillis(interval));
-
-    log.info("Creating streaming context at {}", duration);
-    val streamingContext = new JavaStreamingContext(sparkContext, duration);
-    streamingContext.checkpoint("/tmp/fstream/checkpoint");
-
-    return streamingContext;
-  }
-
-  private SQLContext createSQLContext() {
-    return new SQLContext(sparkContext);
-  }
-
-  private Broadcast<ObjectPool<KafkaProducer>> createProducerPool(JavaStreamingContext streamingContext) {
-    val pool = new KafkaProducerObjectPool(kafkaProperties.getProducerProperties());
-
-    return sparkContext.broadcast(pool);
   }
 
 }

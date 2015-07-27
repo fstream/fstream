@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 
 import com.google.common.collect.Maps;
@@ -50,39 +49,47 @@ public abstract class Job {
   @NonNull
   protected JobContext jobContext;
 
-  public void execute(JavaStreamingContext streamingContext) {
+  public void register() {
     log.info(repeat("-", 100));
     log.info("Creating DStream from topics '{}'...", topics);
     log.info(repeat("-", 100));
 
-    // Setup
-    val kafkaStream = createKafkaStream(streamingContext);
+    // Setup the input to the job
+    val kafkaStream = createKafkaStream();
 
-    analyze(kafkaStream);
+    // Plan the job behavior
+    plan(kafkaStream);
   }
 
   /**
    * Template method
    */
-  protected abstract void analyze(JavaPairReceiverInputDStream<String, String> kafkaStream);
+  protected abstract void plan(JavaPairReceiverInputDStream<String, String> kafkaStream);
 
   /**
    * @see https://spark.apache.org/docs/1.4.1/streaming-kafka-integration.html
    */
-  private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
+  private JavaPairReceiverInputDStream<String, String> createKafkaStream() {
+    // Short-hands
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;
     val keyDecoderClass = StringDecoder.class;
     val valueDecoderClass = StringDecoder.class;
-    val kafkaParams = createKafkaParams();
-    val partitions = topics.stream().collect(toMap(Topic::getId, (x) -> 1));
     val storageLevel = StorageLevel.MEMORY_AND_DISK_SER_2();
 
-    return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,
-        kafkaParams, partitions, storageLevel);
+    // Resolve
+    val kafkaParams = resolveKafkaParams();
+    val partitions = resolveTopicPartitions();
+
+    return KafkaUtils.createStream(jobContext.getStreamingContext(),
+        keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass, kafkaParams, partitions, storageLevel);
   }
 
-  private Map<String, String> createKafkaParams() {
+  private Map<String, Integer> resolveTopicPartitions() {
+    return topics.stream().collect(toMap(Topic::getId, (x) -> 1));
+  }
+
+  private Map<String, String> resolveKafkaParams() {
     val consumerProperties = jobContext.getKafkaProperties().getConsumerProperties();
 
     // Ensure Kafka consumers from different jobs are namespaced and therefore isolated

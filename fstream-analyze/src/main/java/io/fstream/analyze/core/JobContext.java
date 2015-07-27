@@ -17,6 +17,7 @@ import lombok.Value;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 /**
  * Execution context of a {@code Job}.
@@ -24,10 +25,23 @@ import org.apache.spark.sql.SQLContext;
 @Value
 public class JobContext {
 
+  /**
+   * Configuration.
+   */
   @NonNull
   KafkaProperties kafkaProperties;
+
+  /**
+   * Sub-contexts;
+   */
+  @NonNull
+  JavaStreamingContext streamingContext;
   @NonNull
   SQLContext sqlContext;
+
+  /**
+   * Producers.
+   */
   @NonNull
   Broadcast<ObjectPool<KafkaProducer>> pool;
 

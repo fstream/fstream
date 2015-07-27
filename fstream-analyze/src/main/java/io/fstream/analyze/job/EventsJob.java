@@ -11,6 +11,9 @@ package io.fstream.analyze.job;
 
 import static io.fstream.analyze.util.Functions.parseEvents;
 import static io.fstream.core.model.topic.Topic.METRICS;
+import static io.fstream.core.model.topic.Topic.ORDERS;
+import static io.fstream.core.model.topic.Topic.QUOTES;
+import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
@@ -29,6 +32,8 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -38,14 +43,16 @@ import com.google.common.collect.ImmutableSet;
  * For demo purposes only!
  */
 @Slf4j
+@Component
 public class EventsJob extends Job {
 
+  @Autowired
   public EventsJob(JobContext context) {
-    super(ImmutableSet.of(Topic.ORDERS, Topic.TRADES, Topic.QUOTES), context);
+    super(ImmutableSet.of(ORDERS, TRADES, QUOTES), context);
   }
 
   @Override
-  protected void analyze(JavaPairReceiverInputDStream<String, String> kafkaStream) {
+  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
     analyzeStream(kafkaStream, jobContext.getPool(), topics);
   }
 

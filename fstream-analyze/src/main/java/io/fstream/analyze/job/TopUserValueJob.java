@@ -14,6 +14,7 @@ import static io.fstream.analyze.util.Functions.parseOrder;
 import static io.fstream.analyze.util.Functions.sumFloatReducer;
 import static io.fstream.analyze.util.SerializableComparator.serialize;
 import static io.fstream.core.model.topic.Topic.METRICS;
+import static io.fstream.core.model.topic.Topic.ORDERS;
 import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
@@ -36,6 +37,8 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import scala.Tuple2;
 
@@ -47,6 +50,7 @@ import com.google.common.collect.Lists;
  * Calculates a running total of all user / order values.
  */
 @Slf4j
+@Component
 public class TopUserValueJob extends Job {
 
   /**
@@ -54,12 +58,13 @@ public class TopUserValueJob extends Job {
    */
   private static final int N = 20;
 
+  @Autowired
   public TopUserValueJob(JobContext jobContext) {
-    super(ImmutableSet.of(Topic.ORDERS), jobContext);
+    super(ImmutableSet.of(ORDERS), jobContext);
   }
 
   @Override
-  protected void analyze(JavaPairReceiverInputDStream<String, String> kafkaStream) {
+  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
     analyzeStream(kafkaStream, jobContext.getPool(), topics);
   }
 
