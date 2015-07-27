@@ -38,6 +38,7 @@ import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import scala.Tuple2;
@@ -56,20 +57,21 @@ public class TopUserValueJob extends Job {
   /**
    * Top N.
    */
-  private static final int N = 20;
+  private final int n;
 
   @Autowired
-  public TopUserValueJob(JobContext jobContext) {
+  public TopUserValueJob(JobContext jobContext, @Value("${analyze.n}") int n) {
     super(ImmutableSet.of(ORDERS), jobContext);
+    this.n = n;
   }
 
   @Override
   protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    analyzeStream(kafkaStream, jobContext.getPool(), topics);
+    analyzeStream(kafkaStream, jobContext.getPool(), topics, n);
   }
 
   private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
-      Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics) {
+      Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics, int n) {
     log.info("[{}] Order count: {}", topics, kafkaStream.count());
 
     // Define
@@ -82,15 +84,16 @@ public class TopUserValueJob extends Job {
 
     aggregatedUserAmounts.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, order count: {}", topics, rdd.partitions().size(), rdd.count());
-      analyzeBatch(rdd, time, pool);
+      analyzeBatch(rdd, time, pool, n);
       return null;
     });
   }
 
   @SneakyThrows
-  private static void analyzeBatch(JavaPairRDD<String, Float> rdd, Time time, Broadcast<ObjectPool<KafkaProducer>> pool) {
+  private static void analyzeBatch(JavaPairRDD<String, Float> rdd, Time time,
+      Broadcast<ObjectPool<KafkaProducer>> pool, int n) {
     // Find top N by value descending
-    val tuples = rdd.top(N, userValueDescending());
+    val tuples = rdd.top(n, userValueDescending());
 
     val producer = pool.getValue().borrowObject();
     try {
@@ -117,7 +120,7 @@ public class TopUserValueJob extends Job {
       val record = ImmutableMap.of("userId", tuple._1, "value", tuple._2);
       data.add(record);
     }
-  
+
     return new MetricEvent(new DateTime(time.milliseconds()), "topNUserValues".hashCode(), data);
   }
 
