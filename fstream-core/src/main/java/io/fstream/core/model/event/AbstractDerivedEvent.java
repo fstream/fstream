@@ -12,11 +12,13 @@ package io.fstream.core.model.event;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractDerivedEvent extends AbstractEvent {
 

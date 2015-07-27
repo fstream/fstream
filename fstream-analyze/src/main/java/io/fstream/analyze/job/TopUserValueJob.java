@@ -36,15 +36,12 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import scala.Tuple2;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 /**
@@ -61,17 +58,17 @@ public class TopUserValueJob extends Job {
 
   @Autowired
   public TopUserValueJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(ImmutableSet.of(ORDERS), jobContext);
+    super(topics(ORDERS), jobContext);
     this.n = n;
   }
 
   @Override
   protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    analyzeStream(kafkaStream, jobContext.getPool(), topics, n);
+    analyzeStream(kafkaStream, topics, n, jobContext.getPool());
   }
 
   private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
-      Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics, int n) {
+      Set<Topic> topics, int n, Broadcast<ObjectPool<KafkaProducer>> pool) {
     log.info("[{}] Order count: {}", topics, kafkaStream.count());
 
     // Define
@@ -84,17 +81,18 @@ public class TopUserValueJob extends Job {
 
     aggregatedUserAmounts.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, order count: {}", topics, rdd.partitions().size(), rdd.count());
-      analyzeBatch(rdd, time, pool, n);
+      analyzeBatch(rdd, time, n, pool);
       return null;
     });
   }
 
   @SneakyThrows
-  private static void analyzeBatch(JavaPairRDD<String, Float> rdd, Time time,
-      Broadcast<ObjectPool<KafkaProducer>> pool, int n) {
+  private static void analyzeBatch(JavaPairRDD<String, Float> rdd, Time time, int n,
+      Broadcast<ObjectPool<KafkaProducer>> pool) {
     // Find top N by value descending
     val tuples = rdd.top(n, userValueDescending());
 
+    // We use a pool here to amortize the cost of the Kafka socket connections over the entire job.
     val producer = pool.getValue().borrowObject();
     try {
       val metric = createMetricEvent(time, tuples);
@@ -107,21 +105,29 @@ public class TopUserValueJob extends Job {
   }
 
   private static Comparator<Tuple2<String, Float>> userValueDescending() {
-    return serialize((x, y) -> x._2.compareTo(y._2));
+    return serialize((a, b) -> a._2.compareTo(b._2));
   }
 
   private static PairFunction<Order, String, Float> pairUserIdValue() {
-    return order -> new Tuple2<>(order.getUserId(), order.getAmount() * order.getPrice());
+    return order -> new Tuple2<>(order.getUserId(), calculateValue(order));
+  }
+
+  /**
+   * Main business method that defines the "metric" per user id.
+   */
+  private static float calculateValue(Order order) {
+    return order.getAmount() * order.getPrice();
   }
 
   private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {
     val data = Lists.newArrayListWithCapacity(tuples.size());
     for (val tuple : tuples) {
-      val record = ImmutableMap.of("userId", tuple._1, "value", tuple._2);
+      // Will be available downstream for display
+      val record = record("userId", tuple._1, "value", tuple._2);
       data.add(record);
     }
 
-    return new MetricEvent(new DateTime(time.milliseconds()), "topNUserValues".hashCode(), data);
+    return metric(time, "topNUserValues", data);
   }
 
 }

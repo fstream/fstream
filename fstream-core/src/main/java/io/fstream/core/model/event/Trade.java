@@ -4,11 +4,13 @@ import static io.fstream.core.model.event.EventType.TRADE;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Trade extends AbstractEvent {
 

@@ -33,9 +33,8 @@ import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Relays all incoming Kafka events to the {@code metrics} topic in Kafka.
@@ -44,20 +43,21 @@ import com.google.common.collect.ImmutableSet;
  */
 @Slf4j
 @Component
+@Profile("none")
 public class RelayEventsJob extends Job {
 
   @Autowired
   public RelayEventsJob(JobContext context) {
-    super(ImmutableSet.of(ORDERS, TRADES, QUOTES), context);
+    super(topics(ORDERS, TRADES, QUOTES), context);
   }
 
   @Override
   protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    analyzeStream(kafkaStream, jobContext.getPool(), topics);
+    analyzeStream(kafkaStream, topics, jobContext.getPool());
   }
 
   private static void analyzeStream(JavaPairInputDStream<String, String> kafkaStream,
-      Broadcast<ObjectPool<KafkaProducer>> pool, Set<Topic> topics) {
+      Set<Topic> topics, Broadcast<ObjectPool<KafkaProducer>> pool) {
     log.info("Current message count: {}", kafkaStream.count());
 
     // Define
@@ -71,6 +71,7 @@ public class RelayEventsJob extends Job {
   }
 
   private static void analyzeBatch(JavaRDD<Event> rdd, Time time, Broadcast<ObjectPool<KafkaProducer>> pool) {
+    // We use a pool here to amortize the cost of the socket connections over the entire partition.
     rdd.foreachPartition((partition) -> {
       KafkaProducer producer = pool.getValue().borrowObject();
       analyzeBatchPartition(time, partition, producer);

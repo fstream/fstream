@@ -12,7 +12,9 @@ package io.fstream.analyze.core;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.Strings.repeat;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.util.stream.Collectors.toMap;
+import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.topic.Topic;
 
 import java.util.Map;
@@ -24,11 +26,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.spark.storage.StorageLevel;
+import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.joda.time.DateTime;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents streaming analytical job.
@@ -37,15 +43,11 @@ import com.google.common.collect.Maps;
 @RequiredArgsConstructor
 public abstract class Job {
 
-  /**
-   * Configuration
-   */
+  /** The topics to read from. */
   @NonNull
   protected final Set<Topic> topics;
 
-  /**
-   * Dependencies.
-   */
+  /** Handle to context the job is running in. */
   @NonNull
   protected JobContext jobContext;
 
@@ -91,16 +93,36 @@ public abstract class Job {
 
   private Map<String, String> resolveKafkaParams() {
     val consumerProperties = jobContext.getKafka().getConsumerProperties();
-
-    // Ensure Kafka consumers from different jobs are namespaced and therefore isolated
-    val groupIdKey = "group.id";
-    val groupId = consumerProperties.get(groupIdKey);
-    val overrideGroupId = groupId + "-" + UPPER_CAMEL.to(LOWER_HYPHEN, getClass().getSimpleName());
+    val overrideGroupId = resolveKafkaConsumerGroupId(consumerProperties);
 
     log.info("Creating kafka params with group id: {}", overrideGroupId);
-    val kafkaParams = Maps.newHashMap(consumerProperties);
-    kafkaParams.put(groupIdKey, overrideGroupId);
+    val kafkaParams = newHashMap(consumerProperties);
+    kafkaParams.put(ConsumerConfig.GROUP_ID_CONFIG, overrideGroupId);
     return kafkaParams;
+  }
+
+  private String resolveKafkaConsumerGroupId(Map<String, String> consumerProperties) {
+    // Ensure Kafka consumers from different jobs are namespaced and therefore isolated
+    val groupId = consumerProperties.get(ConsumerConfig.GROUP_ID_CONFIG);
+    val jobId = UPPER_CAMEL.to(LOWER_HYPHEN, getClass().getSimpleName());
+
+    return groupId + "-" + jobId;
+  }
+
+  /**
+   * Utilities.
+   */
+
+  protected static Set<Topic> topics(@NonNull Topic... topics) {
+    return ImmutableSet.copyOf(topics);
+  }
+
+  protected static Map<String, Object> record(String k1, Object v1, String k2, Object v2) {
+    return ImmutableMap.of(k1, v1, k2, v2);
+  }
+
+  protected static MetricEvent metric(Time time, String id, Object data) {
+    return new MetricEvent(new DateTime(time.milliseconds()), id.hashCode(), data);
   }
 
 }

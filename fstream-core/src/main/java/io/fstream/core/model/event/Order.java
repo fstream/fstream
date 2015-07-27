@@ -5,11 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 
 import org.joda.time.DateTime;
 
 @Data
 @NoArgsConstructor
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false, of = { "brokerId", "oid" })
 public class Order extends AbstractEvent {
 
