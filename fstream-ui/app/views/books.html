@@ -78,7 +78,7 @@
                      <tbody>
                         <tr ng-repeat="row in top.trades">
                            <td>{{ row.userId }}</td>
-                           <td class="text-right">${{ row.value | number:2 }}</td>
+                           <td class="text-right">{{ row.value }}</td>
                         </tr>                     
                      </tbody>
                   </table>
@@ -102,7 +102,7 @@
                      <tbody>
                         <tr ng-repeat="row in top.orders">
                            <td>{{ row.userId }}</td>
-                           <td class="text-right">${{ row.value | number:2 }}</td>
+                           <td class="text-right">{{ row.value }}</td>
                         </tr>                     
                      </tbody>
                   </table>

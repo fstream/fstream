@@ -21,37 +21,22 @@
          getTop: getTop
       };
 
-      var metricIds = {
-         topUserValues: 10
-      };
-
       return service;
 
       function getTop() {
-         return historyService.getLastMetric({
-            id: metricIds.topUserValues
-         }).then(function (values) {
-            // TODO: Hook up other metrics!
+         var ids = [10, 11, 12, 13];
+         var results = _.map(ids, function (id) {
+            return historyService.getLastMetric({
+               id: id
+            });
+         });
+
+         return $q.all(results).then(function (data) {
             return {
-               values: values,
-               trades: _.times(20, function (i) {
-                  return {
-                     userId: 'user' + i + 1,
-                     value: (20 - i) * 10000
-                  };
-               }),
-               orders: _.times(20, function (i) {
-                  return {
-                     userId: 'user' + i + 2,
-                     value: (20 - i) * 100000
-                  };
-               }),
-               ratios: _.times(20, function (i) {
-                  return {
-                     userId: 'user' + i + 3,
-                     value: (20 - i) * 1
-                  };
-               })
+               values: data[0],
+               trades: data[1],
+               orders: data[2],
+               ratios: data[3]
             };
          });
       }

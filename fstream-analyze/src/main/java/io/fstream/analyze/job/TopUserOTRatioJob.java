@@ -9,17 +9,20 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeFloatRunningSum;
-import static io.fstream.analyze.util.Functions.parseOrder;
-import static io.fstream.analyze.util.Functions.sumFloatReducer;
+import static io.fstream.analyze.util.Functions.computeLongRunningSum;
+import static io.fstream.analyze.util.Functions.parseEvent;
 import static io.fstream.analyze.util.SerializableComparator.serialize;
+import static io.fstream.core.model.event.EventType.ORDER;
+import static io.fstream.core.model.event.EventType.TRADE;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import static io.fstream.core.model.topic.Topic.ORDERS;
+import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.event.Order;
+import io.fstream.core.model.event.Trade;
 import io.fstream.core.model.topic.Topic;
 
 import java.util.Comparator;
@@ -32,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
@@ -42,6 +44,7 @@ import org.springframework.stereotype.Component;
 
 import scala.Tuple2;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /**
@@ -49,12 +52,12 @@ import com.google.common.collect.Lists;
  */
 @Slf4j
 @Component
-public class TopUserValuesJob extends Job {
+public class TopUserOTRatioJob extends Job {
 
   /**
    * The metric id.
    */
-  private static final int ID = 10;
+  private static final int ID = 13;
 
   /**
    * Top N.
@@ -62,8 +65,8 @@ public class TopUserValuesJob extends Job {
   private final int n;
 
   @Autowired
-  public TopUserValuesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(topics(ORDERS), jobContext);
+  public TopUserOTRatioJob(JobContext jobContext, @Value("${analyze.n}") int n) {
+    super(topics(ORDERS, TRADES), jobContext);
     this.n = n;
   }
 
@@ -74,17 +77,43 @@ public class TopUserValuesJob extends Job {
 
   private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
       Set<Topic> topics, int n, Broadcast<ObjectPool<KafkaProducer>> pool) {
-    log.info("[{}] Order count: {}", topics, kafkaStream.count());
+    log.info("[{}] Event count: {}", topics, kafkaStream.count());
 
-    // Define
-    val aggregatedUserAmounts =
+    // Calculate order count by user
+    val userOrderCounts =
         kafkaStream
-            .map(parseOrder())
-            .mapToPair(pairUserIdValue())
-            .reduceByKey(sumFloatReducer())
-            .updateStateByKey(computeFloatRunningSum());
+            .map(parseEvent())
+            .filter(event -> event.getType() == ORDER)
+            .map(event -> (Order) event)
+            .map(order -> order.getUserId())
+            .countByValue()
+            .updateStateByKey(computeLongRunningSum());
 
-    aggregatedUserAmounts.foreachRDD((rdd, time) -> {
+    // Get trade count by user
+    val userTradeCounts =
+        kafkaStream
+            .map(parseEvent())
+            .filter(event -> event.getType() == TRADE)
+            .map(event -> (Trade) event)
+            .flatMap(trade -> ImmutableList.of(trade.getBuyUser(), trade.getSellUser()))
+            .countByValue()
+            .updateStateByKey(computeLongRunningSum());
+
+    // Join and calculate ratios
+    val userOrderTradeRatios =
+        userOrderCounts
+            .join(userTradeCounts)
+            .mapToPair((tuple) -> {
+              String userId = tuple._1;
+              float orderCount = tuple._2._1;
+              float tradeCount = tuple._2._2;
+              float ratio = orderCount / tradeCount;
+
+              return new Tuple2<>(userId, ratio);
+            });
+
+    // Sort and top
+    userOrderTradeRatios.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, user count: {}", topics, rdd.partitions().size(), rdd.count());
       analyzeBatch(rdd, time, n, pool);
       return null;
@@ -111,17 +140,6 @@ public class TopUserValuesJob extends Job {
 
   private static Comparator<Tuple2<String, Float>> userValueDescending() {
     return serialize((a, b) -> a._2.compareTo(b._2));
-  }
-
-  private static PairFunction<Order, String, Float> pairUserIdValue() {
-    return order -> new Tuple2<>(order.getUserId(), calculateValue(order));
-  }
-
-  /**
-   * Main business method that defines the "metric" per user id.
-   */
-  private static float calculateValue(Order order) {
-    return order.getAmount() * order.getPrice();
   }
 
   private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {

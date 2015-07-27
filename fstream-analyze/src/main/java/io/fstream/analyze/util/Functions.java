@@ -38,7 +38,18 @@ public class Functions {
     };
   }
 
-  public static Function2<List<Float>, Optional<Float>, Optional<Float>> compueFloatRunningSum() {
+  public static Function2<List<Integer>, Optional<Integer>, Optional<Integer>> computeIntegerRunningSum() {
+    return (values, state) -> {
+      int sum = state.or(0);
+      for (val i : values) {
+        sum += i;
+      }
+
+      return Optional.of(sum);
+    };
+  }
+
+  public static Function2<List<Float>, Optional<Float>, Optional<Float>> computeFloatRunningSum() {
     return (values, state) -> {
       float sum = state.or(0f);
       for (val i : values) {
@@ -50,6 +61,10 @@ public class Functions {
   }
 
   public static final Function2<Long, Long, Long> sumLongReducer() {
+    return (a, b) -> a + b;
+  }
+
+  public static final Function2<Integer, Integer, Integer> sumIntegerReducer() {
     return (a, b) -> a + b;
   }
 
@@ -65,7 +80,7 @@ public class Functions {
     return tuple -> Codec.decodeText(tuple._2, Trade.class);
   }
 
-  public static Function<Tuple2<String, String>, Event> parseEvents() {
+  public static Function<Tuple2<String, String>, Event> parseEvent() {
     return tuple -> Codec.decodeText(tuple._2, Event.class);
   }
 

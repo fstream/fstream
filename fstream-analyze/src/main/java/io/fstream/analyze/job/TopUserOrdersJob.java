@@ -9,9 +9,9 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeFloatRunningSum;
+import static io.fstream.analyze.util.Functions.computeIntegerRunningSum;
 import static io.fstream.analyze.util.Functions.parseOrder;
-import static io.fstream.analyze.util.Functions.sumFloatReducer;
+import static io.fstream.analyze.util.Functions.sumIntegerReducer;
 import static io.fstream.analyze.util.SerializableComparator.serialize;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import static io.fstream.core.model.topic.Topic.ORDERS;
@@ -19,7 +19,6 @@ import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.core.model.event.MetricEvent;
-import io.fstream.core.model.event.Order;
 import io.fstream.core.model.topic.Topic;
 
 import java.util.Comparator;
@@ -32,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
@@ -49,12 +47,12 @@ import com.google.common.collect.Lists;
  */
 @Slf4j
 @Component
-public class TopUserValuesJob extends Job {
+public class TopUserOrdersJob extends Job {
 
   /**
    * The metric id.
    */
-  private static final int ID = 10;
+  private static final int ID = 12;
 
   /**
    * Top N.
@@ -62,7 +60,7 @@ public class TopUserValuesJob extends Job {
   private final int n;
 
   @Autowired
-  public TopUserValuesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
+  public TopUserOrdersJob(JobContext jobContext, @Value("${analyze.n}") int n) {
     super(topics(ORDERS), jobContext);
     this.n = n;
   }
@@ -76,15 +74,16 @@ public class TopUserValuesJob extends Job {
       Set<Topic> topics, int n, Broadcast<ObjectPool<KafkaProducer>> pool) {
     log.info("[{}] Order count: {}", topics, kafkaStream.count());
 
-    // Define
-    val aggregatedUserAmounts =
+    // Get order amounts by user
+    val userOrderAmounts =
         kafkaStream
             .map(parseOrder())
-            .mapToPair(pairUserIdValue())
-            .reduceByKey(sumFloatReducer())
-            .updateStateByKey(computeFloatRunningSum());
+            .mapToPair(order -> new Tuple2<>(order.getUserId(), order.getAmount()))
+            .reduceByKey(sumIntegerReducer())
+            .updateStateByKey(computeIntegerRunningSum());
 
-    aggregatedUserAmounts.foreachRDD((rdd, time) -> {
+    // Sort and top
+    userOrderAmounts.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, user count: {}", topics, rdd.partitions().size(), rdd.count());
       analyzeBatch(rdd, time, n, pool);
       return null;
@@ -92,7 +91,7 @@ public class TopUserValuesJob extends Job {
   }
 
   @SneakyThrows
-  private static void analyzeBatch(JavaPairRDD<String, Float> rdd, Time time, int n,
+  private static void analyzeBatch(JavaPairRDD<String, Integer> rdd, Time time, int n,
       Broadcast<ObjectPool<KafkaProducer>> pool) {
     // Find top N by value descending
     val tuples = rdd.top(n, userValueDescending());
@@ -109,19 +108,8 @@ public class TopUserValuesJob extends Job {
     }
   }
 
-  private static Comparator<Tuple2<String, Float>> userValueDescending() {
+  private static Comparator<Tuple2<String, Integer>> userValueDescending() {
     return serialize((a, b) -> a._2.compareTo(b._2));
-  }
-
-  private static PairFunction<Order, String, Float> pairUserIdValue() {
-    return order -> new Tuple2<>(order.getUserId(), calculateValue(order));
-  }
-
-  /**
-   * Main business method that defines the "metric" per user id.
-   */
-  private static float calculateValue(Order order) {
-    return order.getAmount() * order.getPrice();
   }
 
   private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {

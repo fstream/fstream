@@ -30,6 +30,15 @@
          if (metric.id == 10) {
             $scope.top.values = metric.data
          }
+         if (metric.id == 11) {
+            $scope.top.trades = metric.data
+         }    
+         if (metric.id == 12) {
+            $scope.top.orders = metric.data
+         }            
+         if (metric.id == 13) {
+            $scope.top.ratios = metric.data
+         }         
       });
    }
 })();
