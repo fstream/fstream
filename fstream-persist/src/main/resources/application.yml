@@ -44,7 +44,14 @@ kafka:
 # Spark
 spark:
    workDir: /tmp/fstream
-   batchInterval: 20
+   batchInterval: 30 # Seconds
+   properties:
+      
+# Hadoop
+hadoop:
+   properties:
+      # https://issues.apache.org/jira/browse/PARQUET-151
+      parquet.enable.summary-metadata: false    
 
 ---
 
@@ -83,17 +90,3 @@ spark:
    # Need as many threads as (# of topics + 1) to service the streams. 
    # "local[*]" indicates physical cores on machine (8 typically)
    master: local[*] 
-     
----
-
-###############################################################################
-# Profile - "quotes"
-###############################################################################
-
-# Profile
-spring.profiles: quotes
-
-# Kafka
-kafka:
-   topics: 
-      - QUOTES

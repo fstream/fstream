@@ -164,4 +164,3 @@ state:
                COUNT(*) AS count
            FROM
                Alert.win:time_batch(1 min)
-               

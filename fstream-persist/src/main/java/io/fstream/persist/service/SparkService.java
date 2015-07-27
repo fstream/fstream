@@ -18,6 +18,7 @@ import io.fstream.persist.config.PersistProperties;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import kafka.serializer.StringDecoder;
 import lombok.Cleanup;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Service;
 import scala.Tuple2;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
 
 /**
  * Service responsible for persisting to the long-term HDFS backing store.
@@ -52,7 +54,7 @@ import com.google.common.collect.ImmutableMap;
 @Slf4j
 @Service
 @Profile("spark")
-public class SparkService {
+public class SparkService extends AbstractExecutionThreadService {
 
   /**
    * Configuration.
@@ -76,6 +78,19 @@ public class SparkService {
   private FileSystem fileSystem;
 
   @PostConstruct
+  public void init() throws Exception {
+    log.info("Initializing HDFS persist job...");
+    startAsync();
+    log.info("Finished initializing HDFS persist job");
+  }
+
+  @PreDestroy
+  public void destroy() throws Exception {
+    log.info("Destroying '{}'...");
+    stopAsync();
+  }
+
+  @Override
   public void run() throws IOException {
     clean();
 

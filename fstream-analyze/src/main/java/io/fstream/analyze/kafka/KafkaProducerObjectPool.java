@@ -33,13 +33,18 @@ public class KafkaProducerObjectPool extends LazySerializableObjectPool<KafkaPro
   @Override
   protected ObjectPool<KafkaProducer> createDelegate() {
     val pooledObjectFactory = new KafkaProducerPooledObjectFactory(producerProperties);
-
-    val maxNumProducers = 10;
-    val poolConfig = new GenericObjectPoolConfig();
-    poolConfig.setMaxTotal(maxNumProducers);
-    poolConfig.setMaxIdle(maxNumProducers);
+    val poolConfig = createPoolConfig();
 
     return new GenericObjectPool<KafkaProducer>(pooledObjectFactory, poolConfig);
+  }
+
+  private GenericObjectPoolConfig createPoolConfig() {
+    val maxNumProducers = 10;
+    val poolConfig = new GenericObjectPoolConfig();
+    poolConfig.setMaxIdle(maxNumProducers);
+    poolConfig.setMaxTotal(maxNumProducers);
+
+    return poolConfig;
   }
 
 }

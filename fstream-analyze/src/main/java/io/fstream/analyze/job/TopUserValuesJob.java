@@ -49,7 +49,7 @@ import com.google.common.collect.Lists;
  */
 @Slf4j
 @Component
-public class TopUserValueJob extends Job {
+public class TopUserValuesJob extends Job {
 
   /**
    * Top N.
@@ -57,7 +57,7 @@ public class TopUserValueJob extends Job {
   private final int n;
 
   @Autowired
-  public TopUserValueJob(JobContext jobContext, @Value("${analyze.n}") int n) {
+  public TopUserValuesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
     super(topics(ORDERS), jobContext);
     this.n = n;
   }
