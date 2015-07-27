@@ -16,9 +16,10 @@ import io.fstream.core.util.Codec;
 
 import java.util.List;
 
+import lombok.val;
+
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
 
 import scala.Tuple2;
 
@@ -26,23 +27,33 @@ import com.google.common.base.Optional;
 
 public class Functions {
 
-  public static Function2<List<Long>, Optional<Long>, Optional<Long>> computeRunningSum() {
-    return new Function2<List<Long>, Optional<Long>, Optional<Long>>() {
-
-      @Override
-      public Optional<Long> call(List<Long> nums, Optional<Long> current) throws Exception {
-        long sum = current.or(0L);
-        for (long i : nums) {
-          sum += i;
-        }
-
-        return Optional.of(sum);
+  public static Function2<List<Long>, Optional<Long>, Optional<Long>> computeLongRunningSum() {
+    return (values, state) -> {
+      long sum = state.or(0L);
+      for (val i : values) {
+        sum += i;
       }
 
+      return Optional.of(sum);
     };
   }
 
-  public static final Function2<Long, Long, Long> sumReducer() {
+  public static Function2<List<Float>, Optional<Float>, Optional<Float>> compueFloatRunningSum() {
+    return (values, state) -> {
+      float sum = state.or(0f);
+      for (val i : values) {
+        sum += i;
+      }
+
+      return Optional.of(sum);
+    };
+  }
+
+  public static final Function2<Long, Long, Long> sumLongReducer() {
+    return (a, b) -> a + b;
+  }
+
+  public static final Function2<Float, Float, Float> sumFloatReducer() {
     return (a, b) -> a + b;
   }
 
@@ -56,10 +67,6 @@ public class Functions {
 
   public static Function<Tuple2<String, String>, Event> parseEvents() {
     return tuple -> Codec.decodeText(tuple._2, Event.class);
-  }
-
-  public static PairFunction<Order, String, Long> mapUserIdAmount() {
-    return order -> new Tuple2<String, Long>(order.getUserId(), (long) order.getAmount());
   }
 
 }

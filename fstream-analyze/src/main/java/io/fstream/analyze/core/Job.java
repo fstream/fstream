@@ -9,10 +9,13 @@
 
 package io.fstream.analyze.core;
 
+import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
+import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.Strings.repeat;
 import static java.util.stream.Collectors.toMap;
 import io.fstream.core.model.topic.Topic;
 
+import java.util.Map;
 import java.util.Set;
 
 import kafka.serializer.StringDecoder;
@@ -25,6 +28,8 @@ import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
+
+import com.google.common.collect.Maps;
 
 /**
  * Represents streaming analytical job.
@@ -65,19 +70,30 @@ public abstract class Job {
    * @see https://spark.apache.org/docs/1.4.1/streaming-kafka-integration.html
    */
   private JavaPairReceiverInputDStream<String, String> createKafkaStream(JavaStreamingContext streamingContext) {
-    log.info(repeat("-", 100));
-    log.info("Creating DStream from topics '{}'...", topics);
-    log.info(repeat("-", 100));
     val keyTypeClass = String.class;
     val valueTypeClass = String.class;
     val keyDecoderClass = StringDecoder.class;
     val valueDecoderClass = StringDecoder.class;
-    val kafkaParams = jobContext.getKafkaProperties().getConsumerProperties();
+    val kafkaParams = createKafkaParams();
     val partitions = topics.stream().collect(toMap(Topic::getId, (x) -> 1));
     val storageLevel = StorageLevel.MEMORY_AND_DISK_SER_2();
 
     return KafkaUtils.createStream(streamingContext, keyTypeClass, valueTypeClass, keyDecoderClass, valueDecoderClass,
         kafkaParams, partitions, storageLevel);
+  }
+
+  private Map<String, String> createKafkaParams() {
+    val consumerProperties = jobContext.getKafkaProperties().getConsumerProperties();
+
+    // Ensure Kafka consumers from different jobs are namespaced and therefore isolated
+    val groupIdKey = "group.id";
+    val groupId = consumerProperties.get(groupIdKey);
+    val overrideGroupId = groupId + "-" + UPPER_CAMEL.to(LOWER_HYPHEN, getClass().getSimpleName());
+
+    log.info("Creating kafka params with group id: {}", overrideGroupId);
+    val kafkaParams = Maps.newHashMap(consumerProperties);
+    kafkaParams.put(groupIdKey, overrideGroupId);
+    return kafkaParams;
   }
 
 }

@@ -9,16 +9,16 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeRunningSum;
-import static io.fstream.analyze.util.Functions.mapUserIdAmount;
+import static io.fstream.analyze.util.Functions.compueFloatRunningSum;
 import static io.fstream.analyze.util.Functions.parseOrder;
-import static io.fstream.analyze.util.Functions.sumReducer;
+import static io.fstream.analyze.util.Functions.sumFloatReducer;
 import static io.fstream.analyze.util.SerializableComparator.serialize;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.core.model.event.MetricEvent;
+import io.fstream.core.model.event.Order;
 import io.fstream.core.model.topic.Topic;
 
 import java.util.Comparator;
@@ -31,15 +31,17 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
-import org.assertj.core.util.Maps;
 import org.joda.time.DateTime;
 
 import scala.Tuple2;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  * Calculates a running total of all user / order values.
@@ -69,9 +71,9 @@ public class TopUserValueJob extends Job {
     val aggregatedUserAmounts =
         kafkaStream
             .map(parseOrder())
-            .mapToPair(mapUserIdAmount())
-            .reduceByKey(sumReducer())
-            .updateStateByKey(computeRunningSum());
+            .mapToPair(pairUserIdValue())
+            .reduceByKey(sumFloatReducer())
+            .updateStateByKey(compueFloatRunningSum());
 
     aggregatedUserAmounts.foreachRDD((rdd, time) -> {
       log.info("[{}] Partition count: {}, order count: {}", topics, rdd.partitions().size(), rdd.count());
@@ -81,7 +83,7 @@ public class TopUserValueJob extends Job {
   }
 
   @SneakyThrows
-  private static void analyzeBatch(JavaPairRDD<String, Long> rdd, Time time, Broadcast<ObjectPool<KafkaProducer>> pool) {
+  private static void analyzeBatch(JavaPairRDD<String, Float> rdd, Time time, Broadcast<ObjectPool<KafkaProducer>> pool) {
     // Find top N by value descending
     val tuples = rdd.top(N, userValueDescending());
 
@@ -96,17 +98,21 @@ public class TopUserValueJob extends Job {
     }
   }
 
-  private static MetricEvent createMetricEvent(Time time, List<Tuple2<String, Long>> tuples) {
-    val data = Maps.<String, Long> newHashMap();
+  private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {
+    val data = Lists.newArrayListWithCapacity(tuples.size());
     for (val tuple : tuples) {
-      data.put(tuple._1, tuple._2);
+      data.add(ImmutableMap.of("userId", tuple._1, "value", tuple._2));
     }
 
     return new MetricEvent(new DateTime(time.milliseconds()), "topNUserValues".hashCode(), data);
   }
 
-  private static Comparator<Tuple2<String, Long>> userValueDescending() {
-    return serialize((x, y) -> -x._2.compareTo(y._2));
+  private static Comparator<Tuple2<String, Float>> userValueDescending() {
+    return serialize((x, y) -> x._2.compareTo(y._2));
+  }
+
+  public static PairFunction<Order, String, Float> pairUserIdValue() {
+    return order -> new Tuple2<>(order.getUserId(), order.getAmount() * order.getPrice());
   }
 
 }
