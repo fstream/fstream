@@ -9,50 +9,47 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeFloatRunningSum;
-import static io.fstream.analyze.util.Functions.parseOrder;
-import static io.fstream.analyze.util.Functions.sumFloatReducer;
+import static io.fstream.analyze.util.EventFunctions.parseOrder;
+import static io.fstream.analyze.util.SumFunctions.runningSumFloats;
+import static io.fstream.analyze.util.SumFunctions.sumFloats;
 import static io.fstream.core.model.topic.Topic.ORDERS;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.core.model.event.Order;
 import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
+import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Calculates a running total of all user / order values.
+ * Calculates "Top N Users by Value" metric.
  */
-@Slf4j
 @Component
-public class TopUserValuesJob extends TopUserJob {
+public class TopUserValuesJob extends TopUserJob<Float> {
 
   /**
    * The metric id.
    */
-  private static final int ID = 10;
+  private static final int TOP_USER_VALUE_ID = 10;
 
   @Autowired
   public TopUserValuesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(ID, topics(ORDERS), n, jobContext);
+    super(TOP_USER_VALUE_ID, topics(ORDERS), n, jobContext);
   }
 
   @Override
-  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    log.info("[{}] Order count: {}", topics, kafkaStream.count());
-
+  protected JavaPairDStream<String, Float> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream) {
     // Define
     val userValues =
         kafkaStream
             .map(parseOrder())
             .mapToPair(order -> pair(order.getUserId(), calculateOrderValue(order)))
-            .reduceByKey(sumFloatReducer())
-            .updateStateByKey(computeFloatRunningSum());
+            .reduceByKey(sumFloats())
+            .updateStateByKey(runningSumFloats());
 
-    analyzeBatches(userValues);
+    return userValues;
   }
 
   /**

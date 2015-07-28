@@ -9,8 +9,9 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeLongRunningSum;
-import static io.fstream.analyze.util.Functions.parseEvent;
+import static io.fstream.analyze.util.EventFunctions.castEvent;
+import static io.fstream.analyze.util.EventFunctions.parseEvent;
+import static io.fstream.analyze.util.SumFunctions.runningSumLongs;
 import static io.fstream.core.model.event.EventType.ORDER;
 import static io.fstream.core.model.event.EventType.TRADE;
 import static io.fstream.core.model.topic.Topic.ORDERS;
@@ -19,9 +20,9 @@ import io.fstream.analyze.core.JobContext;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Trade;
 import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,26 +31,23 @@ import org.springframework.stereotype.Component;
 import scala.Tuple2;
 
 /**
- * Calculates a running total of all user / order values.
+ * Calculates "Top N Users by O/R Ratio" metric.
  */
-@Slf4j
 @Component
-public class TopUserOTRatioJob extends TopUserJob {
+public class TopUserOTRatioJob extends TopUserJob<Float> {
 
   /**
    * The metric id.
    */
-  private static final int ID = 13;
+  private static final int TOP_USER_OT_RATIO_ID = 13;
 
   @Autowired
   public TopUserOTRatioJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(ID, topics(ORDERS, TRADES), n, jobContext);
+    super(TOP_USER_OT_RATIO_ID, topics(ORDERS, TRADES), n, jobContext);
   }
 
   @Override
-  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    log.info("[{}] Event count: {}", topics, kafkaStream.count());
-
+  protected JavaPairDStream<String, Float> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream) {
     // Calculate order count by user
     val userOrderCounts =
         kafkaStream
@@ -58,7 +56,7 @@ public class TopUserOTRatioJob extends TopUserJob {
             .map(castEvent(Order.class))
             .map(order -> order.getUserId())
             .countByValue()
-            .updateStateByKey(computeLongRunningSum());
+            .updateStateByKey(runningSumLongs());
 
     // Get trade count by user
     val userTradeCounts =
@@ -68,7 +66,7 @@ public class TopUserOTRatioJob extends TopUserJob {
             .map(castEvent(Trade.class))
             .flatMap(trade -> list(trade.getBuyUser(), trade.getSellUser()))
             .countByValue()
-            .updateStateByKey(computeLongRunningSum());
+            .updateStateByKey(runningSumLongs());
 
     // Join and calculate ratios
     val userOrderTradeRatios =
@@ -76,7 +74,7 @@ public class TopUserOTRatioJob extends TopUserJob {
             .join(userTradeCounts)
             .mapToPair(calculateOrderTradeRatio());
 
-    analyzeBatches(userOrderTradeRatios);
+    return userOrderTradeRatios;
   }
 
   private static PairFunction<Tuple2<String, Tuple2<Long, Long>>, String, Float> calculateOrderTradeRatio() {

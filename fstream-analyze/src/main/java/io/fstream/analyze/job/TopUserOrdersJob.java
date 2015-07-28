@@ -9,49 +9,46 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeIntegerRunningSum;
-import static io.fstream.analyze.util.Functions.parseOrder;
-import static io.fstream.analyze.util.Functions.sumIntegerReducer;
+import static io.fstream.analyze.util.EventFunctions.parseOrder;
+import static io.fstream.analyze.util.SumFunctions.runningSumIntegers;
+import static io.fstream.analyze.util.SumFunctions.sumIntegers;
 import static io.fstream.core.model.topic.Topic.ORDERS;
 import io.fstream.analyze.core.JobContext;
 import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
+import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Calculates a running total of all user / order values.
+ * Calculates "Top N Users by Order" metric.
  */
-@Slf4j
 @Component
-public class TopUserOrdersJob extends TopUserJob {
+public class TopUserOrdersJob extends TopUserJob<Integer> {
 
   /**
    * The metric id.
    */
-  private static final int ID = 12;
+  private static final int TOP_USER_ORDERS_ID = 12;
 
   @Autowired
   public TopUserOrdersJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(ID, topics(ORDERS), n, jobContext);
+    super(TOP_USER_ORDERS_ID, topics(ORDERS), n, jobContext);
   }
 
   @Override
-  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    log.info("[{}] Order count: {}", topics, kafkaStream.count());
-
+  protected JavaPairDStream<String, Integer> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream) {
     // Get order amounts by user
     val userOrderAmounts =
         kafkaStream
             .map(parseOrder())
             .mapToPair(order -> pair(order.getUserId(), order.getAmount()))
-            .reduceByKey(sumIntegerReducer())
-            .updateStateByKey(computeIntegerRunningSum());
+            .reduceByKey(sumIntegers())
+            .updateStateByKey(runningSumIntegers());
 
-    analyzeBatches(userOrderAmounts);
+    return userOrderAmounts;
   }
 
 }

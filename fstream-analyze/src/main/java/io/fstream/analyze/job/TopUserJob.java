@@ -9,15 +9,12 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.SerializableComparator.serialize;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
-import io.fstream.core.model.event.Event;
 import io.fstream.core.model.topic.Topic;
 
-import java.util.Comparator;
 import java.util.Set;
 
 import lombok.SneakyThrows;
@@ -26,20 +23,18 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
+import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.stereotype.Component;
 
-import scala.Tuple2;
-
 /**
- * Calculates a running total of all user / order values.
+ * Base class of "Top N User by <fact>" calculation jobs.
  */
 @Slf4j
 @Component
-public abstract class TopUserJob extends Job {
+public abstract class TopUserJob<T extends Comparable<T>> extends Job {
 
   /**
    * Output metric identifier.
@@ -57,7 +52,21 @@ public abstract class TopUserJob extends Job {
     this.n = n;
   }
 
-  protected <T extends Comparable<T>> void analyzeBatches(JavaPairDStream<String, T> calculation) {
+  @Override
+  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
+    log.info("[{}:{}] DStream element count: {}", metricId, topics, kafkaStream.count());
+    val calculation = planCalculation(kafkaStream);
+    planBatches(calculation);
+  }
+
+  /**
+   * Template method.
+   * <p>
+   * To filled in by sub-classes.
+   */
+  protected abstract JavaPairDStream<String, T> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream);
+
+  protected void planBatches(JavaPairDStream<String, T> calculation) {
     // Closure safety
     val metricId = this.metricId;
     val topics = this.topics;
@@ -88,19 +97,6 @@ public abstract class TopUserJob extends Job {
     } finally {
       pool.getValue().returnObject(producer);
     }
-  }
-
-  /**
-   * Utilities.
-   */
-
-  @SuppressWarnings("unchecked")
-  protected <T extends Event> Function<Event, T> castEvent(Class<T> t) {
-    return event -> (T) event;
-  }
-
-  protected static <T extends Comparable<T>> Comparator<Tuple2<String, T>> valueDescending() {
-    return serialize((a, b) -> a._2.compareTo(b._2));
   }
 
 }

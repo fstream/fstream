@@ -13,10 +13,12 @@ import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.Strings.repeat;
 import static com.google.common.collect.Maps.newHashMap;
+import static io.fstream.analyze.util.SerializableComparator.serialize;
 import static java.util.stream.Collectors.toMap;
 import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.topic.Topic;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,6 +114,14 @@ public abstract class Job {
     val jobId = UPPER_CAMEL.to(LOWER_HYPHEN, getClass().getSimpleName());
 
     return groupId + "-" + jobId;
+  }
+
+  /**
+   * Factory methods - functions.
+   */
+
+  protected static <T extends Comparable<T>> Comparator<Tuple2<String, T>> valueDescending() {
+    return serialize((a, b) -> a._2.compareTo(b._2));
   }
 
   /**
