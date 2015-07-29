@@ -14,6 +14,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,14 +32,15 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class JobExecutorService extends AbstractExecutionThreadService {
 
   /**
    * Dependencies.
    */
-  @Autowired
+  @NonNull
   private JavaStreamingContext streamingContext;
-  @Autowired
+  @NonNull
   private List<Job> jobs;
 
   @PostConstruct

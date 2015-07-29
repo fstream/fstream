@@ -14,12 +14,12 @@ import static io.fstream.analyze.util.SumFunctions.runningSumIntegers;
 import static io.fstream.analyze.util.SumFunctions.sumIntegers;
 import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.analyze.core.JobContext;
+import io.fstream.core.model.definition.Metrics;
 import io.fstream.core.model.event.Trade;
 import lombok.val;
 
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,19 +30,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class TopUserTradesJob extends TopUserJob<Integer> {
 
-  /**
-   * The metric id.
-   */
-  private static final int TOP_USER_TRADES_ID = 11;
-
   @Autowired
   public TopUserTradesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(TOP_USER_TRADES_ID, topics(TRADES), n, jobContext);
+    super(jobContext, Metrics.TOP_USER_TRADES_ID, n, TRADES);
   }
 
   @Override
-  protected JavaPairDStream<String, Integer> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    // Get trade amounts by user
+  protected JavaPairDStream<String, Integer> planCalculation(JavaPairDStream<String, String> kafkaStream) {
+    // Calculate trade amounts by user
     val userTradeAmounts =
         kafkaStream
             .map(parseTrade())

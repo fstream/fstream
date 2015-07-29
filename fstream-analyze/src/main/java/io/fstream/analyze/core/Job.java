@@ -50,13 +50,13 @@ import com.google.common.collect.Lists;
 @RequiredArgsConstructor
 public abstract class Job {
 
-  /** The topics to read from. */
-  @NonNull
-  protected final Set<Topic> topics;
-
   /** Handle to context the job is running in. */
   @NonNull
   protected JobContext jobContext;
+
+  /** The topics to read from. */
+  @NonNull
+  protected final Set<Topic> topics;
 
   public void register() {
     log.info(repeat("-", 100));

@@ -14,9 +14,6 @@ import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.analyze.kafka.KafkaProducer;
 import io.fstream.core.model.topic.Topic;
-
-import java.util.Set;
-
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +26,8 @@ import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Base class of "Top N User by <fact>" calculation jobs.
  */
@@ -37,7 +36,7 @@ import org.springframework.stereotype.Component;
 public abstract class TopUserJob<T extends Comparable<T>> extends Job {
 
   /**
-   * Output metric identifier.
+   * Calculated metric identifier.
    */
   private final int metricId;
 
@@ -46,8 +45,8 @@ public abstract class TopUserJob<T extends Comparable<T>> extends Job {
    */
   private final int n;
 
-  public TopUserJob(int metricId, Set<Topic> topics, int n, JobContext jobContext) {
-    super(topics, jobContext);
+  public TopUserJob(JobContext jobContext, int metricId, int n, Topic... topics) {
+    super(jobContext, ImmutableSet.copyOf(topics));
     this.metricId = metricId;
     this.n = n;
   }
@@ -64,7 +63,7 @@ public abstract class TopUserJob<T extends Comparable<T>> extends Job {
    * <p>
    * To filled in by sub-classes.
    */
-  protected abstract JavaPairDStream<String, T> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream);
+  protected abstract JavaPairDStream<String, T> planCalculation(JavaPairDStream<String, String> kafkaStream);
 
   protected void planBatches(JavaPairDStream<String, T> calculation) {
     // Closure safety

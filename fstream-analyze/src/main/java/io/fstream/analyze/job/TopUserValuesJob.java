@@ -14,11 +14,11 @@ import static io.fstream.analyze.util.SumFunctions.runningSumFloats;
 import static io.fstream.analyze.util.SumFunctions.sumFloats;
 import static io.fstream.core.model.topic.Topic.ORDERS;
 import io.fstream.analyze.core.JobContext;
+import io.fstream.core.model.definition.Metrics;
 import io.fstream.core.model.event.Order;
 import lombok.val;
 
 import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,19 +29,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class TopUserValuesJob extends TopUserJob<Float> {
 
-  /**
-   * The metric id.
-   */
-  private static final int TOP_USER_VALUE_ID = 10;
-
   @Autowired
   public TopUserValuesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(TOP_USER_VALUE_ID, topics(ORDERS), n, jobContext);
+    super(jobContext, Metrics.TOP_USER_VALUE_ID, n, ORDERS);
   }
 
   @Override
-  protected JavaPairDStream<String, Float> planCalculation(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    // Define
+  protected JavaPairDStream<String, Float> planCalculation(JavaPairDStream<String, String> kafkaStream) {
+    // Calculate value by user
     val userValues =
         kafkaStream
             .map(parseOrder())
