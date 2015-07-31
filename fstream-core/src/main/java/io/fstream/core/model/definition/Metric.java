@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Metric extends Definition {
-
+  
   private String statement;
   private String units;
 

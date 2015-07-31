@@ -9,122 +9,49 @@
 
 package io.fstream.analyze.job;
 
-import static io.fstream.analyze.util.Functions.computeIntegerRunningSum;
-import static io.fstream.analyze.util.Functions.parseTrade;
-import static io.fstream.analyze.util.Functions.sumIntegerReducer;
-import static io.fstream.analyze.util.SerializableComparator.serialize;
-import static io.fstream.core.model.topic.Topic.METRICS;
+import static io.fstream.analyze.util.EventFunctions.parseTrade;
+import static io.fstream.analyze.util.SumFunctions.runningSumIntegers;
+import static io.fstream.analyze.util.SumFunctions.sumIntegers;
 import static io.fstream.core.model.topic.Topic.TRADES;
-import io.fstream.analyze.core.Job;
 import io.fstream.analyze.core.JobContext;
-import io.fstream.analyze.kafka.KafkaProducer;
-import io.fstream.core.model.event.MetricEvent;
-import io.fstream.core.model.topic.Topic;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
-import lombok.SneakyThrows;
+import io.fstream.core.model.definition.Metrics;
+import io.fstream.core.model.event.Trade;
 import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.pool2.ObjectPool;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.streaming.Time;
-import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
+import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import scala.Tuple2;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 /**
- * Calculates a running total of all user / order values.
+ * Calculates "Top N Users by Trade" metric.
  */
-@Slf4j
 @Component
-public class TopUserTradesJob extends Job {
-
-  /**
-   * The metric id.
-   */
-  private static final int ID = 11;
-
-  /**
-   * Top N.
-   */
-  private final int n;
+public class TopUserTradesJob extends TopUserJob<Integer> {
 
   @Autowired
   public TopUserTradesJob(JobContext jobContext, @Value("${analyze.n}") int n) {
-    super(topics(TRADES), jobContext);
-    this.n = n;
+    super(jobContext, Metrics.TOP_USER_TRADES_ID, n, TRADES);
   }
 
   @Override
-  protected void plan(JavaPairReceiverInputDStream<String, String> kafkaStream) {
-    analyzeStream(kafkaStream, topics, n, jobContext.getPool());
-  }
-
-  private static void analyzeStream(JavaPairReceiverInputDStream<String, String> kafkaStream,
-      Set<Topic> topics, int n, Broadcast<ObjectPool<KafkaProducer>> pool) {
-    log.info("[{}] Trade count: {}", topics, kafkaStream.count());
-
-    // Get trade amounts by user
+  protected JavaPairDStream<String, Integer> planCalculation(JavaPairDStream<String, String> kafkaStream) {
+    // Calculate trade amounts by user
     val userTradeAmounts =
         kafkaStream
             .map(parseTrade())
-            .flatMapToPair(
-                trade -> ImmutableList.<Tuple2<String, Integer>> of(
-                    new Tuple2<>(trade.getBuyUser(), trade.getAmount()),
-                    new Tuple2<>(trade.getSellUser(), trade.getAmount())))
-            .reduceByKey(sumIntegerReducer())
-            .updateStateByKey(computeIntegerRunningSum());
+            .flatMapToPair(pairUserTradeAmounts())
+            .reduceByKey(sumIntegers())
+            .updateStateByKey(runningSumIntegers());
 
-    // Sort and top
-    userTradeAmounts.foreachRDD((rdd, time) -> {
-      log.info("[{}] Partition count: {}, user count: {}", topics, rdd.partitions().size(), rdd.count());
-      analyzeBatch(rdd, time, n, pool);
-      return null;
-    });
+    return userTradeAmounts;
   }
 
-  @SneakyThrows
-  private static void analyzeBatch(JavaPairRDD<String, Integer> rdd, Time time, int n,
-      Broadcast<ObjectPool<KafkaProducer>> pool) {
-    // Find top N by value descending
-    val tuples = rdd.top(n, userValueDescending());
-
-    // We use a pool here to amortize the cost of the Kafka socket connections over the entire job.
-    val producer = pool.getValue().borrowObject();
-    try {
-      val metric = createMetricEvent(time, tuples);
-
-      log.info("Sending metric: {}...", metric);
-      producer.send(METRICS, metric);
-    } finally {
-      pool.getValue().returnObject(producer);
-    }
-  }
-
-  private static Comparator<Tuple2<String, Integer>> userValueDescending() {
-    return serialize((a, b) -> a._2.compareTo(b._2));
-  }
-
-  private static MetricEvent createMetricEvent(Time time, List<? extends Tuple2<?, ?>> tuples) {
-    val data = Lists.newArrayListWithCapacity(tuples.size());
-    for (val tuple : tuples) {
-      // Will be available downstream for display
-      val record = record("userId", tuple._1, "value", tuple._2);
-      data.add(record);
-    }
-
-    return metric(time, ID, data);
+  private static PairFlatMapFunction<Trade, String, Integer> pairUserTradeAmounts() {
+    return trade -> list(
+        pair(trade.getBuyUser(), trade.getAmount()),
+        pair(trade.getSellUser(), trade.getAmount()));
   }
 
 }
