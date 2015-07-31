@@ -81,8 +81,8 @@ public class HFTAgent extends Agent {
 
   private float decidePrice(Imbalance imbalance, final float bestAsk, final float bestBid) {
     float price;
-    if (imbalance.getSide() == OrderSide.ASK) {
-      // Ask imbalance
+    if (imbalance.getSide() == OrderSide.BID) {
+      // bid imbalance
       price = bestBid + minQuoteSize;
       float spread = Math.round((price - bestBid) * 10) / 10.0f;
       if (spread < minQuoteSize) {
@@ -90,7 +90,7 @@ public class HFTAgent extends Agent {
         price = bestBid;
       }
     } else {
-      // Bid imbalance
+      // ask imbalance
       price = bestAsk - minQuoteSize;
       float spread = Math.round((bestAsk - price) * 10) / 10f;
       if (spread < minQuoteSize) {
