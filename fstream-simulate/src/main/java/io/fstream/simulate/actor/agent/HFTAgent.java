@@ -17,6 +17,7 @@ import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
+import io.fstream.simulate.message.Command;
 import lombok.Value;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,32 @@ public class HFTAgent extends Agent {
   }
 
   @Override
+  public void preStart() {
+    // Trigger "active" behavior
+    scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
+  }
+
+  @Override
   public void onReceive(Object message) throws Exception {
-    if (message instanceof Quote) {
+    if (message instanceof Command) {
+      onReceiveCommand((Command) message);
+    }
+    else if (message instanceof Quote) {
       onReceiveQuote((Quote) message);
     } else if (message instanceof ActiveInstruments) {
       onReceiveActiveInstruments((ActiveInstruments) message);
     }
+  }
+
+  @Override
+  public void executeAction() {
+    if (activeInstruments.isEmpty()) {
+      // Send a message to exchange and then return null and wait for next decision iteration
+      exchange().tell(new ActiveInstruments(), self());
+      return;
+    }
+    Quote quote = getLastQuote(decideSymbol());
+    onReceiveQuote(quote);
   }
 
   @Override
