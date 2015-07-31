@@ -87,7 +87,7 @@ public class HFTAgent extends Agent {
       float spread = Math.round((price - bestBid) * 10) / 10.0f;
       if (spread < minQuoteSize) {
         log.error("Invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestBid, spread);
-        price = bestAsk;
+        price = bestBid;
       }
     } else {
       // Bid imbalance
