@@ -74,10 +74,9 @@ public class Exchange extends BaseActor {
   public void preStart() throws Exception {
     // On market open, initialize quotes to random numbers.
 
-    // TODO remove the hard coding.
     val random = new Random();
-    val minBid = 10;// properties.getMinPrice();
-    val minAsk = 12; // properties.getMaxPrice();
+    val minBid = properties.getMinPrice();
+    val minAsk = properties.getMaxPrice();
     val riskDistance = properties.getRiskDistance();
 
     for (val symbol : activeInstruments) {
