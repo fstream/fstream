@@ -21,8 +21,9 @@
          restrict : 'E',
          scope: {
             symbol: '@'
-         } ,
-         template: '<div class="book-chart-wrapper"></div>',
+         },
+         replace: true,
+         template: '<div class="book-chart-wrapper"></div>',         
          link: function($scope, $element, $attr) {
             window._ = _;
             var chart = new OrderBook.Chart({element: $element[0]});
