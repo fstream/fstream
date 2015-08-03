@@ -1,13 +1,16 @@
 {
    "jwolfe.file-tree-exclude.list": [
+      ".tmp",      
       ".git",
-      ".tmp",
       ".project",
       ".classpath",
       ".settings",
+      ".apt_generated",
+      ".factorypath",
       "node_modules",
       "bower_components",
       "build",
+      "bin",
       "dist",
       "vendor"
    ]
