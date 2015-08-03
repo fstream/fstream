@@ -62,10 +62,10 @@ simulate:
    # Active instruments
    instruments:
       - RY
-      - BMO
-      - TD
-      - BBM
-      - HUF
+      # - BMO
+      # - TD
+      # - BBM
+      # - HUF
       
    # Active brokers
    brokers:
@@ -81,10 +81,10 @@ simulate:
    tickSize: 0.10
    nonPremiumQuoteDelay: 1000 # in milliseconds
    # all securities trade in same range currently
-   minPrice: 10
-   maxPrice: 12
+   minPrice: 8
+   maxPrice: 14
    # risk quote delta. Currently fixed at 5 ticks.
-   riskDistance: 5
+   riskDistance: 10
    
    # Agents - Types
    institutional:
