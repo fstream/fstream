@@ -16,6 +16,7 @@ import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_CANCEL;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.core.model.event.Quote;
@@ -139,9 +140,11 @@ public abstract class Agent extends BaseActor {
   protected void cancelOpenOrdersBySymbol(String symbol) {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
-      // FIXME: Sending unsafe mutation of message
-      symbolOrder.setOrderType(LIMIT_CANCEL);
-      exchange().tell(symbolOrder, self());
+      // clone open order (minimal version necessary for removing from book)
+      Order cancelOrder =
+          new Order(symbolOrder.getDateTime(), symbolOrder.getOid(), symbolOrder.getBrokerId(),
+              symbolOrder.getSymbol(), LIMIT_CANCEL, symbolOrder.getPrice(), symbolOrder.getSide());
+      exchange().tell(cancelOrder, self());
     }
 
     openOrders.getOrders().removeAll(symbol);
