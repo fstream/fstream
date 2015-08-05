@@ -64,15 +64,6 @@
             pageTitle: 'Books',
          }
       })
-      
-      // Streams
-      .state('streams', {
-         url: "/streams",
-         templateUrl: "views/streams.html",
-         data: {
-            pageTitle: 'Streams',
-         }
-      })
 
       // History
       .state('history', {
