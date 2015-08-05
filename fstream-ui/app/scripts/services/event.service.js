@@ -40,7 +40,7 @@
                   publishEvent("trade", frame);
                });
                stompClient.subscribe('/topic/orders', function (frame) {
-                  publishEvent("orders", frame);
+                  publishEvent("order", frame);
                });
                stompClient.subscribe('/topic/quotes', function (frame) {
                   publishEvent("quote", frame);

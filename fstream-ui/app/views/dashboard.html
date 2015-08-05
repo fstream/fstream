@@ -5,7 +5,7 @@
 <aside id="menu" ng-include="'views/common/navigation.html'"></aside>
 
 <!-- Main Wrapper -->
-<div id="wrapper">
+<div id="wrapper" ng-controller="dashboardController">
    <div class="content" animate-panel effect="fadeIn">
       <div class="row">
          <h1><i class="fa fa-dashboard"></i> Dashboard</h1>
@@ -13,16 +13,16 @@
       </div>
       <div class="row">
          <div class="col-lg-3 text-center highlevel-metric">
-            <span id="hl-alerts-metric" class="highlevel-lg-text">0</span>
-            <span class="highlevel-sm-text">Incoming<br>Alerts</span>
+            <span class="highlevel-lg-text">{{ alertCount }}</span>
+            <span class="highlevel-sm-text">Incoming Alerts</span>
          </div>
          <div class="col-lg-3 text-center highlevel-metric">
-            <span id="hl-events-metric" class="highlevel-lg-text">0</span>
-            <span class="highlevel-sm-text">Incoming<br>Events</span>
+            <span class="highlevel-lg-text">{{ eventRate | number:0 }}/s</span>
+            <span class="highlevel-sm-text">Incoming Events</span>
          </div>
          <div class="col-lg-3 text-center highlevel-metric">
-            <span id="hl-time-metric" class="highlevel-lg-text">.00s</span>
-            <span class="highlevel-sm-text">Time<br>Delay</span>
+            <span class="highlevel-lg-text">{{ timeDelay | number:2 }} s</span>
+            <span class="highlevel-sm-text">Time Delay</span>
          </div>
       </div>
       <div class="row">
@@ -30,52 +30,40 @@
       </div>
       <div class="row">
          <div class="col-sm-3 text-center app" ui-sref="charts">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-line-chart fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-line-chart fa-1x"></i></span>
             <br>
             <span class="app-text">CHARTS</span>
          </div>
          <div class="col-xs-6 col-sm-3  text-center app" ui-sref="streams">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-arrow-right fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-arrow-right fa-1x"></i></span>
             <br>
             <span class="app-text">STREAMS</span>
          </div>
          <div class="col-xs-6 col-sm-3  text-center app" ui-sref="books">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-book fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-book fa-1x"></i></span>
             <br>
             <span class="app-text">BOOKS</span>
          </div>         
          <div class="col-xs-6 col-sm-3  text-center app" ui-sref="alerts">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-exclamation-triangle fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-exclamation-triangle fa-1x"></i></span>
             <br>
             <span class="app-text">ALERTS</span>
          </div>
          <div class="col-xs-6 col-sm-3  text-center app" ui-sref="history">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-clock-o fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-clock-o fa-1x"></i></span>
             <br>
             <span class="app-text">HISTORY</span>
          </div>
          <div class="col-lg-6 text-center app" ui-sref="admin">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-cogs fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-cogs fa-1x"></i></span>
             <br>
             <span class="app-text">ADMIN</span>
          </div>
          <div class="col-lg-6 text-center app" ui-sref="analytics">
-            <span id="hl-alerts-metric" class="highlevel-lg-text"><i class="fa fa-search fa-1x"></i></span>
+            <span class="highlevel-lg-text"><i class="fa fa-search fa-1x"></i></span>
             <br>
             <span class="app-text">ANALYTICS</span>
          </div>         
       </div>
-
-      <script type="application/javascript">
-         setInterval(function () {
-            $("#hl-alerts-metric").text(Math.round(140 + Math.random() * 50) + "");
-         }, 1000 + Math.random() * 1000);
-         setInterval(function () {
-            $("#hl-events-metric").text(Math.round(350 + Math.random() * 50) + "");
-         }, 1000 + Math.random() * 1000);
-         setInterval(function () {
-            $("#hl-time-metric").text(((Math.random() * 1).toFixed(2) + "s").substring(1));
-         }, 500 + Math.random() * 1000);
-      </script>
    </div>
 </div>

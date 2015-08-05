@@ -25,6 +25,7 @@
          replace: true,
          template: '<div class="book-chart-wrapper"></div>',         
          link: function($scope, $element, $attr) {
+            // TODO: Fix
             window._ = _;
             var chart = new OrderBook.Chart({element: $element[0]});
             
