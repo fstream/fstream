@@ -18,6 +18,7 @@ import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.ActiveInstruments;
 import io.fstream.simulate.message.Command;
+import io.fstream.simulate.message.SubscriptionQuoteRequest;
 import lombok.Value;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class HFTAgent extends Agent {
 
   @Override
   public void preStart() {
+    super.preStart();
     // Trigger "active" behavior
     scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
   }
@@ -44,9 +46,13 @@ public class HFTAgent extends Agent {
       onReceiveCommand((Command) message);
     }
     else if (message instanceof Quote) {
+      super.onReceiveQuote((Quote) message);
       onReceiveQuote((Quote) message);
     } else if (message instanceof ActiveInstruments) {
       onReceiveActiveInstruments((ActiveInstruments) message);
+    }
+    else if (message instanceof SubscriptionQuoteRequest) {
+      onReceiveSubscriptionQuote((SubscriptionQuoteRequest) message);
     }
   }
 
@@ -63,7 +69,6 @@ public class HFTAgent extends Agent {
 
   @Override
   protected void onReceiveQuote(Quote quote) {
-    super.onReceiveQuote(quote);
 
     val imbalance = getImbalance(quote);
     val order = isNormal(quote, imbalance) ?
@@ -102,9 +107,12 @@ public class HFTAgent extends Agent {
 
   private float decidePrice(Imbalance imbalance, final float bestAsk, final float bestBid) {
     float price;
+    // speeds up how fast prices can narrow to min spread.
+    // TODO should be a property if permanent. This is a temp. fix.
+    int narrowingIncrement = 5;
     if (imbalance.getSide() == OrderSide.BID) {
       // bid imbalance
-      price = bestBid + minQuoteSize;
+      price = bestBid + (minQuoteSize * narrowingIncrement);
       float spread = Math.round((price - bestBid) * 10) / 10.0f;
       if (spread < minQuoteSize) {
         log.error("Invalid spread/ask ask = {}, bid = {}, spread = {}. rejecting", price, bestBid, spread);
@@ -112,7 +120,7 @@ public class HFTAgent extends Agent {
       }
     } else {
       // ask imbalance
-      price = bestAsk - minQuoteSize;
+      price = bestAsk - (minQuoteSize * narrowingIncrement);
       float spread = Math.round((bestAsk - price) * 10) / 10f;
       if (spread < minQuoteSize) {
         log.error("Invalid spread/bid ask = {}, bid = {}, spread = {}. rejecting", bestAsk, price, spread);
