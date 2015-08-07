@@ -14,7 +14,7 @@ import io.fstream.web.service.HistoryService;
 
 import java.util.List;
 
-import org.influxdb.dto.Serie;
+import org.influxdb.dto.QueryResult.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +29,7 @@ public class HistoryController {
   HistoryService historyService;
 
   @RequestMapping(method = GET)
-  public @ResponseBody List<Serie> getState(@RequestParam("query") String query) {
+  public @ResponseBody List<Result> getState(@RequestParam("query") String query) {
     return historyService.executeQuery(query);
   }
 

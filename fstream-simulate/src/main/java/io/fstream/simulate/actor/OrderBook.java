@@ -252,7 +252,7 @@ public class OrderBook extends BaseActor {
     val latency = calculateLatency(active.getDateTime(), trade.getDateTime());
     val delayed = latency > 5;
     if (delayed) {
-      log.warn("Order took more than 5 seconds to be processed {}", active);
+      log.warn("Order took more than 5 seconds to be processed {}. {} s", active, latency);
     }
   }
 

@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
+import lombok.val;
 
 import org.influxdb.InfluxDB;
-import org.influxdb.dto.Serie;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,8 +42,11 @@ public class HistoryService {
   @Autowired
   private InfluxDB influxDb;
 
-  public List<Serie> executeQuery(@NonNull String query) {
-    return influxDb.query(databaseName, query, PRECISION);
+  public List<Result> executeQuery(@NonNull String text) {
+    val query = new Query(text, databaseName);
+    val result = influxDb.query(query, PRECISION);
+
+    return result.getResults();
   }
 
 }

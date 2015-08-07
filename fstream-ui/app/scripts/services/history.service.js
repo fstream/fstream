@@ -22,20 +22,18 @@
          getMetrics: getMetrics,
          getLastMetric: getLastMetric,
          getAlerts: getAlerts,
+         getHistory: getHistory,
          getTicks: getTicks,
-         getHistory: getHistory
+         getTrades: getTrades,
+         getOrders: getOrders,
+         getQuotes: getQuotes
       };
 
       return service;
 
       function getSymbols() {
-         return executeQuery('LIST SERIES').then(function (result) {
-            return _.compact(_.map(result, function (series) {
-               var match = /^quotes\.([^.]+)/.exec(series.name);
-               return match && {
-                  name: match[1]
-               };
-            }));
+         return executeQuery('SHOW TAG VALUES FROM quotes WITH KEY = symbol', function (result) {
+            return _.get(result, 'data[0].series[0].values[0]');
          });
       }
 
@@ -69,30 +67,33 @@
       }
 
       function getTicks(params) {
-         var series = getSeries(params);
+         var series = params.interval ? 'quotes_1' + params.interval : 'quotes'
          var where = getWhere(params, ['time']);
          var limit = 1000;
          var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit;
 
          return executeQuery(query);
       }
+      
+      function getTrades(params) {
+         return getHistory('trades', params);
+      }
+      
+      function getOrders(params) {
+         return getHistory('orders', params);
+      }      
+      
+      function getQuotes(params) {
+         return getHistory('quotes', params);
+      }      
 
-      function getHistory(params) {
+      function getHistory(series, params) {
          params = params || {};
-         var series = 'quotes';
          var where = getWhere(params, ['time', 'symbol']);
-         var groupBy = 'symbol';
          var limit = getLimit(params);
-         var query = 'SELECT * FROM "' + series + '" ' + where + ' GROUP BY ' + groupBy + ' LIMIT ' + limit;
+         var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit;
 
          return executeQuery(query);
-      }
-
-      function getSeries(params) {
-         var prefix = params.interval ? 'rollups.1' + params.interval + '.' : ''
-         var suffix = params.symbol ? 'quotes.' + params.symbol : 'quotes';
-
-         return prefix + suffix;
       }
 
       function getWhere(params, columns) {
@@ -124,9 +125,25 @@
       }
 
       function transformPoints(result) {
-         var data = _.get(result, 'data[0]', {});
-
-         return data.rows;
+         var data = _.get(result, 'data[0].series[0]', {columns:[], tags:{}, values: []});
+         
+         var points = [];
+         if (data == null) {
+            return points;
+         }
+        
+         for (var i = 0; i < data.values.length; i++) {
+            var values = data.values[i];
+            
+            var point = {};
+            for(var j = 0; j < data.columns.length; j++) {
+               point[data.columns[j]] = values[j];
+            }
+            
+            points.push(_.assign(point, data.tags));
+         }
+         
+         return points;
       }
    }
 })();

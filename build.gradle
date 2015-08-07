@@ -30,7 +30,7 @@ buildscript {
 		hbaseVersion       = '1.0.0-cdh5.4.3'
 		hadoopVersion      = '2.6.0-cdh5.4.3'
 		
-		influxdbVersion    = '1.5'
+		influxdbVersion    = '2.0-SNAPSHOT'
 	
 		camelVersion       = '2.15.2'
 		esperVersion       = '4.11.0'
