@@ -295,9 +295,9 @@ public class OrderBook extends BaseActor {
     getBookSide(order).addOrder(order);
 
     // Set best price and depth attributes
-    if (order.getSide() == ASK && (asks.getDepth() == 0 || order.getPrice() < bestAsk)) {
+    if (order.getSide() == ASK && (bestAsk == 0 || asks.getDepth() == 0 || order.getPrice() < bestAsk)) {
       bestAsk = order.getPrice();
-    } else if (order.getSide() == BID && (bids.getDepth() == 0 || order.getPrice() > bestBid)) {
+    } else if (order.getSide() == BID && (bestBid == 0 || bids.getDepth() == 0 || order.getPrice() > bestBid)) {
       bestBid = order.getPrice();
     }
 
