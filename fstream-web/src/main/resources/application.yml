@@ -10,8 +10,12 @@
 # Profile Activation
 ###############################################################################
 
+# Available profiles:
+# - kafka
+# - development
+
 # Profiles
-spring.profiles.active:
+spring.profiles.active: kafka
 
 ###############################################################################
 # Profile - common

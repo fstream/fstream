@@ -16,7 +16,8 @@ import io.fstream.core.util.Codec;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Setter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,17 +29,16 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class StateListenerService implements StateListener {
 
   /**
    * Dependencies.
    */
-  @Setter
-  @Autowired
-  protected StateService stateService;
-  @Setter
-  @Autowired
-  protected SimpMessagingTemplate template;
+  @NonNull
+  private final StateService stateService;
+  @NonNull
+  private final SimpMessagingTemplate template;
 
   @PostConstruct
   @SneakyThrows

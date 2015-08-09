@@ -9,6 +9,7 @@
 
 package io.fstream.core.config;
 
+import static java.util.Collections.disjoint;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import io.fstream.core.model.state.State;
 import io.fstream.core.service.StateService;
@@ -17,6 +18,7 @@ import io.fstream.core.util.ZooKeepers;
 
 import java.util.List;
 
+import lombok.NonNull;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +29,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 
+import com.google.common.collect.ImmutableList;
+
 @Slf4j
 public class CoreConfig {
 
@@ -34,7 +38,7 @@ public class CoreConfig {
    * Configuration.
    */
   @Value("#{environment.getActiveProfiles()}")
-  List<String> activeProfiles;
+  private List<String> activeProfiles;
 
   /**
    * Dependencies.
@@ -43,6 +47,13 @@ public class CoreConfig {
   protected State state;
   @Autowired
   protected StateService stateService;
+
+  @EventListener
+  public void start(ApplicationReadyEvent ready) {
+    log.info("");
+    log.info("Active profiles: {}", activeProfiles);
+    log.info("");
+  }
 
   @Bean
   @ConditionalOnExpression("false")
@@ -56,11 +67,13 @@ public class CoreConfig {
     return zkPort;
   }
 
-  @EventListener
-  public void start(ApplicationReadyEvent ready) {
-    log.info("");
-    log.info("Active profiles: {}", activeProfiles);
-    log.info("");
+  @NonNull
+  protected boolean isProfilesActive(String... profiles) {
+    return containsAny(activeProfiles, profiles);
+  }
+
+  private boolean containsAny(List<String> list, String[] values) {
+    return !disjoint(list, ImmutableList.copyOf(values));
   }
 
 }
