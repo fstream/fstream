@@ -38,7 +38,7 @@
       <!-- Results -->
       <div class="row m-t">
          <h2>Trades</h2>
-         <table datatable="ng" class="table table-striped table-hover">
+         <table ng-table="history.trades.options" class="table table-striped table-hover">
             <thead>
                <tr>
                   <th>Time</th>
@@ -52,7 +52,7 @@
                </tr>
             </thead>
             <tbody>
-               <tr ng-repeat="trade in history.trades">
+               <tr ng-repeat="trade in $data">
                   <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(trade.time)">{{ trade.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
                   <td>OANDA</td>
                   <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(trade.symbol)">{{ trade.symbol }}</a></td>
@@ -67,7 +67,7 @@
       </div>
       <div class="row m-t">
          <h2>Orders</h2>
-         <table datatable="ng" class="table table-striped table-hover">
+         <table ng-table="history.orders.options" class="table table-striped table-hover">
             <thead>
                <tr>
                   <th>Time</th>
@@ -83,7 +83,7 @@
                </tr>
             </thead>
             <tbody>
-               <tr ng-repeat="order in history.orders">
+               <tr ng-repeat="order in $data">
                   <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(order.time)">{{ order.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
                   <td>{{ order.brokerId }}</td>
                   <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(order.symbol)">{{ order.symbol }}</a></td>
@@ -100,7 +100,7 @@
       </div>      
       <div class="row m-t">
          <h2>Quotes</h2>
-         <table datatable="ng" class="table table-striped table-hover">
+         <table ng-table="history.quotes.options" class="table table-striped table-hover">
             <thead>
                <tr>
                   <th>Time</th>
@@ -111,7 +111,7 @@
                </tr>
             </thead>
             <tbody>
-               <tr ng-repeat="quote in history.quotes">
+               <tr ng-repeat="quote in $data">
                   <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(quote.time)">{{ quote.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
                   <td>TSX</td>
                   <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(quote.symbol)">{{ quote.symbol }}</a></td>

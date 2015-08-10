@@ -91,9 +91,20 @@
          params = params || {};
          var where = getWhere(params, ['time', 'symbol']);
          var limit = getLimit(params);
-         var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit;
-
-         return executeQuery(query);
+         var offset = getOffset(params);
+         var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit + ' OFFSET ' + offset;
+         var column = series === 'quotes' ? 'ask' : 'amount';
+         
+         return executeQuery('SELECT COUNT(' + column + ') FROM "' + series + '" ' + where).then(function(count){
+            return executeQuery(query).then(function(history){
+               return {
+                  start: offset,
+                  size: limit,
+                  count: count && count.length ? count[0].count : 0,
+                  rows: history
+               };
+            });
+         });
       }
 
       function getWhere(params, columns) {
@@ -116,6 +127,10 @@
 
       function getLimit(params) {
          return params.limit || 50;
+      }
+      
+      function getOffset(params) {
+         return params.offset || 0;
       }
 
       function executeQuery(query, transformer) {

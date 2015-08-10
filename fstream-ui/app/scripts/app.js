@@ -24,6 +24,7 @@
       'ui.calendar',              // UI Calendar
       'summernote',               // Summernote plugin
       'ngGrid',                   // Angular ng Grid
+      'ngTable',
       'ui.tree',                  // Angular ui Tree
       'bm.bsTour',                // Angular bootstrap tour
       'datatables',               // Angular datatables plugin

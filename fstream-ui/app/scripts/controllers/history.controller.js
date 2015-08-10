@@ -14,10 +14,10 @@
       .module('fstream')
       .controller('historyController', historyController);
 
-   historyController.$inject = ['$scope', '$filter', 'lodash', 'historyService'];
+   historyController.$inject = ['$scope', '$filter', 'lodash', 'ngTableParams', 'historyService'];
 
-   function historyController($scope, $filter, _, historyService) {
-      $scope.history = {};
+   function historyController($scope, $filter, _, ngTableParams, historyService) {
+      $scope.history = {trades:{}, orders:{}, quotes:{}};
       $scope.updateHistory = updateHistory;
       $scope.updateTimeRange = updateTimeRange;
       $scope.updateSymbol = updateSymbol;
@@ -37,13 +37,24 @@
             var params = {
                symbol: _.get($scope, 'symbols.selected[0].name'),
                startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
-               endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1,
-               limit: 10
+               endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
             }
 
-            historyService.getHistory(type, params).then(function (history) {
-               $scope.history[type] = history;
-            });
+            $scope.history[type].options = new ngTableParams({
+                  page: 1,            
+                  count: 10,          
+                  sorting: {
+                      time: 'asc'     
+                  }
+              }, {
+                  total: 0,
+                  getData: function($defer, table) {
+                     historyService.getHistory(type, _.assign(params, {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
+                        table.total(result.count);
+                        $defer.resolve(result.rows);
+                     });
+                  }
+              });
          });
       }
 

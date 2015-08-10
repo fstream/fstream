@@ -172,6 +172,10 @@
             historyService.getMetrics({
                id: $scope.options.id
             }).then(function (metrics) {
+               if (!metrics.length) {
+                  return
+               }
+               
                var sorted = _.sortBy(metrics, 'time');
 
                var values = _.map(sorted, function (value) {
