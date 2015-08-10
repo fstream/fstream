@@ -14,7 +14,10 @@ import io.fstream.web.service.HistoryService;
 
 import java.util.List;
 
-import org.influxdb.dto.Serie;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import org.influxdb.dto.QueryResult.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +26,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/history")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class HistoryController {
 
-  @Autowired
-  HistoryService historyService;
+  /**
+   * Dependencies.
+   */
+  @NonNull
+  private final HistoryService historyService;
 
   @RequestMapping(method = GET)
-  public @ResponseBody List<Serie> getState(@RequestParam("query") String query) {
+  public @ResponseBody List<Result> getState(@RequestParam("query") String query) {
     return historyService.executeQuery(query);
   }
 

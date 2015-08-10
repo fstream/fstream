@@ -14,9 +14,10 @@
       .module('fstream')
       .controller('historyController', historyController);
 
-   historyController.$inject = ['$scope', '$filter', 'historyService'];
+   historyController.$inject = ['$scope', '$filter', 'lodash', 'ngTableParams', 'historyService'];
 
-   function historyController($scope, $filter, historyService) {
+   function historyController($scope, $filter, _, ngTableParams, historyService) {
+      $scope.history = {trades:{}, orders:{}, quotes:{}};
       $scope.updateHistory = updateHistory;
       $scope.updateTimeRange = updateTimeRange;
       $scope.updateSymbol = updateSymbol;
@@ -28,18 +29,32 @@
 
       function activate() {
          updateHistory();
-         getAvailableSymbols();
+         updateAvailableSymbols();
       }
 
       function updateHistory() {
-         var params = {
-            symbol: $scope.symbols.selected.length && $scope.symbols.selected[0].name,
-            startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
-            endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
-         }
+         ['trades', 'orders', 'quotes'].forEach(function(type){
+            var params = {
+               symbol: _.get($scope, 'symbols.selected[0].name'),
+               startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
+               endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
+            }
 
-         historyService.getHistory(params).then(function (history) {
-            $scope.history = history;
+            $scope.history[type].options = new ngTableParams({
+                  page: 1,            
+                  count: 10,          
+                  sorting: {
+                      time: 'asc'     
+                  }
+              }, {
+                  total: 0,
+                  getData: function($defer, table) {
+                     historyService.getHistory(type, _.assign(params, {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
+                        table.total(result.count);
+                        $defer.resolve(result.rows);
+                     });
+                  }
+              });
          });
       }
 
@@ -55,9 +70,13 @@
          };
       }
 
-      function getAvailableSymbols() {
+      function updateAvailableSymbols() {
          historyService.getSymbols().then(function (symbols) {
-            $scope.availableSymbols = symbols;
+            $scope.availableSymbols = _.map(_.union(symbols, $scope.state.symbols), function(name) {
+               return {
+                  name: name
+               };
+            });
          });
       }
    }

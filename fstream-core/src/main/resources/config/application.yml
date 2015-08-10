@@ -38,7 +38,7 @@ influxdb:
    password: root
    port: 8086
    host: localhost
-   database: fstream-events
+   database: fstream
    url: http://${influxdb.host}:${influxdb.port}
 
 # State     

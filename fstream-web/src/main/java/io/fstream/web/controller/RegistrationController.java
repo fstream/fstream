@@ -12,7 +12,8 @@ package io.fstream.web.controller;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.state.State;
 import io.fstream.core.service.StateService;
-import lombok.Setter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,14 +24,14 @@ import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RegistrationController {
 
   /**
    * Dependencies.
    */
-  @Setter
-  @Autowired
-  protected StateService stateService;
+  @NonNull
+  private final StateService stateService;
 
   @MessageMapping("/register")
   @SendTo("/topic/state")
