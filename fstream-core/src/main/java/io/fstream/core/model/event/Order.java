@@ -51,18 +51,6 @@ public class Order extends AbstractEvent {
     this.userId = userId;
   }
 
-  // minimal order to cancel existing order in book.
-  public Order(@NonNull DateTime time, int oid, String brokerId, @NonNull String symbol, @NonNull OrderType type,
-      float price, @NonNull OrderSide side) {
-    super(time);
-    this.oid = oid;
-    this.brokerId = brokerId;
-    this.symbol = symbol;
-    this.orderType = type;
-    this.price = price;
-    this.side = side;
-  }
-
   @Override
   public EventType getType() {
     return ORDER;
