@@ -141,7 +141,7 @@ public class OrderBook extends BaseActor {
     } else {
       checkState(false);
     }
-
+    updateQuote();
     if (properties.isValidate()) {
       validate();
     }
@@ -214,8 +214,6 @@ public class OrderBook extends BaseActor {
       }
     }
 
-    updateQuote();
-
     return unfilledSize;
   }
 
@@ -252,7 +250,7 @@ public class OrderBook extends BaseActor {
     val latency = calculateLatency(active.getDateTime(), trade.getDateTime());
     val delayed = latency > 5;
     if (delayed) {
-      log.warn("Order took more than 5 seconds to be processed {}", active);
+      log.debug("Order took more than 5 seconds to be processed {}", active);
     }
   }
 
@@ -266,7 +264,7 @@ public class OrderBook extends BaseActor {
     val prevBestBid = bestBid;
     bestBid = bids.getBestPrice();
 
-    if (bestBid == 0 && bestAsk == 0) {
+    if (bestBid == 0 || bestAsk == 0) {
       return; // no quote.
     }
 
@@ -294,12 +292,6 @@ public class OrderBook extends BaseActor {
   private void insertOrder(Order order) {
     getBookSide(order).addOrder(order);
 
-    // Set best price and depth attributes
-    if (order.getSide() == ASK && (bestAsk == 0 || asks.getDepth() == 0 || order.getPrice() < bestAsk)) {
-      bestAsk = order.getPrice();
-    } else if (order.getSide() == BID && (bestBid == 0 || bids.getDepth() == 0 || order.getPrice() > bestBid)) {
-      bestBid = order.getPrice();
-    }
 
     val latency = calculateLatency(order.getProcessedTime(), order.getDateTime());
     val delayed = latency > 5;
@@ -317,6 +309,7 @@ public class OrderBook extends BaseActor {
   private boolean cancelOrder(Order order) {
     val removed = getBookSide(order).removeOrder(order);
     if (!removed) {
+      log.debug("Uncancelled order {}", order);
       return false;
     }
 
