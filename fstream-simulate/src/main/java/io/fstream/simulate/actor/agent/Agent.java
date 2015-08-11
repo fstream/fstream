@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
-import static io.fstream.core.model.event.Order.OrderType.LIMIT_CANCEL;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.fstream.core.model.event.Order;
@@ -35,9 +34,13 @@ import java.util.Map;
 import java.util.Random;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
+
+import org.joda.time.DateTime;
+
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -137,13 +140,15 @@ public abstract class Agent extends BaseActor {
   /**
    * Cancels all open orders for the given symbol
    */
+  @SneakyThrows
   protected void cancelOpenOrdersBySymbol(String symbol) {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
       // clone open order (minimal version necessary for removing from book)
       Order cancelOrder =
-          new Order(symbolOrder.getDateTime(), symbolOrder.getOid(), symbolOrder.getBrokerId(),
-              symbolOrder.getSymbol(), LIMIT_CANCEL, symbolOrder.getPrice(), symbolOrder.getSide());
+          new Order(symbolOrder.getSide(), OrderType.LIMIT_CANCEL, DateTime.now(), symbolOrder.getOid(),
+              symbolOrder.getBrokerId(), symbolOrder.getSymbol(), symbolOrder.getAmount(), symbolOrder.getPrice(),
+              symbolOrder.getUserId());
       exchange().tell(cancelOrder, self());
     }
 

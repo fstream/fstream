@@ -37,7 +37,7 @@ public class HFTAgent extends Agent {
   public void preStart() {
     super.preStart();
     // Trigger "active" behavior
-    scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
+    // scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
   }
 
   @Override
@@ -80,6 +80,7 @@ public class HFTAgent extends Agent {
         return;
       }
     }
+
     // Cancel any existing orders in the book
     cancelOpenOrdersBySymbol(order.getSymbol());
     // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
