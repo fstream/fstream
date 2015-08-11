@@ -62,10 +62,10 @@ simulate:
    # Active instruments
    instruments:
       - RY
-      # - BMO
-      # - TD
-      # - BBM
-      # - HUF
+      - BMO
+      - TD
+      - BBM
+      - HUF
       
    # Active brokers
    brokers:
@@ -91,7 +91,7 @@ simulate:
       probBuy: 0.49
       probMarket: 0.10
       probBestPrice: 0.30
-      probCancel: 0.50 # probabilty of existing order canceled and replaced with new one
+      probCancel: 0.25 # probabilty of existing order canceled and replaced with new one
       maxTradeSize: 5000
       minSleep: 1000 # in millis
       maxSleep: 2500 # in millis
@@ -111,7 +111,7 @@ simulate:
       probBuy: 0.49
       probMarket: 0.69
       probBestPrice: 0.19
-      probCancel: 1.0 # probabilty of existing order canceled and replaced with new one
+      probCancel: 0.75 # probabilty of existing order canceled and replaced with new one
       maxTradeSize: 10000
       maxSleep: 1000 # in millis
       minSleep: 100 # in millis

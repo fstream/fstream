@@ -20,6 +20,7 @@ import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.actor.BaseActor;
+import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.config.SimulateProperties.AgentProperties;
 import io.fstream.simulate.message.ActiveInstruments;
@@ -38,9 +39,6 @@ import lombok.SneakyThrows;
 import lombok.val;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
-
-import org.joda.time.DateTime;
-
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -146,7 +144,8 @@ public abstract class Agent extends BaseActor {
     for (val symbolOrder : symbolOrders) {
       // clone open order (minimal version necessary for removing from book)
       Order cancelOrder =
-          new Order(symbolOrder.getSide(), OrderType.LIMIT_CANCEL, DateTime.now(), symbolOrder.getOid(),
+          new Order(symbolOrder.getSide(), OrderType.LIMIT_CANCEL, Exchange.getSimulationTime(),
+              symbolOrder.getOid(),
               symbolOrder.getBrokerId(), symbolOrder.getSymbol(), symbolOrder.getAmount(), symbolOrder.getPrice(),
               symbolOrder.getUserId());
       exchange().tell(cancelOrder, self());

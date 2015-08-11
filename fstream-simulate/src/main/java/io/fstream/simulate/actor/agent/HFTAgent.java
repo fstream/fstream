@@ -69,6 +69,10 @@ public class HFTAgent extends Agent {
 
   @Override
   protected void onReceiveQuote(Quote quote) {
+    // if quote is older than 10ms ignore.
+    if ((Exchange.getSimulationTime().getMillis() - quote.getDateTime().getMillis()) > 10) {
+      return;
+    }
 
     val imbalance = getImbalance(quote);
     val order = isNormal(quote, imbalance) ?
@@ -103,14 +107,14 @@ public class HFTAgent extends Agent {
     val price = decidePrice(imbalance, bestAsk, bestBid);
 
     return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(), getMaxTradeSize(), price, name);
+        quote.getSymbol(), decideAmount(), price, name);
   }
 
   private float decidePrice(Imbalance imbalance, final float bestAsk, final float bestBid) {
     float price;
     // speeds up how fast prices can narrow to min spread.
     // TODO should be a property if permanent. This is a temp. fix.
-    int narrowingIncrement = 5;
+    int narrowingIncrement = 3;
     if (imbalance.getSide() == OrderSide.BID) {
       // bid imbalance
       price = bestBid + (minQuoteSize * narrowingIncrement);
@@ -174,7 +178,7 @@ public class HFTAgent extends Agent {
     }
 
     return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
-        quote.getSymbol(), getMaxTradeSize(), price, name);
+        quote.getSymbol(), decideAmount(), price, name);
   }
 
   private float generateBestBid(Quote quote) {
