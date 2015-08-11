@@ -11,7 +11,7 @@
          <h1><i class="fa fa-clock-o"></i> History</h1>
          <p class="lead">Showing events in the selected time range</p>
       </div>
-      
+
       <div class="row history-form">
          <form class="form-inline">
             <div class="form-group">
@@ -34,92 +34,113 @@
             <button type="submit" class="btn btn-outline btn-success" ng-click="updateHistory()">Search</button>
          </form>
       </div>
-      
+
       <!-- Results -->
       <div class="row m-t">
          <h2>Trades</h2>
-         <table ng-table="history.trades.options" class="table table-striped table-hover">
-            <thead>
-               <tr>
-                  <th>Time</th>
-                  <th>Broker</th>
-                  <th>Symbol</th>
-                  <th>Amount</th>
-                  <th>Price</th>
-                  <th>Buy User</th>
-                  <th>Sell User</th>
-                  <th>Active Buy?</th>
-               </tr>
-            </thead>
-            <tbody>
-               <tr ng-repeat="trade in $data">
-                  <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(trade.time)">{{ trade.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
-                  <td>OANDA</td>
-                  <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(trade.symbol)">{{ trade.symbol }}</a></td>
-                  <td class="text-right">{{ trade.amount | number }}</td>
-                  <td class="text-right">{{ trade.price | number:4 }}</td>
-                  <td>{{ trade.buyUser }}</td>
-                  <td>{{ trade.sellUser }}</td>
-                  <td class="text-center"><i class="fa fa-check" ng-if="trade.activeBuy"></i></td>
-               </tr>
-            </tbody>
-         </table>
+         <div class="hpanel">
+            <div class="panel-body">
+               <table ng-table="history.trades.options" class="table table-striped table-hover">
+                  <thead>
+                     <tr>
+                        <th>Time</th>
+                        <th>Broker</th>
+                        <th>Symbol</th>
+                        <th>Amount</th>
+                        <th>Price</th>
+                        <th>Buy User</th>
+                        <th>Sell User</th>
+                        <th>Active Buy?</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="trade in $data">
+                        <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(trade.time)">{{ trade.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
+                        <td>OANDA</td>
+                        <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(trade.symbol)">{{ trade.symbol }}</a></td>
+                        <td class="text-right">{{ trade.amount | number }}</td>
+                        <td class="text-right">{{ trade.price | number:4 }}</td>
+                        <td>{{ trade.buyUser }}</td>
+                        <td>{{ trade.sellUser }}</td>
+                        <td class="text-center"><i class="fa fa-check" ng-if="trade.activeBuy"></i></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="panel-footer">
+               Total - <b>{{ history.trades.options.total() | number }}</b> trades
+            </div>
+         </div>
       </div>
       <div class="row m-t">
          <h2>Orders</h2>
-         <table ng-table="history.orders.options" class="table table-striped table-hover">
-            <thead>
-               <tr>
-                  <th>Time</th>
-                  <th>Broker</th>
-                  <th>Symbol</th>
-                  <th>Amount</th>
-                  <th>Price</th>
-                  <th>ID</th>
-                  <th>User ID</th>
-                  <th>Type</th>
-                  <th>Side</th>
-                  <th>Processed Time</th>
-               </tr>
-            </thead>
-            <tbody>
-               <tr ng-repeat="order in $data">
-                  <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(order.time)">{{ order.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
-                  <td>{{ order.brokerId }}</td>
-                  <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(order.symbol)">{{ order.symbol }}</a></td>
-                  <td>{{ order.amount | number }}</td>
-                  <td class="text-right">{{ order.price | number:4 }}</td>
-                  <td>{{ order.oid }}</td>
-                  <td>{{ order.userId }}</td>
-                  <td>{{ order.orderType }}</td>
-                  <td>{{ order.side }}</td>
-                  <td>{{ order.processedTime | date:'yyyy-MM-dd HH:mm:ss:sss'}}</td>
-               </tr>
-            </tbody>
-         </table>
+         <div class="hpanel">
+            <div class="panel-body">
+               <table ng-table="history.orders.options" class="table table-striped table-hover">
+                  <thead>
+                     <tr>
+                        <th>Time</th>
+                        <th>Broker</th>
+                        <th>Symbol</th>
+                        <th>Amount</th>
+                        <th>Price</th>
+                        <th>ID</th>
+                        <th>User ID</th>
+                        <th>Type</th>
+                        <th>Side</th>
+                        <th>Processed Time</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="order in $data">
+                        <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(order.time)">{{ order.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
+                        <td>{{ order.brokerId }}</td>
+                        <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(order.symbol)">{{ order.symbol }}</a></td>
+                        <td>{{ order.amount | number }}</td>
+                        <td class="text-right">{{ order.price | number:4 }}</td>
+                        <td>{{ order.oid }}</td>
+                        <td>{{ order.userId }}</td>
+                        <td>{{ order.orderType }}</td>
+                        <td>{{ order.side }}</td>
+                        <td>{{ order.processedTime | date:'yyyy-MM-dd HH:mm:ss:sss'}}</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="panel-footer">
+               Total - <b>{{ history.orders.options.total() | number  }}</b> orders
+            </div>
+         </div>
       </div>      
       <div class="row m-t">
          <h2>Quotes</h2>
-         <table ng-table="history.quotes.options" class="table table-striped table-hover">
-            <thead>
-               <tr>
-                  <th>Time</th>
-                  <th>Exchange</th>
-                  <th>Symbol</th>
-                  <th>Ask</th>
-                  <th>Bid</th>
-               </tr>
-            </thead>
-            <tbody>
-               <tr ng-repeat="quote in $data">
-                  <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(quote.time)">{{ quote.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
-                  <td>TSX</td>
-                  <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(quote.symbol)">{{ quote.symbol }}</a></td>
-                  <td class="text-right">{{ quote.ask | number:4 }}</td>
-                  <td class="text-right">{{ quote.bid | number:4 }}</td>
-               </tr>
-            </tbody>
-         </table>
+         <div class="hpanel">
+            <div class="panel-body">
+               <table ng-table="history.quotes.options" class="table table-striped table-hover">
+                  <thead>
+                     <tr>
+                        <th>Time</th>
+                        <th>Exchange</th>
+                        <th>Symbol</th>
+                        <th>Ask</th>
+                        <th>Bid</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="quote in $data">
+                        <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(quote.time)">{{ quote.time | date:'yyyy-MM-dd HH:mm:ss:sss' }}</a></td>
+                        <td>TSX</td>
+                        <td><a ng-href="#"  class="hover-link" ng-click="updateSymbol(quote.symbol)">{{ quote.symbol }}</a></td>
+                        <td class="text-right">{{ quote.ask | number:4 }}</td>
+                        <td class="text-right">{{ quote.bid | number:4 }}</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="panel-footer">
+               Total - <b>{{ history.quotes.options.total() | number }}</b> quotes
+            </div>
+         </div>
       </div>      
    </div>
 </div>
