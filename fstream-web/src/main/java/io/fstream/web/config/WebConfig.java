@@ -26,32 +26,33 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 
 /**
  * Java config for Spring consumption.
  */
 @Slf4j
-@Lazy
 @Configuration
 public class WebConfig extends CoreConfig {
 
   @Bean
   @Profile("kafka")
   public TopicMessageService tradesMessageService() {
+    log.info("Starting trade stream...");
     return new TopicMessageService(TRADES);
   }
 
   @Bean
   @Profile("kafka")
   public TopicMessageService ordersMessageService() {
+    log.info("Starting order stream...");
     return new TopicMessageService(ORDERS);
   }
 
   @Bean
   @Profile("kafka")
   public TopicMessageService quotesMessageService() {
+    log.info("Starting quote stream...");
     return new TopicMessageService(QUOTES);
   }
 
@@ -64,12 +65,14 @@ public class WebConfig extends CoreConfig {
   @Bean
   @Profile("kafka")
   public TopicMessageService metricsMessageService() {
+    log.info("Starting metrics stream...");
     return new TopicMessageService(METRICS);
   }
 
   @Bean
   @Profile("!kafka")
   public StateService stateService() {
+    log.info("Starting local state service...");
     return new LocalStateService(state);
   }
 
