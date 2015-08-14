@@ -27,7 +27,8 @@
          link: function($scope, $element, $attr) {
             // TODO: Fix
             window._ = _;
-            var chart = new OrderBook.Chart({element: $element[0]});
+            var chart = new BookViewer();
+            chart.init('order-book-chart', new Date().getTime() - 15*1000);
             
             $scope.$on('quote', function(e, quote) {
                if (quote.symbol == $scope.symbol) {

@@ -14,7 +14,6 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.List;
 
 import lombok.NoArgsConstructor;
-import lombok.val;
 
 import org.apache.spark.api.java.function.Function2;
 
@@ -38,10 +37,10 @@ public final class SumFunctions {
   public static Function2<List<Integer>, Optional<Integer>, Optional<Integer>> runningSumIntegers() {
     return (values, state) -> {
       int sum = state.or(0);
-      for (val i : values) {
+      for (Integer i : values) {
         sum += i;
       }
-  
+
       return Optional.of(sum);
     };
   }
@@ -49,7 +48,7 @@ public final class SumFunctions {
   public static Function2<List<Long>, Optional<Long>, Optional<Long>> runningSumLongs() {
     return (values, state) -> {
       long sum = state.or(0L);
-      for (val i : values) {
+      for (Long i : values) {
         sum += i;
       }
 
@@ -60,7 +59,7 @@ public final class SumFunctions {
   public static Function2<List<Float>, Optional<Float>, Optional<Float>> runningSumFloats() {
     return (values, state) -> {
       float sum = state.or(0F);
-      for (val i : values) {
+      for (Float i : values) {
         sum += i;
       }
 

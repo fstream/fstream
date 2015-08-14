@@ -9,9 +9,116 @@
    <div ng-controller="alertsCtrl" class="content" animate-panel>
       <div class="row">
          <h1><i class="fa fa-exclamation-triangle"></i> Alerts</h1>
-         <p class="lead">Showing alerts in the selected time range</p>
+         <p class="lead">Alerting and monitoring</p>
       </div>
+
+      <div class="row">
+         <h2>Overview</h2>
+         <div class="col-lg-3">
+            <div class="hpanel">
+               <div class="panel-body text-center h-200">
+                  <i class="pe-7s-graph1 fa-4x"></i>
+
+                  <h1 class="m-xs">$1 206,90</h1>
+
+                  <h3 class="font-extra-bold no-margins text-success">
+                     All Income
+                  </h3>
+                  <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit vestibulum.</small>
+               </div>
+               <div class="panel-footer">
+                  This is standard panel footer
+               </div>
+            </div>
+         </div>
+         <div class="col-lg-3">
+            <div class="hpanel stats">
+               <div class="panel-body h-200">
+                  <div class="stats-title pull-left">
+                     <h4>Users Activity</h4>
+                  </div>
+                  <div class="stats-icon pull-right">
+                     <i class="pe-7s-share fa-4x"></i>
+                  </div>
+                  <div class="m-t-xl">
+                     <h3 class="m-b-xs">4 210,160</h3>
+                     <span class="font-bold no-margins">
+                        Social users
+                     </span>
+                     <progressbar value="55" type="success" class="m-t-xs  full progress-small"></progressbar>
+                     <div class="row">
+                        <div class="col-xs-6">
+                           <small class="stats-label">Pages / Visit</small>
+                           <h4>7.80</h4>
+                        </div>
+
+                        <div class="col-xs-6">
+                           <small class="stats-label">% New Visits</small>
+                           <h4>76.43%</h4>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="panel-footer">
+                  This is standard panel footer
+               </div>
+            </div>
+         </div>
+         <div class="col-lg-3">
+            <div class="hpanel stats">
+               <div class="panel-body h-200">
+                  <div class="stats-title pull-left">
+                     <h4>Today's Alerts</h4>
+                  </div>
+                  <div class="stats-icon pull-right">
+                     <i class="pe-7s-shuffle fa-4x"></i>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="flot-pie-chart">
+                     <div flot class="flot-chart-pie-content" dataset="pieChartDataDas" options="pieChartOptions" style="height: 112px"></div>
+                  </div>
+               </div>
+               <div class="panel-footer">
+                  This is standard panel footer
+               </div>
+            </div>
+         </div>
+         <div class="col-lg-3">
+            <div class="hpanel stats">
+               <div class="panel-body h-200">
+                  <div class="stats-title pull-left">
+                     <h4>Today income</h4>
+                  </div>
+                  <div class="stats-icon pull-right">
+                     <i class="pe-7s-cash fa-4x"></i>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="flot-chart">
+                     <div flot class="flot-chart-content" dataset="chartIncomeData" options="chartIncomeOptions"></div>
+                  </div>
+                  <div class="m-t-xs">
+
+                     <div class="row">
+                        <div class="col-xs-5">
+                           <small class="stat-label">Today</small>
+                           <h4>$230,00 </h4>
+                        </div>
+                        <div class="col-xs-7">
+                           <small class="stat-label">Last week</small>
+                           <h4>$7 980,60 <i class="fa fa-level-up text-success"></i></h4>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="panel-footer">
+                  This is standard panel footer
+               </div>
+            </div>
+         </div>
+      </div>      
+
       <div class="row history-form">
+         <h2>Log</h2>
          <form class="form-inline">
             <div class="form-group">
                <label class="sr-only" for="startTime">Start Date / Time</label>
@@ -24,6 +131,7 @@
             <button type="submit" class="btn btn-outline btn-success" ng-click="updateAlerts()">Search</button>
          </form>
       </div>
+
       <div class="row m-t">
          <div>
             <table datatable="ng" class="table table-striped table-hover">
@@ -64,11 +172,11 @@
                            </div>
                         </div>
                      </td>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-         </div>
-      </div>
+               </td>
+               </tr>
+            </tbody>
+         </table>
    </div>
+</div>
+</div>
 </div>

@@ -17,30 +17,49 @@
    historyController.$inject = ['$scope', '$filter', 'lodash', 'ngTableParams', 'historyService'];
 
    function historyController($scope, $filter, _, ngTableParams, historyService) {
-      $scope.history = {trades:{}, orders:{}, quotes:{}};
+      // Export
       $scope.updateHistory = updateHistory;
       $scope.updateTimeRange = updateTimeRange;
       $scope.updateSymbol = updateSymbol;
-      $scope.symbols = {
-         selected: []
-      };
-
+      $scope.resetParams = resetParams;
+      
+      // Init
       activate();
 
       function activate() {
-         updateHistory();
+         $scope.history = {trades:{}, orders:{}, quotes:{}};
+         
+         // Order matters
+         resetParams();
+         createTables();
          updateAvailableSymbols();
       }
-
+      
+      function resetParams() {
+         $scope.startTime = null;
+         $scope.endTime = null;
+         $scope.symbols = {
+            selected: []
+         };
+      }
+      
+      function getParams() {
+         return {
+            symbol: _.get($scope, 'symbols.selected[0].name'),
+            startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
+            endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
+         };
+      }
+      
       function updateHistory() {
          ['trades', 'orders', 'quotes'].forEach(function(type){
-            var params = {
-               symbol: _.get($scope, 'symbols.selected[0].name'),
-               startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
-               endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
-            }
+            $scope.history[type].tableParams.reload();
+         });
+      }
 
-            $scope.history[type].options = new ngTableParams({
+      function createTables() {
+         ['trades', 'orders', 'quotes'].forEach(function(type){
+            $scope.history[type].tableParams = new ngTableParams({
                   page: 1,            
                   count: 10,          
                   sorting: {
@@ -49,7 +68,7 @@
               }, {
                   total: 0,
                   getData: function($defer, table) {
-                     historyService.getHistory(type, _.assign(params, {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
+                     historyService.getHistory(type, _.assign(getParams(), {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
                         table.total(result.count);
                         $defer.resolve(result.rows);
                      });

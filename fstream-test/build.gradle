@@ -7,45 +7,18 @@
  * Proprietary and confidential.
  */
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
- 
-// Can't use Boot's nested jar packaging due to the way Hadoop's Server loads web.xml
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'spring-boot'
 
-mainClassName = "io.fstream.test.TestMain"
-
-shadowJar {
-  zip64 true
-  
-  exclude 'META-INF/*.SF'
-  exclude 'META-INF/*.DSA'
-  exclude 'META-INF/*.RSA'
-  
-  // Required for Storm
-  exclude 'defaults.yaml'
-  classifier = ''
-
-  // Requirede for Spring
-  mergeServiceFiles()
-  transform(AppendingTransformer) { resource = 'META-INF/spring.handlers'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.schemas'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.factories'  }
-}
-
-build.dependsOn shadowJar
+build.dependsOn bootRepackage
 
 applicationDistribution.with {
   // Exclude defaults in lieu of fat jar
   exclude { it.file in configurations.runtime.files }
-  from("src/main/conf") { 
-    into "conf"
-  }
+  from("src/main/conf") { into "conf" }
 }
 
 distTar {
-  dependsOn shadowJar
+  dependsOn bootRepackage
   compression Compression.GZIP
   extension "tar.gz"
 }

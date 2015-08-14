@@ -20,6 +20,54 @@
       $scope.updateAlerts = updateAlerts;
       $scope.updateTimeRange = updateTimeRange;
 
+      $scope.chartIncomeData = [{
+         label: "line",
+         data: [[1, 10], [2, 26], [3, 16], [4, 36], [5, 32], [6, 51]]
+      }];
+      $scope.chartIncomeOptions = {
+         series: {
+            lines: {
+               show: true,
+               lineWidth: 0,
+               fill: true,
+               fillColor: "#64cc34"
+
+            }
+         },
+         colors: ["#62cb31"],
+         grid: {
+            show: false
+         },
+         legend: {
+            show: false
+         }
+      };
+      $scope.pieChartDataDas = [
+         { label: "Data 1", data: 16, color: "#62cb31", },
+         { label: "Data 2", data: 6, color: "#A4E585", },
+         { label: "Data 3", data: 22, color: "#368410", },
+         { label: "Data 4", data: 32, color: "#8DE563", }
+      ];
+      $scope.pieChartOptions = {
+         series: {
+            pie: {
+               show: true
+            }
+         },
+         grid: {
+            hoverable: true
+         },
+         tooltip: true,
+         tooltipOpts: {
+            content: "%p.0%, %s", // show percentages, rounding to 2 decimal places
+            shifts: {
+               x: 20,
+               y: 0
+            },
+            defaultTheme: false
+         }
+      };
+
       activate();
 
       function activate() {
@@ -31,7 +79,7 @@
             startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
             endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
          }
-         
+
          historyService.getAlerts(params).then(function (alerts) {
             $scope.alerts = alerts;
          });
