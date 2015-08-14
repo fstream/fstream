@@ -14,9 +14,9 @@
       .module('fstream')
       .controller('mainController', mainController);
 
-   mainController.$inject = ['$scope', 'lodash', 'stateService', 'eventService'];
+   mainController.$inject = ['$scope', 'lodash', 'stateService', 'settingsService', 'eventService'];
 
-   function mainController($scope, _, stateService, eventService) {
+   function mainController($scope, _, stateService, settingsService, eventService) {
       activate();
 
       function activate() {
@@ -59,8 +59,9 @@
       }
 
       function connect() {
-         console.log("connecting...");
+         console.log("Connecting...");
          stateService.getState().then(updateState);
+         settingsService.getSettings().then(updateSettings);
          initScope();
          resetModel();
 
@@ -74,6 +75,9 @@
       function initScope() {
          $scope.connected = false;
          $scope.state = {};
+         $scope.settings = {
+            analyticsUrl: "http://localhost:8081"
+         };
          $scope.views = [];
          $scope.newAlert = {};
          $scope.connect = connect;
@@ -118,6 +122,10 @@
                symbol: symbol
             });
          });
+      }
+      
+      function updateSettings(settings) {
+         $scope.settings = settings;
       }
 
       function queueEvent(a, value, limit) {
