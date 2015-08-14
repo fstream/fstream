@@ -115,8 +115,8 @@ public class OrderBook extends BaseActor {
 
     if (order.getOrderType() == MARKET_ORDER) {
       // TODO: Explain the need for this. Perhaps this should go into executeOrder.
-      val price = order.getSide() == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
-      order.setPrice(price);
+      // val price = order.getSide() == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
+      // order.setPrice(price);
 
       // TODO: Explain what happens if the order cannot be completely filled. Should it be rejected?
       executeOrder(order);
@@ -172,7 +172,7 @@ public class OrderBook extends BaseActor {
     while (orderIterator.hasNext()) {
       val passiveOrder = orderIterator.next();
 
-      if (isBreakingPriceCrossed(order, passiveOrder)) {
+      if (order.getOrderType() != MARKET_ORDER && isBreakingPriceCrossed(order, passiveOrder)) {
         // Limit price exists, respect bounds
         break;
       }
