@@ -45,8 +45,8 @@ public class OrderBookTest {
     val properties = new SimulateProperties();
 
     // Create the publisher
-    val publisheProps = Props.create(Publisher.class, "log:info");
-    TestActorRef.<Publisher> create(actorSystem, publisheProps, "publisher");
+    val publisheProps = Props.create(CamelPublisher.class, "log:info");
+    TestActorRef.<CamelPublisher> create(actorSystem, publisheProps, "publisher");
 
     // Create the exchange
     val exchangeProps = Props.create(Exchange.class, properties);

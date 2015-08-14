@@ -17,7 +17,7 @@ import akka.camel.javaapi.UntypedProducerActor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class Publisher extends UntypedProducerActor {
+public class CamelPublisher extends UntypedProducerActor {
 
   /**
    * The endpoint to publish to.

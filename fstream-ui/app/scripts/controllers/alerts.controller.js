@@ -43,10 +43,10 @@
          }
       };
       $scope.pieChartDataDas = [
-         { label: "Data 1", data: 16, color: "#62cb31", },
-         { label: "Data 2", data: 6, color: "#A4E585", },
-         { label: "Data 3", data: 22, color: "#368410", },
-         { label: "Data 4", data: 32, color: "#8DE563", }
+         { label: "Mispricing", data: 16, color: "#62cb31", },
+         { label: "Arbitrage", data: 6, color: "#A4E585", },
+         { label: "Bursty Price", data: 22, color: "#368410", },
+         { label: "Stale Price", data: 32, color: "#8DE563", }
       ];
       $scope.pieChartOptions = {
          series: {

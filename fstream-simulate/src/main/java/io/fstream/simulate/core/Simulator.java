@@ -12,7 +12,7 @@ import static akka.actor.ActorRef.noSender;
 import static com.google.common.base.Stopwatch.createStarted;
 import io.fstream.simulate.actor.Broker;
 import io.fstream.simulate.actor.Exchange;
-import io.fstream.simulate.actor.Publisher;
+import io.fstream.simulate.actor.OutputPublisher;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
 
@@ -92,7 +92,7 @@ public class Simulator {
 
   private ActorRef createPublisher() {
     val name = "publisher";
-    val props = Props.create(Publisher.class);
+    val props = Props.create(OutputPublisher.class);
     return actorSystem.actorOf(props, name);
   }
 
