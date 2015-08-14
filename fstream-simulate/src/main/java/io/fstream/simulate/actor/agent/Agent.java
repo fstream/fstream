@@ -20,7 +20,6 @@ import io.fstream.core.model.event.Order.OrderSide;
 import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.core.model.event.Quote;
 import io.fstream.simulate.actor.BaseActor;
-import io.fstream.simulate.actor.Exchange;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.config.SimulateProperties.AgentProperties;
 import io.fstream.simulate.message.ActiveInstruments;
@@ -144,13 +143,12 @@ public abstract class Agent extends BaseActor {
     for (val symbolOrder : symbolOrders) {
       // clone open order (minimal version necessary for removing from book)
       Order cancelOrder =
-          new Order(symbolOrder.getSide(), OrderType.LIMIT_CANCEL, Exchange.getSimulationTime(),
+          new Order(symbolOrder.getSide(), OrderType.LIMIT_CANCEL, symbolOrder.getDateTime(),
               symbolOrder.getOid(),
               symbolOrder.getBrokerId(), symbolOrder.getSymbol(), symbolOrder.getAmount(), symbolOrder.getPrice(),
               symbolOrder.getUserId());
       exchange().tell(cancelOrder, self());
     }
-
     openOrders.getOrders().removeAll(symbol);
   }
 

@@ -132,7 +132,7 @@ public class HFTAgent extends Agent {
         price = bestAsk;
       }
     }
-
+    price = Math.round(price * 100) / 100f;
     return price;
   }
 
@@ -163,20 +163,20 @@ public class HFTAgent extends Agent {
     float askCeiling = properties.getMaxPrice();
     float bidFloor = properties.getMinPrice();
     int riskDistance = properties.getRiskDistance();
-    int rounding = 10;
+    int imbalanceRounding = 10;
 
     if (imbalance.getSide() == OrderSide.ASK) {
       // ask imbalance
       val bestAsk = generateBestAsk(quote);
-      price = bestAsk + (minQuoteSize * Math.round(imbalance.getRatio() / rounding));
+      price = bestAsk + (minQuoteSize * Math.round(imbalance.getRatio() / imbalanceRounding));
       price = price <= askCeiling ? price : askCeiling - (properties.getTickSize() * (randomInt(0, riskDistance) + 1));
     } else {
       // bid imbalance
       val bestBid = generateBestBid(quote);
-      price = bestBid - (minQuoteSize * Math.round(imbalance.getRatio() / rounding));
+      price = bestBid - (minQuoteSize * Math.round(imbalance.getRatio() / imbalanceRounding));
       price = price >= bidFloor ? price : bidFloor + (properties.getTickSize() * (randomInt(0, riskDistance) + 1));
     }
-
+    price = Math.round(price * 100) / 100f;
     return new Order(imbalance.getSide(), OrderType.LIMIT_ADD, getSimulationTime(), Exchange.nextOrderId(), broker,
         quote.getSymbol(), decideAmount(), price, name);
   }

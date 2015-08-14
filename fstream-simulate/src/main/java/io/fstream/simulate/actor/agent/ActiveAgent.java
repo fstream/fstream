@@ -126,7 +126,7 @@ public abstract class ActiveAgent extends Agent {
 
       checkState(price >= 0, "Invalid negative price generated %s", price);
     }
-
+    price = Math.round(price * 100) / 100f;
     return price;
   }
 
