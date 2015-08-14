@@ -105,12 +105,30 @@ public class BookSide {
   public boolean removeOrder(@NonNull Order order) {
     val price = order.getPrice();
 
-    val missing = !priceLevels.remove(price, order);
+    val orders = priceLevels.get(price);
+    // since order (cancel_limit) request is sent my agent for an order that might
+    // be partially filled on the orderbook. The amount to be removed is for what is on the book and not what is sent by
+    // agent as cancel order
+    int removedOrderAmount = 0;
+    val ordersIterator = orders.iterator();
+    boolean missing = true;
+    while (ordersIterator.hasNext()) {
+      val currentOrder = ordersIterator.next();
+      if (currentOrder.equals(order)) {
+        removedOrderAmount = currentOrder.getAmount();
+        ordersIterator.remove(); // remove the order. This also avoids the issue that priceLevel.remove(price,order)
+                                 // uses the comparator and that can cause issue when cancel order time != original
+                                 // order time. see unit test
+        missing = false;
+        break;
+      }
+    }
+    // val missing = !priceLevels.remove(price, order);
     if (missing) {
       return false;
     }
 
-    depth -= order.getAmount();
+    depth -= removedOrderAmount;
 
     return true;
   }

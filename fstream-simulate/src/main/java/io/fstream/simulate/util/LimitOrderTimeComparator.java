@@ -10,7 +10,6 @@
 package io.fstream.simulate.util;
 
 import io.fstream.core.model.event.Order;
-import io.fstream.core.model.event.Order.OrderType;
 
 import java.util.Comparator;
 
@@ -25,18 +24,20 @@ public final class LimitOrderTimeComparator implements Comparator<Order> {
 
   @Override
   public int compare(Order order1, Order order2) {
-    // TODO this is needed for remove from treemap to happen properly. Otherwise it will traverse the tree
-    if (order1.equals(order2) || (order1.getOrderType() == OrderType.LIMIT_CANCEL)) {
+
+    if (order1.equals(order2)) {
       return 0;
     }
 
-    if (order1.getDateTime().getMillis() < order2.getDateTime().getMillis()) {
-      return -1;
-    } else if (order1.getDateTime().getMillis() > order2.getDateTime().getMillis()) {
+    long diff = order1.getDateTime().getMillis() - order2.getDateTime().getMillis();
+    if (diff > 0) {
       return 1;
-    } else {
-      // TODO: This is a hack so orders at same time are not ignored. need a better data structure for orders
+    }
+    else if (diff < 0) {
       return -1;
+    }
+    else {
+      return 1;
     }
   }
 
