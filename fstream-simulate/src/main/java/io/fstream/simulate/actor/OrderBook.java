@@ -105,7 +105,7 @@ public class OrderBook extends BaseActor {
   public void preStart() throws Exception {
     super.preStart();
 
-    // Trigger "active" behavior
+    // Trigger periodic snapshot behavior
     scheduleSnapshot();
   }
 
@@ -175,40 +175,7 @@ public class OrderBook extends BaseActor {
     } else if (command == Command.PRINT_SUMMARY) {
       printSummary();
     } else if (command == Command.SEND_BOOK_SNAPSHOT) {
-      snapshotCount++;
-
-      val orders = Lists.<Order> newArrayList();
-      val priceLevels = Maps.<Float, Integer> newHashMap();
-
-      {
-        int i = 0;
-        for (val price : asks.getPrices()) {
-          if (i++ < 10) {
-            priceLevels.put(price, asks.calculatePriceDepth(price));
-            val order = get(asks.getPriceLevel(price), 0);
-            orders.add(order);
-          }
-        }
-      }
-      {
-        int i = 0;
-        for (val price : bids.getPrices()) {
-          if (i++ < 10) {
-            priceLevels.put(price, bids.calculatePriceDepth(price));
-            val order = get(bids.getPriceLevel(price), 0);
-            orders.add(order);
-          }
-        }
-      }
-
-      val snapshot = new Snapshot();
-      snapshot.setDateTime(Exchange.getSimulationTime());
-      snapshot.setSymbol(this.getSymbol());
-      snapshot.setOrders(orders);
-      snapshot.setPriceLevels(priceLevels);
-
-      publisher().tell(snapshot, self());
-      scheduleSnapshot();
+      sendSnapshot();
     }
   }
 
@@ -217,9 +184,10 @@ public class OrderBook extends BaseActor {
    * 
    * @return Unfilled amount.
    */
-  // TODO: Currently market orders are mimicked via {@code Order}s where trigger price is best ask/bid. Need to add
-  // marketable order implementation.
   private int executeOrder(Order order) {
+    // TODO: Currently market orders are mimicked via {@code Order}s where trigger price is best ask/bid. Need to add
+    // marketable order implementation.
+
     // Match against passive side
     val bookSide = getOppositeBookSide(order);
     int unfilledSize = order.getAmount();
@@ -373,6 +341,44 @@ public class OrderBook extends BaseActor {
     publisher().tell(order, self());
 
     return true;
+  }
+
+  private void sendSnapshot() {
+    snapshotCount++;
+    val orders = Lists.<Order> newArrayList();
+    val priceLevels = Maps.<Float, Integer> newHashMap();
+
+    {
+      int i = 0;
+      val side = asks;
+      for (val price : side.getPrices()) {
+        if (i++ < 10) {
+          priceLevels.put(price, side.calculatePriceDepth(price));
+          val order = get(side.getPriceLevel(price), 0);
+          orders.add(order);
+        }
+      }
+    }
+    {
+      int i = 0;
+      val side = bids;
+      for (val price : side.getPrices()) {
+        if (i++ < 10) {
+          priceLevels.put(price, side.calculatePriceDepth(price));
+          val order = get(side.getPriceLevel(price), 0);
+          orders.add(order);
+        }
+      }
+    }
+
+    val snapshot = new Snapshot();
+    snapshot.setDateTime(Exchange.getSimulationTime());
+    snapshot.setSymbol(this.getSymbol());
+    snapshot.setOrders(orders);
+    snapshot.setPriceLevels(priceLevels);
+
+    publisher().tell(snapshot, self());
+    scheduleSnapshot();
   }
 
   private boolean isExecutable(Order order) {
