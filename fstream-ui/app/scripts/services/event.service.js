@@ -26,7 +26,6 @@
          };
 
       return {
-
          connect: function () {
             stompClient = Stomp.over(new SockJS('/server'));
 

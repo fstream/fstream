@@ -1,7 +1,7 @@
 <div id="logo" class="light-version">
    <img width="150px" src="../../images/fstream-2.png" ui-sref="common.login">
 </div>
-<nav role="navigation">
+<nav role="navigation" ng-controller="loginController">
    <minimaliza-menu></minimaliza-menu>
    <div class="navbar-right">
       <ul class="nav navbar-nav no-borders">
@@ -63,7 +63,7 @@
             </ul>
          </li>
          <li class="dropdown">
-            <a ui-sref="common.login">
+            <a ng-click="logout()">
                <i class="pe-7s-upload pe-rotate-90"></i>
             </a>
          </li>

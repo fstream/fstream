@@ -31,6 +31,7 @@ dependencies {
   // Spring
   compile libraries.springBootActuator
   compile libraries.springBootWeb
+  compile "org.springframework.boot:spring-boot-starter-security"
   compile "org.springframework.boot:spring-boot-starter-websocket"
   compile "org.springframework:spring-messaging"
 

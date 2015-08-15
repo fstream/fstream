@@ -25,6 +25,13 @@ spring.profiles.active: kafka
 kafka:
    consumerProperties:
       group.id: fstream-web
-      
+
+# Web 
 web:
    analyticsUrl: http://localhost:8081
+   
+# Security
+security:
+   user:
+      name: fstream
+      password: demo   

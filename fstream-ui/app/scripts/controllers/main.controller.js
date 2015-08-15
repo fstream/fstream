@@ -17,6 +17,7 @@
    mainController.$inject = ['$scope', 'lodash', 'stateService', 'settingsService', 'eventService'];
 
    function mainController($scope, _, stateService, settingsService, eventService) {
+      $scope.connect = connect;
       activate();
 
       function activate() {
@@ -25,7 +26,6 @@
 
          // Initialize
          registerEvents();
-         connect();
       }
 
       function registerEvents() {

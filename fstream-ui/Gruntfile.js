@@ -55,7 +55,19 @@ module.exports = function (grunt) {
             context: '/state',
             host: 'localhost',
             port: 8080
-         }, {            
+         }, {
+            context: '/login',
+            host: 'localhost',
+            port: 8080
+         }, {
+            context: '/logout',
+            host: 'localhost',
+            port: 8080            
+         }, { 
+            context: '/user',
+            host: 'localhost',
+            port: 8080
+         }, {             
             context: '/settings',
             host: 'localhost',
             port: 8080
