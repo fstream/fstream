@@ -47,12 +47,12 @@ public class KafkaOutput implements Output {
   private Topic getTopic(Event event) {
     if (event.getType() == EventType.TRADE) {
       return Topic.TRADES;
-    }
-    if (event.getType() == EventType.ORDER) {
+    } else if (event.getType() == EventType.ORDER) {
       return Topic.ORDERS;
-    }
-    if (event.getType() == EventType.QUOTE) {
+    } else if (event.getType() == EventType.QUOTE) {
       return Topic.QUOTES;
+    } else if (event.getType() == EventType.SNAPSHOT) {
+      return Topic.SNAPSHOTS;
     }
 
     throw new IllegalStateException();

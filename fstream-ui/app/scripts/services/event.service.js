@@ -44,6 +44,9 @@
                stompClient.subscribe('/topic/quotes', function (frame) {
                   publishEvent("quote", frame);
                });
+               stompClient.subscribe('/topic/snapshots', function (frame) {
+                  publishEvent("snapshot", frame);
+               });               
 
                stompClient.subscribe('/topic/alerts', function (frame) {
                   publishEvent("alert", frame);
