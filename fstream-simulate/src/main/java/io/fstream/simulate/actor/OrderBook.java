@@ -19,9 +19,9 @@ import static io.fstream.core.model.event.Order.OrderType.LIMIT_AMEND;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_CANCEL;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
-import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Trade;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
@@ -73,6 +73,7 @@ public class OrderBook extends BaseActor {
 
   private int orderCount = 0;
   private int tradeCount = 0;
+  private int snapshotCount = 0;
 
   public OrderBook(SimulateProperties properties, String symbol) {
     super(properties);
@@ -88,13 +89,16 @@ public class OrderBook extends BaseActor {
   }
 
   public void printSummary() {
-    log.info("{} orders processed={}, trades processed={}, bidDepth={}, askDepth={} bestAsk={} bestBid={} spread={}",
-        symbol, orderCount, tradeCount, bids.getDepth(), asks.getDepth(), bestAsk, bestBid, getSpread());
+    log.info(
+        "{} orders processed={}, trades processed={}, snapshots sent = {},  bidDepth={}, askDepth={} bestAsk={} bestBid={} spread={}",
+        symbol, orderCount, tradeCount, snapshotCount, bids.getDepth(), asks.getDepth(), bestAsk, bestBid, getSpread());
   }
 
   public void printStatus() {
-    log.info("[{}] trade count = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
-        symbol, tradeCount, asks.calculateOrderCount(), bids.calculateOrderCount(), asks.getDepth(), bids.getDepth());
+    log.info(
+        "[{}] trade count = {}, snapshots sent = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
+        symbol, tradeCount, snapshotCount, asks.calculateOrderCount(), bids.calculateOrderCount(), asks.getDepth(),
+        bids.getDepth());
   }
 
   @Override
@@ -171,6 +175,8 @@ public class OrderBook extends BaseActor {
     } else if (command == Command.PRINT_SUMMARY) {
       printSummary();
     } else if (command == Command.SEND_BOOK_SNAPSHOT) {
+      snapshotCount++;
+
       val orders = Lists.<Order> newArrayList();
       val priceLevels = Maps.<Float, Integer> newHashMap();
 

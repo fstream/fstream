@@ -39,7 +39,12 @@
                if (trade.symbol == $scope.symbol) {
                   chart.addTrade(trade);
                }
-            });            
+            });
+            $scope.$on('snapshot', function(e, snapshot) {
+               if (snapshot.symbol == $scope.symbol) {
+                  chart.addDepth(snapshot);
+               }
+            });             
          }
       };
    } 

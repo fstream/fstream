@@ -19,10 +19,10 @@
    function eventService($rootScope, $timeout, $q) {
       var stompClient,
          publishEvent = function (eventName, frame) {
-            $timeout(function () {
+//            $timeout(function () {
                var event = frame && angular.fromJson(frame.body);
                $rootScope.$broadcast(eventName, event);
-            });
+//            });
          };
 
       return {
