@@ -6,6 +6,7 @@ import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import io.fstream.core.model.event.Order;
+import io.fstream.simulate.actor.publisher.CamelPublisher;
 import io.fstream.simulate.config.SimulateProperties;
 import lombok.val;
 

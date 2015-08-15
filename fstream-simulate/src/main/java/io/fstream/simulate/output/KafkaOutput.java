@@ -34,12 +34,10 @@ public class KafkaOutput implements Output {
   }
 
   @Override
-  public void write(Object message) {
+  public void write(Event event) {
     val key = "1"; // TODO: this should probably be a symbol
-
-    val event = (Event) message;
     val topic = getTopic(event);
-    val value = Codec.encodeText(message);
+    val value = Codec.encodeText(event);
 
     val keyedMessage = new KeyedMessage<String, String>(topic.getId(), key, value);
 

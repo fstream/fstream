@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.simulate.actor;
+package io.fstream.simulate.actor.publisher;
 
 import static io.fstream.simulate.routes.PublishRoutes.PUBLISH_ENDPOINT;
 import lombok.AllArgsConstructor;

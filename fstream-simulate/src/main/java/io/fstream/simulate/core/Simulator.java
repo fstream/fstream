@@ -12,9 +12,12 @@ import static akka.actor.ActorRef.noSender;
 import static com.google.common.base.Stopwatch.createStarted;
 import io.fstream.simulate.actor.Broker;
 import io.fstream.simulate.actor.Exchange;
-import io.fstream.simulate.actor.OutputPublisher;
+import io.fstream.simulate.actor.publisher.OutputPublisher;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
+import io.fstream.simulate.output.Output;
+
+import java.util.List;
 
 import javax.annotation.PreDestroy;
 
@@ -50,6 +53,8 @@ public class Simulator {
   private final ActorSystem actorSystem;
   @NonNull
   private final SimulateProperties properties;
+  @NonNull
+  private final List<Output> outputs;
 
   /**
    * State.
@@ -92,7 +97,7 @@ public class Simulator {
 
   private ActorRef createPublisher() {
     val name = "publisher";
-    val props = Props.create(OutputPublisher.class);
+    val props = Props.create(OutputPublisher.class, outputs);
     return actorSystem.actorOf(props, name);
   }
 
