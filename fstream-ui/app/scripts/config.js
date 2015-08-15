@@ -35,7 +35,7 @@
       $compileProvider.debugInfoEnabled(true);
 
       // Set default state
-      $urlRouterProvider.otherwise("/common/login");
+      $urlRouterProvider.otherwise("/login");
 
       $stateProvider
 
@@ -111,7 +111,7 @@
             pageTitle: 'Common'
          }
       })
-         .state('common.login', {
+         .state('login', {
          url: "/login",
          templateUrl: "views/common_app/login.html",
          data: {
