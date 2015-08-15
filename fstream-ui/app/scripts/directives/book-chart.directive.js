@@ -27,7 +27,12 @@
          link: function($scope, $element, $attr) {
             // TODO: Fix
             window._ = _;
-            var chart = new BookViewer();
+            var chart = new BookViewer({
+                svgWidth: $element.width(),
+                svgHeight: 500,
+                width: $element.width() - 75,
+                height: 400,
+            });
             chart.init('order-book-chart', new Date().getTime() - 15*1000);
             
             $scope.$on('quote', function(e, quote) {

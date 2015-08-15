@@ -17,13 +17,21 @@
    booksController.$inject = ['$scope', 'lodash', 'booksService'];
 
    function booksController($scope, _, booksService) {
+      $scope.symbol = 'RY';
       $scope.symbols = {
          selected: []
       };
+      $scope.snapshot = {};
       $scope.top = {};
 
       booksService.getTop().then(function(top) {
          $scope.top = top;
+      });
+      
+      $scope.$on('snapshot', function (e, snapshot) {
+         if ($scope.symbol == snapshot.symbol) {
+            $scope.snapshot = snapshot;
+         }
       });
 
       $scope.$on('metric', function (e, metric) {
