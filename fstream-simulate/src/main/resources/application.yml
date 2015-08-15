@@ -52,7 +52,10 @@ simulate:
         serializerClass=${kafka.producerProperties.serializer.class}"
    file:
       dir: build
-      
+   
+   # How often to create book snapshot events
+   snapshotInterval: 5
+   
    # Enable assertions
    validate: false
    

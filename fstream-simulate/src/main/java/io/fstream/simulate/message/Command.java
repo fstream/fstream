@@ -15,7 +15,8 @@ package io.fstream.simulate.message;
 public enum Command {
 
   AGENT_EXECUTE_ACTION,
-  PRINT_ORDER_BOOK,
+  PRINT_BOOK,
+  SEND_BOOK_SNAPSHOT,
 
   PRINT_SUMMARY,
 

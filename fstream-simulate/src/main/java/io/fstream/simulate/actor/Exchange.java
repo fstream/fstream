@@ -154,7 +154,7 @@ public class Exchange extends BaseActor {
   }
 
   private void onReceiveCommand(Command command) {
-    val recognized = command == Command.PRINT_ORDER_BOOK || command == Command.PRINT_SUMMARY;
+    val recognized = command == Command.PRINT_BOOK || command == Command.PRINT_SUMMARY;
     if (recognized) {
       for (val orderBook : orderBooks.values()) {
         orderBook.tell(command, self());

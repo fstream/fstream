@@ -13,6 +13,7 @@ import static io.fstream.core.model.topic.Topic.ALERTS;
 import static io.fstream.core.model.topic.Topic.METRICS;
 import static io.fstream.core.model.topic.Topic.ORDERS;
 import static io.fstream.core.model.topic.Topic.QUOTES;
+import static io.fstream.core.model.topic.Topic.SNAPSHOTS;
 import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.core.config.CoreConfig;
 import io.fstream.core.service.LocalStateService;
@@ -54,6 +55,13 @@ public class WebConfig extends CoreConfig {
   public TopicMessageService quotesMessageService() {
     log.info("Starting quote stream...");
     return new TopicMessageService(QUOTES);
+  }
+
+  @Bean
+  @Profile("kafka")
+  public TopicMessageService snapshotsMessageService() {
+    log.info("Starting snapshot stream...");
+    return new TopicMessageService(SNAPSHOTS);
   }
 
   @Bean

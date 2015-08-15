@@ -89,6 +89,10 @@ public class BookSide {
     };
   }
 
+  public Iterable<Float> getPrices() {
+    return priceLevels.keySet();
+  }
+
   public int getPriceLevelCount() {
     return priceLevels.keySet().size();
   }

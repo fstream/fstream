@@ -20,6 +20,7 @@ public enum Topic {
   TRADES("trades"),
   ORDERS("orders"),
   QUOTES("quotes"),
+  SNAPSHOTS("snapshots"),
 
   ALERTS("alerts"),
   METRICS("metrics");

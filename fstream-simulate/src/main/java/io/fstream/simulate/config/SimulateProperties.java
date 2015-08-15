@@ -41,6 +41,7 @@ public class SimulateProperties {
   /**
    * Settings.
    */
+  private int snapshotInterval;
   private String tickDuration;
   private int msgResponseTimeout;
   private float tickSize;

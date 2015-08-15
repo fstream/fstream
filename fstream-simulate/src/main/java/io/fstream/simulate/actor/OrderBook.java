@@ -11,6 +11,7 @@ package io.fstream.simulate.actor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.repeat;
+import static com.google.common.collect.Iterables.get;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
@@ -18,20 +19,29 @@ import static io.fstream.core.model.event.Order.OrderType.LIMIT_AMEND;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_CANCEL;
 import static io.fstream.core.model.event.Order.OrderType.MARKET_ORDER;
 import static io.fstream.simulate.util.OrderBookFormatter.formatOrderBook;
+import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
 import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.util.BookSide;
+
+import java.util.concurrent.TimeUnit;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.assertj.core.util.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
+
+import scala.concurrent.duration.Duration;
+
+import com.google.common.collect.Lists;
 
 /**
  * A price,time ordered implementation of a central limit order book. The principle data structure is a List of
@@ -85,6 +95,14 @@ public class OrderBook extends BaseActor {
   public void printStatus() {
     log.info("[{}] trade count = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
         symbol, tradeCount, asks.calculateOrderCount(), bids.calculateOrderCount(), asks.getDepth(), bids.getDepth());
+  }
+
+  @Override
+  public void preStart() throws Exception {
+    super.preStart();
+
+    // Trigger "active" behavior
+    scheduleSnapshot();
   }
 
   @Override
@@ -148,10 +166,43 @@ public class OrderBook extends BaseActor {
   }
 
   private void onReceiveCommand(Command command) {
-    if (command == Command.PRINT_ORDER_BOOK) {
+    if (command == Command.PRINT_BOOK) {
       printBook();
     } else if (command == Command.PRINT_SUMMARY) {
       printSummary();
+    } else if (command == Command.SEND_BOOK_SNAPSHOT) {
+      val orders = Lists.<Order> newArrayList();
+      val priceLevels = Maps.<Float, Integer> newHashMap();
+
+      {
+        int i = 0;
+        for (val price : asks.getPrices()) {
+          if (i++ < 10) {
+            priceLevels.put(price, asks.calculatePriceDepth(price));
+            val order = get(asks.getPriceLevel(price), 0);
+            orders.add(order);
+          }
+        }
+      }
+      {
+        int i = 0;
+        for (val price : bids.getPrices()) {
+          if (i++ < 10) {
+            priceLevels.put(price, bids.calculatePriceDepth(price));
+            val order = get(bids.getPriceLevel(price), 0);
+            orders.add(order);
+          }
+        }
+      }
+
+      val snapshot = new Snapshot();
+      snapshot.setDateTime(Exchange.getSimulationTime());
+      snapshot.setSymbol(this.getSymbol());
+      snapshot.setOrders(orders);
+      snapshot.setPriceLevels(priceLevels);
+
+      publisher().tell(snapshot, self());
+      scheduleSnapshot();
     }
   }
 
@@ -349,6 +400,10 @@ public class OrderBook extends BaseActor {
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {
     return Seconds.secondsBetween(endTime, startTime).getSeconds();
+  }
+
+  private void scheduleSnapshot() {
+    scheduleSelfOnce(Command.SEND_BOOK_SNAPSHOT, Duration.create(properties.getSnapshotInterval(), TimeUnit.SECONDS));
   }
 
   /**

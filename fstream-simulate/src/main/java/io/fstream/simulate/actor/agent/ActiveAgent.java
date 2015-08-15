@@ -38,6 +38,7 @@ public abstract class ActiveAgent extends Agent {
   @Override
   public void preStart() {
     super.preStart();
+
     // Trigger "active" behavior
     scheduleSelfOnceRandom(Command.AGENT_EXECUTE_ACTION);
   }

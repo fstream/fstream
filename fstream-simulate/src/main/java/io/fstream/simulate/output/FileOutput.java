@@ -26,6 +26,7 @@ public class FileOutput implements Output, Closeable {
   private final PrintWriter tradeWriter;
   private final PrintWriter orderWriter;
   private final PrintWriter quoteWriter;
+  private final PrintWriter snapshotWriter;
 
   @SneakyThrows
   @Autowired
@@ -33,6 +34,7 @@ public class FileOutput implements Output, Closeable {
     this.tradeWriter = new PrintWriter(new File(outputDir, "fstream-simulate-trades.json"));
     this.orderWriter = new PrintWriter(new File(outputDir, "fstream-simulate-orders.json"));
     this.quoteWriter = new PrintWriter(new File(outputDir, "fstream-simulate-quotes.json"));
+    this.snapshotWriter = new PrintWriter(new File(outputDir, "fstream-simulate-snapshots.json"));
   }
 
   @Override
@@ -49,6 +51,8 @@ public class FileOutput implements Output, Closeable {
       return orderWriter;
     } else if (event.getType() == EventType.QUOTE) {
       return quoteWriter;
+    } else if (event.getType() == EventType.SNAPSHOT) {
+      return snapshotWriter;
     }
 
     throw new IllegalStateException();

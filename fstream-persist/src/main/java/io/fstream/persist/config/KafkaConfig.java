@@ -13,6 +13,7 @@ import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Trade;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.persist.service.KafkaService;
@@ -33,6 +34,11 @@ public class KafkaConfig {
   @Bean
   public KafkaService ordersService() {
     return new KafkaService(Topic.ORDERS, Order.class);
+  }
+
+  @Bean
+  public KafkaService snapshotsService() {
+    return new KafkaService(Topic.SNAPSHOTS, Snapshot.class);
   }
 
   @Bean

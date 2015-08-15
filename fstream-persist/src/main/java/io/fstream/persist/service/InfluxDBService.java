@@ -14,6 +14,7 @@ import static io.fstream.core.model.event.EventType.ALERT;
 import static io.fstream.core.model.event.EventType.METRIC;
 import static io.fstream.core.model.event.EventType.ORDER;
 import static io.fstream.core.model.event.EventType.QUOTE;
+import static io.fstream.core.model.event.EventType.SNAPSHOT;
 import static io.fstream.core.model.event.EventType.TRADE;
 import static java.util.function.Predicate.isEqual;
 import io.fstream.core.model.event.AlertEvent;
@@ -21,6 +22,7 @@ import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Trade;
 import io.fstream.core.util.Codec;
 
@@ -131,6 +133,13 @@ public class InfluxDBService implements PersistenceService {
           .field("askAmount", quote.getAskAmount())
           .field("bidAmount", quote.getBidAmount())
           .build();
+    } else if (event.getType() == SNAPSHOT) {
+      val snapshot = (Snapshot) event;
+      return point("snapshots", event)
+          .tag("symbol", snapshot.getSymbol())
+          .field("orders", Codec.encodeText(snapshot.getOrders()))
+          .field("priceLevels", Codec.encodeText(snapshot.getPriceLevels()))      
+          .build();      
     } else if (event.getType() == METRIC) {
       val metricEvent = (MetricEvent) event;
       return point("metrics", event)

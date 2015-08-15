@@ -18,6 +18,7 @@ public enum EventType {
   TRADE,
   QUOTE,
   ORDER,
-  METRIC;
+  METRIC,
+  SNAPSHOT;
 
 }
