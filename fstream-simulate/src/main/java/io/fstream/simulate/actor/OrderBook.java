@@ -35,13 +35,13 @@ import lombok.ToString;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
-import org.assertj.core.util.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import scala.concurrent.duration.Duration;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * A price,time ordered implementation of a central limit order book. The principle data structure is a List of
