@@ -14,6 +14,8 @@ import javax.annotation.PreDestroy;
 import lombok.SneakyThrows;
 import lombok.val;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +28,8 @@ public class FileOutput implements Output, Closeable {
   private final PrintWriter quoteWriter;
 
   @SneakyThrows
-  public FileOutput() {
-    val outputDir = new File("/tmp/");
+  @Autowired
+  public FileOutput(@Value("${simulate.file.dir}") File outputDir) {
     this.tradeWriter = new PrintWriter(new File(outputDir, "fstream-simulate-trades.json"));
     this.orderWriter = new PrintWriter(new File(outputDir, "fstream-simulate-orders.json"));
     this.quoteWriter = new PrintWriter(new File(outputDir, "fstream-simulate-quotes.json"));
