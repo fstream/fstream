@@ -17,12 +17,17 @@
    stateService.$inject = ['$http'];
 
    function stateService($http) {
+      var state;
+      
       return {
          getState: function () {
             return $http.get('/state').then(function (response) {
-               return response.data;
+               return state = response.data;
             });
-         }
+         },
+         getCachedState: function () {
+            return state;
+         }         
       }
    }
 })();

@@ -11,8 +11,10 @@
 ###############################################################################
 
 # Available simulation profiles:
-# - akka
-# - timer
+# - book
+# - fx
+# - alerts
+# - metrics
 
 # Available output profiles:
 # - console

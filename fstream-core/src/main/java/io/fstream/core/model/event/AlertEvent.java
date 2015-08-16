@@ -24,8 +24,15 @@ import org.joda.time.DateTime;
 @EqualsAndHashCode(callSuper = true)
 public class AlertEvent extends AbstractDerivedEvent {
 
-  public AlertEvent(@NonNull DateTime dateTime, int id, @NonNull Object data) {
+  private String symbol;
+
+  public AlertEvent(@NonNull DateTime dateTime, int id, String symbol, @NonNull Object data) {
     super(dateTime, id, data);
+    this.symbol = symbol;
+  }
+
+  public AlertEvent(@NonNull DateTime dateTime, int id, @NonNull Object data) {
+    this(dateTime, id, null, data);
   }
 
   @Override

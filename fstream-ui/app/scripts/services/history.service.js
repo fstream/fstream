@@ -66,6 +66,9 @@
          return executeQuery(query);
       }
 
+      /**
+       * Gets aggregated quotes
+       */
       function getTicks(params) {
          var series = params.interval ? 'quotes_1' + params.interval : 'quotes'
          var where = getWhere(params, ['time']);

@@ -117,7 +117,7 @@
 
          _.each(state.symbols, function (symbol, i) {
             $scope.views.push({
-               type: 'tick-chart',
+               type: 'quote-chart',
                index: i,
                symbol: symbol
             });
