@@ -42,9 +42,9 @@ module.exports = function (grunt) {
       // The grunt server settings
       connect: {
          options: {
-            port: 9000,
+            port: 9080,
             hostname: 'localhost',
-            livereload: 35729
+            livereload: 39080
          },
          proxies: [{
             context: '/server',
@@ -62,12 +62,12 @@ module.exports = function (grunt) {
          }, {
             context: '/logout',
             host: 'localhost',
-            port: 8080            
-         }, { 
+            port: 8080
+         }, {
             context: '/user',
             host: 'localhost',
             port: 8080
-         }, {             
+         }, {
             context: '/settings',
             host: 'localhost',
             port: 8080

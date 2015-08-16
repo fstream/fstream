@@ -47,7 +47,8 @@
             });
             $scope.$on('snapshot', function(e, snapshot) {
                if (snapshot.symbol == $scope.symbol) {
-                  chart.addDepth(snapshot);
+                  // TODO: waiting for Daniel
+                  // chart.addDepth(snapshot);
                }
             });             
          }
