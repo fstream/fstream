@@ -20,4 +20,10 @@ dependencies {
   compile libraries.jacksonDatabind
   compile libraries.jacksonAnnotations
   compile libraries.jacksonJoda
+  
+  // Overrides
+  configurations.all {    
+    // http://stackoverflow.com/questions/31039367/spark-parallelize-could-not-find-creator-property-with-name-id
+    resolutionStrategy.force "com.fasterxml.jackson.core:jackson-databind:2.4.4"
+  }
 }

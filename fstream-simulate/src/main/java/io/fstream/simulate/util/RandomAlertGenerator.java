@@ -12,6 +12,7 @@ package io.fstream.simulate.util;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.fstream.core.model.event.AlertEvent;
 
+import java.util.List;
 import java.util.Random;
 
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,8 @@ public class RandomAlertGenerator implements Processor {
   /**
    * Configuration.
    */
-  private final int id;
-  private final String symbol;
+  private final List<Integer> ids;
+  private final List<String> symbol;
 
   /**
    * State.
@@ -45,14 +46,37 @@ public class RandomAlertGenerator implements Processor {
     MILLISECONDS.sleep(delay);
 
     val data = Maps.newHashMap();
-    val alert = new AlertEvent(DateTime.now(), id, symbol, data);
+    val alert = new AlertEvent(DateTime.now(), generateId(), generateSymbol(), data);
 
     // Simulated event
     exchange.getOut().setBody(alert);
   }
 
   private int generateDelay(int min, int max) {
-    return (int) (min + (max - min) * random.nextFloat());
+    return randomInt(min, max);
+  }
+
+  private String generateSymbol() {
+    return randomElement(symbol);
+  }
+
+  private int generateId() {
+    return randomElement(ids);
+  }
+
+  /**
+   * Return a random element in {@code list}.
+   */
+  protected <T> T randomElement(List<T> list) {
+    val randomIndex = random.nextInt(list.size());
+    return list.get(randomIndex);
+  }
+
+  /**
+   * Return a random number in range {@code [min, max]}
+   */
+  protected int randomInt(int min, int max) {
+    return min + random.nextInt(max - min) + 1;
   }
 
 }
