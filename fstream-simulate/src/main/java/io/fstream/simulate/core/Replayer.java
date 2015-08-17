@@ -10,6 +10,7 @@
 package io.fstream.simulate.core;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.AUTO_CLOSE_SOURCE;
+import static java.util.Comparator.comparing;
 import io.fstream.core.model.event.AbstractEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
@@ -17,7 +18,6 @@ import io.fstream.simulate.routes.PublishRoutes;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -155,7 +155,7 @@ public class Replayer extends AbstractExecutionThreadService {
 
   private static PriorityQueue<Event> createEventQueue() {
     // Prioritize by time
-    return new PriorityQueue<Event>(Comparator.<Event, DateTime> comparing(e -> e.getDateTime()));
+    return new PriorityQueue<>(comparing(e -> e.getDateTime()));
   }
 
   private static MappingIterator<Event> openEventStream(File file) throws JsonProcessingException, IOException {
