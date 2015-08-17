@@ -15,8 +15,10 @@ import static io.fstream.core.model.event.EventType.QUOTE;
 import static io.fstream.core.model.event.EventType.TRADE;
 import io.fstream.core.model.event.AbstractEvent;
 import io.fstream.core.model.event.Event;
+import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
+import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Trade;
 import io.fstream.simulate.routes.PublishRoutes;
 
@@ -81,11 +83,14 @@ public class Replayer extends AbstractExecutionThreadService {
     val orders = read("fstream-simulate-orders.json", Order.class);
     @Cleanup
     val quotes = read("fstream-simulate-quotes.json", Quote.class);
+    @Cleanup
+    val snapshots = read("fstream-simulate-snapshots.json", Snapshot.class);
 
     val events = createEventQueue();
     events.add(trades.next());
     events.add(orders.next());
     events.add(quotes.next());
+    events.add(snapshots.next());
 
     long currentTime = events.peek().getDateTime().getMillis();
 
@@ -114,6 +119,9 @@ public class Replayer extends AbstractExecutionThreadService {
       }
       if (event.getType() == QUOTE && quotes.hasNext()) {
         events.add(quotes.next());
+      }
+      if (event.getType() == EventType.SNAPSHOT && snapshots.hasNext()) {
+        events.add(snapshots.next());
       }
     }
   }
