@@ -16,6 +16,9 @@
 # - alerts
 # - metrics
 
+# Available input profiles:
+# - replay
+
 # Available output profiles:
 # - console
 # - log
@@ -53,7 +56,10 @@ simulate:
         partitioner=${kafka.producerProperties.partitioner.class}&\
         serializerClass=${kafka.producerProperties.serializer.class}"
    file:
+      # Where to read and write from
       dir: build
+      # Playback speed factor. 1.0 = realtime, 10.0 = ten times faster, etc.
+      speed: 1.0
    
    # How often to create book snapshot events
    snapshotInterval: 5
