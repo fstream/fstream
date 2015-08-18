@@ -20,8 +20,9 @@ import lombok.val;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.assertj.core.util.Maps;
 import org.joda.time.DateTime;
+
+import com.google.common.collect.Maps;
 
 /**
  * {@link QuoteEvent} generator used to create a simulated quote feed when running in simulation mode.
