@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
 
 // Can't use Boot's nested jar packaging due to Storm's classloader
 apply plugin: 'application'
@@ -26,10 +26,11 @@ shadowJar {
 
   // Required for Spring
   mergeServiceFiles()
+  transform(AppendingTransformer) { resource = 'reference.conf'  }
   transform(AppendingTransformer) { resource = 'META-INF/spring.handlers'  }
   transform(AppendingTransformer) { resource = 'META-INF/spring.schemas'  }
   transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.factories'  }
+  transform(PropertiesFileTransformer) { paths = ['META-INF/spring.factories' ] }
 }
 
 build.dependsOn shadowJar
