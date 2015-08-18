@@ -12,7 +12,6 @@ package io.fstream.compute.bolt;
 import io.fstream.core.model.definition.Definition;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
-import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.util.Codec;
 
@@ -41,7 +40,6 @@ import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.StatementAwareUpdateListener;
 import com.espertech.esper.client.metric.MetricEvent;
-import com.espertech.esper.client.time.CurrentTimeEvent;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
@@ -123,12 +121,6 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
   public void execute(Tuple tuple) {
     val value = (String) tuple.getValue(0);
     val event = Codec.decodeText(value, Event.class);
-    // send external timer event - timestamp of incoming event.
-    // Quote are truly external events. Rest are internally generated.
-    if (event.getType().equals(EventType.QUOTE)) {
-      runtime.sendEvent(new CurrentTimeEvent(event.getDateTime().getMillis()));
-    }
-
     runtime.sendEvent(event);
 
     collector.ack(tuple);
