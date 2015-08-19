@@ -80,6 +80,11 @@ public class Replayer extends AbstractExecutionThreadService {
 
     // Open streams
     val eventStreams = openEventStreams();
+    if (eventStreams.isEmpty()) {
+      log.warn("*** No streams available. Exiting...");
+      stopAsync();
+      return;
+    }
 
     // Initialize time ordered queue of blended events
     val eventQueue = createEventQueue();

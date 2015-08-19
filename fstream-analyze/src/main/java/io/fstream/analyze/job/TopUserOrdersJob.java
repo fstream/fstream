@@ -9,9 +9,11 @@
 
 package io.fstream.analyze.job;
 
+import static io.fstream.analyze.util.EventFunctions.filterOrderType;
 import static io.fstream.analyze.util.EventFunctions.parseOrder;
 import static io.fstream.analyze.util.SumFunctions.runningSumIntegers;
 import static io.fstream.analyze.util.SumFunctions.sumIntegers;
+import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
 import static io.fstream.core.model.topic.Topic.ORDERS;
 import io.fstream.analyze.core.JobContext;
 import io.fstream.core.model.definition.Metrics;
@@ -39,6 +41,7 @@ public class TopUserOrdersJob extends TopUserJob<Integer> {
     val userOrderAmounts =
         kafkaStream
             .map(parseOrder())
+            .filter(filterOrderType(LIMIT_ADD))
             .mapToPair(order -> pair(order.getUserId(), order.getAmount()))
             .reduceByKey(sumIntegers())
             .updateStateByKey(runningSumIntegers());

@@ -21,6 +21,8 @@
          getSymbols: getSymbols,
          getMetrics: getMetrics,
          getLastMetric: getLastMetric,
+         getTodaysAlertCount: getTodaysAlertCount,
+         getTodaysAlertCountsById: getTodaysAlertCountsById,
          getAlerts: getAlerts,
          getHistory: getHistory,
          getTicks: getTicks,
@@ -57,7 +59,26 @@
          });
       }      
 
-      function getAlerts(params) {
+      function getTodaysAlertCount() {
+         var series = 'alerts';
+         var where = getWhere(getTodayRange(), ['time']);
+         var query = 'SELECT COUNT(id) FROM "' + series + '" ' + where;
+
+         return executeQuery(query, function(result) {
+            return transformPoints(result)[0].count;
+         });
+      }
+      
+      function getTodaysAlertCountsById() {
+         var series = 'alerts';
+         var where = getWhere(getTodayRange(), ['time']);
+         // FIXME: Can't group by field. Need to change id to tag in persist
+         var query = 'SELECT COUNT(id) FROM "' + series + '" ' + where + ' GROUP BY id';
+
+         return executeQuery(query);
+      }
+      
+      function getAlerts() {
          var series = 'alerts';
          var limit = 50;
          var where = getWhere(params, ['id', 'time']);
@@ -162,6 +183,19 @@
          }
          
          return points;
+      }
+      
+      function getTodayRange() {
+         var start = new Date();
+         start.setHours(0,0,0,0);
+
+         var end = new Date();
+         end.setHours(23,59,59,999);
+         
+         return {
+            startTime: (start.getTime() / 1000).toFixed(0), 
+            endTime: (end.getTime() / 1000).toFixed(0)
+         }
       }
    }
 })();

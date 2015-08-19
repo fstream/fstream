@@ -11,10 +11,12 @@ package io.fstream.analyze.job;
 
 import static io.fstream.analyze.util.EventFunctions.castEvent;
 import static io.fstream.analyze.util.EventFunctions.filterEventType;
+import static io.fstream.analyze.util.EventFunctions.filterOrderType;
 import static io.fstream.analyze.util.EventFunctions.parseEvent;
 import static io.fstream.analyze.util.SumFunctions.runningSumLongs;
 import static io.fstream.core.model.event.EventType.ORDER;
 import static io.fstream.core.model.event.EventType.TRADE;
+import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
 import static io.fstream.core.model.topic.Topic.ORDERS;
 import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.analyze.core.JobContext;
@@ -50,6 +52,7 @@ public class TopUserOTRatiosJob extends TopUserJob<Float> {
             .map(parseEvent())
             .filter(filterEventType(ORDER))
             .map(castEvent(Order.class))
+            .filter(filterOrderType(LIMIT_ADD))
             .map(order -> order.getUserId())
             .countByValue()
             .updateStateByKey(runningSumLongs());

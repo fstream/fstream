@@ -21,6 +21,8 @@ import lombok.Data;
 public class State {
 
   private List<String> symbols = newArrayList();
+  private List<String> fxSymbols = newArrayList();
+
   private List<String> statements = newArrayList();
   private List<Alert> alerts = newArrayList();
   private List<Metric> metrics = newArrayList();

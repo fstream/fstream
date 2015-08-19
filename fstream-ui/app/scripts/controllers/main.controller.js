@@ -105,6 +105,7 @@
          // This could be smarter to allow not updating things that haven't changed
          $scope.views = [];
 
+         // Metrics
          _.each(state.metrics, function (metric, i) {
             $scope.views.push({
                type: 'metric-chart',
@@ -115,6 +116,7 @@
             });
          });
 
+         // Quotes - Equities
          _.each(state.symbols, function (symbol, i) {
             $scope.views.push({
                type: 'quote-chart',
@@ -122,6 +124,15 @@
                symbol: symbol
             });
          });
+         
+         // Quotes - FX
+         _.each(state.fxSymbols, function (symbol, i) {
+            $scope.views.push({
+               type: 'quote-chart',
+               index: i,
+               symbol: symbol
+            });
+         });         
       }
       
       function updateSettings(settings) {

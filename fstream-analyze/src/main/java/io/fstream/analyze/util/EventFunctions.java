@@ -13,6 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.Order;
+import io.fstream.core.model.event.Order.OrderType;
 import io.fstream.core.model.event.Trade;
 import io.fstream.core.util.Codec;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,11 @@ public final class EventFunctions {
   @NonNull
   public static Function<Event, Boolean> filterEventType(EventType eventType) {
     return event -> event.getType() == eventType;
+  }
+
+  @NonNull
+  public static Function<Order, Boolean> filterOrderType(OrderType orderType) {
+    return order -> order.getOrderType() == orderType;
   }
 
   @NonNull

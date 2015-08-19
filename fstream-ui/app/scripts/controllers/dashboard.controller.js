@@ -14,7 +14,7 @@
       .module('fstream')
       .controller('dashboardController', dashboardController);
 
-   dashboardController.$inject = ['$scope'];
+   dashboardController.$inject = ['$scope', 'historyService'];
    
    function dashboardController($scope, historyService) {
       var eventCount = 0;
@@ -24,6 +24,10 @@
       $scope.alertCount = 0;
       $scope.eventRate = 0;
       $scope.timeDelay = 0;
+      
+      historyService.getTodaysAlertCount().then(function(alertCount){
+         $scope.alertCount = alertCount;
+      });
       
       // Update dashboard metrics on events
       $scope.$on('alert', function () {

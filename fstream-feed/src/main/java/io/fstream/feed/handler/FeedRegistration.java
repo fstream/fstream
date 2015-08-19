@@ -44,7 +44,7 @@ public class FeedRegistration {
 
   @Handler
   public Message register() {
-    log.info("Registering {}...", state.getSymbols());
+    log.info("Registering {}...", state.getFxSymbols());
 
     // All these fields are required
     val message = new MarketDataRequest(
@@ -63,7 +63,7 @@ public class FeedRegistration {
     message.addGroup(entryTypes);
 
     // Symbols
-    for (val symbol : state.getSymbols()) {
+    for (val symbol : state.getFxSymbols()) {
       val relatedSymbols = new MarketDataRequest.NoRelatedSym();
       relatedSymbols.set(new Symbol(symbol));
       message.addGroup(relatedSymbols);
