@@ -11,28 +11,8 @@
          <h1><i class="fa fa-book"></i> Books</h1>
          <p class="lead">Order Book Dashboard</p>
       </div>
-      <div class="row history-form">
-         <form class="form-inline">
-            <div class="form-group">
-               <ui-select style="height: 34px; min-width: 168px" multiple ng-model="symbols.selected" theme="bootstrap" ng-disabled="disabled">
-                  <ui-select-match placeholder="Symbols">{{$item.name}}</ui-select-match>
-                  <ui-select-choices repeat="symbol in availableSymbols">
-                     {{symbol.name}}
-                  </ui-select-choices>
-               </ui-select>
-            </div>
-            <div class="form-group">
-               <label class="sr-only" for="startTime">User ID</label>
-               <input class="form-control" id="startTime" placeholder="User ID" ng-model="startTime">
-            </div>
-            <div class="form-group">
-               <label class="sr-only" for="endTime">User Type</label>
-               <input class="form-control" id="endTime" placeholder="User Type" ng-model="endTime">
-            </div>            
-            <button type="reset" class="btn btn-default">Clear</button>
-            <button type="submit" class="btn btn-outline btn-success" ng-click="updateHistory()">Search</button>
-         </form>
-      </div>
+      
+      <h2><div class="well"><span>symbol:</span> <b style="color: #62CB31">{{ symbol }}</b></div></h2>
       <div class="row">
          <div class="col-md-8">
             <book-chart id="order-book-chart" symbol="{{ symbol }}"></book-chart>

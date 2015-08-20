@@ -139,6 +139,7 @@
                   <tr>
                      <th>Time</th>
                      <th>ID</th>
+                     <th>Name</th>
                      <th>Sequence Number</th>
                      <th>Broker</th>
                      <th>Alert</th>
@@ -150,6 +151,7 @@
                      <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a>
                      </td>
                      <td>{{ alert.id }}</td>
+                     <td>{{ alert.name }}</td>
                      <td>{{ alert.sequence_number }}</td>
                      <td>OANDA</td>
                      <td><code>{{ alert.data }}</code>

@@ -19,8 +19,10 @@
    function dashboardController($scope, historyService) {
       var eventCount = 0;
       var startTime = new Date().getTime();
+      var averageLast20Delay = movingAverage(100 /* events */);
       
       // Initialize
+      $scope.orderCount = 0;
       $scope.alertCount = 0;
       $scope.eventRate = 0;
       $scope.timeDelay = 0;
@@ -34,8 +36,9 @@
          $scope.alertCount++;
       });
       $scope.$on('order', function(e, order) {
-         var delay = (order.processedTime - order.dateTime) / 1000;
-         $scope.timeDelay = delay;
+         $scope.orderCount++;
+         var delay = (order.processedTime - order.dateTime) / 1000.0;
+         $scope.timeDelay = averageLast20Delay(delay);
       });
       ['alert', 'metric', 'trade', 'order', 'quote'].forEach(function(eventType) {
          $scope.$on(eventType, function() {
@@ -44,5 +47,21 @@
             $scope.eventRate = eventCount / elapsed;
          });
       });
+   }
+   
+   function movingAverage(period) {
+      var nums = [];
+      return function(num) {
+         nums.push(num);
+         if (nums.length > period)
+            nums.splice(0,1);  // remove the first element of the array
+         var sum = 0;
+         for (var i in nums)
+            sum += nums[i];
+         var n = period;
+         if (nums.length < period)
+            n = nums.length;
+         return(sum/n);
+      }
    }
 })();

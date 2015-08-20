@@ -14,11 +14,12 @@
       .module('fstream')
       .controller('alertsCtrl', alertsCtrl);
 
-   alertsCtrl.$inject = ['$scope', '$filter', 'historyService'];
+   alertsCtrl.$inject = ['$scope', '$filter', 'stateService', 'historyService', 'lodash'];
 
-   function alertsCtrl($scope, $filter, historyService) {
+   function alertsCtrl($scope, $filter, stateService, historyService, _) {
       $scope.updateAlerts = updateAlerts;
       $scope.updateTimeRange = updateTimeRange;
+      $scope.alertDefs = _.indexBy(stateService.getCachedState().alerts, 'id');
 
       $scope.chartIncomeData = [{
          label: "line",
@@ -81,7 +82,11 @@
          }
 
          historyService.getAlerts(params).then(function (alerts) {
-            $scope.alerts = alerts;
+            $scope.alerts = _.map(alerts, function(alert) {
+               alert.name = ($scope.alertDefs[alert.id] || {}).name || 'Unknown';
+               
+               return alert;
+            });
          });
       }
 
