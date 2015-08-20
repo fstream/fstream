@@ -92,19 +92,27 @@
                      valueDecimals: 4,
                      useHTML: true,
                      formatter: function () {
-                        var s = '<b>' + Highcharts.dateFormat('%H:%M:%S %p', new Date(this.x)) + '</b>';
+                        var isAlert = this.point ? true : false;
                         
-                        s += "<div style='border-top: 2px solid " + this.points[0].series.color + "; margin: 2px 0;'></div>"
-                        s += "<table>"
-                        $.each(this.points, function () {
-                           if (this.point.options.high) {
-                              s += '<tr><td><b>Ask</b>&nbsp;</td><td class="text-right">' + this.point.options.high.toFixed(4) + '</td></tr>';
-                              s += '<tr><td><b>Bid</b>&nbsp;</td><td class="text-right">' + this.point.options.low.toFixed(4) + '</td></tr>';
-                           } else if (this.point.series.name !== 'Price') {
-                              s += '<tr><td><b>' + this.point.series.name + '</b>&nbsp;</td><td class="text-right">' + this.point.y.toFixed(4) + '</td></tr>';
-                           }
-                        });
-                        s += "</table>"
+                        var s = '<b>' + Highcharts.dateFormat('%H:%M:%S %p', new Date(this.x)) + '</b>';
+                        if(isAlert) {
+                           s += "<div style='border-top: 2px solid #c61515; margin: 2px 0;'></div>"
+                           s += "<table>"
+                           s += ' <tr><td><b>Alert ' + this.point.title + ':</b>&nbsp;</td><td>' + this.point.text + '</td></tr>';
+                           s += "</table>" ;
+                        } else {
+                           s += "<div style='border-top: 2px solid " + this.points[0].series.color + "; margin: 2px 0;'></div>"
+                           s += "<table>"
+                           $.each(this.points, function () {
+                              if (this.point.options.high) {
+                                 s += '<tr><td><b>Ask:</b>&nbsp;</td><td class="text-right">' + this.point.options.high.toFixed(4) + '</td></tr>';
+                                 s += '<tr><td><b>Bid:</b>&nbsp;</td><td class="text-right">' + this.point.options.low.toFixed(4) + '</td></tr>';
+                              } else if (this.point.series.name !== 'Price') {
+                                 s += '<tr><td><b>' + this.point.series.name + '</b>&nbsp;</td><td class="text-right">' + this.point.y.toFixed(4) + '</td></tr>';
+                              }
+                           });
+                           s += "</table>"
+                        }
 
                         return s;
                      }
@@ -281,11 +289,11 @@
                   maxAlertTime = lastAlert.dateTime;
                   
                   var values = _.map(sorted, function(alert) {
-                     var alertDef = getAlertDefinition(alert.id) || {};
+                     var alertDef = getAlertDefinition(alert.id) || {name: 'Unknown'};
                      return {
                         x: alert.time,
-                        title: " " + alert.id + " ",
-                        text: alertDef.name,
+                        title: alert.id,
+                        text: alertDef.name
                      };
                   });
                   
