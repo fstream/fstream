@@ -78,7 +78,7 @@
          return executeQuery(query);
       }
       
-      function getAlerts() {
+      function getAlerts(params) {
          var series = 'alerts';
          var limit = 50;
          var where = getWhere(params, ['id', 'time']);

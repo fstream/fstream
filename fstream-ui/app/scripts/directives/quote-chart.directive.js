@@ -230,18 +230,19 @@
                   onQuote(e, lastQuote);
                }
 
-               var shift = false,
-                   animate = false;
 
                maxAlertTime = alert.dateTime;
 
                var alertDef = getAlertDefinition(alert.id);               
 
+               var shift = false,
+                   animate = false;
+               
                chart.series[2].addPoint({
                   x: alert.dateTime,
                   title: " " + alert.id + " ",
                   text: alertDef.name,
-               }, false, shift, animate);
+               }, true, shift, animate);
             }
 
             function loadHistory() {
@@ -266,6 +267,30 @@
 
                   $scope.loading = false;
                });
+               
+               historyService.getAlerts({
+                  symbol: $scope.options.symbol
+               }).then(function (alerts) {
+                  if (!alerts) {
+                     return
+                  }
+                  
+                  var sorted = _.sortBy(alerts, 'time');
+
+                  var lastAlert = _.last(sorted);
+                  maxAlertTime = lastAlert.dateTime;
+                  
+                  var values = _.map(sorted, function(alert) {
+                     var alertDef = getAlertDefinition(alert.id) || {};
+                     return {
+                        x: alert.time,
+                        title: " " + alert.id + " ",
+                        text: alertDef.name,
+                     };
+                  });
+                  
+                  chart.series[2].setData(values, true, false);
+               });               
             }
 
             function getAlertDefinition(id) {

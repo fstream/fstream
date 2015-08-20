@@ -37,12 +37,12 @@ public class KafkaProducerPooledObjectFactory extends BasePooledObjectFactory<Ka
   public KafkaProducer create() throws Exception {
     val producerConfig = createProducerConfig();
 
-    return new KafkaProducer(new Producer<String, String>(producerConfig));
+    return new KafkaProducer(new Producer<>(producerConfig));
   }
 
   @Override
   public PooledObject<KafkaProducer> wrap(KafkaProducer producer) {
-    return new DefaultPooledObject<KafkaProducer>(producer);
+    return new DefaultPooledObject<>(producer);
   }
 
   @Override

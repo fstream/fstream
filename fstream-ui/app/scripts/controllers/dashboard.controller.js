@@ -26,7 +26,7 @@
       $scope.timeDelay = 0;
       
       historyService.getTodaysAlertCount().then(function(alertCount){
-         $scope.alertCount = alertCount;
+         $scope.alertCount = alertCount || 0;
       });
       
       // Update dashboard metrics on events

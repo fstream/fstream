@@ -35,7 +35,7 @@ public class KafkaProducerObjectPool extends LazySerializableObjectPool<KafkaPro
     val pooledObjectFactory = new KafkaProducerPooledObjectFactory(producerProperties);
     val poolConfig = createPoolConfig();
 
-    return new GenericObjectPool<KafkaProducer>(pooledObjectFactory, poolConfig);
+    return new GenericObjectPool<>(pooledObjectFactory, poolConfig);
   }
 
   private GenericObjectPoolConfig createPoolConfig() {
