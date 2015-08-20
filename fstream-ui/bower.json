@@ -63,6 +63,7 @@
     "prism": "*",
     "angular-ui-ace": "bower",
     "d3": "~3.5.6",
+    "d3-tip": "~0.6.7",
     "ng-table": "~0.8.3"
   },
   "resolutions": {
