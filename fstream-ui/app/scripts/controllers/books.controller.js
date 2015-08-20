@@ -22,14 +22,23 @@
          selected: []
       };
       $scope.snapshot = {};
+      $scope.quote = {};
       $scope.top = {};
 
       booksService.getTop().then(function(top) {
          $scope.top = top;
       });
       
+      $scope.$on('quote', function (e, quote) {
+         if ($scope.symbol == quote.symbol) {
+            $scope.quote = quote;
+         }
+      });
+      
       $scope.$on('snapshot', function (e, snapshot) {
-         if ($scope.symbol == snapshot.symbol) {
+         if ($scope.symbol == snapshot.symbol && $scope.quote) {
+            // Spit into above mid and below mid partitions
+            snapshot.orders = _.partition(snapshot.orders, function(order){ order.price > $scope.quote.mid });
             $scope.snapshot = snapshot;
          }
       });
