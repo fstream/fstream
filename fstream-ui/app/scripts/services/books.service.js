@@ -27,15 +27,13 @@
       function getBook(symbol) {
          return $q.all([
             historyService.getTrades(),
-            historyService.getOrders(),
             historyService.getQuotes(),
             historyService.getSnapshots()
          ]).then(function(data){
             return {
                trades: data[0].rows,
-               orders: data[1].rows,
-               quotes: data[2].rows,
-               snapshots: data[3].rows
+               quotes: data[1].rows,
+               snapshots: data[2].rows
             }
          });
       }
