@@ -12,7 +12,7 @@
          <p class="lead">Order Book Dashboard</p>
       </div>
       
-      <h2><div class="well"><span>symbol:</span> <b style="color: #62CB31">{{ symbol }}</b></div></h2>
+      <h2><div class="well"><span>symbol:</span> <b style="color: #62CB31">{{ symbol }}</b><span ng-show="quote.bid"> @ {{ quote.bid }} / {{ quote.ask }}</span></div></h2>
       <div class="row">
          <div class="col-md-8">
             <book-chart id="order-book-chart" symbol="{{ symbol }}"></book-chart>

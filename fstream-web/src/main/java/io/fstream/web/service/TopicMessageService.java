@@ -85,18 +85,27 @@ public class TopicMessageService extends AbstractExecutionThreadService {
     log.info("Reading from '{}' and writing to '{}'", getTopicName(), getMessageDestination());
 
     for (val messageAndMetadata : stream) {
-      val message = messageAndMetadata.message();
-
-      if (log.isDebugEnabled()) {
-        val text = new String(message);
-        log.debug("Received: {}", text);
+      if (!isRunning()) {
+        return;
       }
 
-      template.send(getMessageDestination(), convert(message));
+      try {
+        val message = messageAndMetadata.message();
+
+        if (log.isDebugEnabled()) {
+          val text = new String(message);
+          log.debug("Received '{}' topic message at offset {}: {}",
+              messageAndMetadata.topic(), messageAndMetadata.offset(), text);
+        }
+
+        template.send(getMessageDestination(), convert(message));
+      } catch (Exception e) {
+        log.error("Error procesing message {}: {}", messageAndMetadata, e);
+      }
     }
   }
 
-  private static Message<byte[]> convert(final byte[] message) {
+  private static Message<byte[]> convert(byte[] message) {
     return MessageBuilder.withPayload(message).build();
   }
 

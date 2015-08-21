@@ -53,12 +53,19 @@ public class EmbeddedKafka {
     log.info("Finished shutdown");
   }
 
+  /**
+   * @see https://kafka.apache.org/08/configuration.html
+   */
   private Properties createProperties() {
     log.info("Creating properties with zkConnect = '{}'", zkConnect);
     val properties = new Properties();
     properties.put("zookeeper.connect", zkConnect);
     properties.put("port", "6667");
     properties.put("broker.id", "0");
+
+    // Max size of each topic partition log:
+    properties.put("log.retention.bytes", "2147483648"); // 2 GB
+
     properties.put("log.dirs", logDir.getAbsolutePath());
 
     return properties;

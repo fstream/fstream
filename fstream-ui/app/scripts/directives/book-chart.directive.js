@@ -14,17 +14,18 @@
       .module('fstream')
       .directive('bookChart', bookChart);
 
-   bookChart.$inject = ['lodash'];
+   bookChart.$inject = ['lodash', 'booksService'];
    
-   function bookChart(_) {
+   function bookChart(_, booksService) {
       return {
          restrict : 'E',
          scope: {
             symbol: '@'
          },
          replace: true,
-         template: '<div class="book-chart-wrapper"></div>',         
+         templateUrl: 'views/components/book.html',         
          link: function($scope, $element, $attr) {
+            $scope.paused = false; 
             // TODO: Fix
             window._ = _;
             var chart = new BookViewer({
@@ -32,8 +33,17 @@
                 svgHeight: 500,
                 width: $element.width() - 75,
                 height: 400,
+                windowSize: 1000 * 60 * 0.5
             });
             chart.init('order-book-chart', new Date().getTime() - 15*1000);
+            
+            booksService.getBook($scope.symbol).then(function(book){
+               for (var i = 0; i < book.quotes.length; i++) {
+                  var quote = book.quotes[i];
+                  quote.dateTime = quote.time;
+                  chart.addQuote(quote);
+               }
+            });
             
             $scope.$on('quote', function(e, quote) {
                if (quote.symbol == $scope.symbol) {
@@ -49,7 +59,18 @@
                if (snapshot.symbol == $scope.symbol) {
                   chart.addDepth(snapshot);
                }
-            });             
+            });
+            
+            $scope.pause = function() {
+               $scope.paused = !$scope.paused;
+               chart.togglePause();
+            }
+            $scope.rewind = function() {
+               chart.rewind(1000 * 10)
+            }
+            $scope.forward = function() {
+               chart.forward(1000 * 10)
+            }            
          }
       };
    } 

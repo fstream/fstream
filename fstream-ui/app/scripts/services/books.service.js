@@ -18,11 +18,28 @@
 
    function booksService($http, $q, _, historyService) {
       var service = {
-         getTop: getTop
+         getTop: getTop,
+         getBook: getBook
       };
 
       return service;
 
+      function getBook(symbol) {
+         return $q.all([
+            historyService.getTrades(),
+            historyService.getOrders(),
+            historyService.getQuotes(),
+            historyService.getSnapshots()
+         ]).then(function(data){
+            return {
+               trades: data[0].rows,
+               orders: data[1].rows,
+               quotes: data[2].rows,
+               snapshots: data[3].rows
+            }
+         });
+      }
+      
       function getTop() {
          var ids = [10, 11, 12, 13];
          var results = _.map(ids, function (id) {

@@ -28,7 +28,8 @@
          getTicks: getTicks,
          getTrades: getTrades,
          getOrders: getOrders,
-         getQuotes: getQuotes
+         getQuotes: getQuotes,
+         getSnapshots: getSnapshots
       };
 
       return service;
@@ -109,7 +110,11 @@
       
       function getQuotes(params) {
          return getHistory('quotes', params);
-      }      
+      }
+      
+      function getSnapshots(params) {
+         return getHistory('snapshots', params);
+      }       
 
       function getHistory(series, params) {
          params = params || {};

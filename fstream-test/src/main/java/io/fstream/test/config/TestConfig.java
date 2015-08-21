@@ -45,13 +45,12 @@ public class TestConfig extends CoreConfig {
    */
   @Value("${zk.connect}")
   private String zkConnect;
-
-  private static File WORK_DIR = new File("/tmp/fstream-test");
+  @Value("${test.workDir}")
+  private File workDir;;
 
   @Bean
   @SneakyThrows
   public File workDir() {
-    val workDir = WORK_DIR;
     if (workDir.exists()) {
       deleteDirectory(workDir);
     }
