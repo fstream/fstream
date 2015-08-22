@@ -356,6 +356,8 @@ public class OrderBook extends BaseActor {
           priceLevels.put(price, side.calculatePriceDepth(price));
           val order = get(side.getPriceLevel(price), 0);
           orders.add(order);
+        } else {
+          break;
         }
       }
     }
@@ -367,6 +369,8 @@ public class OrderBook extends BaseActor {
           priceLevels.put(price, side.calculatePriceDepth(price));
           val order = get(side.getPriceLevel(price), 0);
           orders.add(order);
+        } else {
+          break;
         }
       }
     }

@@ -22,7 +22,7 @@
       $scope.logout = logout;
       
       authenticate();
-         
+      
       function login() {
          authenticate($scope.credentials, function () {
             if ($rootScope.authenticated) {
@@ -53,11 +53,7 @@
          $http.get('user', {
             headers: headers
          }).success(function (data) {
-            if (data.name) {
-               $rootScope.authenticated = true;
-            } else {
-               $rootScope.authenticated = false;
-            }
+            $rootScope.authenticated = true;
             callback && callback();
          }).error(function () {
             $rootScope.authenticated = false;

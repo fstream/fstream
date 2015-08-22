@@ -78,15 +78,15 @@ state:
          
       - id: 1
         name: Relative Tick Threshold
-        description: Tick-to-tick percentage is greater than 1%
+        description: Tick-to-tick percentage is greater than 20%
         statement: |
            CONTEXT SegmentedBySymbol
            SELECT
-              ask / prior(1, ask) AS askPercentChange, symbol,dateTime
+              mid / prior(1, mid) AS midPercentChange, symbol, dateTime
            FROM
               Quote
            WHERE
-              ask / prior(1, ask) > 1.01
+              mid / prior(1, mid) NOT BETWEEN 0.80 AND 1.20
 
       - id: 2
         name: Flat Pricing

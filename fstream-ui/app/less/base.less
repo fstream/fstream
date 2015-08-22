@@ -1,5 +1,38 @@
 /**
- * highcharts
+ * Animation
+ */
+
+@-webkit-keyframes fadeIt {
+  0%   { background-color: #FFFFFF; }
+  50%  { background-color: rgba(93, 217, 38, 0.30); }
+  100% { background-color: #FFFFFF; }
+}
+@-moz-keyframes fadeIt {
+  0%   { background-color: #FFFFFF; }
+  50%  { background-color: rgba(93, 217, 38, 0.30); }
+  100% { background-color: #FFFFFF; }
+}
+@-o-keyframes fadeIt {
+  0%   { background-color: #FFFFFF; }
+  50%  { background-color: rgba(93, 217, 38, 0.30); }
+  100% { background-color: #FFFFFF; }
+}
+@keyframes fadeIt {
+  0%   { background-color: #FFFFFF; }
+  50%  { background-color: rgba(93, 217, 38, 0.30); }
+  100% { background-color: #FFFFFF; }
+}
+
+.change-animation {    
+    background-image:none !important;
+    -webkit-animation: fadeIt 0.5s ease-in-out; 
+       -moz-animation: fadeIt 0.5s ease-in-out; 
+         -o-animation: fadeIt 0.5s ease-in-out; 
+            animation: fadeIt 0.5s ease-in-out; 
+}
+
+/**
+ * Highcharts
  */
 
 .highcharts-title,
@@ -64,4 +97,13 @@ pre.language-sql, pre.language-javascript {
    margin: 0px 0;
 }
 .book-chart-controls {
+}
+
+.book-chart-wrapper .start-label,
+.book-chart-wrapper .end-label {
+   font-size: 1em;
+}
+
+.crosshair {
+   //stroke: lawngreen;
 }

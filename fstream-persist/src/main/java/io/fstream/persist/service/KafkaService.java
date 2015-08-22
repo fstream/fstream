@@ -84,6 +84,10 @@ public class KafkaService extends AbstractExecutionThreadService {
     log.info("Running '{}'!", topic);
 
     for (val messageAndMetadata : stream) {
+      if (!isRunning()) {
+        return;
+      }
+
       val message = messageAndMetadata.message();
 
       if (log.isDebugEnabled()) {

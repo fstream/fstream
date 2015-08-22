@@ -9,7 +9,7 @@
 
 package io.fstream.test.kafka;
 
-import java.io.File;
+import java.util.Map;
 import java.util.Properties;
 
 import kafka.server.KafkaConfig;
@@ -27,9 +27,7 @@ public class EmbeddedKafka {
    * Configuration.
    */
   @NonNull
-  private final String zkConnect;
-  @NonNull
-  private final File logDir;
+  private final Map<String, String> brokerProperties;
 
   /**
    * State.
@@ -40,7 +38,7 @@ public class EmbeddedKafka {
     val properties = createProperties();
     server = new KafkaServerStartable(new KafkaConfig(properties));
 
-    log.info("Starting up server using logDir '{}'...", logDir.getAbsolutePath());
+    log.info("Starting up server using logDir '{}'...", properties.get("log.dirs"));
     server.startup();
     log.info("Finished startup");
   }
@@ -57,16 +55,9 @@ public class EmbeddedKafka {
    * @see https://kafka.apache.org/08/configuration.html
    */
   private Properties createProperties() {
-    log.info("Creating properties with zkConnect = '{}'", zkConnect);
+    log.info("Creating properties {}", brokerProperties);
     val properties = new Properties();
-    properties.put("zookeeper.connect", zkConnect);
-    properties.put("port", "6667");
-    properties.put("broker.id", "0");
-
-    // Max size of each topic partition log:
-    properties.put("log.retention.bytes", "2147483648"); // 2 GB
-
-    properties.put("log.dirs", logDir.getAbsolutePath());
+    properties.putAll(brokerProperties);
 
     return properties;
   }

@@ -38,7 +38,7 @@
             chart.init('order-book-chart');
             
             // This breaks stuff
-            load();
+            // load();
             
             $scope.$on('quote', function(e, quote) {
                if (quote.symbol == $scope.symbol) {
@@ -66,12 +66,12 @@
             $scope.forward = function() {
                chart.forward(1000 * 10)
             }            
-            $scope.expandPrice = function() {
+            $scope.rescalePrice = function() {
                chart.rescalePriceRange(0, 12);
             }
-            $scope.shrinkPrice = function() {
-               chart.rescalePriceRange(10, 12);
-            }
+            $scope.rescaleTime = function() {
+               chart.rescaleDateRange(1000 * 60);
+            }            
             
             function load() {
                booksService.getBook($scope.symbol).then(function(book){

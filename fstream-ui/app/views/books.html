@@ -12,13 +12,13 @@
          <p class="lead">Order Book Dashboard</p>
       </div>
       
-      <h2><div class="well"><span>symbol:</span> <b style="color: #62CB31">{{ symbol }}</b><span ng-show="quote.bid"> @ {{ quote.bid }} / {{ quote.ask }}</span></div></h2>
+      <h2><div class="well"><span>symbol:</span> <b style="color: #62CB31">{{ symbol }}</b><span ng-show="quote.bid" class="change-animation"> @ {{ quote.dateTime | date:'hh:mm:ss:sss a' }} {{ quote.bid | number:4 }} / {{ quote.ask | number:4 }}</span></div></h2>
       <div class="row">
          <div class="col-md-8">
             <book-chart id="order-book-chart" symbol="{{ symbol }}"></book-chart>
          </div>
          <div class="col-md-4">
-            <h3><i style="color: #8900BB" class="glyphicon glyphicon-triangle-bottom"></i> Sells</h3>
+            <h3 style="border-bottom: 2px solid #8900BB; padding-bottom: 5px;"><i style="color: #8900BB" class="glyphicon glyphicon-triangle-bottom"></i> Sells</h3>
             <table class="table table-striped table-hover">
                <thead>
                   <tr>
@@ -37,7 +37,7 @@
                   </tr>                     
                </tbody>
             </table>
-            <h3><i style="color: #3eb71a" class="glyphicon glyphicon-triangle-top"></i> Buys</h3>
+            <h3 style="border-bottom: 2px solid #3eb71a; padding-bottom: 5px;"><i style="color: #3eb71a" class="glyphicon glyphicon-triangle-top"></i> Buys</h3>
             <table class="table table-striped table-hover">
                <thead>
                   <tr>

@@ -102,31 +102,31 @@ simulate:
       probBuy: 0.49
       probMarket: 0.50
       probBestPrice: 0.80
-      probCancel: 0.50 # probabilty of existing order canceled and replaced with new one
+      probCancel: 0.25 # probabilty of existing order canceled and replaced with new one
       maxTradeSize: 5000
       minSleep: 500 # in millis
       maxSleep: 2000 # in millis
-      numAgents: 3000 #3000
+      numAgents: 100 #3000
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    retail:
       probBuy: 0.49
       probMarket: 0.69
       probBestPrice: 0.50
-      probCancel: 0.25 # probabilty of existing order canceled and replaced with new one
+      probCancel: 0.10 # probabilty of existing order canceled and replaced with new one
       maxTradeSize: 1000
       maxSleep: 10000 # in millis
       minSleep: 5000 # in millis
-      numAgents: 1500 #1500
+      numAgents: 50 #1500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    hft:
       probBuy: 0.49
       probMarket: 0.25
       probBestPrice: 0.19
-      probCancel: 0.75 # probabilty of existing order canceled and replaced with new one
+      probCancel: 0.50 # probabilty of existing order canceled and replaced with new one
       maxTradeSize: 2500
       maxSleep: 1000 # in millis
       minSleep: 100 # in millis
-      numAgents: 500 #500
+      numAgents: 10 #500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
 
 ---

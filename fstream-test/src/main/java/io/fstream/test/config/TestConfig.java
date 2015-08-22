@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.repeat;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import io.fstream.core.config.CoreConfig;
+import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.topic.Topic;
 import io.fstream.test.hbase.EmbeddedHBase;
 import io.fstream.test.kafka.EmbeddedKafka;
@@ -30,6 +31,7 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.I0Itec.zkclient.ZkClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
@@ -46,7 +48,9 @@ public class TestConfig extends CoreConfig {
   @Value("${zk.connect}")
   private String zkConnect;
   @Value("${test.workDir}")
-  private File workDir;;
+  private File workDir;
+  @Autowired
+  private KafkaProperties kafkaProperties;
 
   @Bean
   @SneakyThrows
@@ -80,7 +84,7 @@ public class TestConfig extends CoreConfig {
   @Bean
   @SneakyThrows
   public EmbeddedKafka embeddedKafka() {
-    return new EmbeddedKafka(zkConnect, new File(workDir(), "kafka"));
+    return new EmbeddedKafka(kafkaProperties.getBrokerProperties());
   }
 
   @Bean

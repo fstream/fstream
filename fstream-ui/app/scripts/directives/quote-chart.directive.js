@@ -297,7 +297,8 @@
                      };
                   });
                   
-                  chart.series[2].setData(values, true, false);
+                  var redraw = false, animation = false;
+                  chart.series[2].setData(values, redraw, animation);
                });               
             }
 

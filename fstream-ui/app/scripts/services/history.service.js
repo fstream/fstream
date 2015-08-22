@@ -150,6 +150,9 @@
          if (params.endTime && _.contains(columns, 'time')) {
             conditions.push('time < ' + params.endTime + 's');
          }
+         if (params.recent) {
+            conditions.push('time > now() - 1h');
+         }         
 
          return conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
       }

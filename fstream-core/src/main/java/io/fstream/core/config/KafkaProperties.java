@@ -29,6 +29,13 @@ import org.springframework.stereotype.Component;
 public class KafkaProperties {
 
   /**
+   * Kafka properties that effect broker behavior.
+   * <p>
+   * Only applicable to fstream-test
+   */
+  private Map<String, String> brokerProperties = newHashMap();
+
+  /**
    * Kafka properties that effect producer behavior.
    */
   private Map<String, String> producerProperties = newHashMap();

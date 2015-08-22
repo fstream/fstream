@@ -43,7 +43,7 @@ public class RandomAlertGenerator implements Processor {
 
   @Override
   public void process(Exchange exchange) throws Exception {
-    val delay = generateDelay(0, 1 * 1000);
+    val delay = generateDelay(0, 1 * 60 * 1000);
     MILLISECONDS.sleep(delay);
 
     val data = Maps.newHashMap();

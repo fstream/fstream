@@ -26,9 +26,9 @@
 
       function getBook(symbol) {
          return $q.all([
-            historyService.getTrades(),
-            historyService.getQuotes(),
-            historyService.getSnapshots()
+            historyService.getTrades({recent: true}),
+            historyService.getQuotes({recent: true}),
+            historyService.getSnapshots({recent: true})
          ]).then(function(data){
             return {
                trades: data[0].rows,

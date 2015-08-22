@@ -17,11 +17,16 @@ spring.profiles.active:
 # Profile - common
 ###############################################################################
 
-# Kafka
-kafka:
-   consumerProperties:
-      group.id: fstream-test
- 
 # Test     
 test:
    workDir: /tmp/fstream-test      
+
+# Kafka
+kafka:
+   brokerProperties:
+      host.name: localhost      
+      port: 6667
+      broker.id: 0
+      zookeeper.connect: ${zk.connect}
+      log.dirs: ${test.workDir}/kafka
+      log.retention.bytes: 2147483648 # 2 GB

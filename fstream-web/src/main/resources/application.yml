@@ -28,7 +28,6 @@ kafka:
 
 # Web 
 web:
-   secure: true
    analyticsUrl: http://localhost:8081
    
 # Security
