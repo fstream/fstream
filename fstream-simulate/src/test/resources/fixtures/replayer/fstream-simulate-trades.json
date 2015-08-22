@@ -1,0 +1,10 @@
+{"type":"TRADE","dateTime":1440254861908,"buyUser":"institutional-agent-28","sellUser":"institutional-agent-49","price":8.6,"activeBuy":false,"symbol":"HUF","amount":167}
+{"type":"TRADE","dateTime":1440254861916,"buyUser":"institutional-agent-49","sellUser":"institutional-agent-19","price":8.0,"activeBuy":false,"symbol":"BBM","amount":408}
+{"type":"TRADE","dateTime":1440254861997,"buyUser":"institutional-agent-53","sellUser":"institutional-agent-2","price":8.7,"activeBuy":false,"symbol":"TD","amount":3688}
+{"type":"TRADE","dateTime":1440254862016,"buyUser":"institutional-agent-32","sellUser":"institutional-agent-70","price":13.8,"activeBuy":true,"symbol":"BMO","amount":3674}
+{"type":"TRADE","dateTime":1440254862347,"buyUser":"hft-agent-6","sellUser":"institutional-agent-90","price":11.0,"activeBuy":false,"symbol":"BBM","amount":51}
+{"type":"TRADE","dateTime":1440254862347,"buyUser":"hft-agent-7","sellUser":"institutional-agent-90","price":11.0,"activeBuy":false,"symbol":"BBM","amount":1159}
+{"type":"TRADE","dateTime":1440254862347,"buyUser":"hft-agent-0","sellUser":"institutional-agent-90","price":11.0,"activeBuy":false,"symbol":"BBM","amount":1130}
+{"type":"TRADE","dateTime":1440254862347,"buyUser":"hft-agent-3","sellUser":"institutional-agent-90","price":11.0,"activeBuy":false,"symbol":"BBM","amount":19}
+{"type":"TRADE","dateTime":1440254862397,"buyUser":"institutional-agent-66","sellUser":"hft-agent-7","price":12.7,"activeBuy":true,"symbol":"BMO","amount":433}
+{"type":"TRADE","dateTime":1440254862415,"buyUser":"institutional-agent-80","sellUser":"hft-agent-7","price":12.7,"activeBuy":true,"symbol":"BMO","amount":600}

@@ -1,0 +1,10 @@
+{"type":"ORDER","dateTime":1440254861379,"side":"BID","orderType":"LIMIT_ADD","oid":1,"brokerId":"Scottrade","symbol":"BBM","amount":408,"price":8.0,"userId":"institutional-agent-49","processedTime":1440254861389}
+{"type":"ORDER","dateTime":1440254861466,"side":"ASK","orderType":"LIMIT_ADD","oid":2,"brokerId":"Fidelity","symbol":"RY","amount":4082,"price":13.4,"userId":"institutional-agent-55","processedTime":1440254861467}
+{"type":"ORDER","dateTime":1440254861715,"side":"BID","orderType":"LIMIT_ADD","oid":6,"brokerId":"TD Ameritrade","symbol":"TD","amount":4763,"price":8.7,"userId":"institutional-agent-53","processedTime":1440254861715}
+{"type":"ORDER","dateTime":1440254861777,"side":"ASK","orderType":"LIMIT_ADD","oid":7,"brokerId":"Fidelity","symbol":"BMO","amount":4092,"price":13.8,"userId":"institutional-agent-70","processedTime":1440254861777}
+{"type":"ORDER","dateTime":1440254861797,"side":"BID","orderType":"LIMIT_ADD","oid":8,"brokerId":"ETrade","symbol":"HUF","amount":167,"price":8.6,"userId":"institutional-agent-28","processedTime":1440254861797}
+{"type":"ORDER","dateTime":1440254861817,"side":"BID","orderType":"LIMIT_ADD","oid":9,"brokerId":"Scottrade","symbol":"TD","amount":2037,"price":8.2,"userId":"institutional-agent-39","processedTime":1440254861817}
+{"type":"ORDER","dateTime":1440254861908,"side":"ASK","orderType":"LIMIT_ADD","oid":11,"brokerId":"ETrade","symbol":"TD","amount":4668,"price":13.1,"userId":"institutional-agent-29","processedTime":1440254861908}
+{"type":"ORDER","dateTime":1440254861911,"side":"ASK","orderType":"LIMIT_ADD","oid":13,"brokerId":"Fidelity","symbol":"TD","amount":1258,"price":12.8,"userId":"hft-agent-0","processedTime":1440254861911}
+{"type":"ORDER","dateTime":1440254861911,"side":"ASK","orderType":"LIMIT_ADD","oid":14,"brokerId":"Merrill Edge","symbol":"TD","amount":2245,"price":12.8,"userId":"hft-agent-1","processedTime":1440254861911}
+{"type":"ORDER","dateTime":1440254861911,"side":"ASK","orderType":"LIMIT_ADD","oid":15,"brokerId":"Merrill Edge","symbol":"TD","amount":48,"price":12.8,"userId":"hft-agent-2","processedTime":1440254861911}

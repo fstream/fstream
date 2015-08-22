@@ -60,6 +60,10 @@ simulate:
       dir: build
       # Playback speed factor. 1.0 = realtime, 10.0 = ten times faster, etc.
       speed: 1.0
+      # How long to delay before running
+      delay: 5000
+      # Whether to loop during playback
+      loop: true
    
    # How often to create book snapshot events
    snapshotInterval: 5
