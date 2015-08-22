@@ -38,7 +38,7 @@
       $scope.$on('snapshot', function (e, snapshot) {
          if ($scope.symbol == snapshot.symbol && $scope.quote) {
             // Spit into above mid and below mid partitions
-            snapshot.orders = _.partition(snapshot.orders, function(order){ order.price > $scope.quote.mid });
+            snapshot.orders = _.partition(snapshot.orders, function(order){ return order.price > $scope.quote.mid });
             $scope.snapshot = snapshot;
          }
       });

@@ -10,10 +10,12 @@
 package io.fstream.simulate.core;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.AUTO_CLOSE_SOURCE;
+import static io.fstream.core.model.event.EventType.ORDER;
 import static java.util.Comparator.comparing;
 import io.fstream.core.model.event.AbstractEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
+import io.fstream.core.model.event.Order;
 import io.fstream.simulate.routes.PublishRoutes;
 
 import java.io.File;
@@ -87,9 +89,6 @@ public class Replayer extends AbstractExecutionThreadService {
 
   @Override
   protected void run() throws Exception {
-    // Wait for destination camel route (heuristic)
-    Thread.sleep(delay);
-
     log.info("Calculating interval...");
     val interval = getInterval();
     log.info("Calculated interval: {}", interval);
@@ -97,6 +96,10 @@ public class Replayer extends AbstractExecutionThreadService {
     // The duration of the entire cycle
     this.cycleDuration = interval.toDurationMillis();
     log.info("Calculated cycle duration: {} ms", cycleDuration);
+
+    // Wait for destination camel route (heuristic)
+    log.info("Delaying for {} ms...", delay);
+    Thread.sleep(delay);
 
     // Open streams
     val eventStreams = openEventStreams();
@@ -134,7 +137,13 @@ public class Replayer extends AbstractExecutionThreadService {
       }
 
       // Make it current
-      ((AbstractEvent) event).setDateTime(DateTime.now());
+      val dateTime = DateTime.now();
+      if (event.getType() == ORDER) {
+        val order = (Order) event;
+        val delay = order.getProcessedTime().getMillis() - order.getDateTime().getMillis();
+        order.setProcessedTime(dateTime.plus(delay));
+      }
+      setDateTime(event, dateTime);
 
       //
       // Publish
@@ -263,10 +272,13 @@ public class Replayer extends AbstractExecutionThreadService {
         val event = delegate.next();
         eventCount++;
 
-        // Advance time
-        val delta = cycleCount * cycleDuration;
-        val newDateTime = event.getDateTime().plus(delta);
-        setDateTime(event, newDateTime);
+        // Advance time due to looping
+        val offset = cycleCount * cycleDuration;
+        if (event.getType() == ORDER) {
+          val order = (Order) event;
+          order.setProcessedTime(order.getProcessedTime().plus(offset));
+        }
+        setDateTime(event, event.getDateTime().plus(offset));
 
         return event;
       }
