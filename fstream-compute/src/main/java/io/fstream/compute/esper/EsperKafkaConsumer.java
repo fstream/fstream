@@ -29,8 +29,8 @@ import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,12 +44,14 @@ import com.google.common.util.concurrent.AbstractExecutionThreadService;
 @Slf4j
 @Component
 @Profile("esper")
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EsperKafkaConsumer extends AbstractExecutionThreadService {
 
-  @Setter
-  @Autowired
-  protected KafkaProperties kafka;
+  /**
+   * Dependencies.
+   */
+  @NonNull
+  private final KafkaProperties kafka;
 
   @Getter
   private final BlockingQueue<Event> queue = new ArrayBlockingQueue<>(10);

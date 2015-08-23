@@ -9,31 +9,22 @@
 
 package io.fstream.compute.esper;
 
-import static io.fstream.core.util.Maps.getProperties;
-import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Definition;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
+import io.fstream.core.model.event.MetricEvent;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
 import io.fstream.core.model.state.State;
-import io.fstream.core.model.topic.Topic;
-import io.fstream.core.util.Codec;
-
-import java.util.List;
-
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
-import kafka.producer.ProducerConfig;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.espertech.esper.client.Configuration;
 import com.espertech.esper.client.EPAdministrator;
@@ -43,39 +34,35 @@ import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.StatementAwareUpdateListener;
-import com.espertech.esper.client.metric.MetricEvent;
 import com.espertech.esper.client.time.CurrentTimeEvent;
 
 @Slf4j
 public class EsperJob implements StatementAwareUpdateListener {
 
   /**
-   * Constants.
+   * Configuration.
    */
-  private static final String KAFKA_TOPIC_KEY = "1";
-
+  @Getter
+  private final String jobId;
   private final State state;
-  @Autowired
-  private final KafkaProperties kafka;
 
   /**
-   * Esper.
+   * Dependencies
    */
+  private final EsperKafkaProducer producer;
   private final EPServiceProvider provider;
   private final EPRuntime runtime;
   private final EPAdministrator admin;
 
   /**
-   * Kafka.
+   * Configuration.
    */
-  private final Producer<String, String> pruducer;
-
   private final boolean externalClock = false;
 
-  public EsperJob(String jobId, State state, KafkaProperties kafka) {
+  public EsperJob(String jobId, State state, EsperKafkaProducer producer) {
+    this.jobId = jobId;
     this.state = state;
-    this.kafka = kafka;
-    this.pruducer = createProducer();
+    this.producer = producer;
 
     val configuration = createConfiguration();
     if (externalClock) {
@@ -89,11 +76,15 @@ public class EsperJob implements StatementAwareUpdateListener {
     this.admin = provider.getEPAdministrator();
 
     log.info("[{}] Creating common statements...", jobId);
-    for (val statement : getStatements()) {
+    for (val statement : state.getStatements()) {
       log.info("Registering common statement: '{};", statement.replace('\n', ' '));
-      val epl = admin.createEPL(statement);
+      try {
+        val epl = admin.createEPL(statement);
 
-      epl.addListener(this);
+        epl.addListener(this);
+      } catch (Exception e) {
+        log.error("Error registering esper statement: {}", e);
+      }
     }
     log.info("Finished creating common statements.");
 
@@ -101,22 +92,6 @@ public class EsperJob implements StatementAwareUpdateListener {
     log.info("Creating '{}' statements...", this.getClass().getSimpleName());
     createStatements(admin);
     log.info("Finished creating '{}' statements.", this.getClass().getSimpleName());
-  }
-
-  private Event createEvent(int id, Object data) {
-    return new AlertEvent(new DateTime(), id, data);
-  }
-
-  private Configuration createConfiguration() {
-    val configuration = new Configuration();
-    configuration.configure();
-    configuration.addEventType("Trade", Trade.class.getName());
-    configuration.addEventType("Order", Order.class.getName());
-    configuration.addEventType("Quote", Quote.class.getName());
-    configuration.addEventType("Alert", AlertEvent.class.getName());
-    configuration.addEventType("Metric", MetricEvent.class.getName());
-
-    return configuration;
   }
 
   @SneakyThrows
@@ -139,21 +114,32 @@ public class EsperJob implements StatementAwareUpdateListener {
       val definition = (Definition) statement.getUserObject();
       for (val newEvent : newEvents) {
         val data = newEvent.getUnderlying();
-        val event = createEvent(definition.getId(), data);
+        val event = createEvent(definition, data);
 
-        val value = Codec.encodeText(event);
-        val topicName = resolveTopic(definition).getId();
-        val message = new KeyedMessage<String, String>(topicName, KAFKA_TOPIC_KEY, value);
-        pruducer.send(message);
+        producer.send(event);
       }
     }
   }
 
-  private Topic resolveTopic(Definition definition) {
-    return definition instanceof Alert ? Topic.ALERTS : Topic.METRICS;
+  public void stop() {
+    if (provider != null) {
+      provider.destroy();
+    }
   }
 
-  protected void createStatements(EPAdministrator admin) {
+  private Configuration createConfiguration() {
+    val configuration = new Configuration();
+    configuration.configure();
+    configuration.addEventType("Trade", Trade.class.getName());
+    configuration.addEventType("Order", Order.class.getName());
+    configuration.addEventType("Quote", Quote.class.getName());
+    configuration.addEventType("Alert", AlertEvent.class.getName());
+    configuration.addEventType("Metric", MetricEvent.class.getName());
+
+    return configuration;
+  }
+
+  private void createStatements(EPAdministrator admin) {
     val alerts = state.getAlerts();
     for (val alert : alerts) {
       log.info("Registering alert: {}", alert.getName());
@@ -171,22 +157,11 @@ public class EsperJob implements StatementAwareUpdateListener {
     }
   }
 
-  public void cleanup() {
-    if (provider != null) {
-      provider.destroy();
-    }
-  }
-
-  @SneakyThrows
-  private List<String> getStatements() {
-    return state.getStatements();
-  }
-
-  @SneakyThrows
-  private Producer<String, String> createProducer() {
-    val producerConfig = new ProducerConfig(getProperties(kafka.getProducerProperties()));
-
-    return new Producer<>(producerConfig);
+  private Event createEvent(Definition definition, Object data) {
+    val id = definition.getId();
+    return definition instanceof Alert ?
+        new AlertEvent(new DateTime(), id, data) :
+        new MetricEvent(new DateTime(), id, data);
   }
 
 }

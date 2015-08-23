@@ -10,8 +10,9 @@
 package io.fstream.compute.esper;
 
 import static java.util.UUID.randomUUID;
-import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.state.State;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("esper")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EsperJobFactory {
 
-  @Autowired
-  KafkaProperties kafka;
+  /**
+   * Dependencies.
+   */
+  @NonNull
+  private final EsperKafkaProducer producer;
 
   public EsperJob createJob(State state) {
     val jobId = createJobId("esper-job");
 
-    return new EsperJob(jobId, state, kafka);
+    return new EsperJob(jobId, state, producer);
   }
 
   private static String createJobId(String prefix) {

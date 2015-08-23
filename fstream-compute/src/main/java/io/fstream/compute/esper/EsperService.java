@@ -17,6 +17,7 @@ import io.fstream.core.service.StateService;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +32,17 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @Profile("esper")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EsperService implements StateListener {
 
   /**
    * Dependencies.
    */
-  @Autowired
+  @NonNull
   private StateService stateService;
-  @Autowired
+  @NonNull
   private EsperJobFactory jobFactory;
-  @Autowired
+  @NonNull
   private EsperJobExecutor jobExecutor;
 
   @PostConstruct
@@ -54,7 +56,6 @@ public class EsperService implements StateListener {
   @Override
   @SneakyThrows
   public void onUpdate(@NonNull State nextState) {
-    // TODO: Support removal of definitions
     log.info("{}", repeat("-", 100));
     log.info("Updating state...");
     log.info("{}", repeat("-", 100));
