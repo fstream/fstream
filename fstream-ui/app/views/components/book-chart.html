@@ -1,0 +1,25 @@
+<div class="book-chart-wrapper">
+   <div class="book-chart-controls">
+      <button type="button" class="btn btn-default" ng-click="pause()">
+        <span class="glyphicon glyphicon-pause" ng-class="paused ? 'glyphicon-play' : 'glyphicon-pause'" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="btn btn-default" ng-click="rewind()">
+        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+      </button>   
+      <button type="button" class="btn btn-default" ng-click="forward()">
+        <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="btn btn-default" ng-click="rescalePrice()">
+        <span class="glyphicon glyphicon-resize-vertical " aria-hidden="true"></span>
+      </button>
+      <button type="button" class="btn btn-default" ng-click="rescaleTime(30)">
+        <span>30s</span>
+      </button>      
+      <button type="button" class="btn btn-default" ng-click="rescaleTime(1)">
+        <span>1m</span>
+      </button>
+      <button type="button" class="btn btn-default" ng-click="rescaleTime(5)">
+        <span>5m</span>
+      </button>      
+   </div>   
+</div>
