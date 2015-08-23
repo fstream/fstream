@@ -11,7 +11,6 @@ package io.fstream.simulate.actor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.repeat;
-import static com.google.common.collect.Iterables.get;
 import static io.fstream.core.model.event.Order.OrderSide.ASK;
 import static io.fstream.core.model.event.Order.OrderSide.BID;
 import static io.fstream.core.model.event.Order.OrderType.LIMIT_ADD;
@@ -27,7 +26,8 @@ import io.fstream.simulate.config.SimulateProperties;
 import io.fstream.simulate.message.Command;
 import io.fstream.simulate.util.BookSide;
 
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,8 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-
-import scala.concurrent.duration.Duration;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -349,32 +347,8 @@ public class OrderBook extends BaseActor {
     val orders = Lists.<Order> newArrayList();
     val priceLevels = Maps.<Float, Integer> newHashMap();
 
-    {
-      int i = 0;
-      val side = asks;
-      for (val price : side.getPrices()) {
-        if (i++ < 10) {
-          priceLevels.put(price, side.calculatePriceDepth(price));
-          val order = get(side.getPriceLevel(price), 0);
-          orders.add(order);
-        } else {
-          break;
-        }
-      }
-    }
-    {
-      int i = 0;
-      val side = bids;
-      for (val price : side.getPrices()) {
-        if (i++ < 10) {
-          priceLevels.put(price, side.calculatePriceDepth(price));
-          val order = get(side.getPriceLevel(price), 0);
-          orders.add(order);
-        } else {
-          break;
-        }
-      }
-    }
+    calculateSide(asks, orders, priceLevels);
+    calculateSide(bids, orders, priceLevels);
 
     val snapshot = new Snapshot();
     snapshot.setDateTime(Exchange.getSimulationTime());
@@ -383,7 +357,30 @@ public class OrderBook extends BaseActor {
     snapshot.setPriceLevels(priceLevels);
 
     publisher().tell(snapshot, self());
-    scheduleSnapshot();
+  }
+
+  private void calculateSide(BookSide side, List<Order> orders, Map<Float, Integer> priceLevels) {
+    {
+      int i = 0;
+      for (val price : side.getPrices()) {
+        if (i++ < 10) {
+          priceLevels.put(price, side.calculatePriceDepth(price));
+        } else {
+          break;
+        }
+      }
+      if (i == 0) {
+        log.error("No asks!");
+      }
+    }
+    {
+      int i = 0;
+      val iterator = side.iterator();
+      while (iterator.hasNext() && i++ < 10) {
+        orders.add(iterator.next());
+      }
+    }
+
   }
 
   private boolean isExecutable(Order order) {
@@ -417,10 +414,6 @@ public class OrderBook extends BaseActor {
 
   private int calculateLatency(DateTime endTime, DateTime startTime) {
     return Seconds.secondsBetween(endTime, startTime).getSeconds();
-  }
-
-  private void scheduleSnapshot() {
-    scheduleSelfOnce(Command.SEND_BOOK_SNAPSHOT, Duration.create(properties.getSnapshotInterval(), TimeUnit.SECONDS));
   }
 
   /**

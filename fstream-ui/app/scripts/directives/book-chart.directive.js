@@ -38,16 +38,18 @@
             chart.init('order-book-chart');
             
             // This breaks stuff
-            // load();
+            //load();
             
             $scope.$on('quote', function(e, quote) {
                if (quote.symbol == $scope.symbol) {
                   chart.addQuote(quote);
+                  chart.guide(quote.dateTime);
                }
             });
             $scope.$on('trade', function(e, trade) {
                if (trade.symbol == $scope.symbol) {
                   chart.addTrade(trade);
+                  chart.guide(trade.dateTime);
                }
             });
             $scope.$on('snapshot', function(e, snapshot) {
@@ -67,46 +69,41 @@
                chart.forward(1000 * 10)
             }            
             $scope.rescalePrice = function() {
-               chart.rescalePriceRange(0, 12);
+               chart.rescalePriceRange(8, 12);
             }
-            $scope.rescaleTime = function() {
-               chart.rescaleDateRange(1000 * 60);
+            $scope.rescaleTime = function(scale) {
+               if (scale == 30) {
+                  chart.rescaleDateRange(1000 * 30);
+               }
+               if (scale == 1) {
+                  chart.rescaleDateRange(1000 * 60);
+               }
+               if (scale == 5) {
+                  chart.rescaleDateRange(1000 * 60 * 5);
+               }                  
             }            
             
             function load() {
                booksService.getBook($scope.symbol).then(function(book){
                   var quotes = _.map(book.quotes, function(quote) {
                      quote.type = 'QUOTE';
+                     quote.dateTime = quote.time;
                      return quote;
                   });
                   var trades = _.map(book.trades, function(trade) {
                      trade.type = 'TRADE';
+                     trade.dateTime = trade.time;
                      return trade;
                   });
                   var snapshots = _.map(book.snapshots, function(snapshot) {
                      snapshot.type = 'SNAPSHOT';
+                     snapshot.dateTime = snapshot.time;
                      snapshot.orders = JSON.parse(snapshot.orders);
                      snapshot.priceLevels = JSON.parse(snapshot.priceLevels);
                      return snapshot;
                   });                  
                   
-                  var events = _.union(quotes, trades, snapshots)
-                  events = _.sortBy(events, 'time');
-                  
-                  for (var i = 0; i < events.length; i++) {
-                     var event = events[i];
-                     event.dateTime = event.time;
-                     
-                     if (event.type == 'QUOTE') {
-                        chart.addQuote(event);
-                     }
-                     if (event.type == 'TRADE') {
-                        chart.addTrade(event);
-                     }
-                     if (event.type == 'SNAPSHOT') {
-                        chart.addDepth(event);
-                     }                     
-                  }                 
+                  chart.preload(quotes, trades, snapshots)               
                });
             }
          }
