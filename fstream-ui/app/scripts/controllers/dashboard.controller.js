@@ -40,6 +40,11 @@
          var delay = (order.processedTime - order.dateTime) / 1000.0;
          $scope.timeDelay = averageLast20Delay(delay);
       });
+      $scope.$on('metric', function(e, metric) {
+         if (metric.id == 3) {
+            $scope.timeDelay = metric.data.delay / 1000;
+         }
+      });      
       ['alert', 'metric', 'trade', 'order', 'quote'].forEach(function(eventType) {
          $scope.$on(eventType, function() {
             eventCount++;

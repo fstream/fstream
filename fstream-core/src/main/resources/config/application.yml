@@ -94,7 +94,8 @@ state:
         statement: |
            CONTEXT SegmentedBySymbol
            SELECT
-               symbol, dateTime,
+               symbol, 
+               dateTime,
                COUNT(*) AS eventCnt 
            FROM
                Quote.win:time(60 sec)
@@ -153,7 +154,7 @@ state:
            SELECT
                COUNT(*) AS count
            FROM
-               Quote.win:time_batch(1 min)
+               Quote.win:time_batch(1 min)            
 
       - id: 2
         name: Alerts per Minute
@@ -164,3 +165,13 @@ state:
                COUNT(*) AS count
            FROM
                Alert.win:time_batch(1 min)
+               
+      - id: 3
+        name: Time Delay
+        description: Calculates the average time delay of orders
+        units: Events / min
+        statement: |
+           SELECT
+               AVG(processedTime.millis - dateTime.millis) AS delay
+           FROM
+               `Order`.win:time_batch(2 sec)                

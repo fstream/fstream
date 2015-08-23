@@ -104,9 +104,6 @@ public class OrderBook extends BaseActor {
   @Override
   public void preStart() throws Exception {
     super.preStart();
-
-    // Trigger periodic snapshot behavior
-    // scheduleSnapshot();
   }
 
   @Override

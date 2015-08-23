@@ -3,5 +3,7 @@
     <expression math-context="precision=5 roundingMode=UNNECESSARY"/>
   </defaults>
   <plugin-singlerow-function name="fuzzyEquals" function-class="io.fstream.compute.esper.SingleRowFunctions" function-method="fuzzyEquals"/>
+  <plugin-singlerow-function name="eventMillis" function-class="io.fstream.compute.esper.SingleRowFunctions" function-method="eventMillis"/>
   <auto-import import-name="io.fstream.core.model.event.*"/>
+  <auto-import import-name="io.fstream.compute.esper.SingleRowFunctions"/>
 </engine-settings>

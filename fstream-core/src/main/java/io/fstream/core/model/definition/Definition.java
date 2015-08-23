@@ -15,6 +15,7 @@ import lombok.Data;
 public class Definition {
 
   private int id;
+  private DefinitionType type;
   private int version;
   private String name;
   private String description;

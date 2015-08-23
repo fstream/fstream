@@ -16,6 +16,7 @@ import static io.fstream.core.model.topic.Topic.QUOTES;
 import static io.fstream.core.model.topic.Topic.SNAPSHOTS;
 import static io.fstream.core.model.topic.Topic.TRADES;
 import io.fstream.core.config.CoreConfig;
+import io.fstream.core.config.Disabled;
 import io.fstream.core.service.LocalStateService;
 import io.fstream.core.service.StateService;
 import io.fstream.web.service.TopicMessageService;
@@ -44,6 +45,7 @@ public class WebConfig extends CoreConfig {
   }
 
   @Bean
+  @Disabled("Not needed in the UI right now")
   @Profile("kafka")
   public TopicMessageService ordersMessageService() {
     log.info("Starting order stream...");

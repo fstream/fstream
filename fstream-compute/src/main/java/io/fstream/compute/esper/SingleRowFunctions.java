@@ -12,6 +12,8 @@ package io.fstream.compute.esper;
 import static lombok.AccessLevel.PRIVATE;
 import lombok.NoArgsConstructor;
 
+import org.joda.time.DateTime;
+
 import com.google.common.math.DoubleMath;
 
 /**
@@ -24,6 +26,10 @@ public class SingleRowFunctions {
 
   public static boolean fuzzyEquals(double a, double b, double tolerance) {
     return DoubleMath.fuzzyEquals(a, b, tolerance);
+  }
+
+  public static long eventMillis(DateTime dateTime) {
+    return dateTime.getMillis();
   }
 
 }

@@ -10,7 +10,7 @@
 package io.fstream.web.service;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static io.fstream.core.util.PropertiesUtils.getProperties;
+import static io.fstream.core.util.Maps.getProperties;
 import io.fstream.core.config.KafkaProperties;
 import io.fstream.core.model.topic.Topic;
 

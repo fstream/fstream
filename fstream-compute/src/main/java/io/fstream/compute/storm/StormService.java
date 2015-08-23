@@ -7,12 +7,10 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.service;
+package io.fstream.compute.storm;
 
 import static com.google.common.base.Strings.repeat;
 import static com.google.common.collect.Maps.newConcurrentMap;
-import io.fstream.compute.storm.StormJobExecutor;
-import io.fstream.compute.storm.StormJobFactory;
 import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Metric;
 import io.fstream.core.model.state.State;
@@ -30,6 +28,7 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Ordering;
@@ -39,7 +38,8 @@ import com.google.common.collect.Ordering;
  */
 @Slf4j
 @Service
-public class ComputeService implements StateListener {
+@Profile("storm")
+public class StormService implements StateListener {
 
   /**
    * Dependencies.

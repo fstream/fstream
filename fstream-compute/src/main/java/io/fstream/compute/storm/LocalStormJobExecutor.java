@@ -58,6 +58,8 @@ public class LocalStormJobExecutor extends AbstractStormJobExecutor {
     val totalAvailableSlots = getTotalAvailableSlots();
     if (totalAvailableSlots == 0) {
       log.warn("*** No slots available!!!");
+    } else {
+      log.warn("Available slots: {}", totalAvailableSlots);
     }
 
     log.info("Submitting local storm job '{}'  with config {}...", job.getId(), job.getConfig());

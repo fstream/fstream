@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 
 @NoArgsConstructor(access = PRIVATE)
-public final class PropertiesUtils {
+public final class Maps {
 
   public static Properties getProperties(Map<String, String> map) {
     val value = new Properties();

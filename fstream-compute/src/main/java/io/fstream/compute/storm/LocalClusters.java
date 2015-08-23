@@ -32,13 +32,14 @@ public final class LocalClusters {
   @NonNull
   public static LocalCluster createLocalCluster(List<String> zkServers, long zkPort) {
     val daemonConf = new Config();
-    daemonConf.put(Config.TOPOLOGY_ACKER_EXECUTORS, 0);
     daemonConf.put(Config.STORM_ZOOKEEPER_SERVERS, zkServers);
     daemonConf.put(Config.STORM_ZOOKEEPER_PORT, zkPort);
+    daemonConf.put(Config.TOPOLOGY_ACKER_EXECUTORS, 0);
+    daemonConf.put(Config.TOPOLOGY_MAX_TASK_PARALLELISM, 1);
 
     val clusterParams = new MkClusterParam();
-    clusterParams.setSupervisors(5);
-    clusterParams.setPortsPerSupervisor(5);
+    clusterParams.setSupervisors(6);
+    clusterParams.setPortsPerSupervisor(6);
     clusterParams.setDaemonConf(daemonConf);
 
     return createLocalCluster(clusterParams);

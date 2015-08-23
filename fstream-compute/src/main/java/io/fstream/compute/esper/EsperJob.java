@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 fStream. All Rights Reserved.
+ * Copyright (c) 2015 fStream. All Rights Reserved.
  *
  * Project and contact information: https://bitbucket.org/fstream/fstream
  *
@@ -7,8 +7,11 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.compute.bolt;
+package io.fstream.compute.esper;
 
+import static io.fstream.core.util.Maps.getProperties;
+import io.fstream.core.config.KafkaProperties;
+import io.fstream.core.model.definition.Alert;
 import io.fstream.core.model.definition.Definition;
 import io.fstream.core.model.event.AlertEvent;
 import io.fstream.core.model.event.Event;
@@ -16,23 +19,21 @@ import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
+import io.fstream.core.model.state.State;
+import io.fstream.core.model.topic.Topic;
 import io.fstream.core.util.Codec;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import kafka.javaapi.producer.Producer;
+import kafka.producer.KeyedMessage;
+import kafka.producer.ProducerConfig;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
+
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.espertech.esper.client.Configuration;
 import com.espertech.esper.client.EPAdministrator;
@@ -44,60 +45,51 @@ import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.StatementAwareUpdateListener;
 import com.espertech.esper.client.metric.MetricEvent;
 import com.espertech.esper.client.time.CurrentTimeEvent;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
-public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUpdateListener {
+public class EsperJob implements StatementAwareUpdateListener {
 
   /**
    * Constants.
    */
   private static final String KAFKA_TOPIC_KEY = "1";
 
-  /**
-   * Configuration keys.
-   */
-  public static final String STATEMENTS_CONFIG_KEY = EsperBolt.class.getName();
+  private final State state;
+  @Autowired
+  private final KafkaProperties kafka;
 
   /**
    * Esper.
    */
-  private transient EPServiceProvider provider;
-  private transient EPRuntime runtime;
-  private transient EPAdministrator admin;
+  private final EPServiceProvider provider;
+  private final EPRuntime runtime;
+  private final EPAdministrator admin;
 
   /**
-   * Storm.
+   * Kafka.
    */
-  private transient OutputCollector collector;
+  private final Producer<String, String> pruducer;
 
   private final boolean externalClock = false;
 
-  @Override
-  public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(
-        FieldNameBasedTupleToKafkaMapper.BOLT_KEY,
-        FieldNameBasedTupleToKafkaMapper.BOLT_MESSAGE));
-  }
+  public EsperJob(String jobId, State state, KafkaProperties kafka) {
+    this.state = state;
+    this.kafka = kafka;
+    this.pruducer = createProducer();
 
-  @Override
-  public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context, OutputCollector collector) {
-    log.info("Preparing...");
     val configuration = createConfiguration();
-
     if (externalClock) {
       // Set external clock for esper
       configuration.getEngineDefaults().getThreading().setInternalTimerEnabled(false);
     }
 
-    this.collector = collector;
     this.provider = EPServiceProviderManager.getProvider(this.toString(), configuration);
     this.provider.initialize();
     this.runtime = provider.getEPRuntime();
     this.admin = provider.getEPAdministrator();
 
-    log.info("Creating common statements...");
-    for (val statement : getStatements(conf)) {
+    log.info("[{}] Creating common statements...", jobId);
+    for (val statement : getStatements()) {
       log.info("Registering common statement: '{};", statement.replace('\n', ' '));
       val epl = admin.createEPL(statement);
 
@@ -107,8 +99,12 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
 
     // Delegate to child
     log.info("Creating '{}' statements...", this.getClass().getSimpleName());
-    createStatements(conf, admin);
+    createStatements(admin);
     log.info("Finished creating '{}' statements.", this.getClass().getSimpleName());
+  }
+
+  private Event createEvent(int id, Object data) {
+    return new AlertEvent(new DateTime(), id, data);
   }
 
   private Configuration createConfiguration() {
@@ -123,22 +119,8 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
     return configuration;
   }
 
-  /**
-   * Template method to create a statement.
-   */
-  protected abstract void createStatements(Map<?, ?> conf, EPAdministrator admin);
-
-  /**
-   * Template method to create an event.
-   */
-  protected abstract Event createEvent(int id, Object data);
-
-  @Override
   @SneakyThrows
-  public void execute(Tuple tuple) {
-    val value = (String) tuple.getValue(0);
-    val event = Codec.decodeText(value, Event.class);
-
+  public void execute(Event event) {
     if (externalClock) {
       // Send external timer event - timestamp of incoming event.
       // Quote are truly external events. Rest are internally generated.
@@ -148,8 +130,6 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
     }
 
     runtime.sendEvent(event);
-
-    collector.ack(tuple);
   }
 
   @Override
@@ -160,14 +140,37 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
       for (val newEvent : newEvents) {
         val data = newEvent.getUnderlying();
         val event = createEvent(definition.getId(), data);
-        val value = Codec.encodeText(event);
 
-        collector.emit(new Values(KAFKA_TOPIC_KEY, value));
+        val value = Codec.encodeText(event);
+        val topicName = resolveTopic(definition).getId();
+        val message = new KeyedMessage<String, String>(topicName, KAFKA_TOPIC_KEY, value);
+        pruducer.send(message);
       }
     }
   }
 
-  @Override
+  private Topic resolveTopic(Definition definition) {
+    return definition instanceof Alert ? Topic.ALERTS : Topic.METRICS;
+  }
+
+  protected void createStatements(EPAdministrator admin) {
+    val alerts = state.getAlerts();
+    for (val alert : alerts) {
+      log.info("Registering alert: {}", alert.getName());
+      val statement = admin.createEPL(alert.getStatement(), alert);
+
+      statement.addListener(this);
+    }
+
+    val metrics = state.getMetrics();
+    for (val metric : metrics) {
+      log.info("Registering metric: {}", metric.getName());
+      val statement = admin.createEPL(metric.getStatement(), metric);
+
+      statement.addListener(this);
+    }
+  }
+
   public void cleanup() {
     if (provider != null) {
       provider.destroy();
@@ -175,10 +178,15 @@ public abstract class EsperBolt extends BaseRichBolt implements StatementAwareUp
   }
 
   @SneakyThrows
-  private static List<String> getStatements(Map<?, ?> conf) {
-    val value = (String) conf.get(STATEMENTS_CONFIG_KEY);
+  private List<String> getStatements() {
+    return state.getStatements();
+  }
 
-    return Codec.decodeText(value, new TypeReference<ArrayList<String>>() {});
+  @SneakyThrows
+  private Producer<String, String> createProducer() {
+    val producerConfig = new ProducerConfig(getProperties(kafka.getProducerProperties()));
+
+    return new Producer<>(producerConfig);
   }
 
 }

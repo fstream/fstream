@@ -18,13 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Application level configuration.
  */
 @Slf4j
 @Configuration
-public class ComputeConfig extends CoreConfig {
+@Profile("storm")
+public class StormConfig extends CoreConfig {
 
   @Bean
   public StormJobExecutor stormJobExecutor(@Value("${storm.local}") boolean local) {

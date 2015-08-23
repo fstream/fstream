@@ -11,7 +11,12 @@
 ###############################################################################
 
 # Profiles
-spring.profiles.active: development
+spring.profiles.active: development,storm
+
+# Kafka
+kafka:
+   consumerProperties:
+      group.id: fstream-compute
 
 ###############################################################################
 # Profile - common
