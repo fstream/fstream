@@ -21,7 +21,25 @@
       .directive('smallHeader', smallHeader)
       .directive('animatePanel', animatePanel)
       .directive('landingScrollspy', landingScrollspy)
+      .directive('animateChange', animateChange);
 
+   animateChange.$inject = ['$animate', '$timeout'];
+   
+   function animateChange($animate, $timeout) {
+      return function (scope, elem, attr) {
+         scope.$watch(attr.animateChange, function (nv, ov) {
+            if (nv != ov) {
+               var c = 'change-animation';
+               $animate.addClass(elem, c).then(function () {
+                  $timeout(function () {
+                     $animate.removeClass(elem, c)
+                  });
+               });
+            }
+         });
+      };
+   }
+   
    /**
     * pageTitle - Directive for set Page title - mata title
     */
