@@ -106,7 +106,7 @@ public class OrderBook extends BaseActor {
     super.preStart();
 
     // Trigger periodic snapshot behavior
-    scheduleSnapshot();
+    // scheduleSnapshot();
   }
 
   @Override
@@ -163,6 +163,7 @@ public class OrderBook extends BaseActor {
     } else {
       checkState(false);
     }
+
     updateQuote();
     if (properties.isValidate()) {
       validate();
@@ -308,6 +309,9 @@ public class OrderBook extends BaseActor {
       // Publish
       exchange().tell(quote, self());
       publisher().tell(quote, self());
+
+      // Update snapshot on quote
+      sendSnapshot();
     }
   }
 
