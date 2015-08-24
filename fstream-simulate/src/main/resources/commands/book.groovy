@@ -25,7 +25,7 @@ class book {
   @Command
   def main(InvocationContext context) {
     def simulator = getSimulator(context)
-    simulator.exchange.tell(Message.PRINT_ORDER_BOOK, null)
+    simulator.exchange.tell(Message.PRINT_BOOK, null)
     
     "The book has been printed to the console."
   }
