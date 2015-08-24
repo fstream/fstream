@@ -58,8 +58,11 @@
                stompClient.subscribe('/topic/state', function (frame) {
                   publishEvent("state", frame);
                });
+            }, function (error) {
+               console.log("Connection error!", error);
+               
+               publishEvent("disconnected");
             });
-
          },
 
          disconnect: function () {

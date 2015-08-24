@@ -36,7 +36,7 @@
 
       function getSymbols() {
          return executeQuery('SHOW TAG VALUES FROM quotes WITH KEY = symbol', function (result) {
-            return _.get(result, 'data[0].series[0].values[0]');
+            return _.get(result, 'data[0].series[0].values[0]', []);
          });
       }
 
@@ -56,7 +56,7 @@
          var query = 'SELECT * FROM "' + series + '"' + where + ' LIMIT ' + limit;
 
          return executeQuery(query, function(result) {
-            return JSON.parse(_.get(result, 'data[0].rows[0].data', '[]'));
+            return JSON.parse(_.get(result, 'data[0].rows[0].data', []));
          });
       }      
 
@@ -66,7 +66,8 @@
          var query = 'SELECT COUNT(id) FROM "' + series + '" ' + where;
 
          return executeQuery(query, function(result) {
-            return transformPoints(result)[0].count;
+            var rows = transformPoints(result);
+            return _.get(rows, '[0].count', 0);
          });
       }
       

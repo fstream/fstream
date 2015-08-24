@@ -1,8 +1,8 @@
-/* 
+/*
  * Copyright (c) 2015 fStream. All Rights Reserved.
- * 
+ *
  * Project and contact information: https://bitbucket.org/fstream/fstream
- * 
+ *
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
@@ -15,19 +15,20 @@
       .directive('bookChart', bookChart);
 
    bookChart.$inject = ['lodash', 'booksService'];
-   
+
    function bookChart(_, booksService) {
       return {
          restrict : 'E',
          scope: {
-            symbol: '@'
+            symbol: '@',
+            book: '='
          },
          replace: true,
-         templateUrl: 'views/components/book-chart.html',         
+         templateUrl: 'views/components/book-chart.html',
          link: function($scope, $element, $attr) {
-            $scope.paused = false; 
             // TODO: Fix
             window._ = _;
+            
             var chart = new BookViewer({
                 svgWidth: $element.width(),
                 svgHeight: 500,
@@ -36,9 +37,11 @@
                 windowSize: 1000 * 60 * 0.5
             });
             chart.init('order-book-chart');
-            
+
             // This breaks stuff
             //load();
+
+            $scope.book.paused
             
             $scope.$on('quote', function(e, quote) {
                if (quote.symbol == $scope.symbol) {
@@ -57,9 +60,9 @@
                   chart.addDepth(snapshot);
                }
             });
-            
+
             $scope.pause = function() {
-               $scope.paused = !$scope.paused;
+               $scope.book.paused = !$scope.book.paused;
                chart.togglePause();
             }
             $scope.rewind = function() {
@@ -67,9 +70,9 @@
             }
             $scope.forward = function() {
                chart.forward(1000 * 10)
-            }            
+            }
             $scope.rescalePrice = function() {
-               chart.rescalePriceRange(8, 12);
+               chart.rescalePriceRange(8, 14);
             }
             $scope.rescaleTime = function(scale) {
                if (scale == 30) {
@@ -80,9 +83,9 @@
                }
                if (scale == 5) {
                   chart.rescaleDateRange(1000 * 60 * 5);
-               }                  
-            }            
-            
+               }
+            }
+
             function load() {
                booksService.getBook($scope.symbol).then(function(book){
                   var quotes = _.map(book.quotes, function(quote) {
@@ -101,12 +104,12 @@
                      snapshot.orders = JSON.parse(snapshot.orders);
                      snapshot.priceLevels = JSON.parse(snapshot.priceLevels);
                      return snapshot;
-                  });                  
-                  
-                  chart.preload(quotes, trades, snapshots)               
+                  });
+
+                  chart.preload(quotes, trades, snapshots)
                });
             }
          }
       };
-   } 
+   }
 })();

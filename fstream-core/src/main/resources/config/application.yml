@@ -31,7 +31,7 @@ kafka:
    consumerProperties:
       zookeeper.connect: ${zk.connect}
       zookeeper.connection.timeout.ms: 1000000
-      
+
 # InfluxDB
 influxdb:
    username: root
@@ -41,7 +41,7 @@ influxdb:
    database: fstream
    url: http://${influxdb.host}:${influxdb.port}
 
-# State     
+# State
 state:
 
    # Registered instruments
@@ -169,7 +169,7 @@ state:
       - id: 3
         name: Time Delay
         description: Calculates the average time delay of orders
-        units: Events / min
+        units: ms
         statement: |
            SELECT
                AVG(processedTime.millis - dateTime.millis) AS delay
