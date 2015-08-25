@@ -78,7 +78,7 @@
       }
 
       function updateTimeRange(time) {
-         $scope.startTime = $scope.endTime = $filter('date')(time, 'yyyy-MM-dd HH:mm:ss');
+         $scope.startTime = $scope.endTime = $filter('date')(time, 'yyyy-mm-dd HH:mm:ss');
       }
 
       function updateSymbol(name) {

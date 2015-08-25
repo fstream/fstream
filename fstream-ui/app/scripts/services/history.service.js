@@ -123,8 +123,14 @@
          var limit = getLimit(params);
          var offset = getOffset(params);
          var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit + ' OFFSET ' + offset;
-         var column = series === 'quotes' ? 'ask' : 'amount';
-         
+         var column 
+         if (series == 'quotes' ) {
+            column = 'ask';
+         } else if (series == 'trades' || series == 'orders') {
+            column = 'amount';
+         } else if (series == 'alerts' || series == 'metrics') {
+            column = 'id';
+         }
          return executeQuery('SELECT COUNT(' + column + ') FROM "' + series + '" ' + where).then(function(count){
             return executeQuery(query).then(function(history){
                return {
@@ -176,7 +182,7 @@
          var data = _.get(result, 'data[0].series[0]', {columns:[], tags:{}, values: []});
          
          var points = [];
-         if (data == null) {
+         if (data == null || !data.values) {
             return points;
          }
         

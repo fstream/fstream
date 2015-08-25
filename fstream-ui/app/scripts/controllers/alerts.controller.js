@@ -14,11 +14,13 @@
       .module('fstream')
       .controller('alertsCtrl', alertsCtrl);
 
-   alertsCtrl.$inject = ['$scope', '$filter', 'stateService', 'historyService', 'lodash'];
+   alertsCtrl.$inject = ['$scope', '$filter', 'ngTableParams', 'lodash', 'stateService', 'historyService'];
 
-   function alertsCtrl($scope, $filter, stateService, historyService, _) {
+   function alertsCtrl($scope, $filter, ngTableParams, _, stateService, historyService) {
       $scope.updateAlerts = updateAlerts;
       $scope.updateTimeRange = updateTimeRange;
+      
+      $scope.resetParams = resetParams;
       $scope.alertDefs = _.indexBy(stateService.getCachedState().alerts, 'id');
 
       $scope.chartIncomeData = [{
@@ -68,30 +70,52 @@
             defaultTheme: false
          }
       };
-
-      activate();
-
-      function activate() {
+      
+      $scope.tableParams = new ngTableParams({
+            page: 1,            
+            count: 10,          
+            sorting: {
+                time: 'asc'     
+            }
+        }, {
+            total: 0,
+            getData: function($defer, table) {
+               historyService.getHistory('alerts', _.assign(getParams(), {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
+                  table.total(result.count);
+                  
+                  var rows = _.map(result.rows, function(alert) {
+                     alert.name = ($scope.alertDefs[alert.id] || {}).name || 'Unknown';
+                     return alert;
+                  });
+                  
+                  $defer.resolve(rows);
+               });
+            }
+        });      
+      
+      function resetParams() {
+         $scope.startTime = null;
+         $scope.endTime = null;
+         $scope.tableParams.parameters({page: 1});
          updateAlerts();
-      }
+      }      
 
-      function updateAlerts() {
-         var params = {
+      function getParams() {
+         return {
+            symbol: _.get($scope, 'symbols.selected[0].name', null),
             startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
             endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
-         }
-
-         historyService.getAlerts(params).then(function (alerts) {
-            $scope.alerts = _.map(alerts, function(alert) {
-               alert.name = ($scope.alertDefs[alert.id] || {}).name || 'Unknown';
-               
-               return alert;
-            });
-         });
+         };
+      }
+      
+      function updateAlerts() {
+         $scope.tableParams.reload();
       }
 
       function updateTimeRange(time) {
+         resetParams();
          $scope.startTime = $scope.endTime = $filter('date')(time, 'yyyy-MM-dd HH:mm:ss');
+         updateAlerts();
       }
    }
 })();
