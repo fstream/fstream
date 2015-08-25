@@ -24,7 +24,6 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -32,7 +31,6 @@ import com.google.common.collect.ImmutableSet;
  * Base class of "Top N User by <fact>" calculation jobs.
  */
 @Slf4j
-@Component
 public abstract class TopUserJob<T extends Comparable<T>> extends Job {
 
   /**

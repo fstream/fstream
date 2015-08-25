@@ -36,7 +36,7 @@
 
       function getSymbols() {
          return executeQuery('SHOW TAG VALUES FROM quotes WITH KEY = symbol', function (result) {
-            return _.get(result, 'data[0].series[0].values[0]');
+            return _.get(result, 'data[0].series[0].values[0]', []);
          });
       }
 
@@ -56,7 +56,7 @@
          var query = 'SELECT * FROM "' + series + '"' + where + ' LIMIT ' + limit;
 
          return executeQuery(query, function(result) {
-            return JSON.parse(_.get(result, 'data[0].rows[0].data', '[]'));
+            return JSON.parse(_.get(result, 'data[0].rows[0].data', []));
          });
       }      
 
@@ -66,7 +66,8 @@
          var query = 'SELECT COUNT(id) FROM "' + series + '" ' + where;
 
          return executeQuery(query, function(result) {
-            return transformPoints(result)[0].count;
+            var rows = transformPoints(result);
+            return _.get(rows, '[0].count', 0);
          });
       }
       
@@ -122,8 +123,14 @@
          var limit = getLimit(params);
          var offset = getOffset(params);
          var query = 'SELECT * FROM "' + series + '" ' + where + ' LIMIT ' + limit + ' OFFSET ' + offset;
-         var column = series === 'quotes' ? 'ask' : 'amount';
-         
+         var column 
+         if (series == 'quotes' ) {
+            column = 'ask';
+         } else if (series == 'trades' || series == 'orders') {
+            column = 'amount';
+         } else if (series == 'alerts' || series == 'metrics') {
+            column = 'id';
+         }
          return executeQuery('SELECT COUNT(' + column + ') FROM "' + series + '" ' + where).then(function(count){
             return executeQuery(query).then(function(history){
                return {
@@ -175,7 +182,7 @@
          var data = _.get(result, 'data[0].series[0]', {columns:[], tags:{}, values: []});
          
          var points = [];
-         if (data == null) {
+         if (data == null || !data.values) {
             return points;
          }
         

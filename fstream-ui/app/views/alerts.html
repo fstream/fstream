@@ -128,54 +128,50 @@
                <label class="sr-only" for="endTime">End Date / Time</label>
                <input class="form-control" id="endTime" date-time-picker placeholder="End Date / Time" ng-model="endTime">
             </div>
+            <button type="reset" class="btn btn-default" ng-click="resetParams()">Clear</button>
             <button type="submit" class="btn btn-outline btn-success" ng-click="updateAlerts()">Search</button>
          </form>
       </div>
 
       <div class="row m-t">
-         <div>
-            <table datatable="ng" class="table table-striped table-hover">
-               <thead>
-                  <tr>
-                     <th>Time</th>
-                     <th>ID</th>
-                     <th>Name</th>
-                     <th>Sequence Number</th>
-                     <th>Alert</th>
-                     <th></th>
-                  </tr>
-               </thead>
-               <tbody>
-                  <tr ng-repeat="alert in alerts">
-                     <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a>
-                     </td>
-                     <td>{{ alert.id }}</td>
-                     <td>{{ alert.name }}</td>
-                     <td>{{ alert.time }}</td>
-                     <td><code>{{ alert.data }}</code>
-                     </td>
-                     <td>
+         <table ng-table="tableParams" class="table table-striped table-hover">
+            <thead>
+               <tr>
+                  <th>Time</th>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Sequence Number</th>
+                  <th>Alert</th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr ng-repeat="alert in $data">
+                  <td><a ng-href="#" class="hover-link" ng-click="updateTimeRange(alert.time)">{{ alert.time | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
+                  <td>{{ alert.id }}</td>
+                  <td>{{ alert.name }}</td>
+                  <td>{{ alert.time }}</td>
+                  <td><code>{{ alert.data }}</code></td>
+                  <td>
+                     <form class="form-inline" role="form">
                         <div class="input-group">
                            <div class="input-group-btn">
                               <button tabindex="-1" class="btn btn-default" type="button">Assign</button>
                               <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><span class="caret"></span>
                               </button>
                               <ul class="dropdown-menu pull-right">
-                                 <li><a href="">Flag</a>
-                                 </li>
-                                 <li><a href="">Review</a>
-                                 </li>
+                                 <li><a href="">Flag</a></li>
+                                 <li><a href="">Review</a></li>
                                  <li class="divider"></li>
-                                 <li><a href="">Report</a>
-                                 </li>
+                                 <li><a href="">Report</a></li>
                               </ul>
                            </div>
                         </div>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-         </div>
+                     </form>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
       </div>
    </div>
 </div>
