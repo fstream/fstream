@@ -73,14 +73,16 @@
       
       $scope.tableParams = new ngTableParams({
             page: 1,            
-            count: 10,          
-            sorting: {
-                time: 'asc'     
-            }
+            count: 10
         }, {
             total: 0,
             getData: function($defer, table) {
-               historyService.getHistory('alerts', _.assign(getParams(), {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
+               var params = _.assign(getParams(), {
+                  offset: (table.page() -  1)  * table.count(), 
+                  limit: table.count()
+               });
+               
+               historyService.getHistory('alerts', params).then(function (result) {
                   table.total(result.count);
                   
                   var rows = _.map(result.rows, function(alert) {
@@ -93,13 +95,6 @@
             }
         });      
       
-      function resetParams() {
-         $scope.startTime = null;
-         $scope.endTime = null;
-         $scope.tableParams.parameters({page: 1});
-         updateAlerts();
-      }      
-
       function getParams() {
          return {
             symbol: _.get($scope, 'symbols.selected[0].name', null),
@@ -107,6 +102,13 @@
             endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
          };
       }
+      
+      function resetParams() {
+         $scope.startTime = null;
+         $scope.endTime = null;
+         $scope.tableParams.parameters({page: 1});
+         updateAlerts();
+      }      
       
       function updateAlerts() {
          $scope.tableParams.reload();

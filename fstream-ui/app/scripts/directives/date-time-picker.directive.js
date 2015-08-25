@@ -15,7 +15,7 @@
       .directive('dateTimePicker', dateTimePicker);
 
    dateTimeController.$inject = ['$scope', '$rootScope'];
-   
+
    function dateTimeController($scope, $rootScope) {
       $scope.vm = {
          message: "Bootstrap DateTimePicker Directive",
@@ -24,8 +24,8 @@
    }
 
    dateTimePicker.$inject = ['$rootScope'];
-   
-   function dateTimePicker($rootScope) {
+
+   function dateTimePicker($rootScope) {      
       return {
          require: '?ngModel',
          restrict: 'AE',
@@ -35,10 +35,18 @@
             useCurrent: '@',
             location: '@'
          },
-         link: function (scope, elem, attrs) {
-            elem.datetimepicker({
+         link: function (scope, elem, attrs, ngModelCtrl) {
+            var picker = elem.datetimepicker({
                format: 'YYYY-MM-DD HH:mm:ss'
-            })
+            });
+            ngModelCtrl.$render(function() {
+               picker.data('DateTimePicker').date(ngModelCtrl.$modelValue || '');
+            });
+            picker.on('dp.change', function(e) {
+               scope.$apply(function(){
+                  ngModelCtrl.$setViewValue(moment(e.date).format('YYYY-MM-DD HH:mm:ss'));
+               });
+            });         
          }
       }
    }

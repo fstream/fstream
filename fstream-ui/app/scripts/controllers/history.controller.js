@@ -23,24 +23,40 @@
       $scope.updateSymbol = updateSymbol;
       $scope.resetParams = resetParams;
       
+      var eventTypes = ['trades', 'orders', 'quotes'];
+
       // Init
       activate();
 
       function activate() {
          $scope.history = {trades:{}, orders:{}, quotes:{}};
-         
+
          // Order matters
-         resetParams();
          createTables();
+         resetParams();
          updateAvailableSymbols();
       }
-      
-      function resetParams() {
-         $scope.startTime = null;
-         $scope.endTime = null;
-         $scope.symbols = {
-            selected: []
-         };
+
+      function createTables() {
+         eventTypes.forEach(function(eventType){
+            $scope.history[eventType].tableParams = new ngTableParams({
+               page: 1,            
+               count: 10
+            }, {
+               total: 0,
+               getData: function($defer, table) {
+                  var params = _.assign(getParams(), {
+                     offset: (table.page() -  1)  * table.count(), 
+                     limit: table.count()
+                  });
+                  
+                  historyService.getHistory(eventType, params).then(function (result) {
+                     table.total(result.count);
+                     $defer.resolve(result.rows);
+                  });
+               }
+            });
+         });
       }
       
       function getParams() {
@@ -49,37 +65,35 @@
             startTime: $scope.startTime && moment($scope.startTime, "YYYY-MM-DD hh:mm:ss").unix(),
             endTime: $scope.endTime && moment($scope.endTime, "YYYY-MM-DD hh:mm:ss").unix() + 1
          };
-      }
+      }      
       
-      function updateHistory() {
-         ['trades', 'orders', 'quotes'].forEach(function(type){
-            $scope.history[type].tableParams.reload();
-         });
-      }
-
-      function createTables() {
-         ['trades', 'orders', 'quotes'].forEach(function(type){
-            $scope.history[type].tableParams = new ngTableParams({
-                  page: 1,            
-                  count: 10,          
-                  sorting: {
-                      time: 'asc'     
-                  }
-              }, {
-                  total: 0,
-                  getData: function($defer, table) {
-                     historyService.getHistory(type, _.assign(getParams(), {offset: table.page() * table.count(), limit: table.count() })).then(function (result) {
-                        table.total(result.count);
-                        $defer.resolve(result.rows);
-                     });
-                  }
-              });
-         });
+      function resetParams() {
+         $scope.startTime = null;
+         $scope.endTime = null;
+         $scope.symbols = {
+            selected: []
+         };
+         eventTypes.forEach(function(eventType) {
+            $scope.history[eventType].tableParams.parameters({page: 1});
+         })
+         
+         updateHistory();
       }
 
       function updateTimeRange(time) {
-         $scope.startTime = $scope.endTime = $filter('date')(time, 'yyyy-mm-dd HH:mm:ss');
+         $scope.startTime = $scope.endTime = $filter('date')(time, 'yyyy-MM-dd HH:mm:ss');
+         updateHistory();
       }
+      
+      function updateHistory() {
+         eventTypes.forEach(function(eventType){
+            $scope.history[eventType].tableParams.reload();
+         });
+      }
+      
+      /**
+       * Symbols
+       */
 
       function updateSymbol(name) {
          $scope.symbols = {
