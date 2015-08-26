@@ -14,11 +14,13 @@
       .module('fstream')
       .controller('chartController', chartController);
 
-   chartController.$inject = ['$scope', 'historyService'];
+   chartController.$inject = ['$scope', 'lodash', 'historyService'];
    
-   function chartController($scope, historyService) {
+   function chartController($scope, _, historyService) {
       // TODO: Implement
       $scope.enableChart = angular.noop;
       $scope.disableChart = angular.noop;
+      
+      $scope.quoteSymbols = ['EUR/USD', 'USD/JPY','USD/CAD', 'RY', 'BMO', 'TD'];
    }
 })();

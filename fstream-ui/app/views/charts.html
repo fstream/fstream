@@ -5,14 +5,14 @@
 <aside id="menu" ng-include="'views/common/navigation.html'"></aside>
 
 <!-- Main Wrapper -->
-<div id="wrapper">
+<div id="wrapper" ng-controller="chartController">
    <div class="content" animate-panel effect="fadeIn">
       <div class="row">
          <h1><i class="fa fa-line-chart"></i> Charts</h1>
          <p class="lead">High level system charting</p>
       </div>
       <div class="row">
-         <div ng-repeat="view in views | filter:{type: 'metric-chart'}" ng-switch="view.type" class="view">
+         <div ng-repeat="view in views | limitTo:2" ng-switch="view.type" class="view">
             <div class="col-lg-6 text-center">
                <div class="hpanel">
                   <div class="panel-heading">
@@ -30,7 +30,7 @@
       </div>
       <div class="row">
          <h3>Quotes</h3>
-         <div ng-repeat="view in views | filter:{type: 'quote-chart'}" ng-switch="view.type" class="view">
+         <div ng-repeat="view in views | filter:{type: 'quote-chart'}" class="view" ng-if="quoteSymbols.indexOf(view.symbol) > -1">
             <div class="col-lg-4 text-center">
                <div class="hpanel">
                   <div class="panel-heading">
@@ -39,7 +39,7 @@
                   </div>
                   <div class="panel-body text-center">
                      <div ng-controller="chartController">
-                        <quote-chart ng-switch-when="quote-chart" options="view"></quote-chart>
+                        <quote-chart options="view"></quote-chart>
                      </div>
                   </div>
                </div>
