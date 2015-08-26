@@ -72,6 +72,7 @@ public class OrderBook extends BaseActor {
   private int orderCount = 0;
   private int tradeCount = 0;
   private int snapshotCount = 0;
+  private Quote lastQuote = null;
 
   public OrderBook(SimulateProperties properties, String symbol) {
     super(properties);
@@ -301,12 +302,16 @@ public class OrderBook extends BaseActor {
           asks.calculatePriceDepth(bestAsk),
           bids.calculatePriceDepth(bestBid));
 
-      // Publish
-      exchange().tell(quote, self());
-      publisher().tell(quote, self());
+      if (lastQuote == null || (quote.getDateTime().getMillis() - lastQuote.getDateTime().getMillis()) >= 1) {
+        // Publish
+        exchange().tell(quote, self());
+        publisher().tell(quote, self());
 
-      // Update snapshot on quote
-      sendSnapshot();
+        // Update snapshot on quote
+        sendSnapshot();
+      }
+      lastQuote = quote;
+
     }
   }
 
