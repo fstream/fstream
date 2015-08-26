@@ -28,6 +28,7 @@ import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
+import kafka.message.MessageAndMetadata;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -81,21 +82,21 @@ public class EsperKafkaConsumer extends AbstractExecutionThreadService {
     val streams = createStreams();
     val executor = Executors.newFixedThreadPool(streams.size());
     for (val entry : streams.entrySet()) {
-      val stream = entry.getValue().get(0);
+      KafkaStream<byte[], byte[]> stream = entry.getValue().get(0);
 
       log.info("Submitting consumer for {}", entry.getKey());
       executor.submit(() -> {
-        for (val messageAndMetadata : stream) {
+        for (MessageAndMetadata<byte[], byte[]> messageAndMetadata : stream) {
           try {
-            val message = messageAndMetadata.message();
+            byte[] message = messageAndMetadata.message();
 
             if (log.isDebugEnabled()) {
-              val text = new String(message);
+              String text = new String(message);
               log.debug("Received '{}' topic message at offset {}: {}",
                   messageAndMetadata.topic(), messageAndMetadata.offset(), text);
             }
 
-            val event = Codec.decodeBytes(message, Event.class);
+            Event event = Codec.decodeBytes(message, Event.class);
             queue.put(event);
           } catch (Exception e) {
             log.error("Error procesing message {}: {}", messageAndMetadata, e);
