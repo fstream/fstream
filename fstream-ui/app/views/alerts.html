@@ -144,15 +144,16 @@
                <td>
                   <form class="form-inline" role="form">
                      <div class="input-group">
-                        <div class="input-group-btn">
-                           <button tabindex="-1" class="btn btn-default" type="button">Assign</button>
-                           <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"><span class="caret"></span>
+                        <div class="input-group-btn" ng-init="class = 'btn-default'; text = 'Assign'">
+                           <button ng-class="[class, 'btn']" ng-click="class = 'btn-success'" tabindex="-1" type="button">{{ text }}</button>
+                           <button ng-class="[class, 'btn', 'dropdown-toggle']" data-toggle="dropdown" type="button" aria-expanded="false"><span class="caret"></span>
                            </button>
                            <ul class="dropdown-menu pull-right">
-                              <li><a href="">Flag</a></li>
-                              <li><a href="">Review</a></li>
+                              <li><a ng-click="class = 'btn-success'; text = 'Assign'" href="">Assign</a></li>
+                              <li><a ng-click="class = 'btn-warning'; text = 'Flag'" href="">Flag</a></li>
+                              <li><a ng-click="class = 'btn-warning'; text = 'Review'" href="">Review</a></li>
                               <li class="divider"></li>
-                              <li><a href="">Report</a></li>
+                              <li><a ng-click="class = 'btn-danger'; text = 'Report'" href="">Report</a></li>
                            </ul>
                         </div>
                      </div>
