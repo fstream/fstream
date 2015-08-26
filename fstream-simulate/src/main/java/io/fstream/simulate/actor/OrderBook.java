@@ -302,7 +302,7 @@ public class OrderBook extends BaseActor {
           asks.calculatePriceDepth(bestAsk),
           bids.calculatePriceDepth(bestBid));
 
-      if (lastQuote == null || (quote.getDateTime().getMillis() - lastQuote.getDateTime().getMillis()) >= 1) {
+      if (lastQuote == null || (quote.getDateTime().getMillis() - lastQuote.getDateTime().getMillis()) >= 100) {
         // Publish
         exchange().tell(quote, self());
         publisher().tell(quote, self());

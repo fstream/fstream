@@ -29,8 +29,8 @@ kafka:
 # Analyze
 analyze:
    n: 20
-   batchInterval: 1 # Seconds
-   checkpointDir: /tmp/fstream/checkpoint
+   batchInterval: 5 # Seconds
+   checkpointDir: /tmp/fstream-persist/checkpoint
    
    
 # Spark

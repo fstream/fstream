@@ -110,7 +110,7 @@ simulate:
       maxTradeSize: 5000
       minSleep: 500 # in millis
       maxSleep: 2000 # in millis
-      numAgents: 100 #3000
+      numAgents: 150 #700 #100 #3000
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    retail:
       probBuy: 0.49
@@ -120,7 +120,7 @@ simulate:
       maxTradeSize: 1000
       maxSleep: 10000 # in millis
       minSleep: 5000 # in millis
-      numAgents: 50 #1500
+      numAgents: 75 #200 #50 #1500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES
    hft:
       probBuy: 0.49
@@ -130,7 +130,7 @@ simulate:
       maxTradeSize: 2500
       maxSleep: 1000 # in millis
       minSleep: 100 # in millis
-      numAgents: 10 #500
+      numAgents: 25 #100 #10 #500
       quoteSubscriptionLevel: SUBSCRIBE_QUOTES_PREMIUM
 
 ---
