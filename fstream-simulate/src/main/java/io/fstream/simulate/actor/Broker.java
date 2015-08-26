@@ -74,15 +74,15 @@ public class Broker extends BaseActor {
   }
 
   private ActorRef createRetailAgent(int i) {
-    return createAgent(RetailAgent.class, "ret" + i);
+    return createAgent(RetailAgent.class, "ret-" + i);
   }
 
   private ActorRef createInstitutionalAgent(int i) {
-    return createAgent(InstitutionalAgent.class, "inst" + i);
+    return createAgent(InstitutionalAgent.class, "inst-" + i);
   }
 
   private ActorRef createHftAgent(int i) {
-    return createAgent(HFTAgent.class, "hft" + i);
+    return createAgent(HFTAgent.class, "hft-" + i);
   }
 
   private ActorRef createAgent(Class<? extends Agent> agentClass, String name) {
