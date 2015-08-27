@@ -28,7 +28,7 @@ public class EsperJobFactory {
    * Dependencies.
    */
   @NonNull
-  private final EsperKafkaProducer producer;
+  private final EsperProducer producer;
 
   public EsperJob createJob(State state) {
     val jobId = createJobId("esper-job");

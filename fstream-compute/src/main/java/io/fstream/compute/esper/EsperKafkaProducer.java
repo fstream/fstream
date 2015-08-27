@@ -27,8 +27,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("esper")
-public class EsperKafkaProducer {
+@Profile("kafka")
+public class EsperKafkaProducer implements EsperProducer {
 
   /**
    * Constants.
@@ -49,6 +49,7 @@ public class EsperKafkaProducer {
     this.producer = createProducer();
   }
 
+  @Override
   public void send(Event event) {
     val value = Codec.encodeText(event);
     val topicName = resolveTopic(event).getId();

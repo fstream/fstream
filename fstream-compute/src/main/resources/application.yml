@@ -18,6 +18,12 @@ kafka:
    consumerProperties:
       group.id: fstream-compute
 
+# Simulation
+compute:
+   file:
+      # Where to read and write from
+      dir: /tmp/fstream-compute
+
 ###############################################################################
 # Profile - common
 ###############################################################################

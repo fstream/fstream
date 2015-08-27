@@ -49,7 +49,7 @@ public class EsperJob implements StatementAwareUpdateListener {
   /**
    * Dependencies
    */
-  private final EsperKafkaProducer producer;
+  private final EsperProducer producer;
   private final EPServiceProvider provider;
   private final EPRuntime runtime;
   private final EPAdministrator admin;
@@ -59,7 +59,7 @@ public class EsperJob implements StatementAwareUpdateListener {
    */
   private final boolean externalClock = false;
 
-  public EsperJob(String jobId, State state, EsperKafkaProducer producer) {
+  public EsperJob(String jobId, State state, EsperProducer producer) {
     this.jobId = jobId;
     this.state = state;
     this.producer = producer;
