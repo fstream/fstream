@@ -115,6 +115,7 @@ public class EsperKafkaConsumer extends AbstractExecutionThreadService {
     map.put(Topic.TRADES.getId(), 1);
     map.put(Topic.ORDERS.getId(), 1);
     map.put(Topic.QUOTES.getId(), 1);
+    map.put(Topic.ALERTS.getId(), 1);
 
     return consumerConnector.createMessageStreams(map);
   }

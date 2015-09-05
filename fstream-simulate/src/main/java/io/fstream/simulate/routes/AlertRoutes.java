@@ -30,7 +30,7 @@ public class AlertRoutes extends AbstractRoutes {
 
   @Override
   public void configure() throws Exception {
-    val period = 5000L;
+    val period = 15 * 1000L;
     val ids = ImmutableList.of(1,2,3,4);
     val symbols = ImmutableList.of("RY", "BMO", "RD", "BBM", "HUF");
 

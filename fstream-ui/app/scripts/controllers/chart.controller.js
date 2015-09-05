@@ -21,6 +21,6 @@
       $scope.enableChart = angular.noop;
       $scope.disableChart = angular.noop;
       
-      $scope.quoteSymbols = ['EUR/USD', 'USD/JPY','USD/CAD', 'RY', 'BMO', 'TD'];
+      $scope.quoteSymbols = ['EUR/USD', 'AUD/NZD','USD/CAD', 'RY', 'BMO', 'TD'];
    }
 })();
