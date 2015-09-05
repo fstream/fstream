@@ -18,6 +18,7 @@
 # - kafka
 
 # Available output profiles:
+# - parquet
 # - influxdb
 # - hadoop
 # - hbase
@@ -90,3 +91,19 @@ spark:
    # Need as many threads as (# of topics + 1) to service the streams. 
    # "local[*]" indicates physical cores on machine (8 typically)
    master: local[*] 
+
+   
+---
+
+###############################################################################
+# Profile - "parquet"
+###############################################################################
+   
+# Profile
+spring.profiles: parquet
+
+parquet:
+   files:
+      trades: build/trades.parquet
+      orders: build/orders.parquet
+      quotes: build/quotes.parquet

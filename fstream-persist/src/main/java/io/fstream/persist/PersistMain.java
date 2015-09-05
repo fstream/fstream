@@ -24,7 +24,7 @@ public class PersistMain {
 
     out.println("\n\n*** Running persist. Press CTLR+C to shutdown\n\n");
 
-    // TODO: daemonize
+    // TODO: Daemonize
     Thread.sleep(Long.MAX_VALUE);
   }
 
