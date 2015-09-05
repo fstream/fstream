@@ -19,6 +19,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import parquet.column.ParquetProperties;
@@ -31,6 +32,7 @@ import parquet.hadoop.example.GroupWriteSupport;
 import parquet.schema.MessageType;
 import parquet.schema.MessageTypeParser;
 
+@Ignore
 public class ParquetWriterTest {
 
   FileSystem fileSystem;
@@ -46,8 +48,8 @@ public class ParquetWriterTest {
   @Test
   public void testWriter() throws Exception {
     // Write
+    val groupFactory = new SimpleGroupFactory(createSchema());
     try (val writer = createWriter(createSchema())) {
-      val groupFactory = new SimpleGroupFactory(createSchema());
       val group = groupFactory.newGroup()
           .append("left", "L")
           .append("right", "R");
