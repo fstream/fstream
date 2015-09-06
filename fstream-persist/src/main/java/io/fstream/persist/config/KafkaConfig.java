@@ -16,7 +16,7 @@ import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Trade;
 import io.fstream.core.model.topic.Topic;
-import io.fstream.persist.service.KafkaService;
+import io.fstream.persist.kafka.KafkaService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

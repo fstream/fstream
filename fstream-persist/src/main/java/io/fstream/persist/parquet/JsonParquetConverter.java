@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.util;
+package io.fstream.persist.parquet;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;

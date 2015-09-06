@@ -7,12 +7,12 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.util;
+package io.fstream.persist.parquet;
 
 import static com.google.common.base.Strings.repeat;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import io.fstream.core.model.event.Quote;
-import io.fstream.persist.util.JsonParquetConverter;
+import io.fstream.persist.parquet.JsonParquetConverter;
 
 import java.io.File;
 import java.io.IOException;

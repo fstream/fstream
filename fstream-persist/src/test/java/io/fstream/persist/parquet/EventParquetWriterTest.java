@@ -7,35 +7,35 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.util;
+package io.fstream.persist.parquet;
 
 import static io.fstream.core.model.event.EventType.ORDER;
 import static io.fstream.core.model.event.EventType.QUOTE;
 import static io.fstream.core.model.event.EventType.TRADE;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
-
-import java.io.File;
-
+import io.fstream.persist.parquet.EventParquetWriter;
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 import lombok.val;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 
 public class EventParquetWriterTest {
 
-  String tradesFile = "build/trades.parquet";
-  String ordersFile = "build/orders.parquet";
-  String quotesFile = "build/quotes.parquet";
+  Path tradesFile = new Path("build/trades.parquet");
+  Path ordersFile = new Path("build/orders.parquet");
+  Path quotesFile = new Path("build/quotes.parquet");
 
   @Before
   public void setUp() {
-    deleteQuietly(new File(tradesFile));
-    deleteQuietly(new File(ordersFile));
-    deleteQuietly(new File(quotesFile));
+    deleteQuietly(tradesFile);
+    deleteQuietly(ordersFile);
+    deleteQuietly(quotesFile);
   }
 
   @Test
@@ -49,6 +49,11 @@ public class EventParquetWriterTest {
     @Cleanup
     val quotesWriter = new EventParquetWriter(QUOTE, quotesFile);
     quotesWriter.write(new Quote());
+  }
+
+  @SneakyThrows
+  private static void deleteQuietly(Path file) {
+    file.getFileSystem(new Configuration()).delete(file, false);
   }
 
 }

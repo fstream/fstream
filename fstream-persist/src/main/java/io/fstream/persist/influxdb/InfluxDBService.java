@@ -8,7 +8,7 @@
  */
 // @formatter:off
 
-package io.fstream.persist.service;
+package io.fstream.persist.influxdb;
 
 import static io.fstream.core.model.event.EventType.ALERT;
 import static io.fstream.core.model.event.EventType.METRIC;
@@ -25,6 +25,7 @@ import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Snapshot;
 import io.fstream.core.model.event.Trade;
 import io.fstream.core.util.Codec;
+import io.fstream.persist.core.PersistenceService;
 
 import java.util.concurrent.TimeUnit;
 

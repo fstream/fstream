@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.service;
+package io.fstream.persist.spark;
 
 import static com.google.common.base.Strings.repeat;
 import static java.util.concurrent.TimeUnit.SECONDS;

@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist;
+package io.fstream.persist.parquet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

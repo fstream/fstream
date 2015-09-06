@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.service;
+package io.fstream.persist.core;
 
 import io.fstream.core.model.event.Event;
 

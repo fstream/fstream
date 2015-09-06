@@ -7,7 +7,7 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.util;
+package io.fstream.persist.parquet;
 
 import static parquet.schema.OriginalType.UTF8;
 import static parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
@@ -22,7 +22,7 @@ import io.fstream.core.model.event.EventType;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
-import io.fstream.persist.util.EventParquetWriter.Groups;
+import io.fstream.persist.parquet.EventParquetWriter.Groups;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -62,10 +62,10 @@ public class EventParquetWriter implements Closeable {
   @NonNull
   private final ParquetWriter<Group> writer;
 
-  public EventParquetWriter(@NonNull EventType type, @NonNull String fileName) {
+  public EventParquetWriter(@NonNull EventType type, @NonNull Path outputFile) {
     this.type = type;
     this.schema = createSchema(type);
-    this.writer = createWriter(fileName, schema);
+    this.writer = createWriter(outputFile, schema);
   }
 
   @SneakyThrows
@@ -173,12 +173,12 @@ public class EventParquetWriter implements Closeable {
   }
 
   @SneakyThrows
-  private ParquetWriter<Group> createWriter(String fileName, MessageType schema) {
+  private ParquetWriter<Group> createWriter(Path outputFile, MessageType schema) {
     val conf = new Configuration();
     GroupWriteSupport.setSchema(schema, conf);
     val writeSupport = new GroupWriteSupport();
 
-    return new ParquetWriter<Group>(new Path(fileName), writeSupport,
+    return new ParquetWriter<Group>(outputFile, writeSupport,
         ParquetWriter.DEFAULT_COMPRESSION_CODEC_NAME,
         ParquetWriter.DEFAULT_BLOCK_SIZE,
         ParquetWriter.DEFAULT_PAGE_SIZE,

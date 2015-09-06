@@ -7,25 +7,23 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.service;
+package io.fstream.persist.parquet;
 
 import static io.fstream.core.model.event.EventType.ORDER;
 import static io.fstream.core.model.event.EventType.QUOTE;
 import static io.fstream.core.model.event.EventType.TRADE;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.EventType;
-import io.fstream.persist.util.EventParquetWriter;
-
-import java.io.File;
+import io.fstream.persist.core.PersistenceService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.SneakyThrows;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -38,12 +36,8 @@ public class ParquetService implements PersistenceService {
   /**
    * Configuration.
    */
-  @Value("${parquet.files.trades}")
-  private String tradesFileName;
-  @Value("${parquet.files.orders}")
-  private String ordersFileName;
-  @Value("${parquet.files.quotes}")
-  private String quotesFileName;
+  @Value("${persist.file.dir}")
+  private String fileDir;
 
   /**
    * State.
@@ -54,9 +48,10 @@ public class ParquetService implements PersistenceService {
 
   @PostConstruct
   public void initialize() {
-    this.tradesWriter = createWriter(TRADE, tradesFileName);
-    this.ordersWriter = createWriter(ORDER, ordersFileName);
-    this.quotesWriter = createWriter(QUOTE, quotesFileName);
+    log.info("Creating writers...");
+    this.tradesWriter = createWriter(TRADE, new Path(fileDir, "fstream-trades.parquet"));
+    this.ordersWriter = createWriter(ORDER, new Path(fileDir, "fstream-orders.parquet"));
+    this.quotesWriter = createWriter(QUOTE, new Path(fileDir, "fstream-quotes.parquet"));
   }
 
   @PreDestroy
@@ -85,12 +80,11 @@ public class ParquetService implements PersistenceService {
   }
 
   @SneakyThrows
-  private static EventParquetWriter createWriter(EventType type, String fileName) {
-    val file = new File(fileName);
-    log.info("Writing to '{}'", file.getCanonicalPath());
-    deleteQuietly(file);
+  private static EventParquetWriter createWriter(EventType type, Path outputFile) {
+    log.info("Writing '{}' events to '{}'", type, outputFile);
+    outputFile.getFileSystem(new Configuration()).delete(outputFile, false);
 
-    return new EventParquetWriter(type, fileName);
+    return new EventParquetWriter(type, outputFile);
   }
 
 }

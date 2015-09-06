@@ -7,10 +7,11 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist.service;
+package io.fstream.persist.hbase;
 
 import io.fstream.core.model.event.Event;
 import io.fstream.core.model.event.Quote;
+import io.fstream.persist.core.PersistenceService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

@@ -7,10 +7,10 @@
  * Proprietary and confidential.
  */
 
-package io.fstream.persist;
+package io.fstream.persist.parquet;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import io.fstream.persist.util.JsonParquetConverter;
+import io.fstream.persist.parquet.JsonParquetConverter;
 
 import java.io.File;
 
