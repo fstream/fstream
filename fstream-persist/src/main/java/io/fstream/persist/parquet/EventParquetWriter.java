@@ -42,6 +42,7 @@ import parquet.example.data.Group;
 import parquet.example.data.simple.SimpleGroup;
 import parquet.hadoop.ParquetWriter;
 import parquet.hadoop.example.GroupWriteSupport;
+import parquet.hadoop.metadata.CompressionCodecName;
 import parquet.schema.MessageType;
 import parquet.schema.PrimitiveType;
 
@@ -179,12 +180,12 @@ public class EventParquetWriter implements Closeable {
     val writeSupport = new GroupWriteSupport();
 
     return new ParquetWriter<Group>(outputFile, writeSupport,
-        ParquetWriter.DEFAULT_COMPRESSION_CODEC_NAME,
-        ParquetWriter.DEFAULT_BLOCK_SIZE,
-        ParquetWriter.DEFAULT_PAGE_SIZE,
+        CompressionCodecName.GZIP, // Default is uncompressed
+        ParquetWriter.DEFAULT_BLOCK_SIZE, // 128M
+        ParquetWriter.DEFAULT_PAGE_SIZE, // 1M
         ParquetWriter.DEFAULT_PAGE_SIZE, // Dictionary page size
-        ParquetWriter.DEFAULT_IS_DICTIONARY_ENABLED,
-        ParquetWriter.DEFAULT_IS_VALIDATING_ENABLED,
+        ParquetWriter.DEFAULT_IS_DICTIONARY_ENABLED, // true
+        ParquetWriter.DEFAULT_IS_VALIDATING_ENABLED, // valse
         ParquetProperties.WriterVersion.PARQUET_1_0, conf);
   }
 
