@@ -9,6 +9,7 @@
 
 package io.fstream.persist.util;
 
+import static parquet.schema.OriginalType.UTF8;
 import static parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 import static parquet.schema.PrimitiveType.PrimitiveTypeName.BOOLEAN;
 import static parquet.schema.PrimitiveType.PrimitiveTypeName.FLOAT;
@@ -130,34 +131,34 @@ public class EventParquetWriter implements Closeable {
     switch (type) {
     case TRADE:
       return new MessageType("trade",
-          new PrimitiveType(REQUIRED, BINARY, "type"),
+          new PrimitiveType(REQUIRED, BINARY, "type", UTF8),
           new PrimitiveType(OPTIONAL, INT64, "dateTime"),
-          new PrimitiveType(OPTIONAL, BINARY, "symbol"),
+          new PrimitiveType(OPTIONAL, BINARY, "symbol", UTF8),
 
-          new PrimitiveType(OPTIONAL, BINARY, "buyUser"),
-          new PrimitiveType(OPTIONAL, BINARY, "sellUser"),
+          new PrimitiveType(OPTIONAL, BINARY, "buyUser", UTF8),
+          new PrimitiveType(OPTIONAL, BINARY, "sellUser", UTF8),
           new PrimitiveType(OPTIONAL, INT32, "amount"),
           new PrimitiveType(OPTIONAL, FLOAT, "price"),
           new PrimitiveType(OPTIONAL, BOOLEAN, "activeBuy"));
     case ORDER:
       return new MessageType("order",
-          new PrimitiveType(REQUIRED, BINARY, "type"),
+          new PrimitiveType(REQUIRED, BINARY, "type", UTF8),
           new PrimitiveType(OPTIONAL, INT64, "dateTime"),
-          new PrimitiveType(OPTIONAL, BINARY, "symbol"),
+          new PrimitiveType(OPTIONAL, BINARY, "symbol", UTF8),
 
-          new PrimitiveType(OPTIONAL, BINARY, "orderType"),
-          new PrimitiveType(OPTIONAL, BINARY, "side"),
+          new PrimitiveType(OPTIONAL, BINARY, "orderType", UTF8),
+          new PrimitiveType(OPTIONAL, BINARY, "side", UTF8),
           new PrimitiveType(OPTIONAL, INT32, "oid"),
           new PrimitiveType(OPTIONAL, INT32, "amount"),
           new PrimitiveType(OPTIONAL, FLOAT, "price"),
-          new PrimitiveType(OPTIONAL, BINARY, "brokerId"),
-          new PrimitiveType(OPTIONAL, BINARY, "userId"),
+          new PrimitiveType(OPTIONAL, BINARY, "brokerId", UTF8),
+          new PrimitiveType(OPTIONAL, BINARY, "userId", UTF8),
           new PrimitiveType(OPTIONAL, INT64, "processedTime"));
     case QUOTE:
       return new MessageType("quote",
-          new PrimitiveType(REQUIRED, BINARY, "type"),
+          new PrimitiveType(REQUIRED, BINARY, "type", UTF8),
           new PrimitiveType(OPTIONAL, INT64, "dateTime"),
-          new PrimitiveType(OPTIONAL, BINARY, "symbol"),
+          new PrimitiveType(OPTIONAL, BINARY, "symbol", UTF8),
 
           new PrimitiveType(OPTIONAL, FLOAT, "ask"),
           new PrimitiveType(OPTIONAL, FLOAT, "bid"),
