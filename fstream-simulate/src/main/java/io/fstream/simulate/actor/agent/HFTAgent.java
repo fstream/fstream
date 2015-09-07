@@ -60,7 +60,7 @@ public class HFTAgent extends Agent {
   public void executeAction() {
     if (activeInstruments.isEmpty()) {
       // Send a message to exchange and then return null and wait for next decision iteration
-      exchange().tell(new ActiveInstruments(), self());
+      exchangeMessage(new ActiveInstruments());
       return;
     }
     Quote quote = getLastQuote(decideSymbol());
@@ -88,7 +88,7 @@ public class HFTAgent extends Agent {
     // Cancel any existing orders in the book
     cancelOpenOrdersBySymbol(order.getSymbol());
     // TODO: For now optimistically assume all LimitOrders sent are accepted by the exchange (no rejects)
-    exchange().tell(order, self());
+    exchangeMessage(order);
     openOrders.addOpenOrder(order);
 
   }

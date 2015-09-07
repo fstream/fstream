@@ -52,6 +52,11 @@ import com.google.common.collect.Maps;
 public class OrderBook extends BaseActor {
 
   /**
+   * Constants.
+   */
+  private static final int SUMMARY_INTERVAL = 100_000;
+
+  /**
    * Configuration.
    */
   @NonNull
@@ -62,6 +67,7 @@ public class OrderBook extends BaseActor {
    */
   private final BookSide asks = new BookSide(ASK);
   private final BookSide bids = new BookSide(BID);
+  private Quote lastQuote;
 
   /**
    * Aggregation caches.
@@ -69,13 +75,7 @@ public class OrderBook extends BaseActor {
   private float bestAsk = asks.getBestPrice();
   private float bestBid = bids.getBestPrice();
 
-  private int orderCount = 0;
-  private int tradeCount = 0;
-  private int quoteCount = 0;
-  private int snapshotCount = 0;
-  private Quote lastQuote = null;
-
-  public OrderBook(SimulateProperties properties, String symbol) {
+  public OrderBook(@NonNull SimulateProperties properties, @NonNull String symbol) {
     super(properties);
     this.symbol = symbol;
   }
@@ -90,16 +90,12 @@ public class OrderBook extends BaseActor {
 
   public void printSummary() {
     log.info(
-        "{} orders processed={}, trades processed={}, snapshots sent = {},  bidDepth={}, askDepth={} bestAsk={} bestBid={} spread={}",
-        symbol, orderCount, tradeCount, snapshotCount, bids.getDepth(), asks.getDepth(), bestAsk, bestBid, getSpread());
-  }
-
-  public void printStatus() {
-    log.info(
-        "[{}] order count: {}, trade count = {}, quoteCount = {}, snapshots count = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
-        symbol, orderCount, tradeCount, quoteCount, snapshotCount,
+        "[{}] stats = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}, spread = {}, quote = {}",
+        String.format("%3s", symbol),
+        stats,
         asks.calculateOrderCount(), bids.calculateOrderCount(),
-        asks.getDepth(), bids.getDepth());
+        asks.getDepth(), bids.getDepth(),
+        getSpread(), lastQuote);
   }
 
   @Override
@@ -123,21 +119,10 @@ public class OrderBook extends BaseActor {
   private void onReceiveOrder(Order order) {
     checkState(order.getSymbol() == symbol, "Received unexpected symbol '%s' for book '%s'", order.getSymbol(), this);
 
-    // Book keeping
-    orderCount += 1;
-
-    if (orderCount % 100_000 == 0) {
-      printStatus();
-    }
-
     log.debug("Processing {} order: {}", order.getOrderType(), order);
     order.setProcessedTime(getSimulationTime());
 
     if (order.getOrderType() == MARKET_ORDER) {
-      // TODO: Explain the need for this. Perhaps this should go into executeOrder.
-      // val price = order.getSide() == ASK ? Float.MIN_VALUE : Float.MAX_VALUE;
-      // order.setPrice(price);
-
       // TODO: Explain what happens if the order cannot be completely filled. Should it be rejected?
       executeOrder(order);
     } else if (order.getOrderType() == LIMIT_ADD) {
@@ -174,7 +159,7 @@ public class OrderBook extends BaseActor {
     } else if (command == Command.PRINT_SUMMARY) {
       printSummary();
     } else if (command == Command.SEND_BOOK_SNAPSHOT) {
-      sendSnapshot();
+      publishSnapshot();
     }
   }
 
@@ -245,9 +230,6 @@ public class OrderBook extends BaseActor {
    * Registers a trade
    */
   private void executeTrade(Order active, Order passiveOrder, int executedSize) {
-    // Book keeping
-    tradeCount += 1;
-
     val trade = new Trade();
     trade.setDateTime(getSimulationTime());
     trade.setPrice(passiveOrder.getPrice());
@@ -268,8 +250,8 @@ public class OrderBook extends BaseActor {
     }
 
     // Publish
-    exchange().tell(trade, self());
-    publisher().tell(trade, self());
+    exchangeMessage(trade);
+    publishEvent(trade);
 
     val latency = calculateLatency(active.getDateTime(), trade.getDateTime());
     val delayed = latency > 5;
@@ -300,18 +282,17 @@ public class OrderBook extends BaseActor {
 
     val changed = bestAsk != prevBestAsk || bestBid != prevBestBid;
     if (changed) {
-      quoteCount++;
       val quote = new Quote(getSimulationTime(), symbol, bestAsk, bestBid,
           asks.calculatePriceDepth(bestAsk),
           bids.calculatePriceDepth(bestBid));
 
       if (lastQuote == null || (quote.getDateTime().getMillis() - lastQuote.getDateTime().getMillis()) >= 100) {
         // Publish
-        exchange().tell(quote, self());
-        publisher().tell(quote, self());
+        exchangeMessage(quote);
+        publishEvent(quote);
 
         // Update snapshot on quote
-        sendSnapshot();
+        publishSnapshot();
       }
       lastQuote = quote;
 
@@ -330,8 +311,7 @@ public class OrderBook extends BaseActor {
       log.debug("Order took more than 5 seconds to be processed: {}", order);
     }
 
-    // publish to tape
-    publisher().tell(order, self());
+    publishOrder(order);
   }
 
   /**
@@ -345,13 +325,19 @@ public class OrderBook extends BaseActor {
     }
 
     log.debug("Cancelled order {}", order);
-    publisher().tell(order, self());
+    publishOrder(order);
 
     return true;
   }
 
-  private void sendSnapshot() {
-    snapshotCount++;
+  private void publishOrder(Order order) {
+    publishEvent(order);
+    if (stats.getOrderCount() % SUMMARY_INTERVAL == 0) {
+      printSummary();
+    }
+  }
+
+  private void publishSnapshot() {
     val orders = Lists.<Order> newArrayList();
     val priceLevels = Maps.<Float, Integer> newHashMap();
 
@@ -364,7 +350,7 @@ public class OrderBook extends BaseActor {
     snapshot.setOrders(orders);
     snapshot.setPriceLevels(priceLevels);
 
-    publisher().tell(snapshot, self());
+    publishEvent(snapshot);
   }
 
   private void calculateSide(BookSide side, List<Order> orders, Map<Float, Integer> priceLevels) {
@@ -437,7 +423,6 @@ public class OrderBook extends BaseActor {
 
       // Dump state
       printBook();
-      printStatus();
       printSummary();
 
       // Shutdown system

@@ -78,14 +78,14 @@ public abstract class ActiveAgent extends Agent {
       }
       cancelOpenOrdersBySymbol(order.getSymbol());
       openOrders.addOpenOrder(order);
-      exchange().tell(order, self());
+      exchangeMessage(order);
     }
   }
 
   private Order createOrder() {
     if (activeInstruments.isEmpty()) {
       // Send a message to exchange and then return null and wait for next decision iteration
-      exchange().tell(new ActiveInstruments(), self());
+      exchangeMessage(new ActiveInstruments());
       return null;
     }
 

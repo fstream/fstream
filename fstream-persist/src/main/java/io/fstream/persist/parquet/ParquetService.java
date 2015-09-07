@@ -52,13 +52,16 @@ public class ParquetService implements PersistenceService {
     this.tradesWriter = createWriter(TRADE, new Path(fileDir, "fstream-trades.parquet"));
     this.ordersWriter = createWriter(ORDER, new Path(fileDir, "fstream-orders.parquet"));
     this.quotesWriter = createWriter(QUOTE, new Path(fileDir, "fstream-quotes.parquet"));
+    log.info("Finished creating writers");
   }
 
   @PreDestroy
   public void destroy() throws Exception {
+    log.info("Closing writers...");
     tradesWriter.close();
     ordersWriter.close();
     quotesWriter.close();
+    log.info("Finished closing writers");
   }
 
   @Override

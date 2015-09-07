@@ -39,10 +39,8 @@ import lombok.val;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import scala.concurrent.Await;
-import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import akka.pattern.Patterns;
 import akka.util.Timeout;
 
 @Slf4j
@@ -83,7 +81,7 @@ public abstract class Agent extends BaseActor {
   @Override
   public void preStart() {
     // Register to receive quotes
-    exchange().tell(new SubscriptionQuoteRequest(this.getQuoteSubscriptionLevel()), self());
+    exchangeMessage(new SubscriptionQuoteRequest(this.getQuoteSubscriptionLevel()));
   }
 
   /**
@@ -124,7 +122,7 @@ public abstract class Agent extends BaseActor {
    */
   protected Quote getLastQuote(String symbol) {
     return quotes.computeIfAbsent(symbol, (key) -> {
-      Future<Object> future = Patterns.ask(exchange(), new QuoteRequest(symbol), msgResponseTimeout);
+      val future = exchangeAsk(new QuoteRequest(symbol), msgResponseTimeout);
       try {
         return (Quote) Await.result(future, msgResponseTimeout.duration());
       } catch (Exception e) {
@@ -142,12 +140,12 @@ public abstract class Agent extends BaseActor {
     val symbolOrders = openOrders.getOrders().get(symbol);
     for (val symbolOrder : symbolOrders) {
       // clone open order (minimal version necessary for removing from book)
-      Order cancelOrder =
+      val cancelOrder =
           new Order(symbolOrder.getSide(), OrderType.LIMIT_CANCEL, symbolOrder.getDateTime(),
               symbolOrder.getOid(),
               symbolOrder.getBrokerId(), symbolOrder.getSymbol(), symbolOrder.getAmount(), symbolOrder.getPrice(),
               symbolOrder.getUserId());
-      exchange().tell(cancelOrder, self());
+      exchangeMessage(cancelOrder);
     }
     openOrders.getOrders().removeAll(symbol);
   }

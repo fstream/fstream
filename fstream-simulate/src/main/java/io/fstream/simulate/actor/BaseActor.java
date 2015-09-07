@@ -10,7 +10,10 @@
 package io.fstream.simulate.actor;
 
 import static com.google.common.collect.Lists.newArrayList;
+import io.fstream.core.model.event.Event;
+import io.fstream.core.model.event.EventType;
 import io.fstream.simulate.config.SimulateProperties;
+import io.fstream.simulate.util.EventStats;
 
 import java.util.List;
 
@@ -21,9 +24,12 @@ import lombok.val;
 
 import org.joda.time.DateTime;
 
+import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 import akka.actor.ActorSelection;
 import akka.actor.UntypedActor;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 
 /**
  * Base class for all simulation actors.
@@ -41,20 +47,48 @@ public abstract class BaseActor extends UntypedActor {
   protected final SimulateProperties properties;
 
   /**
+   * Statistics.
+   */
+  protected final EventStats stats = new EventStats();
+
+  /**
    * State.
    */
   protected List<String> activeInstruments = newArrayList();
 
-  protected ActorSelection exchange() {
+  private ActorSelection exchange() {
     return context().actorSelection("/user/exchange");
   }
 
-  protected ActorSelection publisher() {
+  private ActorSelection publisher() {
     return context().actorSelection("/user/publisher");
   }
 
   protected static DateTime getSimulationTime() {
     return DateTime.now();
+  }
+
+  protected void exchangeMessage(@NonNull Object message) {
+    exchange().tell(message, self());
+  }
+
+  protected Future<Object> exchangeAsk(@NonNull Object message, Timeout timeout) {
+    return Patterns.ask(exchange(), message, timeout);
+  }
+
+  protected void publishEvent(@NonNull Event event) {
+    // Update stats
+    if (event.getType() == EventType.TRADE) {
+      stats.incrementTradeCount();
+    } else if (event.getType() == EventType.ORDER) {
+      stats.incrementOrderCount();
+    } else if (event.getType() == EventType.QUOTE) {
+      stats.incrementQuoteCount();
+    } else if (event.getType() == EventType.SNAPSHOT) {
+      stats.incrementSnapshotCount();
+    }
+
+    publisher().tell(event, self());
   }
 
   @NonNull

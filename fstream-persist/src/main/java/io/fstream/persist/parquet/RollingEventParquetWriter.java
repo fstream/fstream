@@ -40,10 +40,14 @@ public class RollingEventParquetWriter implements EventParquetWriter {
   private long thresholdEventCount;
 
   /**
-   * State.
+   * Statistics.
    */
   private long rollCount;
   private long eventCount;
+
+  /**
+   * State.
+   */
   private EventParquetWriter delegate;
 
   public RollingEventParquetWriter(EventType type, Path outputFile) {
