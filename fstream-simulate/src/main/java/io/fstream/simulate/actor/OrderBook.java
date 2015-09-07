@@ -71,6 +71,7 @@ public class OrderBook extends BaseActor {
 
   private int orderCount = 0;
   private int tradeCount = 0;
+  private int quoteCount = 0;
   private int snapshotCount = 0;
   private Quote lastQuote = null;
 
@@ -95,9 +96,10 @@ public class OrderBook extends BaseActor {
 
   public void printStatus() {
     log.info(
-        "[{}] trade count = {}, snapshots sent = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
-        symbol, tradeCount, snapshotCount, asks.calculateOrderCount(), bids.calculateOrderCount(), asks.getDepth(),
-        bids.getDepth());
+        "[{}] order count: {}, trade count = {}, quoteCount = {}, snapshots count = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}",
+        symbol, orderCount, tradeCount, quoteCount, snapshotCount,
+        asks.calculateOrderCount(), bids.calculateOrderCount(),
+        asks.getDepth(), bids.getDepth());
   }
 
   @Override
@@ -298,6 +300,7 @@ public class OrderBook extends BaseActor {
 
     val changed = bestAsk != prevBestAsk || bestBid != prevBestBid;
     if (changed) {
+      quoteCount++;
       val quote = new Quote(getSimulationTime(), symbol, bestAsk, bestBid,
           asks.calculatePriceDepth(bestAsk),
           bids.calculatePriceDepth(bestBid));

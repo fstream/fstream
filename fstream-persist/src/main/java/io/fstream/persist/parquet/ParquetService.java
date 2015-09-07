@@ -84,7 +84,7 @@ public class ParquetService implements PersistenceService {
     log.info("Writing '{}' events to '{}'", type, outputFile);
     outputFile.getFileSystem(new Configuration()).delete(outputFile, false);
 
-    return new EventParquetWriter(type, outputFile);
+    return new RollingEventParquetWriter(type, outputFile, 10_000_000);
   }
 
 }

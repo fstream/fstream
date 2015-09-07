@@ -15,13 +15,13 @@ import static io.fstream.core.model.event.EventType.TRADE;
 import io.fstream.core.model.event.Order;
 import io.fstream.core.model.event.Quote;
 import io.fstream.core.model.event.Trade;
-import io.fstream.persist.parquet.EventParquetWriter;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,13 +41,25 @@ public class EventParquetWriterTest {
   @Test
   public void testWrite() throws Exception {
     @Cleanup
-    val tradesWriter = new EventParquetWriter(TRADE, tradesFile);
-    tradesWriter.write(new Trade());
+    val tradesWriter = new RollingEventParquetWriter(TRADE, tradesFile);
+
+    for (int i = 0; i < 1_000_000_000; i++) {
+      val trade = new Trade();
+      trade.setActiveBuy(i % 2 == 0);
+      trade.setAmount(i);
+      trade.setDateTime(DateTime.now());
+      trade.setSymbol(i % 5 + "");
+      trade.setPrice((i % 10) * 1.1f);
+      trade.setSellUser(i % 1000 + "");
+      trade.setBuyUser(i % 2000 + "");
+      tradesWriter.write(trade);
+    }
+
     @Cleanup
-    val ordersWriter = new EventParquetWriter(ORDER, ordersFile);
+    val ordersWriter = new BasicEventParquetWriter(ORDER, ordersFile);
     ordersWriter.write(new Order());
     @Cleanup
-    val quotesWriter = new EventParquetWriter(QUOTE, quotesFile);
+    val quotesWriter = new BasicEventParquetWriter(QUOTE, quotesFile);
     quotesWriter.write(new Quote());
   }
 
