@@ -122,6 +122,9 @@ public class OrderBook extends BaseActor {
     log.debug("Processing {} order: {}", order.getOrderType(), order);
     order.setProcessedTime(getSimulationTime());
 
+    // Persist
+    publishOrder(order);
+
     if (order.getOrderType() == MARKET_ORDER) {
       // TODO: Explain what happens if the order cannot be completely filled. Should it be rejected?
       executeOrder(order);
@@ -294,8 +297,8 @@ public class OrderBook extends BaseActor {
         // Update snapshot on quote
         publishSnapshot();
       }
-      lastQuote = quote;
 
+      lastQuote = quote;
     }
   }
 
@@ -310,8 +313,6 @@ public class OrderBook extends BaseActor {
     if (delayed) {
       log.debug("Order took more than 5 seconds to be processed: {}", order);
     }
-
-    publishOrder(order);
   }
 
   /**
@@ -325,8 +326,6 @@ public class OrderBook extends BaseActor {
     }
 
     log.debug("Cancelled order {}", order);
-    publishOrder(order);
-
     return true;
   }
 
