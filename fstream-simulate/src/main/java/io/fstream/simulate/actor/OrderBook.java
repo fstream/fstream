@@ -67,11 +67,11 @@ public class OrderBook extends BaseActor {
    */
   private final BookSide asks = new BookSide(ASK);
   private final BookSide bids = new BookSide(BID);
-  private Quote lastQuote;
 
   /**
-   * Aggregation caches.
+   * Caches.
    */
+  private Quote lastQuote;
   private float bestAsk = asks.getBestPrice();
   private float bestBid = bids.getBestPrice();
 
@@ -90,7 +90,7 @@ public class OrderBook extends BaseActor {
 
   public void printSummary() {
     log.info(
-        "[{}] stats = {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}, spread = {}, quote = {}",
+        "[{}] {}, ask count = {}, bid count = {}, ask depth = {}, bid depth = {}, spread = {}, quote = {}",
         String.format("%3s", symbol),
         stats,
         asks.calculateOrderCount(), bids.calculateOrderCount(),
