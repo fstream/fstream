@@ -39,6 +39,7 @@ import lombok.val;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import scala.concurrent.Await;
+import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import akka.util.Timeout;
@@ -122,7 +123,7 @@ public abstract class Agent extends BaseActor {
    */
   protected Quote getLastQuote(String symbol) {
     return quotes.computeIfAbsent(symbol, (key) -> {
-      val future = exchangeAsk(new QuoteRequest(symbol), msgResponseTimeout);
+      Future<Object> future = exchangeAsk(new QuoteRequest(symbol), msgResponseTimeout);
       try {
         return (Quote) Await.result(future, msgResponseTimeout.duration());
       } catch (Exception e) {
