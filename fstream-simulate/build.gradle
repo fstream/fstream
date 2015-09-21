@@ -34,7 +34,7 @@ dependencies {
   // Akka
   compile libraries.akkaActor
   compile libraries.akkaCamel
-  testCompile libraries.akkaTestkit
+  compile libraries.akkaTestkit // Compile to get single threaded support
   
   // Camel
   compile "org.apache.camel:camel-core:$camelVersion"

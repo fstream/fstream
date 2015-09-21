@@ -18,19 +18,18 @@ import lombok.val;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.parquet.column.ParquetProperties;
+import org.apache.parquet.example.data.Group;
+import org.apache.parquet.example.data.simple.SimpleGroupFactory;
+import org.apache.parquet.hadoop.ParquetReader;
+import org.apache.parquet.hadoop.ParquetWriter;
+import org.apache.parquet.hadoop.example.GroupReadSupport;
+import org.apache.parquet.hadoop.example.GroupWriteSupport;
+import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.MessageTypeParser;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import parquet.column.ParquetProperties;
-import parquet.example.data.Group;
-import parquet.example.data.simple.SimpleGroupFactory;
-import parquet.hadoop.ParquetReader;
-import parquet.hadoop.ParquetWriter;
-import parquet.hadoop.example.GroupReadSupport;
-import parquet.hadoop.example.GroupWriteSupport;
-import parquet.schema.MessageType;
-import parquet.schema.MessageTypeParser;
 
 @Ignore
 public class ParquetWriterTest {
