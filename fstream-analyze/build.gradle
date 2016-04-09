@@ -15,6 +15,8 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = "io.fstream.analyze.AnalyzeMain"
 
+build.dependsOn shadowJar
+
 shadowJar {
   zip64 true
   
@@ -33,9 +35,8 @@ shadowJar {
   transform(PropertiesFileTransformer) { paths = ['META-INF/spring.factories' ] }
 }
 
-build.dependsOn shadowJar
-
 startScripts {
+  dependsOn shadowJar
   classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files
   classpath += files('conf')
   doLast {
@@ -79,5 +80,4 @@ dependencies {
     // http://stackoverflow.com/questions/31039367/spark-parallelize-could-not-find-creator-property-with-name-id
     resolutionStrategy.force "com.fasterxml.jackson.core:jackson-databind:2.4.4" 
   }
-  
 }
