@@ -9,7 +9,7 @@
 
 import java.util.concurrent.TimeUnit
 
-defaultTasks 'build'
+defaultTasks 'clean', 'tarball'
 
 buildscript {
 
@@ -191,6 +191,10 @@ subprojects {
 					from "src/main/resources"
 					include '*.yml'
 					include '*.xml'
+				}
+				into('conf') {
+					from "src/main/conf"
+					include '*'
 				}
 			}
 		}

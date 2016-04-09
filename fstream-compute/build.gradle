@@ -35,14 +35,6 @@ shadowJar {
 
 build.dependsOn shadowJar
 
-applicationDistribution.with {
-  // Exclude defaults in lieu of fat jar
-  exclude { it.file in configurations.runtime.files }
-  from("src/main/conf") {
-    into "conf"
-  }
-}
-
 startScripts {
   classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files
   classpath += files('conf')
@@ -52,10 +44,8 @@ startScripts {
   }
 }
 
-distTar {
-  dependsOn shadowJar
-  compression Compression.GZIP
-  extension "tar.gz"
+tarball {
+  dependsOn startScripts
 }
 
 dependencies {
