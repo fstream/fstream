@@ -18,7 +18,7 @@ buildscript {
 	//
 	
 	ext {
-		springBootVersion  = "1.3.0.M2"
+		springBootVersion  = "1.3.0.M3" // When upgrading to .M5, need to add dependency on application plugin
 		springCloudVersion = "1.0.1.RELEASE"
 		
 		kafkaVersion       = '0.8.2.0'
@@ -30,7 +30,7 @@ buildscript {
 		hbaseVersion       = '1.0.0-cdh5.4.3'
 		hadoopVersion      = '2.6.0-cdh5.4.3'
 		
-		influxdbVersion    = '2.0-SNAPSHOT'
+		influxdbVersion    = '2.1'
 	
 		camelVersion       = '2.15.2'
 		esperVersion       = '4.11.0'
@@ -38,7 +38,7 @@ buildscript {
 		quickfixjVersion   = '1.5.3'
 		jacksonVersion     = '2.3.3'
 		guavaVersion       = '18.0'
-		lombokVersion      = '1.16.4'
+		lombokVersion      = '1.16.8'
 	
 		//
 		// Libraries
@@ -95,7 +95,7 @@ buildscript {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
 		classpath "org.springframework.build.gradle:propdeps-plugin:0.0.6"
 		classpath 'org.ajoberstar:gradle-git:0.8.0'
-		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
 		classpath 'com.moowork.gradle:gradle-node-plugin:0.10-SNAPSHOT'
 		classpath 'com.moowork.gradle:gradle-grunt-plugin:0.10-SNAPSHOT'
 	}
@@ -169,6 +169,32 @@ subprojects {
 			attributes 'Provider': 'gradle', 'Implementation-Title': project.name, 'Implementation-Version': project.version
 		}
 	}
+	
+	/**
+	 * Package an application jar with its associated configuration as a tarball
+	 */
+	task tarball(type: Tar) {
+		compression Compression.GZIP
+		extension "tar.gz"
+		with copySpec {
+			into("$baseName-$version") {
+				into('lib') {
+					from libsDir
+					include '*.jar'
+				}
+				into('bin') {
+					from "$buildDir/scripts"
+					include '*'
+					fileMode 0755
+				}
+				into('conf') {
+					from "src/main/resources"
+					include '*.yml'
+					include '*.xml'
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -240,3 +266,4 @@ task vagrant(type: Exec, dependsOn: subprojects.collectNested { p -> p.tasks.mat
 	commandLine "vagrant", "up"
 	standardInput = System.in
 }
+

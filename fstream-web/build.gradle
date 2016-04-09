@@ -9,19 +9,11 @@
 
 apply plugin: 'spring-boot'
 
-applicationDistribution.with {
-  // Exclude defaults in lieu of fat jar
-  exclude { it.file in configurations.runtime.files }
-  from("src/main/conf") { into "conf" }
-}
-
-distTar {
-  dependsOn bootRepackage
-  compression Compression.GZIP
-  extension "tar.gz"
-}
-
 build.dependsOn bootRepackage
+
+tarball {
+  dependsOn bootRepackage
+}
 
 dependencies {
   // fStream

@@ -11,16 +11,8 @@ apply plugin: 'spring-boot'
 
 build.dependsOn bootRepackage
 
-applicationDistribution.with {
-  // Exclude defaults in lieu of fat jar
-  exclude { it.file in configurations.runtime.files }
-  from("src/main/conf") { into "conf" }
-}
-
-distTar {
+tarball {
   dependsOn bootRepackage
-  compression Compression.GZIP
-  extension "tar.gz"
 }
 
 dependencies {

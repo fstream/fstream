@@ -224,7 +224,7 @@ public class Replayer extends AbstractExecutionThreadService {
 
   @SneakyThrows
   private Interval getEventFileInterval(File file) {
-    MappingIterator<Event> iterator = MAPPER.reader(Event.class).readValues(file);
+    MappingIterator<Event> iterator = MAPPER.readerFor(Event.class).readValues(file);
 
     DateTime minTime = null;
     DateTime maxTime = null;
@@ -285,7 +285,7 @@ public class Replayer extends AbstractExecutionThreadService {
 
       @SneakyThrows
       private MappingIterator<Event> open() {
-        return MAPPER.reader(Event.class).readValues(file);
+        return MAPPER.readerFor(Event.class).readValues(file);
       }
 
     };
