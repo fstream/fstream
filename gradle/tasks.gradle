@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2014 fStream. All Rights Reserved.
+ *
+ * Project and contact information: https://bitbucket.org/fstream/fstream
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ */
+
+import java.util.concurrent.TimeUnit
+
+/**
+ * Run fStream in "vagrant up / fig up" style.
+ */
+task up << {
+	addShutdownHook {
+		println "**** Shutting down..."
+
+		println "Waiting ${seconds}s ..."
+		TimeUnit.SECONDS.sleep(seconds)
+	}
+
+	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name in ["bootRun", "run"]}.collectEntries{[it.project.name, it]}
+	def seconds = 10
+
+	[
+		'fstream-configure',
+		'fstream-test',
+		'fstream-persist',
+		'fstream-feed',
+		'fstream-compute',
+		'fstream-web',
+		'fstream-ui'
+	].each { projectName ->
+		Thread.start {
+			println "Running $projectName..."
+			def task = tasks[projectName]
+			def name = projectName.split("-")[1]
+			task.main = "io.fstream.${name}.${name.capitalize()}Main"
+
+			task.execute()
+		}
+
+		println "Waiting ${seconds}s ..."
+		TimeUnit.SECONDS.sleep(seconds)
+	}
+
+	// Finished
+	println ""
+	println '#' * 100
+	println "Finished starting system"
+	println '#' * 100
+	println ""
+
+	TimeUnit.DAYS.sleep(1)
+}
+
+/**
+ * Kills all fStream processes.
+ */
+task kill << {
+	def process = "jps -l".execute()
+	process.waitFor()
+	def lines = process.in.text.eachLine {
+		if (it.contains("io.fstream")) {
+			println "Killing: $it"
+			def pid = it.split()[0]
+			"kill -9 $pid".execute().waitFor()
+		}
+	}
+}
+
+/**
+ * Provisions Vagrant.
+ */
+task vagrant(type: Exec, dependsOn: subprojects.collectNested { p -> p.tasks.matching { t -> t.name.endsWith("distTar") } }) {
+	workingDir "src/main/vagrant/virtualbox-single"
+	commandLine "vagrant", "up"
+	standardInput = System.in
+}

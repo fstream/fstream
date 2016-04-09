@@ -7,80 +7,18 @@
  * Proprietary and confidential.
  */
 
-import java.util.concurrent.TimeUnit
 import com.github.jengelman.gradle.plugins.shadow.transformers.*
-
+ 
 defaultTasks 'clean', 'tarball'
 
+// Import utilities
+apply from: "$rootDir/gradle/tasks.gradle"
+
 buildscript {
-
-	//
-	// Versions
-	//
-
-	ext {
-		springBootVersion  = "1.3.0.M3" // When upgrading to .M5, need to add dependency on application plugin
-		springCloudVersion = "1.0.1.RELEASE"
-
-		kafkaVersion       = '0.8.2.0'
-		stormVersion       = '0.9.4'
-
-		akkaVersion        = '2.3.12'
-
-		sparkVersion       = '1.5.0'
-		hbaseVersion       = '1.0.0-cdh5.4.3'
-		hadoopVersion      = '2.6.0-cdh5.4.3'
-
-		influxdbVersion    = '2.1'
-
-		camelVersion       = '2.15.2'
-		esperVersion       = '4.11.0'
-		curatorVersion     = '2.6.0'
-		quickfixjVersion   = '1.5.3'
-		jacksonVersion     = '2.3.3'
-		guavaVersion       = '18.0'
-		lombokVersion      = '1.16.8'
-
-		//
-		// Libraries
-		//
-
-		libraries = [
-			springBoot:              "org.springframework.boot:spring-boot:$springBootVersion",
-			springBootWeb:           "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
-			springBootActuator:      "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
-			springBootRemoteShell:   "org.springframework.boot:spring-boot-starter-remote-shell:$springBootVersion",
-			springBootAutoconfigure: "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion",
-			springCloudClient:       "org.springframework.cloud:spring-cloud-config-client:$springCloudVersion",
-			springCloudServer:       "org.springframework.cloud:spring-cloud-config-server:$springCloudVersion",
-
-			jacksonDatabind:         "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-			jacksonAnnotations:      "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
-			jacksonJoda:             "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
-
-			kafka:                   "org.apache.kafka:kafka_2.10:$kafkaVersion",
-			storm:                   "org.apache.storm:storm-core:${stormVersion}",
-			stormKafka:              "org.apache.storm:storm-kafka:${stormVersion}",
-
-			sparkSql:                "org.apache.spark:spark-sql_2.10:$sparkVersion",
-			sparkStreaming:          "org.apache.spark:spark-streaming_2.10:$sparkVersion",
-			sparkStreamingKafka:     "org.apache.spark:spark-streaming-kafka_2.10:$sparkVersion",
-
-			akkaActor:               "com.typesafe.akka:akka-actor_2.10:${akkaVersion}",
-			akkaCamel:               "com.typesafe.akka:akka-camel_2.10:${akkaVersion}",
-			akkaTestkit:             "com.typesafe.akka:akka-testkit_2.10:${akkaVersion}",
-
-			influxdb:                "org.influxdb:influxdb-java:$influxdbVersion",
-			hadoopClient:            "org.apache.hadoop:hadoop-client:$hadoopVersion",
-			hadoopMiniCluster:       "org.apache.hadoop:hadoop-minicluster:$hadoopVersion",
-			hbaseClient:             "org.apache.hbase:hbase-client:$hbaseVersion",
-			esper:                   "com.espertech:esper:${esperVersion}",
-			guava:                   "com.google.guava:guava:$guavaVersion",
-			curator:                 "org.apache.curator:curator-recipes:$curatorVersion",
-			curatorTest:             "org.apache.curator:curator-test:$curatorVersion"
-		]
-	}
-
+	
+	// Import library definitions
+	apply from: "$rootDir/gradle/libraries.gradle", to: ext
+	
 	repositories {
 		mavenLocal()
 		maven { url "http://repo.spring.io/libs-milestone" }
@@ -100,6 +38,7 @@ buildscript {
 		classpath 'com.moowork.gradle:gradle-node-plugin:0.10-SNAPSHOT'
 		classpath 'com.moowork.gradle:gradle-grunt-plugin:0.10-SNAPSHOT'
 	}
+	
 }
 
 subprojects {
@@ -185,13 +124,13 @@ subprojects {
 	ext.configs = [
 		shadowJar: {
 			zip64 true
-
+		
 			exclude 'META-INF/*.SF'
 			exclude 'META-INF/*.DSA'
 			exclude 'META-INF/*.RSA'
-
+		
 			classifier = ''
-
+		
 			// Required for Spring
 			mergeServiceFiles()
 			transform(AppendingTransformer) { resource = 'reference.conf'  }
@@ -200,6 +139,7 @@ subprojects {
 			transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
 			transform(PropertiesFileTransformer) { paths = [ 'META-INF/spring.factories' ] }
 		},
+		
 		startScripts: {
 			classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files
 			classpath += files('conf')
@@ -208,6 +148,7 @@ subprojects {
 				unixScript.text = unixScript.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
 			}
 		},
+		
 		tar: {
 			compression Compression.GZIP
 			extension "tar.gz"
@@ -235,74 +176,5 @@ subprojects {
 			}
 		}
 	]
-}
 
-/**
- * Run fStream in "vagrant up / fig up" style.
- */
-task up << {
-	addShutdownHook {
-		println "**** Shutting down..."
-
-		println "Waiting ${seconds}s ..."
-		TimeUnit.SECONDS.sleep(seconds)
-	}
-
-	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name in ["bootRun", "run"]}.collectEntries{[it.project.name, it]}
-	def seconds = 10
-
-	[
-		'fstream-configure',
-		'fstream-test',
-		'fstream-persist',
-		'fstream-feed',
-		'fstream-compute',
-		'fstream-web',
-		'fstream-ui'
-	].each { projectName ->
-		Thread.start {
-			println "Running $projectName..."
-			def task = tasks[projectName]
-			def name = projectName.split("-")[1]
-			task.main = "io.fstream.${name}.${name.capitalize()}Main"
-
-			task.execute()
-		}
-
-		println "Waiting ${seconds}s ..."
-		TimeUnit.SECONDS.sleep(seconds)
-	}
-
-	// Finished
-	println ""
-	println '#' * 100
-	println "Finished starting system"
-	println '#' * 100
-	println ""
-
-	TimeUnit.DAYS.sleep(1)
-}
-
-/**
- * Kills all fStream processes.
- */
-task kill << {
-	def process = "jps -l".execute()
-	process.waitFor()
-	def lines = process.in.text.eachLine {
-		if (it.contains("io.fstream")) {
-			println "Killing: $it"
-			def pid = it.split()[0]
-			"kill -9 $pid".execute().waitFor()
-		}
-	}
-}
-
-/**
- * Provisions Vagrant.
- */
-task vagrant(type: Exec, dependsOn: subprojects.collectNested { p -> p.tasks.matching { t -> t.name.endsWith("distTar") } }) {
-	workingDir "src/main/vagrant/virtualbox-single"
-	commandLine "vagrant", "up"
-	standardInput = System.in
 }
