@@ -13,6 +13,7 @@ build.dependsOn bootRepackage
 
 tarball {
   dependsOn bootRepackage
+  configure configs.tar
 }
 
 dependencies {

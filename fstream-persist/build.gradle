@@ -7,8 +7,6 @@
  * Proprietary and confidential.
  */
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.*
-
 // Can't use Boot's nested jar packaging due to Storm's classloader
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -18,36 +16,17 @@ mainClassName = "io.fstream.persist.PersistMain"
 build.dependsOn shadowJar
 
 shadowJar {
-  zip64 true
-  
-  exclude 'META-INF/*.SF'
-  exclude 'META-INF/*.DSA'
-  exclude 'META-INF/*.RSA'
-  
-  exclude 'defaults.yaml'
-  classifier = ''
-
-  // Required for Spring
-  mergeServiceFiles()
-  transform(AppendingTransformer) { resource = 'reference.conf'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.handlers'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.schemas'  }
-  transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
-  transform(PropertiesFileTransformer) { paths = ['META-INF/spring.factories' ] }
+  configure configs.shadowJar
 }
 
 startScripts {
   dependsOn shadowJar
-  classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files
-  classpath += files('conf')
-  doLast {
-    // https://issues.gradle.org/browse/GRADLE-2991
-    unixScript.text = unixScript.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
-  }
+  configure configs.startScripts
 }
 
 tarball {
   dependsOn startScripts
+  configure configs.tar
 }
 
 dependencies {

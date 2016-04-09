@@ -8,6 +8,7 @@
  */
 
 import java.util.concurrent.TimeUnit
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
 
 defaultTasks 'clean', 'tarball'
 
@@ -16,22 +17,22 @@ buildscript {
 	//
 	// Versions
 	//
-	
+
 	ext {
 		springBootVersion  = "1.3.0.M3" // When upgrading to .M5, need to add dependency on application plugin
 		springCloudVersion = "1.0.1.RELEASE"
-		
+
 		kafkaVersion       = '0.8.2.0'
 		stormVersion       = '0.9.4'
-		
+
 		akkaVersion        = '2.3.12'
-		
+
 		sparkVersion       = '1.5.0'
 		hbaseVersion       = '1.0.0-cdh5.4.3'
 		hadoopVersion      = '2.6.0-cdh5.4.3'
-		
+
 		influxdbVersion    = '2.1'
-	
+
 		camelVersion       = '2.15.2'
 		esperVersion       = '4.11.0'
 		curatorVersion     = '2.6.0'
@@ -39,11 +40,11 @@ buildscript {
 		jacksonVersion     = '2.3.3'
 		guavaVersion       = '18.0'
 		lombokVersion      = '1.16.8'
-	
+
 		//
 		// Libraries
 		//
-	
+
 		libraries = [
 			springBoot:              "org.springframework.boot:spring-boot:$springBootVersion",
 			springBootWeb:           "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
@@ -52,23 +53,23 @@ buildscript {
 			springBootAutoconfigure: "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion",
 			springCloudClient:       "org.springframework.cloud:spring-cloud-config-client:$springCloudVersion",
 			springCloudServer:       "org.springframework.cloud:spring-cloud-config-server:$springCloudVersion",
-			                         
+
 			jacksonDatabind:         "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
 			jacksonAnnotations:      "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
 			jacksonJoda:             "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion",
-			                         
+
 			kafka:                   "org.apache.kafka:kafka_2.10:$kafkaVersion",
 			storm:                   "org.apache.storm:storm-core:${stormVersion}",
 			stormKafka:              "org.apache.storm:storm-kafka:${stormVersion}",
-			                         
+
 			sparkSql:                "org.apache.spark:spark-sql_2.10:$sparkVersion",
 			sparkStreaming:          "org.apache.spark:spark-streaming_2.10:$sparkVersion",
 			sparkStreamingKafka:     "org.apache.spark:spark-streaming-kafka_2.10:$sparkVersion",
-			                         
+
 			akkaActor:               "com.typesafe.akka:akka-actor_2.10:${akkaVersion}",
 			akkaCamel:               "com.typesafe.akka:akka-camel_2.10:${akkaVersion}",
 			akkaTestkit:             "com.typesafe.akka:akka-testkit_2.10:${akkaVersion}",
-			                         
+
 			influxdb:                "org.influxdb:influxdb-java:$influxdbVersion",
 			hadoopClient:            "org.apache.hadoop:hadoop-client:$hadoopVersion",
 			hadoopMiniCluster:       "org.apache.hadoop:hadoop-minicluster:$hadoopVersion",
@@ -102,15 +103,16 @@ buildscript {
 }
 
 subprojects {
+
 	version = '0.0.1-SNAPSHOT'
 	group = 'io.fstream'
 
 	apply plugin: 'java'
-	
+
 	// See http://docs.spring.io/spring-boot/docs/current/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor
 	apply plugin: 'propdeps'
 	compileJava.dependsOn(processResources)
-	
+
 	// Create new provided scope similiar to maven
 	configurations {
 		provided
@@ -155,9 +157,9 @@ subprojects {
 		compile 'ch.qos.logback:logback-classic:1.1.3'
 		compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 		compile 'org.slf4j:log4j-over-slf4j:1.7.12'
-		
+
 		optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
-		
+
 		// Test
 		testCompile 'junit:junit:4.11'
 		testCompile 'org.assertj:assertj-core:1.6.0'
@@ -169,36 +171,70 @@ subprojects {
 			attributes 'Provider': 'gradle', 'Implementation-Title': project.name, 'Implementation-Version': project.version
 		}
 	}
-	
+
 	/**
 	 * Package an application jar with its associated configuration as a tarball
 	 */
 	task tarball(type: Tar) {
-		compression Compression.GZIP
-		extension "tar.gz"
-		with copySpec {
-			into("$baseName-$version") {
-				into('lib') {
-					from libsDir
-					include '*.jar'
-				}
-				into('bin') {
-					from "$buildDir/scripts"
-					include '*'
-					fileMode 0755
-				}
-				into('conf') {
-					from "src/main/resources"
-					include '*.yml'
-					include '*.xml'
-				}
-				into('conf') {
-					from "src/main/conf"
-					include '*'
+	}
+	
+	//
+	// Configs
+	//
+	
+	ext.configs = [
+		shadowJar: {
+			zip64 true
+
+			exclude 'META-INF/*.SF'
+			exclude 'META-INF/*.DSA'
+			exclude 'META-INF/*.RSA'
+
+			classifier = ''
+
+			// Required for Spring
+			mergeServiceFiles()
+			transform(AppendingTransformer) { resource = 'reference.conf'  }
+			transform(AppendingTransformer) { resource = 'META-INF/spring.handlers'  }
+			transform(AppendingTransformer) { resource = 'META-INF/spring.schemas'  }
+			transform(AppendingTransformer) { resource = 'META-INF/spring.tooling'  }
+			transform(PropertiesFileTransformer) { paths = [ 'META-INF/spring.factories' ] }
+		},
+		startScripts: {
+			classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files
+			classpath += files('conf')
+			doLast {
+				// https://issues.gradle.org/browse/GRADLE-2991
+				unixScript.text = unixScript.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
+			}
+		},
+		tar: {
+			compression Compression.GZIP
+			extension "tar.gz"
+			with copySpec {
+				into("$baseName-$version") {
+					into('lib') {
+						from "$buildDir/libs"
+						include '*.jar'
+					}
+					into('bin') {
+						from "$buildDir/scripts"
+						include '*'
+						fileMode 0755
+					}
+					into('conf') {
+						from "src/main/resources"
+						include '*.yml'
+						include '*.xml'
+					}
+					into('conf') {
+						from "src/main/conf"
+						include '*'
+					}
 				}
 			}
 		}
-	}
+	]
 }
 
 /**
@@ -207,12 +243,12 @@ subprojects {
 task up << {
 	addShutdownHook {
 		println "**** Shutting down..."
-		
+
 		println "Waiting ${seconds}s ..."
 		TimeUnit.SECONDS.sleep(seconds)
 	}
 
-	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name in ["bootRun", "run"] }.collectEntries{[it.project.name, it]}
+	def tasks = project.getAllTasks(true).values().flatten().findAll { it.name in ["bootRun", "run"]}.collectEntries{[it.project.name, it]}
 	def seconds = 10
 
 	[
@@ -243,7 +279,7 @@ task up << {
 	println "Finished starting system"
 	println '#' * 100
 	println ""
-	
+
 	TimeUnit.DAYS.sleep(1)
 }
 
@@ -270,4 +306,3 @@ task vagrant(type: Exec, dependsOn: subprojects.collectNested { p -> p.tasks.mat
 	commandLine "vagrant", "up"
 	standardInput = System.in
 }
-
