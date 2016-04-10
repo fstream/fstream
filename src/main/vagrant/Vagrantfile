@@ -157,6 +157,6 @@ def provision(vms)
     
     # Special configuration
     # - Avoids ssh: connect to host <ip-address> port 22: Host is down
-    ansible.raw_arguments = "--timeout=60"
+    ansible.raw_arguments = ["--timeout=60"]
   end
 end

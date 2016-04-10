@@ -12,11 +12,6 @@
 # This playbook will provision fstream-feed hosts
 - hosts: fstream-feed
   become: yes
-    
-  vars_prompt:
-    - name: fstream_feed_password
-      prompt: OANDA FIX password
-      confirm: yes
       
   # Apply role
   roles: 

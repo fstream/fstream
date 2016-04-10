@@ -19,4 +19,3 @@
   notify:
     - Restart influxdb
     - Wait for influxdb port
-    
