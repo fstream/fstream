@@ -23,7 +23,7 @@ Provisioning
 To create and provision the VM, clone the project, navigate to the `vagrant` directory and issue [`vagrant up`](http://docs.vagrantup.com/v2/cli/up.html):
  
  	git clone <project>
- 	cd fstream/fstream/src/main/vagrant/aws
+ 	cd fstream/src/main/vagrant/virtualbox-single
 	vagrant up
 
 Ad Hoc Commands

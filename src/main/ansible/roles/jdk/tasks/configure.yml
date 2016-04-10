@@ -18,8 +18,8 @@
 
 - name: Inform the system where JDK is located
   command: "update-alternatives --install /usr/bin/{{ item }} {{ item }} {{ jdk_home }}/bin/{{ item }} 1"
-  with_items: jdk_tools
+  with_items: "{{ jdk_tools }}"
 
 - name: Inform the system that JDK must be the default
   command: "update-alternatives --set {{ item }} {{ jdk_home }}/bin/{{ item }}"
-  with_items: jdk_tools
+  with_items: "{{ jdk_tools }}"

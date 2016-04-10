@@ -11,7 +11,7 @@
 
 # This single play playbook will provision ZooKeeper hosts
 - hosts: zookeeper
-  sudo: yes
+  become: yes
   
   # Apply role
   roles: 

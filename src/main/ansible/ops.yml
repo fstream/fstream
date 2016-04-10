@@ -11,7 +11,7 @@
 
 # This single play playbook will provision the operation host
 - hosts: ops
-  sudo: yes
+  become: yes
   roles:
     - ansible
     - elasticsearch

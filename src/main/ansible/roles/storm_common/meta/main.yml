@@ -2,7 +2,7 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 dependencies:
-  - { role: hostname, sudo: yes }
+  - { role: hostname, become: yes }
   - { role: build }
   - { role: python }
   - { role: jdk }

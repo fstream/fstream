@@ -11,7 +11,7 @@
 
 # This playbook will provision fstream-web hosts
 - hosts: fstream-web
-  sudo: yes
+  become: yes
   
   # Apply role
   roles: 

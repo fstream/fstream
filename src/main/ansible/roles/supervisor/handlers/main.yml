@@ -3,16 +3,16 @@
 
 - name: Enable supervisor
   service: name=supervisor enabled=yes
-  sudo: yes
+  become: yes
 
 - name: Start supervisor
   service: name=supervisor state=started
-  sudo: yes
+  become: yes
 
 - name: Stop supervisor
   service: name=supervisor state=stopped
-  sudo: yes
+  become: yes
   
 - name: Restart supervisor
   service: name=supervisor state=restarted
-  sudo: yes
+  become: yes

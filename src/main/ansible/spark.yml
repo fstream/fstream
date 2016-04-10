@@ -14,7 +14,7 @@
 #
 - name: Create non-root clusteruser user
   hosts: spark
-  sudo: True
+  become: yes
   roles:
     - clusteruser_common
 
@@ -23,13 +23,13 @@
   
 - name: Setup passwordless SSH for clusteruser - donor key
   hosts: spark-master
-  sudo: True
+  become: yes
   roles: 
     - { role: sshkey_donor }
   
 - name: Setup passwordless SSH for clusteruser - accept key
   hosts: spark-worker
-  sudo: True
+  become: yes
   roles:
     - { role: sshkey_acceptor }
 
@@ -39,7 +39,7 @@
 
 # Spark
 - hosts: spark
-  sudo: yes
+  become: yes
   roles:
     - spark
     - spark_standalone

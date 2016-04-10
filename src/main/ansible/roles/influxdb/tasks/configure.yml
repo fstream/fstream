@@ -11,6 +11,9 @@
   file: dest=/opt/influxdb/shared/data/raft state=absent
   when: config_has_ip|failed
 
+- name: Add current dir
+  file: path=/opt/influxdb/current state=directory mode=0755
+
 - name: Update config
   template: src=config.toml dest=/opt/influxdb/current/config.toml
   notify:

@@ -11,7 +11,7 @@
 
 # This playbook will provision fstream-feed hosts
 - hosts: fstream-feed
-  sudo: yes
+  become: yes
     
   vars_prompt:
     - name: fstream_feed_password

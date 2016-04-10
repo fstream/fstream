@@ -11,7 +11,7 @@
 
 # Zeppelin
 - hosts: zeppelin
-  sudo: yes
+  become: yes
   roles:
     - zeppelin
     

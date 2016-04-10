@@ -6,12 +6,12 @@
 
 - name: get_zeppelin_package
   get_url: url={{ zeppelin_package_base_url }}/{{ zeppelin_package_name }}{{ zeppelin_package_suffix }} dest={{ zeppelin_dir }}/{{ zeppelin_package_name }}{{ zeppelin_package_suffix }}
-  sudo: yes
+  become: yes
   sudo_user: zeppelin
 
 - name: unarchive_zeppelin_package
   shell: tar xvzf {{ zeppelin_package_name }}{{ zeppelin_package_suffix }} chdir={{ zeppelin_dir }} creates={{ zeppelin_dir }}/{{ zeppelin_package_name }}/LICENSE
-  sudo: yes
+  become: yes
   sudo_user: zeppelin
 
 - name: create_alternatives_link_of_default

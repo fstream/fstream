@@ -11,7 +11,7 @@
 
 # This multi play playbook will provision Storm hosts
 - hosts: storm-nimbus
-  sudo: yes
+  become: yes
   
   # Apply nimbus role
   roles:
@@ -19,7 +19,7 @@
     
 - hosts: storm-supervisor
   gather_facts: True
-  sudo: yes
+  become: yes
   
   # Apply supervisor role
   roles:

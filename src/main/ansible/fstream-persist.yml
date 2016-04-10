@@ -11,7 +11,7 @@
 
 # This playbook will provision fstream-persist hosts
 - hosts: fstream-persist
-  sudo: yes
+  become: yes
   
   # Apply role
   roles: 

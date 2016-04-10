@@ -2,5 +2,5 @@
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Restart NTP daemon
-  sudo: true
+  become: yes
   service: name=ntp state=restarted

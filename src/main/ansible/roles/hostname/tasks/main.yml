@@ -2,7 +2,8 @@
 # Copyright (c) 2015 fStream. All Rights Reserved.
 
 - name: Update hostname
-  command: sudo hostname {{ hostname }}
+  become: yes
+  command: "hostname {{ hostname }}"
 
 - name: Update /etc/hostname
   template: src=hostname.j2 dest=/etc/hostname owner=root group=root mode=064

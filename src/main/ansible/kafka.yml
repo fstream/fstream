@@ -11,7 +11,7 @@
 
 # This single play playbook will provision Kafka hosts
 - hosts: kafka
-  sudo: yes
+  become: yes
     
   # Apply role
   roles: 

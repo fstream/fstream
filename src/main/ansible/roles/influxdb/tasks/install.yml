@@ -2,7 +2,7 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 - name: Fetch package
-  get_url: url=http://s3.amazonaws.com/influxdb/influxdb_{{ influxdb.version }}_amd64.deb dest=/usr/local/src/influxdb_{{ influxdb.version }}_amd64.deb
+  get_url: url=https://s3.amazonaws.com/influxdb/influxdb_{{ influxdb.version }}-1_amd64.deb dest=/usr/local/src/influxdb_{{ influxdb.version }}_amd64.deb
 
 - name: Install package
   command: dpkg --skip-same-version -i /usr/local/src/influxdb_{{ influxdb.version }}_amd64.deb

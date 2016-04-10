@@ -3,7 +3,7 @@
 
 - name: Update package list
   apt: update_cache=yes cache_valid_time=3600
-  sudo: yes
+  become: yes
 
 - name: Install base packages
   apt: name={{ item }} state=latest
@@ -14,7 +14,7 @@
     - curl
     - acl
     - vim
-  sudo: yes
+  become: yes
 
 - name: Add vim config syntax highlighting
   lineinfile: >
@@ -23,8 +23,8 @@
     regexp='^"syntax on'
     state=present
     backrefs=yes
-  sudo: yes
+  become: yes
 
 - name: Make vim the default editor
   alternatives: name=editor path=/usr/bin/vim.basic
-  sudo: yes
+  become: yes

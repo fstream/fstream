@@ -65,3 +65,4 @@ packer_cache/
 
 # Ansible
 ansible.log
+*.retry

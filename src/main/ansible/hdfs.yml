@@ -13,12 +13,12 @@
 
 # HDFS - Namenode
 - hosts: hdfs-namenode
-  sudo: yes
+  become: yes
   roles:
     - { role: hdfs, hdfs_namenode: True }
 
 # HDFS - Datanode    
 - hosts: hdfs-datanode
-  sudo: yes
+  become: yes
   roles:
     - { role: hdfs, hdfs_namenode: False }
