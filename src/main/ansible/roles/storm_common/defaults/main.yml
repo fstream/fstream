@@ -3,7 +3,7 @@
 
 # The version of Storm to install
 storm_version: "0.9.3"
-storm_url: "http://people.apache.org/~ptgoetz"
+storm_url: "http://mirror.csclub.uwaterloo.ca/apache/storm"
 storm_artifact: "apache-storm-{{ storm_version }}"
 storm_archive: "{{ storm_artifact }}.tar.gz"
 storm_archive_url: "{{ storm_url }}/{{ storm_artifact }}/{{ storm_archive }}"

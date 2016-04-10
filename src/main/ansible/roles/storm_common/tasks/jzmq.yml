@@ -2,7 +2,7 @@
 # Copyright (c) 2014 fStream. All Rights Reserved.
 
 - name: Download the jzmq source from the git repo
-  git: repo=https://github.com/zeromq/jzmq.git dest=/tmp/jzmq
+  git: repo=https://github.com/zeromq/jzmq.git dest=/tmp/jzmq version=90f7dc5fc4586e8fa1f60b9c1615236976787e5e
 
 #- name: prepare the jzmq source
 #  shell: ./autogen.sh chdir=/tmp/jzmq
